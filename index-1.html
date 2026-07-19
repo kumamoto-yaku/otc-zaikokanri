@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>OTC在庫台帳 — 熊本県薬剤師会</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
+<style>
+:root {
+  --ai: #1E3A55; --ai-deep: #14283C; --shu: #B7402B; --take: #3E7C59;
+  --hakuji: #F4F6F5; --ink: #1F2933; --line: #D8DFDD;
+  --serif: "Hiragino Mincho ProN", "Yu Mincho", "Noto Serif JP", serif;
+  --sans: "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Yu Gothic", "Noto Sans JP", sans-serif;
+}
+* { box-sizing: border-box; margin: 0; }
+body { min-height: 100vh; background: var(--hakuji); color: var(--ink); font-family: var(--sans); font-size: 15px; line-height: 1.6; }
+.chrome { max-width: 760px; margin: 0 auto; padding: 0 14px 60px; }
+.header { display: flex; align-items: center; justify-content: space-between; padding: 18px 2px 12px; gap: 10px; }
+.brand { display: flex; align-items: center; gap: 12px; }
+.brand-mark { width: 44px; height: 44px; border-radius: 8px; background: var(--ai); color: #fff; font-family: var(--serif); font-size: 24px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.brand h1 { font-family: var(--serif); font-size: 21px; font-weight: 600; letter-spacing: 0.06em; color: var(--ai-deep); }
+.brand-sub { font-size: 12px; color: #5C6B78; letter-spacing: 0.04em; }
+.low-chip { border: 1px solid var(--shu); color: var(--shu); background: #fff; border-radius: 999px; padding: 5px 12px; font-size: 12.5px; cursor: pointer; white-space: nowrap; display: none; }
+.tabs { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 2px; border-bottom: 2px solid var(--ai); position: sticky; top: 0; background: var(--hakuji); z-index: 10; padding-top: 4px; }
+.tab { flex: 1; min-width: 92px; border: 1px solid var(--line); border-bottom: none; background: #EAEEEC; color: #4A5761; padding: 10px 6px 8px; border-radius: 8px 8px 0 0; font-size: 13.5px; letter-spacing: 0.05em; cursor: pointer; font-family: var(--sans); }
+.tab.active { background: var(--ai); border-color: var(--ai); color: #fff; font-weight: 600; }
+.tab:focus-visible, .btn:focus-visible, .link:focus-visible { outline: 2px solid var(--shu); outline-offset: 2px; }
+.panel { background: #fff; border: 1px solid var(--line); border-top: none; border-radius: 0 0 12px 12px; padding: 18px 16px 24px; display: none; flex-direction: column; gap: 16px; }
+.panel.active { display: flex; }
+.btn { font-family: var(--sans); font-size: 14.5px; padding: 10px 18px; border-radius: 8px; border: 1px solid var(--ai); cursor: pointer; letter-spacing: 0.04em; background: var(--ai); color: #fff; }
+.btn:active { background: var(--ai-deep); }
+.btn.big { width: 100%; padding: 16px; font-size: 16px; }
+.btn.ghost { background: #fff; color: var(--ai); }
+.btn.ghost.danger { border-color: var(--shu); color: var(--shu); }
+.btn:disabled { opacity: 0.4; cursor: default; }
+.link { background: none; border: none; color: var(--ai); text-decoration: underline; cursor: pointer; font-size: 13.5px; font-family: var(--sans); }
+.link.center { margin: 0 auto; display: block; }
+.scan-box { display: flex; flex-direction: column; gap: 10px; }
+#jan-reader { border-radius: 10px; overflow: hidden; border: 1px solid var(--line); }
+.scan-msg { font-size: 13px; color: var(--ai-deep); background: #EDF2F0; border-left: 3px solid var(--take); padding: 8px 10px; border-radius: 0 6px 6px 0; display: none; }
+.divider { display: flex; align-items: center; gap: 10px; color: #5C6B78; font-size: 12.5px; letter-spacing: 0.14em; }
+.divider::before, .divider::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+.form { display: flex; flex-direction: column; gap: 12px; }
+label { display: flex; flex-direction: column; gap: 4px; font-size: 12.5px; color: #4A5761; letter-spacing: 0.04em; }
+input, select { font-family: var(--sans); font-size: 15px; padding: 9px 10px; border: 1px solid var(--line); border-radius: 7px; background: #FBFCFC; color: var(--ink); width: 100%; }
+input:focus, select:focus { outline: 2px solid var(--ai); outline-offset: -1px; background: #fff; }
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+.row { display: flex; align-items: center; }
+.row.gap { gap: 10px; }
+.row.wrap { flex-wrap: wrap; }
+.hint { font-size: 12.5px; color: #5C6B78; }
+.settings { border: 1px dashed var(--line); border-radius: 10px; padding: 10px 14px; background: #FAFBFB; }
+.settings summary { cursor: pointer; font-size: 13.5px; color: var(--ai); letter-spacing: 0.04em; }
+.stats { display: flex; gap: 10px; }
+.stat { flex: 1; background: #F7F9F8; border: 1px solid var(--line); border-radius: 10px; padding: 10px; text-align: center; }
+.stat-num { display: block; font-family: var(--serif); font-size: 26px; font-weight: 600; color: var(--ai-deep); font-variant-numeric: tabular-nums; }
+.stat.warn .stat-num { color: var(--shu); }
+.stat-label { font-size: 11.5px; color: #5C6B78; letter-spacing: 0.1em; }
+.search { flex: 1; min-width: 180px; }
+.select-bar { font-size: 13.5px; background: #EDF2F0; border-radius: 8px; padding: 8px 12px; display: none; }
+.stock-list { list-style: none; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.stock-item { display: flex; align-items: center; gap: 10px; border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; background: #fff; }
+.stock-item.low { border-left: 4px solid var(--shu); }
+.stock-main { flex: 1; min-width: 0; cursor: pointer; }
+.stock-top { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.stock-name { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.stock-sub { display: flex; gap: 10px; font-size: 12px; color: #5C6B78; flex-wrap: wrap; }
+.low-flag { color: var(--shu); font-weight: 600; }
+.cat-badge { border: 1px solid; border-radius: 4px; font-size: 10.5px; padding: 1px 5px; white-space: nowrap; flex-shrink: 0; }
+.qty-ctrl { display: flex; align-items: center; gap: 6px; }
+.qty-ctrl button { width: 30px; height: 30px; border-radius: 50%; border: 1px solid var(--line); background: #F7F9F8; font-size: 16px; cursor: pointer; }
+.qty { min-width: 26px; text-align: center; font-family: var(--serif); font-size: 18px; font-variant-numeric: tabular-nums; }
+.del { border: none; background: none; color: #9AA7AF; font-size: 18px; cursor: pointer; padding: 4px; }
+.empty { text-align: center; padding: 30px 10px; color: #5C6B78; display: flex; flex-direction: column; gap: 14px; align-items: center; }
+.seg { display: flex; border: 1px solid var(--ai); border-radius: 8px; overflow: hidden; width: fit-content; }
+.seg button { border: none; background: #fff; color: var(--ai); padding: 8px 18px; font-size: 14px; cursor: pointer; font-family: var(--sans); }
+.seg button.on { background: var(--ai); color: #fff; }
+.tag-sheet { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; }
+.price-tag { border: 1.5px solid var(--ink); border-radius: 6px; padding: 0 0 8px; text-align: center; background: #fff; overflow: hidden; break-inside: avoid; }
+.tag-cat { color: #fff; font-size: 11px; letter-spacing: 0.15em; padding: 3px 0; }
+.tag-name { font-family: var(--serif); font-weight: 600; font-size: 16px; padding: 8px 10px 0; line-height: 1.35; }
+.tag-maker { font-size: 11px; color: #5C6B78; }
+.tag-price { margin: 6px 0 4px; }
+.tag-yen { font-family: var(--serif); font-size: 30px; font-weight: 700; color: var(--shu); font-variant-numeric: tabular-nums; }
+.tag-tax { font-size: 11px; margin-left: 4px; color: var(--ink); }
+.barcode-num { font-family: monospace; font-size: 10px; letter-spacing: 2px; color: var(--ink); }
+.pop-wrap { display: flex; justify-content: center; }
+.pop-card { position: relative; width: min(100%, 420px); aspect-ratio: 1 / 1.18; border: 2px solid var(--ai); border-radius: 10px; background: #fff; padding: 26px 22px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; text-align: center; break-inside: avoid; }
+.pop-copy { font-family: var(--serif); font-size: 20px; color: var(--ai-deep); letter-spacing: 0.08em; border-bottom: 2px solid var(--shu); padding-bottom: 6px; }
+.pop-name { font-family: var(--serif); font-size: 30px; font-weight: 700; line-height: 1.3; }
+.pop-maker { font-size: 13px; color: #5C6B78; }
+.pop-price { display: flex; align-items: baseline; gap: 6px; }
+.pop-yen { font-family: var(--serif); font-size: 52px; font-weight: 700; color: var(--shu); font-variant-numeric: tabular-nums; }
+.pop-tax { font-size: 14px; }
+.pop-foot { display: flex; flex-direction: column; gap: 6px; align-items: center; }
+.pop-cat { color: #fff; font-size: 12px; letter-spacing: 0.12em; padding: 3px 12px; border-radius: 4px; }
+.pop-note { font-size: 13px; color: #4A5761; }
+.pop-seal { position: absolute; right: 14px; top: 14px; width: 58px; height: 58px; border: 2px solid var(--shu); color: var(--shu); border-radius: 50%; font-family: var(--serif); font-size: 13px; display: flex; align-items: center; justify-content: center; text-align: center; line-height: 1.3; transform: rotate(6deg); }
+.share-note { font-size: 13px; background: #FDF3EF; border: 1px solid #E8C4B8; border-radius: 8px; padding: 10px 12px; color: #6B3A2C; }
+.ph-card { border: 1px solid var(--line); border-radius: 10px; background: #fff; }
+.ph-card summary { cursor: pointer; padding: 12px 14px; display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; align-items: baseline; }
+.ph-name { font-family: var(--serif); font-weight: 600; font-size: 16px; color: var(--ai-deep); }
+.ph-meta { font-size: 12px; color: #5C6B78; }
+.ph-items { list-style: none; padding: 0 14px 12px; display: flex; flex-direction: column; gap: 6px; }
+.ph-items li { display: flex; align-items: center; gap: 8px; font-size: 14px; border-top: 1px dashed var(--line); padding-top: 6px; }
+.ph-item-name { flex: 1; }
+.ph-item-qty { font-variant-numeric: tabular-nums; color: #4A5761; }
+.hit-list { list-style: none; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.hit-list li { border: 1px solid var(--line); border-left: 4px solid var(--take); border-radius: 8px; padding: 10px 12px; background: #fff; }
+.hit-name { font-weight: 600; }
+.hit-qty { color: var(--take); margin-left: 8px; }
+.hit-ph { font-size: 12.5px; color: #5C6B78; }
+.toast { position: fixed; left: 50%; bottom: 28px; transform: translateX(-50%); background: var(--ai-deep); color: #fff; padding: 10px 20px; border-radius: 999px; font-size: 13.5px; box-shadow: 0 4px 14px rgba(0,0,0,0.2); z-index: 50; display: none; }
+.foot { text-align: center; font-size: 11.5px; color: #8A97A0; padding-top: 26px; letter-spacing: 0.08em; }
+@media (max-width: 520px) { .grid2, .grid3 { grid-template-columns: 1fr; } }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+@media print {
+  body * { visibility: hidden; }
+  .print-target, .print-target * { visibility: visible; }
+  .print-target { position: absolute; left: 0; top: 0; width: 100%; }
+  .tag-sheet { grid-template-columns: repeat(3, 1fr); gap: 6mm; }
+  .pop-card { border-width: 3px; }
+}
+</style>
+</head>
+<body>
+<div class="chrome">
+  <header class="header">
+    <div class="brand">
+      <span class="brand-mark">薬</span>
+      <div>
+        <h1>OTC在庫台帳</h1>
+        <p class="brand-sub" id="brand-sub">市販薬の登録・値札・備蓄共有</p>
+      </div>
+    </div>
+    <button class="low-chip" id="low-chip" onclick="showTab('list')"></button>
+  </header>
+
+  <nav class="tabs" role="tablist">
+    <button class="tab active" data-tab="scan" onclick="showTab('scan')">スキャン登録</button>
+    <button class="tab" data-tab="list" onclick="showTab('list')">在庫リスト</button>
+    <button class="tab" data-tab="print" onclick="showTab('print')">値札・POP</button>
+    <button class="tab" data-tab="share" onclick="showTab('share')">会員間共有</button>
+  </nav>
+
+  <!-- ============ スキャン登録 ============ -->
+  <section class="panel active" id="tab-scan">
+    <div class="scan-box">
+      <button class="btn big" id="scan-toggle" onclick="toggleScan()">カメラでスキャン開始</button>
+      <div id="jan-reader"></div>
+      <div class="row gap">
+        <button class="btn ghost" style="flex:1" onclick="document.getElementById('photo-input').click()">写真から読み取る</button>
+        <input type="file" id="photo-input" accept="image/*" capture="environment" style="display:none" onchange="handlePhoto(event)">
+      </div>
+      <div id="jan-file-reader" style="display:none"></div>
+      <p class="scan-msg" id="scan-msg"></p>
+    </div>
+
+    <div class="divider"><span>商品情報</span></div>
+
+    <div class="form">
+      <label>JANコード
+        <input inputmode="numeric" id="f-jan" placeholder="4987……(8桁 / 13桁)" onblur="onJanBlur()">
+      </label>
+      <label>商品名 *
+        <input id="f-name" placeholder="例:ロキソニンS 12錠">
+      </label>
+      <div class="grid2">
+        <label>メーカー <input id="f-maker" placeholder="例:第一三共ヘルスケア"></label>
+        <label>リスク区分 <select id="f-category"></select></label>
+      </div>
+      <div class="grid3">
+        <label>販売価格(税込) <input inputmode="numeric" id="f-price" placeholder="998"></label>
+        <label id="f-qty-label">入庫数 <input inputmode="numeric" id="f-qty" value="1"></label>
+        <label>発注点 <input inputmode="numeric" id="f-reorder" value="2"></label>
+      </div>
+      <div class="grid2">
+        <label>使用期限 <input type="date" id="f-expiry"></label>
+        <label>メモ <input id="f-memo" placeholder="陳列場所・仕入先など"></label>
+      </div>
+      <div class="row gap">
+        <button class="btn" id="save-btn" onclick="saveItem()">在庫に登録</button>
+        <button class="btn ghost" onclick="clearForm()">クリア</button>
+      </div>
+      <p class="hint">スキャンすると商品データベースから商品名・リスク区分を自動取得します。一度登録した商品は自局マスタから瞬時に補完されます。</p>
+    </div>
+
+    <details class="settings">
+      <summary>外部データベース設定(商品名の自動取得)</summary>
+      <div class="form" style="padding-top:10px">
+        <p class="hint">無料のAPIキーを設定すると、JANコードから商品名を自動取得します。医薬品のヒット率が高い<strong>楽天ウェブサービス</strong>のアプリID(webservice.rakuten.co.jp で無料発行)がおすすめです。</p>
+        <label>楽天ウェブサービス アプリID
+          <input id="k-rakuten" placeholder="例:1234567890123456789" onchange="saveKeys()">
+        </label>
+        <label>JANCODE LOOKUP アプリID(任意)
+          <input id="k-jancode" placeholder="jancodelookup.com で無料発行" onchange="saveKeys()">
+        </label>
+        <p class="hint">検索順: JANCODE LOOKUP → 楽天市場 → Open Food Facts(キー不要) → 手入力。キーはこの端末にのみ保存されます。</p>
+      </div>
+    </details>
+  </section>
+
+  <!-- ============ 在庫リスト ============ -->
+  <section class="panel" id="tab-list">
+    <div class="stats">
+      <div class="stat"><span class="stat-num" id="st-items">0</span><span class="stat-label">品目</span></div>
+      <div class="stat"><span class="stat-num" id="st-total">0</span><span class="stat-label">総在庫</span></div>
+      <div class="stat warn"><span class="stat-num" id="st-low">0</span><span class="stat-label">低在庫</span></div>
+    </div>
+    <div class="row gap wrap">
+      <input class="search" id="q" placeholder="商品名・JAN・メーカーで検索" oninput="renderList()">
+      <select id="cat-filter" onchange="renderList()"></select>
+      <button class="btn ghost" onclick="exportCsv()">CSV出力</button>
+    </div>
+    <div class="select-bar" id="select-bar"></div>
+    <div id="list-area"></div>
+  </section>
+
+  <!-- ============ 値札・POP ============ -->
+  <section class="panel" id="tab-print">
+    <div class="seg">
+      <button id="seg-tags" class="on" onclick="setPrintKind('tags')">値札シート</button>
+      <button id="seg-pop" onclick="setPrintKind('pop')">販促POP</button>
+    </div>
+    <div id="print-tags"></div>
+    <div id="print-pop" style="display:none">
+      <div class="form">
+        <label>対象商品 <select id="pop-item" onchange="renderPop()"></select></label>
+        <div class="grid2">
+          <label>キャッチコピー <input id="pop-copy" value="薬剤師おすすめ" oninput="renderPop()"></label>
+          <label>ひとこと <input id="pop-note" value="お気軽にご相談ください" oninput="renderPop()"></label>
+        </div>
+        <button class="btn" onclick="window.print()">POPを印刷</button>
+      </div>
+      <div class="pop-wrap print-target" id="pop-preview"></div>
+    </div>
+  </section>
+
+  <!-- ============ 会員間共有 ============ -->
+  <section class="panel" id="tab-share">
+    <div class="share-note">
+      熊本県薬剤師会 会員間の備蓄情報共有です。アップロードすると、共有サーバーに接続している<strong>すべての会員</strong>が薬局名・品目・在庫数を閲覧できます。
+    </div>
+    <div class="form">
+      <div class="grid2">
+        <label>薬局名 <input id="ph-name" placeholder="例:メリー薬局" onchange="savePharmacy()"></label>
+        <label>地区 <input id="ph-area" placeholder="例:熊本市中央区" onchange="savePharmacy()"></label>
+      </div>
+      <label>共有サーバーURL(管理者から配布されたもの)
+        <input id="gas-url" placeholder="https://script.google.com/macros/s/……/exec" onchange="savePharmacy()">
+      </label>
+      <div class="row gap wrap">
+        <button class="btn" onclick="uploadShare()">備蓄リストをアップロード</button>
+        <button class="btn ghost" onclick="loadShared()">最新の状態に更新</button>
+        <button class="btn ghost danger" onclick="removeShare()">自局の共有を取り下げ</button>
+      </div>
+      <p class="hint" id="share-msg"></p>
+    </div>
+    <div class="divider"><span>備蓄をさがす</span></div>
+    <input class="search" id="share-q" placeholder="商品名・JANで全薬局を横断検索" oninput="renderShared()">
+    <div id="share-area"></div>
+  </section>
+
+  <div class="toast" id="toast"></div>
+  <footer class="foot">OTC在庫台帳 — 熊本県薬剤師会 会員向けツール</footer>
+</div>
+
+<script>
+"use strict";
+/* ============ 定数 ============ */
+const CATEGORIES = ["要指導医薬品","第1類医薬品","指定第2類医薬品","第2類医薬品","第3類医薬品","医薬部外品"];
+const CAT_SHORT = {"要指導医薬品":"要指導","第1類医薬品":"第①類","指定第2類医薬品":"指定第②類","第2類医薬品":"第②類","第3類医薬品":"第③類","医薬部外品":"部外品"};
+const CAT_COLOR = {"要指導医薬品":"#8A2A2A","第1類医薬品":"#B0483A","指定第2類医薬品":"#A8622C","第2類医薬品":"#8A7326","第3類医薬品":"#3E7C59","医薬部外品":"#5C6B78"};
+
+/* ============ 状態 ============ */
+let S = { items: [], master: {}, pharmacy: { id: rid(), name: "", area: "" }, apiKeys: { rakuten: "", jancode: "" }, gasUrl: "" };
+let selected = new Set();
+let editingId = null;
+let sharedData = [];
+let scanner = null, scanning = false;
+
+function rid(){ return Math.random().toString(36).slice(2,10); }
+function today(){ return new Date().toISOString().slice(0,10); }
+function yen(n){ return (n===""||n==null||isNaN(n)) ? "—" : "¥" + Number(n).toLocaleString("ja-JP"); }
+function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+
+function load(){
+  try {
+    const raw = localStorage.getItem("otc-ledger-v1");
+    if (raw) { const d = JSON.parse(raw); S = Object.assign(S, d); if (!S.pharmacy.id) S.pharmacy.id = rid(); }
+  } catch(e){}
+}
+function save(){ try { localStorage.setItem("otc-ledger-v1", JSON.stringify(S)); } catch(e){} }
+
+function toast(msg){
+  const t = document.getElementById("toast");
+  t.textContent = msg; t.style.display = "block";
+  clearTimeout(t._tm); t._tm = setTimeout(()=>{ t.style.display = "none"; }, 2600);
+}
+function scanMsg(msg){
+  const el = document.getElementById("scan-msg");
+  if (!msg) { el.style.display = "none"; return; }
+  el.textContent = msg; el.style.display = "block";
+}
+
+/* ============ EAN-13 ============ */
+const L_CODES = ["0001101","0011001","0010011","0111101","0100011","0110001","0101111","0111011","0110111","0001011"];
+const R_CODES = L_CODES.map(p => p.split("").map(b => b==="1"?"0":"1").join(""));
+const G_CODES = R_CODES.map(p => p.split("").reverse().join(""));
+const PARITY = ["LLLLLL","LLGLGG","LLGGLG","LLGGGL","LGLLGG","LGGLLG","LGGGLL","LGLGLG","LGLGGL","LGGLGL"];
+
+function checkDigit(d12){
+  let sum = 0;
+  for (let i=0;i<12;i++) sum += parseInt(d12[i],10) * (i%2===0?1:3);
+  return (10 - (sum%10)) % 10;
+}
+function isValidJan(code){
+  if (!/^\d{13}$/.test(code) && !/^\d{8}$/.test(code)) return false;
+  if (code.length===13) return checkDigit(code.slice(0,12)) === parseInt(code[12],10);
+  return true;
+}
+function ean13Svg(code, height){
+  if (!/^\d{13}$/.test(code)) return '<div class="barcode-num">' + esc(code) + '</div>';
+  const parity = PARITY[parseInt(code[0],10)];
+  let m = "101";
+  for (let i=1;i<=6;i++){ const d = parseInt(code[i],10); m += (parity[i-1]==="L") ? L_CODES[d] : G_CODES[d]; }
+  m += "01010";
+  for (let i=7;i<=12;i++) m += R_CODES[parseInt(code[i],10)];
+  let rects = "", x = 0;
+  for (let i=0;i<m.length;i++){
+    if (m[i]==="1"){
+      let w=1; while (i+w<m.length && m[i+w]==="1") w++;
+      rects += '<rect x="'+x+'" y="0" width="'+w+'" height="'+height+'" fill="#1F2933"/>';
+      i += w-1; x += w;
+    } else x += 1;
+  }
+  return '<div style="display:inline-block;text-align:center">'
+    + '<svg viewBox="0 0 '+m.length+' '+height+'" width="'+(m.length*1.4)+'" height="'+height+'" shape-rendering="crispEdges">'+rects+'</svg>'
+    + '<div class="barcode-num">'+esc(code)+'</div></div>';
+}
+
+/* ============ 外部データベース連携 ============ */
+function parseDrugCategory(name){
+  if (/要指導医薬品/.test(name)) return "要指導医薬品";
+  if (/第[1１]類医薬品/.test(name)) return "第1類医薬品";
+  if (/指定第[2２]類医薬品/.test(name)) return "指定第2類医薬品";
+  if (/第[2２]類医薬品/.test(name)) return "第2類医薬品";
+  if (/第[3３]類医薬品/.test(name)) return "第3類医薬品";
+  if (/医薬部外品/.test(name)) return "医薬部外品";
+  return null;
+}
+function cleanItemName(name){
+  return name.replace(/【[^】]*】/g,"").replace(/[★☆◆■]/g,"").replace(/\s+/g," ").trim();
+}
+function jsonp(url){
+  return new Promise(resolve => {
+    const cb = "jancb_" + Math.random().toString(36).slice(2);
+    const sc = document.createElement("script");
+    const tm = setTimeout(()=>{ cleanup(); resolve(null); }, 8000);
+    function cleanup(){ try{ delete window[cb]; }catch(e){} sc.remove(); clearTimeout(tm); }
+    window[cb] = d => { cleanup(); resolve(d); };
+    sc.src = url + "&callback=" + cb;
+    sc.onerror = ()=>{ cleanup(); resolve(null); };
+    document.head.appendChild(sc);
+  });
+}
+async function lookupJanExternal(code){
+  const k = S.apiKeys;
+  if (k.jancode){
+    try {
+      const r = await fetch("https://api.jancodelookup.com/?appId="+encodeURIComponent(k.jancode)+"&query="+code+"&type=code&hits=1");
+      if (r.ok){
+        const d = await r.json();
+        const p = d.product && d.product[0];
+        const raw = p && (p.itemName || p.name);
+        if (raw) return { name: cleanItemName(raw), maker: p.makerName || p.brandName || "", category: parseDrugCategory(raw), source: "JANCODE LOOKUP" };
+      }
+    } catch(e){}
+  }
+  if (k.rakuten){
+    try {
+      const d = await jsonp("https://app.rakuten.co.jp/services/api/IchibaItem/Search/20220601?applicationId="+encodeURIComponent(k.rakuten)+"&keyword="+code+"&hits=1&formatVersion=2");
+      const item = d && d.Items && d.Items[0];
+      if (item && item.itemName) return { name: cleanItemName(item.itemName), maker: "", category: parseDrugCategory(item.itemName), source: "楽天市場" };
+    } catch(e){}
+  }
+  try {
+    const r = await fetch("https://world.openfoodfacts.org/api/v2/product/"+code+".json?fields=product_name,product_name_ja,brands");
+    if (r.ok){
+      const d = await r.json();
+      const p = d.product;
+      const nm = p && (p.product_name_ja || p.product_name);
+      if (nm) return { name: nm, maker: (p && p.brands) || "", category: null, source: "Open Food Facts" };
+    }
+  } catch(e){}
+  return null;
+}
+
+/* ============ スキャン ============ */
+async function toggleScan(){
+  if (scanning) { await stopScan(); return; }
+  const btn = document.getElementById("scan-toggle");
+  try {
+    scanner = new Html5Qrcode("jan-reader");
+    scanning = true;
+    btn.textContent = "カメラを停止";
+    scanMsg("カメラを起動しています…");
+    await scanner.start(
+      { facingMode: "environment" },
+      { fps: 10, qrbox: { width: 260, height: 130 } },
+      text => {
+        const code = text.trim();
+        if (/^\d{8}$/.test(code) || /^\d{13}$/.test(code)){
+          if (navigator.vibrate) navigator.vibrate(80);
+          stopScan();
+          scanMsg("読み取りました: " + code);
+          applyJan(code);
+        }
+      },
+      ()=>{}
+    );
+    scanMsg("バーコードを枠内に合わせてください");
+  } catch(e){
+    scanning = false;
+    btn.textContent = "カメラでスキャン開始";
+    scanMsg("カメラを起動できませんでした。ブラウザのアドレスバー付近のカメラ許可を「許可」にしてから再度お試しください。このページは https:// のURLで開く必要があります。");
+  }
+}
+async function stopScan(){
+  scanning = false;
+  document.getElementById("scan-toggle").textContent = "カメラでスキャン開始";
+  if (scanner){ try { await scanner.stop(); scanner.clear(); } catch(e){} scanner = null; }
+}
+async function handlePhoto(ev){
+  const file = ev.target.files && ev.target.files[0];
+  ev.target.value = "";
+  if (!file) return;
+  scanMsg("画像を解析しています…");
+  try {
+    if ("BarcodeDetector" in window){
+      const det = new BarcodeDetector({ formats: ["ean_13","ean_8"] });
+      const bmp = await createImageBitmap(file);
+      const codes = await det.detect(bmp);
+      const hit = codes.find(c => /^\d{8}$/.test(c.rawValue) || /^\d{13}$/.test(c.rawValue));
+      if (hit){ scanMsg("読み取りました: " + hit.rawValue); applyJan(hit.rawValue); return; }
+    }
+  } catch(e){}
+  try {
+    document.getElementById("jan-file-reader").innerHTML = "";
+    const s = new Html5Qrcode("jan-file-reader");
+    const text = await s.scanFile(file, false);
+    try { s.clear(); } catch(e){}
+    const code = String(text).trim();
+    if (/^\d{8}$/.test(code) || /^\d{13}$/.test(code)){ scanMsg("読み取りました: " + code); applyJan(code); return; }
+    scanMsg("JANコード(数字のバーコード)を撮影してください。");
+  } catch(e){
+    scanMsg("読み取れませんでした。バーコードに近づき、明るい場所でピントを合わせて撮り直すか、数字を直接入力してください。");
+  }
+}
+
+/* ============ フォーム ============ */
+function fillCategorySelects(){
+  const sel = document.getElementById("f-category");
+  sel.innerHTML = CATEGORIES.map(c => "<option>"+c+"</option>").join("");
+  sel.value = "第2類医薬品";
+  const cf = document.getElementById("cat-filter");
+  cf.innerHTML = "<option>すべて</option>" + CATEGORIES.map(c => "<option>"+c+"</option>").join("");
+}
+function readForm(){
+  return {
+    jan: document.getElementById("f-jan").value.replace(/\D/g,""),
+    name: document.getElementById("f-name").value.trim(),
+    maker: document.getElementById("f-maker").value.trim(),
+    category: document.getElementById("f-category").value,
+    price: document.getElementById("f-price").value.replace(/\D/g,""),
+    qty: Math.max(0, parseInt(document.getElementById("f-qty").value,10) || 0),
+    reorder: Math.max(0, parseInt(document.getElementById("f-reorder").value,10) || 0),
+    expiry: document.getElementById("f-expiry").value,
+    memo: document.getElementById("f-memo").value.trim()
+  };
+}
+function fillForm(o){
+  document.getElementById("f-jan").value = o.jan || "";
+  document.getElementById("f-name").value = o.name || "";
+  document.getElementById("f-maker").value = o.maker || "";
+  document.getElementById("f-category").value = o.category || "第2類医薬品";
+  document.getElementById("f-price").value = (o.price===0||o.price) ? o.price : "";
+  document.getElementById("f-qty").value = (o.qty===0||o.qty) ? o.qty : 1;
+  document.getElementById("f-reorder").value = (o.reorder===0||o.reorder) ? o.reorder : 2;
+  document.getElementById("f-expiry").value = o.expiry || "";
+  document.getElementById("f-memo").value = o.memo || "";
+}
+function clearForm(){
+  editingId = null;
+  document.getElementById("save-btn").textContent = "在庫に登録";
+  fillForm({}); scanMsg("");
+}
+function onJanBlur(){
+  const code = document.getElementById("f-jan").value.replace(/\D/g,"");
+  document.getElementById("f-jan").value = code;
+  if (code && !document.getElementById("f-name").value) applyJan(code);
+}
+
+/* ============ JAN適用 ============ */
+async function applyJan(code){
+  editingId = null;
+  document.getElementById("save-btn").textContent = "在庫に登録";
+  showTab("scan");
+  const existing = S.items.find(it => it.jan === code);
+  if (existing){
+    fillForm(Object.assign({}, existing, { qty: 1 }));
+    scanMsg("在庫あり(現在 " + existing.qty + " 個)。登録すると数量が加算されます。");
+    return;
+  }
+  const m = S.master[code];
+  if (m){
+    fillForm({ jan: code, name: m.name, maker: m.maker, category: m.category, price: m.price });
+    scanMsg("商品マスタから情報を補完しました。");
+    return;
+  }
+  fillForm({ jan: code });
+  scanMsg("商品データベースを検索しています…");
+  const hit = await lookupJanExternal(code);
+  if (hit){
+    fillForm({ jan: code, name: hit.name, maker: hit.maker, category: hit.category || "第2類医薬品" });
+    scanMsg(hit.source + " から取得しました" + (hit.category ? "(リスク区分も自動判定)" : "") + "。内容を確認して登録してください。");
+  } else if (S.apiKeys.rakuten || S.apiKeys.jancode){
+    scanMsg("データベースに見つかりませんでした。商品名を入力してください(次回からは自動補完されます)。");
+  } else {
+    scanMsg("商品名を入力してください。「外部データベース設定」で無料APIキーを設定すると自動取得できます。");
+  }
+}
+
+/* ============ 登録・一覧 ============ */
+function saveItem(){
+  const f = readForm();
+  if (!f.jan || !f.name){ toast("JANコードと商品名は必須です"); return; }
+  if (!isValidJan(f.jan)){ toast("JANコードの形式が正しくありません(8桁または13桁)"); return; }
+  S.master[f.jan] = { name: f.name, maker: f.maker, category: f.category, price: f.price };
+  if (editingId){
+    S.items = S.items.map(it => it.id===editingId ? Object.assign({}, it, f, { updatedAt: today() }) : it);
+    toast("更新しました");
+  } else {
+    const ex = S.items.find(it => it.jan === f.jan);
+    if (ex){
+      ex.name = f.name; ex.maker = f.maker; ex.category = f.category; ex.price = f.price;
+      ex.reorder = f.reorder; if (f.expiry) ex.expiry = f.expiry; if (f.memo) ex.memo = f.memo;
+      ex.qty += f.qty; ex.updatedAt = today();
+      toast("「" + f.name + "」に " + f.qty + " 個 加算しました");
+    } else {
+      S.items.unshift(Object.assign({ id: rid(), updatedAt: today() }, f));
+      toast("登録しました");
+    }
+  }
+  save(); clearForm(); renderList();
+}
+function editItem(id){
+  const it = S.items.find(x => x.id===id);
+  if (!it) return;
+  editingId = id;
+  fillForm(it);
+  document.getElementById("save-btn").textContent = "上書き保存";
+  showTab("scan");
+  scanMsg("編集モード:保存すると内容を上書きします");
+}
+function changeQty(id, d){
+  const it = S.items.find(x => x.id===id);
+  if (!it) return;
+  it.qty = Math.max(0, it.qty + d); it.updatedAt = today();
+  save(); renderList();
+}
+function removeItem(id){
+  S.items = S.items.filter(x => x.id!==id);
+  selected.delete(id);
+  save(); renderList();
+}
+function toggleSelect(id){
+  selected.has(id) ? selected.delete(id) : selected.add(id);
+  renderList(); renderTags();
+}
+function renderList(){
+  const low = S.items.filter(it => it.qty <= it.reorder);
+  document.getElementById("st-items").textContent = S.items.length;
+  document.getElementById("st-total").textContent = S.items.reduce((s,i)=>s+i.qty,0);
+  document.getElementById("st-low").textContent = low.length;
+  const chip = document.getElementById("low-chip");
+  chip.style.display = low.length ? "block" : "none";
+  chip.textContent = "低在庫 " + low.length + " 品目";
+
+  const q = document.getElementById("q").value.trim().toLowerCase();
+  const cf = document.getElementById("cat-filter").value;
+  const arr = S.items.filter(it => {
+    if (cf !== "すべて" && it.category !== cf) return false;
+    if (!q) return true;
+    return it.name.toLowerCase().includes(q) || it.jan.includes(q) || (it.maker||"").toLowerCase().includes(q);
+  });
+
+  const bar = document.getElementById("select-bar");
+  if (selected.size){
+    bar.style.display = "block";
+    bar.innerHTML = selected.size + ' 品目を選択中 — <button class="link" onclick="setPrintKind(\'tags\');showTab(\'print\')">値札を作成</button> <button class="link" onclick="selected.clear();renderList();renderTags()">選択解除</button>';
+  } else bar.style.display = "none";
+
+  const area = document.getElementById("list-area");
+  if (!S.items.length){
+    area.innerHTML = '<div class="empty"><p>まだ在庫がありません。</p><button class="btn" onclick="showTab(\'scan\')">最初の商品をスキャンする</button></div>';
+    return;
+  }
+  area.innerHTML = '<ul class="stock-list">' + arr.map(it =>
+    '<li class="stock-item' + (it.qty<=it.reorder?' low':'') + '">'
+    + '<input type="checkbox" ' + (selected.has(it.id)?'checked':'') + ' onchange="toggleSelect(\''+it.id+'\')" aria-label="値札用に選択">'
+    + '<div class="stock-main" onclick="editItem(\''+it.id+'\')">'
+    +   '<div class="stock-top"><span class="cat-badge" style="border-color:'+CAT_COLOR[it.category]+';color:'+CAT_COLOR[it.category]+'">'+CAT_SHORT[it.category]+'</span><span class="stock-name">'+esc(it.name)+'</span></div>'
+    +   '<div class="stock-sub">' + (it.maker?'<span>'+esc(it.maker)+'</span>':'') + '<span>'+yen(it.price)+'</span>' + (it.expiry?'<span>期限 '+it.expiry+'</span>':'') + (it.qty<=it.reorder?'<span class="low-flag">要発注</span>':'') + '</div>'
+    + '</div>'
+    + '<div class="qty-ctrl"><button onclick="changeQty(\''+it.id+'\',-1)" aria-label="1減らす">−</button><span class="qty">'+it.qty+'</span><button onclick="changeQty(\''+it.id+'\',1)" aria-label="1増やす">＋</button></div>'
+    + '<button class="del" onclick="removeItem(\''+it.id+'\')" aria-label="削除">×</button></li>'
+  ).join("") + '</ul>';
+}
+function exportCsv(){
+  if (!S.items.length){ toast("在庫がありません"); return; }
+  const head = ["JANコード","商品名","メーカー","リスク区分","販売価格","在庫数","発注点","使用期限","メモ","更新日"];
+  const rows = S.items.map(it => [it.jan,it.name,it.maker,it.category,it.price,it.qty,it.reorder,it.expiry,(it.memo||"").replace(/[\r\n,]/g," "),it.updatedAt]);
+  const csv = "\uFEFF" + [head].concat(rows).map(r => r.join(",")).join("\r\n");
+  const blob = new Blob([csv], { type: "text/csv" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "OTC在庫_" + today() + ".csv";
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+/* ============ 値札・POP ============ */
+let printKind = "tags";
+function setPrintKind(k){
+  printKind = k;
+  document.getElementById("seg-tags").className = k==="tags" ? "on" : "";
+  document.getElementById("seg-pop").className = k==="pop" ? "on" : "";
+  document.getElementById("print-tags").style.display = k==="tags" ? "block" : "none";
+  document.getElementById("print-pop").style.display = k==="pop" ? "block" : "none";
+  if (k==="tags") renderTags(); else { fillPopSelect(); renderPop(); }
+}
+function renderTags(){
+  const area = document.getElementById("print-tags");
+  const arr = S.items.filter(it => selected.has(it.id));
+  if (!arr.length){
+    area.innerHTML = '<div class="empty"><p>在庫リストで商品にチェックを入れると、ここに値札が並びます。</p><button class="btn" onclick="showTab(\'list\')">在庫リストで商品を選ぶ</button></div>';
+    return;
+  }
+  area.innerHTML =
+    '<div class="row gap" style="margin-bottom:12px"><button class="btn" onclick="window.print()">値札を印刷(' + arr.length + ' 枚)</button></div>'
+    + '<div class="tag-sheet print-target">' + arr.map(it =>
+      '<div class="price-tag">'
+      + '<div class="tag-cat" style="background:'+CAT_COLOR[it.category]+'">'+it.category+'</div>'
+      + '<div class="tag-name">'+esc(it.name)+'</div>'
+      + (it.maker?'<div class="tag-maker">'+esc(it.maker)+'</div>':'')
+      + '<div class="tag-price"><span class="tag-yen">'+(it.price===""?"—":"¥"+Number(it.price).toLocaleString("ja-JP"))+'</span><span class="tag-tax">税込</span></div>'
+      + ean13Svg(it.jan, 34)
+      + '</div>'
+    ).join("") + '</div>';
+}
+function fillPopSelect(){
+  const sel = document.getElementById("pop-item");
+  const cur = sel.value;
+  sel.innerHTML = '<option value="">— 商品を選択 —</option>' + S.items.map(it => '<option value="'+it.id+'">'+esc(it.name)+'</option>').join("");
+  if (cur) sel.value = cur;
+}
+function renderPop(){
+  const id = document.getElementById("pop-item").value;
+  const it = S.items.find(x => x.id===id);
+  const area = document.getElementById("pop-preview");
+  if (!it){ area.innerHTML = ""; return; }
+  const copy = document.getElementById("pop-copy").value;
+  const note = document.getElementById("pop-note").value;
+  area.innerHTML =
+    '<div class="pop-card">'
+    + '<div class="pop-copy">'+esc(copy)+'</div>'
+    + '<div class="pop-name">'+esc(it.name)+'</div>'
+    + (it.maker?'<div class="pop-maker">'+esc(it.maker)+'</div>':'')
+    + '<div class="pop-price">' + (it.price!==""?'<span class="pop-yen">¥'+Number(it.price).toLocaleString("ja-JP")+'</span><span class="pop-tax">税込</span>':'') + '</div>'
+    + '<div class="pop-foot"><span class="pop-cat" style="background:'+CAT_COLOR[it.category]+'">'+it.category+'</span><span class="pop-note">'+esc(note)+'</span></div>'
+    + '<div class="pop-seal">薬剤師<br>相談</div>'
+    + '</div>';
+}
+
+/* ============ 会員間共有(Google Apps Script サーバー) ============ */
+function savePharmacy(){
+  S.pharmacy.name = document.getElementById("ph-name").value.trim();
+  S.pharmacy.area = document.getElementById("ph-area").value.trim();
+  S.gasUrl = document.getElementById("gas-url").value.trim();
+  save();
+  document.getElementById("brand-sub").textContent = S.pharmacy.name || "市販薬の登録・値札・備蓄共有";
+}
+function saveKeys(){
+  S.apiKeys.rakuten = document.getElementById("k-rakuten").value.trim();
+  S.apiKeys.jancode = document.getElementById("k-jancode").value.trim();
+  save();
+}
+function shareMsg(m){ document.getElementById("share-msg").textContent = m; }
+
+async function uploadShare(){
+  if (!S.gasUrl){ shareMsg("共有サーバーURLを入力してください(管理者から配布されます)。"); return; }
+  if (!S.pharmacy.name){ shareMsg("先に薬局名を入力してください。"); return; }
+  shareMsg("アップロード中…");
+  try {
+    const payload = {
+      action: "upload", id: S.pharmacy.id,
+      pharmacy: { name: S.pharmacy.name, area: S.pharmacy.area },
+      updatedAt: new Date().toISOString(),
+      items: S.items.map(it => ({ jan: it.jan, name: it.name, category: it.category, qty: it.qty }))
+    };
+    const r = await fetch(S.gasUrl, { method: "POST", body: JSON.stringify(payload) });
+    if (!r.ok) throw new Error();
+    shareMsg("アップロードしました(" + S.items.length + " 品目)。");
+    loadShared();
+  } catch(e){
+    shareMsg("アップロードに失敗しました。URLと通信環境を確認してください。");
+  }
+}
+async function removeShare(){
+  if (!S.gasUrl) return;
+  try {
+    await fetch(S.gasUrl, { method: "POST", body: JSON.stringify({ action: "delete", id: S.pharmacy.id }) });
+    shareMsg("共有データを取り下げました。");
+    loadShared();
+  } catch(e){ shareMsg("取り下げに失敗しました。"); }
+}
+async function loadShared(){
+  if (!S.gasUrl){ shareMsg("共有サーバーURLを入力すると、会員の備蓄が表示されます。"); return; }
+  shareMsg("読み込み中…");
+  try {
+    const r = await fetch(S.gasUrl + "?action=list");
+    const d = await r.json();
+    sharedData = Array.isArray(d) ? d : [];
+    sharedData.sort((a,b) => String(b.updatedAt||"").localeCompare(String(a.updatedAt||"")));
+    shareMsg(sharedData.length ? "" : "まだ共有データがありません。最初の1件をアップロードしましょう。");
+    renderShared();
+  } catch(e){
+    shareMsg("共有データを読み込めませんでした。URLを確認してください。");
+  }
+}
+function renderShared(){
+  const area = document.getElementById("share-area");
+  const q = document.getElementById("share-q").value.trim().toLowerCase();
+  if (q){
+    const hits = [];
+    for (const ph of sharedData){
+      for (const it of (ph.items||[])){
+        if (String(it.name).toLowerCase().includes(q) || String(it.jan).includes(q))
+          hits.push({ ph: ph.pharmacy, it: it });
+      }
+    }
+    area.innerHTML = hits.length
+      ? '<ul class="hit-list">' + hits.map(h =>
+          '<li><div class="hit-name">'+esc(h.it.name)+' <span class="hit-qty">'+h.it.qty+' 個</span></div>'
+          + '<div class="hit-ph">'+esc(h.ph&&h.ph.name||"")+(h.ph&&h.ph.area?'('+esc(h.ph.area)+')':'')+'</div></li>'
+        ).join("") + '</ul>'
+      : '<p class="hint">該当する備蓄が見つかりませんでした。</p>';
+    return;
+  }
+  area.innerHTML = sharedData.map(ph =>
+    '<details class="ph-card"' + (sharedData.length<=2?' open':'') + '>'
+    + '<summary><span class="ph-name">'+esc(ph.pharmacy&&ph.pharmacy.name||"名称未設定")+'</span>'
+    + '<span class="ph-meta">'+esc(ph.pharmacy&&ph.pharmacy.area||"")+' ・ '+(ph.items?ph.items.length:0)+' 品目 ・ '+String(ph.updatedAt||"").slice(0,10)+'</span></summary>'
+    + '<ul class="ph-items">' + (ph.items||[]).map(it =>
+        '<li><span class="cat-badge" style="border-color:'+(CAT_COLOR[it.category]||"#5C6B78")+';color:'+(CAT_COLOR[it.category]||"#5C6B78")+'">'+(CAT_SHORT[it.category]||"")+'</span>'
+        + '<span class="ph-item-name">'+esc(it.name)+'</span><span class="ph-item-qty">'+it.qty+' 個</span></li>'
+      ).join("") + '</ul></details>'
+  ).join("");
+}
+
+/* ============ タブ ============ */
+function showTab(k){
+  document.querySelectorAll(".tab").forEach(b => b.classList.toggle("active", b.dataset.tab===k));
+  document.querySelectorAll(".panel").forEach(p => p.classList.toggle("active", p.id==="tab-"+k));
+  if (k!=="scan") stopScan();
+  if (k==="list") renderList();
+  if (k==="print") setPrintKind(printKind);
+  if (k==="share") loadShared();
+}
+
+/* ============ 起動 ============ */
+load();
+fillCategorySelects();
+document.getElementById("ph-name").value = S.pharmacy.name || "";
+document.getElementById("ph-area").value = S.pharmacy.area || "";
+document.getElementById("gas-url").value = S.gasUrl || "";
+document.getElementById("k-rakuten").value = S.apiKeys.rakuten || "";
+document.getElementById("k-jancode").value = S.apiKeys.jancode || "";
+document.getElementById("brand-sub").textContent = S.pharmacy.name || "市販薬の登録・値札・備蓄共有";
+renderList();
+</script>
+</body>
+</html>
