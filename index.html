@@ -104,10 +104,12 @@ input:focus, select:focus { outline: 2px solid var(--ai); outline-offset: -1px; 
 .seg button.on { background: var(--ai); color: #fff; }
 .tag-sheet { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; }
 .price-tag { border: 1.5px solid var(--ink); border-radius: 0; text-align: center; background: #fff; break-inside: avoid; display: flex; flex-direction: column; box-sizing: border-box; overflow: hidden; }
-.price-tag .tag-spacer { flex: 1; }
-.price-tag .tag-inner { width: 100%; display: flex; flex-direction: column; }
+.price-tag .tag-inner { width: 100%; height: 100%; display: flex; flex-direction: column; }
+.price-tag .tag-top { flex: 0 0 auto; }
+.price-tag .tag-mid { flex: 1 1 auto; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 2px; min-height: 0; padding: 4px 6px; }
+.price-tag .tag-bot { flex: 0 0 auto; display: flex; justify-content: center; align-items: flex-end; max-width: 100%; overflow: hidden; padding: 2px 4px 4px; }
 .tag-cat { color: #fff; font-size: 11px; letter-spacing: 0.15em; padding: 3px 0; }
-.tag-name { font-family: var(--serif); font-weight: 600; font-size: 16px; padding: 8px 10px 0; line-height: 1.35; overflow-wrap: anywhere; word-break: break-word; }
+.tag-name { font-family: var(--serif); font-weight: 600; font-size: 16px; line-height: 1.3; overflow-wrap: anywhere; word-break: break-word; }
 .tag-maker { font-size: 11px; color: #5C6B78; }
 .tag-price { margin: 6px 0 4px; }
 .tag-yen { font-family: var(--serif); font-size: 30px; font-weight: 700; color: var(--shu); font-variant-numeric: tabular-nums; }
@@ -1056,21 +1058,26 @@ function resetTagStyle(){
 }
 function fitTags(){
   const t = tagStyle_();
-  // 高さを明示指定したカスタム値札のときだけ、収まらない場合に縮小する
-  if (t.size !== "custom" || !t.height) return;
+  // 高さを明示指定したときだけ、はみ出しを実測して文字を縮小する
+  if (!(t.size === "custom" && t.height)) return;
   document.querySelectorAll("#print-tags .price-tag").forEach(tag => {
     const box = tag.querySelector(".tag-inner");
     if (!box) return;
-    box.style.transform = "";
-    box.style.transformOrigin = "top center";
-    const avail = tag.clientHeight;
-    // 高さが取得できない・異常に小さいときは何もしない(誤縮小防止)
-    if (!avail || avail < 20) return;
-    const need = box.scrollHeight;
-    if (need <= avail) return; // 収まっているので縮小しない
-    let sc = avail / need;
-    sc = Math.max(0.4, Math.min(1, sc)); // 下限0.4(縮めすぎ防止)
-    box.style.transform = "scale(" + sc + ")";
+    const avail = tag.clientHeight - (tag.__padPx || 0);
+    if (!avail || avail < 16) return;
+    // 各テキスト要素を段階的に縮小(実測しながら収まるまで)
+    const els = box.querySelectorAll(".tag-name, .tag-yen, .tag-maker, .tag-cat");
+    let guard = 0;
+    while (box.scrollHeight > tag.clientHeight && guard < 60){
+      guard++;
+      els.forEach(el => {
+        const cur = parseFloat(getComputedStyle(el).fontSize);
+        if (cur > 6) el.style.setProperty("font-size", (cur * 0.92) + "px", "important");
+      });
+      // バーコードも縮小
+      const svg = box.querySelector("svg");
+      if (svg){ const h = svg.getBoundingClientRect().height; if (h > 12) svg.style.height = (h*0.9)+"px"; }
+    }
   });
 }
 function renderTags(){
@@ -1101,27 +1108,39 @@ function renderTags(){
     '<div class="row gap" style="margin-bottom:12px"><button class="btn" onclick="window.print()">値札を印刷(' + arr.length + ' 枚)</button></div>'
     + '<div class="tag-sheet print-target size-' + t.size + '" style="'+sheetStyle+'">' + arr.map(it => {
       let inner = '<div class="tag-inner">';
-      if (f.cat !== false) inner += '<div class="tag-cat" style="background:'+CAT_COLOR[it.category]+'">'+it.category+'</div>';
-      if (it.ranyo) inner += '<div class="tag-ranyo">指定濫用防止医薬品</div>';
-      inner += '<div>';
+      // 上段: 区分帯
+      let top = '';
+      if (f.cat !== false) top += '<div class="tag-cat" style="background:'+CAT_COLOR[it.category]+'">'+it.category+'</div>';
+      if (it.ranyo) top += '<div class="tag-ranyo">指定濫用防止医薬品</div>';
+      inner += '<div class="tag-top">'+top+'</div>';
+      // 中段: 商品名・メーカー・価格(縦中央)
+      inner += '<div class="tag-mid">';
       if (f.name !== false) inner += '<div class="tag-name" style="'+nameStyle+'">'+(it.name?esc(it.name):"(名称未設定)")+'</div>';
       if (f.maker !== false && it.maker) inner += '<div class="tag-maker" style="'+makerStyle+'">'+esc(it.maker)+'</div>';
       if (f.price !== false) inner += '<div class="tag-price"><span class="tag-yen" style="'+yenStyle+'">'+(it.price===""?"—":"¥"+Number(it.price).toLocaleString("ja-JP"))+'</span><span class="tag-tax">税込</span></div>';
       inner += '</div>';
-      if (isCustom && t.height) inner += '<div class="tag-spacer"></div>';
-      if (f.jan !== false) inner += '<div style="padding-bottom:4px;max-width:100%;overflow:hidden">'+ean13Svg(it.jan, sz.bar, f.jannum !== false)+'</div>';
-      else if (f.jannum !== false) inner += '<div class="barcode-num" style="padding-bottom:4px">'+esc(it.jan)+'</div>';
+      // 下段: バーコード
+      let bot = '';
+      if (f.jan !== false) bot += ean13Svg(it.jan, sz.bar, f.jannum !== false);
+      else if (f.jannum !== false) bot += '<div class="barcode-num">'+esc(it.jan)+'</div>';
+      inner += '<div class="tag-bot">'+bot+'</div>';
       inner += '</div>';
       // カスタム時は幅・高さをmmで固定(印刷実寸を保証)
       const pad = (t.pad==null?2:t.pad);
-      let tagStyle = 'padding:'+pad+'mm '+pad+'mm '+(pad+2)+'mm;';
+      let tagStyle = 'padding:0;';
       if (isCustom){
         tagStyle += 'width:'+t.width+'mm;';
         if (t.height) tagStyle += 'height:'+t.height+'mm;';
+      } else {
+        tagStyle += 'min-height:'+(sz.w*0.62)+'px;';
       }
       return '<div class="price-tag"'+(tagStyle?(' style="'+tagStyle+'"'):'')+'>'+inner+'</div>';
     }).join("") + '</div>';
-  requestAnimationFrame(() => requestAnimationFrame(fitTags));
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    const padPx = ((t.pad==null?2:t.pad) * 2 + 2) * 3.78;
+    document.querySelectorAll("#print-tags .price-tag").forEach(el => { el.__padPx = padPx; });
+    fitTags();
+  }));
 }
 function fillPopSelect(){
   const sel = document.getElementById("pop-item");
