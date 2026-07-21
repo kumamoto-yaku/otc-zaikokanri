@@ -46,7 +46,12 @@ body { min-height: 100vh; background: var(--hakuji); color: var(--ink); font-fam
 .btn:disabled { opacity: 0.4; cursor: default; }
 .link { background: none; border: none; color: var(--ai); text-decoration: underline; cursor: pointer; font-size: 13.5px; font-family: var(--sans); }
 .link.center { margin: 0 auto; display: block; }
-.scan-box { display: flex; flex-direction: column; gap: 10px; }
+.scan-box { display: flex; flex-direction: column; gap: 12px; align-items: center; max-width: 460px; margin: 8px auto 0; }
+.scan-box .btn { width: 100%; }
+.scan-main { display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 17px; padding: 18px; letter-spacing: 0.05em; }
+.scan-ico { font-size: 20px; letter-spacing: -2px; opacity: 0.9; }
+.scan-sub { max-width: 260px; }
+.scan-box #jan-reader:empty { display: none; }
 #jan-reader { border-radius: 10px; overflow: hidden; border: 1px solid var(--line); }
 .scan-msg { font-size: 13px; color: var(--ai-deep); background: #EDF2F0; border-left: 3px solid var(--take); padding: 8px 10px; border-radius: 0 6px 6px 0; display: none; }
 .divider { display: flex; align-items: center; gap: 10px; color: #5C6B78; font-size: 12.5px; letter-spacing: 0.14em; }
@@ -174,13 +179,21 @@ table.inv tr.low-row td { background: #FDF3EF; }
 @media (max-width: 520px) { .grid2, .grid3 { grid-template-columns: 1fr; } }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 @media print {
-  body * { visibility: hidden; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-  .print-target, .print-target * { visibility: visible; }
-  .print-target { position: absolute; left: 0; top: 0; width: 100%; }
-  .tag-sheet.size-s { grid-template-columns: repeat(4, 1fr) !important; gap: 5mm; }
-  .tag-sheet.size-m { grid-template-columns: repeat(3, 1fr) !important; gap: 6mm; }
-  .tag-sheet.size-l { grid-template-columns: repeat(2, 1fr) !important; gap: 8mm; }
-  .pop-card { border-width: 3px; }
+  @page { margin: 8mm; }
+  html, body { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+  /* 印刷対象以外を完全に消す(場所も詰める) */
+  body > .chrome > *:not(.panel),
+  .panel:not(.active),
+  .panel.active > *:not(#print-tags-wrap):not(#print-pop),
+  #print-tags-wrap > *:not(#print-tags),
+  #print-tags > .row,
+  .tabs, .header, .foot, #login-gate, .toast {
+    display: none !important;
+  }
+  body, .chrome, .panel { display: block !important; padding: 0 !important; margin: 0 !important; max-width: none !important; border: none !important; background: #fff !important; }
+  .price-tag { break-inside: avoid; page-break-inside: avoid; }
+  .pop-wrap { display: block !important; }
+  .pop-card { break-inside: avoid; page-break-inside: avoid; }
 }
 </style>
 </head>
@@ -217,12 +230,12 @@ table.inv tr.low-row td { background: #FDF3EF; }
   <!-- ============ スキャン登録 ============ -->
   <section class="panel active" id="tab-scan">
     <div class="scan-box">
-      <button class="btn big" id="scan-toggle" onclick="toggleScan()">カメラでスキャン開始</button>
+      <button class="btn big scan-main" id="scan-toggle" onclick="toggleScan()">
+        <span class="scan-ico">▚</span> カメラでスキャン開始
+      </button>
       <div id="jan-reader"></div>
-      <div class="row gap">
-        <button class="btn ghost" style="flex:1" onclick="document.getElementById('photo-input').click()">写真から読み取る</button>
-        <input type="file" id="photo-input" accept="image/*" style="display:none" onchange="handlePhoto(event)">
-      </div>
+      <button class="btn ghost scan-sub" onclick="document.getElementById('photo-input').click()">写真から読み取る</button>
+      <input type="file" id="photo-input" accept="image/*" style="display:none" onchange="handlePhoto(event)">
       <div id="jan-file-reader" style="display:none"></div>
       <p class="scan-msg" id="scan-msg"></p>
     </div>
@@ -1025,10 +1038,13 @@ function renderTags(){
   const nameStyle = 'font-family:'+fontCssAttr(t.font)+' !important;font-size:'+t.nameSize+'px !important;color:'+t.nameColor+' !important;font-weight:'+fw+' !important';
   const yenStyle = 'font-family:'+fontCssAttr(t.font)+' !important;font-size:'+t.priceSize+'px !important;color:'+t.priceColor+' !important;font-weight:'+fw+' !important';
   const f = t.fields || {};
+  const isCustom = t.size === "custom";
+  const sheetStyle = isCustom
+    ? 'display:flex;flex-wrap:wrap;gap:4mm'
+    : 'display:grid;grid-template-columns:repeat(auto-fill,minmax('+sz.w+'px,1fr));gap:12px';
   area.innerHTML =
     '<div class="row gap" style="margin-bottom:12px"><button class="btn" onclick="window.print()">値札を印刷(' + arr.length + ' 枚)</button></div>'
-    + '<div class="tag-sheet print-target size-' + t.size + '" style="grid-template-columns:repeat(auto-fill,minmax(' + sz.w + 'px,1fr))">' + arr.map(it => {
-      const hasHeight = t.size==="custom" && t.height;
+    + '<div class="tag-sheet print-target size-' + t.size + '" style="'+sheetStyle+'">' + arr.map(it => {
       let inner = '';
       if (f.cat !== false) inner += '<div class="tag-cat" style="background:'+CAT_COLOR[it.category]+'">'+it.category+'</div>';
       if (it.ranyo) inner += '<div class="tag-ranyo">指定濫用防止医薬品</div>';
@@ -1037,10 +1053,16 @@ function renderTags(){
       if (f.maker !== false && it.maker) inner += '<div class="tag-maker">'+esc(it.maker)+'</div>';
       if (f.price !== false) inner += '<div class="tag-price"><span class="tag-yen" style="'+yenStyle+'">'+(it.price===""?"—":"¥"+Number(it.price).toLocaleString("ja-JP"))+'</span><span class="tag-tax">税込</span></div>';
       inner += '</div>';
-      if (hasHeight) inner += '<div class="tag-spacer"></div>';
+      if (isCustom && t.height) inner += '<div class="tag-spacer"></div>';
       if (f.jan !== false) inner += '<div style="padding-bottom:4px">'+ean13Svg(it.jan, sz.bar, f.jannum !== false)+'</div>';
       else if (f.jannum !== false) inner += '<div class="barcode-num" style="padding-bottom:4px">'+esc(it.jan)+'</div>';
-      return '<div class="price-tag"'+(hasHeight?(' style="min-height:'+Math.round(t.height*3.78)+'px"'):'')+'>'+inner+'</div>';
+      // カスタム時は幅・高さをmmで固定(印刷実寸を保証)
+      let tagStyle = '';
+      if (isCustom){
+        tagStyle = 'width:'+t.width+'mm;';
+        if (t.height) tagStyle += 'height:'+t.height+'mm;';
+      }
+      return '<div class="price-tag"'+(tagStyle?(' style="'+tagStyle+'"'):'')+'>'+inner+'</div>';
     }).join("") + '</div>';
 }
 function fillPopSelect(){
