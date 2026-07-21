@@ -46,11 +46,11 @@ body { min-height: 100vh; background: var(--hakuji); color: var(--ink); font-fam
 .btn:disabled { opacity: 0.4; cursor: default; }
 .link { background: none; border: none; color: var(--ai); text-decoration: underline; cursor: pointer; font-size: 13.5px; font-family: var(--sans); }
 .link.center { margin: 0 auto; display: block; }
-.scan-box { display: flex; flex-direction: column; gap: 12px; align-items: center; max-width: 460px; margin: 8px auto 0; }
-.scan-box .btn { width: 100%; }
-.scan-main { display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 17px; padding: 18px; letter-spacing: 0.05em; }
-.scan-ico { font-size: 20px; letter-spacing: -2px; opacity: 0.9; }
-.scan-sub { max-width: 260px; }
+.scan-box { display: flex; flex-direction: column; gap: 12px; align-items: center; max-width: 520px; margin: 8px auto 0; }
+.scan-btns { display: flex; gap: 10px; width: 100%; }
+.scan-btns .btn { flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 15px 10px; font-size: 15px; }
+.scan-ico { font-size: 18px; letter-spacing: -2px; opacity: 0.9; }
+.scan-box #jan-reader { width: 100%; }
 .scan-box #jan-reader:empty { display: none; }
 #jan-reader { border-radius: 10px; overflow: hidden; border: 1px solid var(--line); }
 .scan-msg { font-size: 13px; color: var(--ai-deep); background: #EDF2F0; border-left: 3px solid var(--take); padding: 8px 10px; border-radius: 0 6px 6px 0; display: none; }
@@ -100,10 +100,10 @@ input:focus, select:focus { outline: 2px solid var(--ai); outline-offset: -1px; 
 .seg button { border: none; background: #fff; color: var(--ai); padding: 8px 18px; font-size: 14px; cursor: pointer; font-family: var(--sans); }
 .seg button.on { background: var(--ai); color: #fff; }
 .tag-sheet { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; }
-.price-tag { border: 1.5px solid var(--ink); border-radius: 6px; padding: 0 0 8px; text-align: center; background: #fff; break-inside: avoid; display: flex; flex-direction: column; }
+.price-tag { border: 1.5px solid var(--ink); border-radius: 6px; text-align: center; background: #fff; break-inside: avoid; display: flex; flex-direction: column; box-sizing: border-box; }
 .price-tag .tag-spacer { flex: 1; }
 .tag-cat { color: #fff; font-size: 11px; letter-spacing: 0.15em; padding: 3px 0; }
-.tag-name { font-family: var(--serif); font-weight: 600; font-size: 16px; padding: 8px 10px 0; line-height: 1.35; }
+.tag-name { font-family: var(--serif); font-weight: 600; font-size: 16px; padding: 8px 10px 0; line-height: 1.35; overflow-wrap: anywhere; word-break: break-word; }
 .tag-maker { font-size: 11px; color: #5C6B78; }
 .tag-price { margin: 6px 0 4px; }
 .tag-yen { font-family: var(--serif); font-size: 30px; font-weight: 700; color: var(--shu); font-variant-numeric: tabular-nums; }
@@ -230,12 +230,12 @@ table.inv tr.low-row td { background: #FDF3EF; }
   <!-- ============ スキャン登録 ============ -->
   <section class="panel active" id="tab-scan">
     <div class="scan-box">
-      <button class="btn big scan-main" id="scan-toggle" onclick="toggleScan()">
-        <span class="scan-ico">▚</span> カメラでスキャン開始
-      </button>
-      <div id="jan-reader"></div>
-      <button class="btn ghost scan-sub" onclick="document.getElementById('photo-input').click()">写真から読み取る</button>
+      <div class="scan-btns">
+        <button class="btn scan-main" id="scan-toggle" onclick="toggleScan()"><span class="scan-ico">▚</span> カメラでスキャン</button>
+        <button class="btn ghost scan-sub" onclick="document.getElementById('photo-input').click()">写真から読み取る</button>
+      </div>
       <input type="file" id="photo-input" accept="image/*" style="display:none" onchange="handlePhoto(event)">
+      <div id="jan-reader"></div>
       <div id="jan-file-reader" style="display:none"></div>
       <p class="scan-msg" id="scan-msg"></p>
     </div>
@@ -316,6 +316,9 @@ table.inv tr.low-row td { background: #FDF3EF; }
           <div class="grid2">
             <label>商品名の色 <input type="color" id="ts-name-color" onchange="saveTagStyle()"></label>
             <label>価格の色 <input type="color" id="ts-price-color" onchange="saveTagStyle()"></label>
+          </div>
+          <div class="grid2">
+            <label>値札の余白(mm) <input type="number" id="ts-pad" min="0" max="20" step="0.5" inputmode="decimal" onchange="saveTagStyle()"></label>
           </div>
           <div class="field-toggles">
             <span class="ft-label">表示する項目:</span>
@@ -519,7 +522,7 @@ function ean13Svg(code, height, showNum){
     } else x += 1;
   }
   return '<div style="display:inline-block;text-align:center">'
-    + '<svg viewBox="0 0 '+m.length+' '+height+'" width="'+(m.length*1.4)+'" height="'+height+'" shape-rendering="crispEdges">'+rects+'</svg>'
+    + '<svg viewBox="0 0 '+m.length+' '+height+'" width="'+(m.length*1.4)+'" height="'+height+'" style="max-width:100%;height:auto" shape-rendering="crispEdges">'+rects+'</svg>'
     + (showNum ? '<div class="barcode-num">'+esc(code)+'</div>' : '') + '</div>';
 }
 
@@ -972,7 +975,7 @@ function fontCss(k){ return (FONTS[k]||FONTS.serif).css; }
 function fontCssAttr(k){ return fontCss(k).replace(/"/g, "'"); }
 const TAG_SIZES = { s: { w: 170, bar: 28 }, m: { w: 220, bar: 34 }, l: { w: 290, bar: 42 } };
 function tagSize_(t){ if (t.size === "custom") { const px = Math.round((t.width || 60) * 3.78); return { w: px, bar: Math.max(20, Math.round(px * 0.16)) }; } return TAG_SIZES[t.size] || TAG_SIZES.m; }
-function defaultTagStyle(){ return { size: "m", width: 60, height: 0, fields: { cat:true, name:true, maker:true, price:true, jan:true, jannum:true }, font: "serif", bold: "bold", nameSize: 16, priceSize: 30, nameColor: "#1F2933", priceColor: "#B7402B" }; }
+function defaultTagStyle(){ return { size: "m", width: 60, height: 0, pad: 2, fields: { cat:true, name:true, maker:true, price:true, jan:true, jannum:true }, font: "serif", bold: "bold", nameSize: 16, priceSize: 30, nameColor: "#1F2933", priceColor: "#B7402B" }; }
 function tagStyle_(){ return Object.assign(defaultTagStyle(), S.tagStyle || {}); }
 function syncTagStyleInputs(){
   const t = tagStyle_();
@@ -988,6 +991,7 @@ function syncTagStyleInputs(){
   document.getElementById("ts-price-size").value = t.priceSize;
   document.getElementById("ts-name-color").value = t.nameColor;
   document.getElementById("ts-price-color").value = t.priceColor;
+  document.getElementById("ts-pad").value = (t.pad==null?2:t.pad);
   const f = t.fields || {};
   document.getElementById("tf-cat").checked = f.cat !== false;
   document.getElementById("tf-name").checked = f.name !== false;
@@ -1010,6 +1014,7 @@ function saveTagStyle(){
     priceSize: Math.min(120, Math.max(10, parseInt(document.getElementById("ts-price-size").value, 10) || 30)),
     nameColor: document.getElementById("ts-name-color").value,
     priceColor: document.getElementById("ts-price-color").value,
+    pad: Math.min(20, Math.max(0, parseFloat(document.getElementById("ts-pad").value) || 0)),
     fields: {
       cat: document.getElementById("tf-cat").checked,
       name: document.getElementById("tf-name").checked,
@@ -1035,8 +1040,16 @@ function renderTags(){
   const t = tagStyle_();
   const sz = tagSize_(t);
   const fw = t.bold === "normal" ? 500 : 700;
-  const nameStyle = 'font-family:'+fontCssAttr(t.font)+' !important;font-size:'+t.nameSize+'px !important;color:'+t.nameColor+' !important;font-weight:'+fw+' !important';
-  const yenStyle = 'font-family:'+fontCssAttr(t.font)+' !important;font-size:'+t.priceSize+'px !important;color:'+t.priceColor+' !important;font-weight:'+fw+' !important';
+  // 値札の実効幅(px)に応じて文字を自動縮小(基準: 中サイズ相当220px=倍率1.0)
+  const baseW = 220;
+  const scale = Math.min(1, Math.max(0.35, sz.w / baseW));
+  const nName = Math.round(t.nameSize * scale);
+  const nPrice = Math.round(t.priceSize * scale);
+  const nMaker = Math.max(8, Math.round(11 * scale));
+  const ff = fontCssAttr(t.font);
+  const nameStyle = 'font-family:'+ff+' !important;font-size:'+nName+'px !important;color:'+t.nameColor+' !important;font-weight:'+fw+' !important;line-height:1.2 !important';
+  const yenStyle = 'font-family:'+ff+' !important;font-size:'+nPrice+'px !important;color:'+t.priceColor+' !important;font-weight:'+fw+' !important;line-height:1.1 !important';
+  const makerStyle = 'font-size:'+nMaker+'px';
   const f = t.fields || {};
   const isCustom = t.size === "custom";
   const sheetStyle = isCustom
@@ -1048,18 +1061,19 @@ function renderTags(){
       let inner = '';
       if (f.cat !== false) inner += '<div class="tag-cat" style="background:'+CAT_COLOR[it.category]+'">'+it.category+'</div>';
       if (it.ranyo) inner += '<div class="tag-ranyo">指定濫用防止医薬品</div>';
-      inner += '<div style="padding:6px 8px 0">';
+      inner += '<div>';
       if (f.name !== false) inner += '<div class="tag-name" style="'+nameStyle+'">'+(it.name?esc(it.name):"(名称未設定)")+'</div>';
-      if (f.maker !== false && it.maker) inner += '<div class="tag-maker">'+esc(it.maker)+'</div>';
+      if (f.maker !== false && it.maker) inner += '<div class="tag-maker" style="'+makerStyle+'">'+esc(it.maker)+'</div>';
       if (f.price !== false) inner += '<div class="tag-price"><span class="tag-yen" style="'+yenStyle+'">'+(it.price===""?"—":"¥"+Number(it.price).toLocaleString("ja-JP"))+'</span><span class="tag-tax">税込</span></div>';
       inner += '</div>';
       if (isCustom && t.height) inner += '<div class="tag-spacer"></div>';
-      if (f.jan !== false) inner += '<div style="padding-bottom:4px">'+ean13Svg(it.jan, sz.bar, f.jannum !== false)+'</div>';
+      if (f.jan !== false) inner += '<div style="padding-bottom:4px;max-width:100%;overflow:hidden">'+ean13Svg(it.jan, sz.bar, f.jannum !== false)+'</div>';
       else if (f.jannum !== false) inner += '<div class="barcode-num" style="padding-bottom:4px">'+esc(it.jan)+'</div>';
       // カスタム時は幅・高さをmmで固定(印刷実寸を保証)
-      let tagStyle = '';
+      const pad = (t.pad==null?2:t.pad);
+      let tagStyle = 'padding:'+pad+'mm '+pad+'mm '+(pad+2)+'mm;';
       if (isCustom){
-        tagStyle = 'width:'+t.width+'mm;';
+        tagStyle += 'width:'+t.width+'mm;';
         if (t.height) tagStyle += 'height:'+t.height+'mm;';
       }
       return '<div class="price-tag"'+(tagStyle?(' style="'+tagStyle+'"'):'')+'>'+inner+'</div>';
