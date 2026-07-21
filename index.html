@@ -956,6 +956,7 @@ function fontOptions(sel){
   return Object.keys(FONTS).map(k => '<option value="'+k+'"'+(k===sel?' selected':'')+'>'+FONTS[k].label+'</option>').join("");
 }
 function fontCss(k){ return (FONTS[k]||FONTS.serif).css; }
+function fontCssAttr(k){ return fontCss(k).replace(/"/g, "'"); }
 const TAG_SIZES = { s: { w: 170, bar: 28 }, m: { w: 220, bar: 34 }, l: { w: 290, bar: 42 } };
 function tagSize_(t){ if (t.size === "custom") { const px = Math.round((t.width || 60) * 3.78); return { w: px, bar: Math.max(20, Math.round(px * 0.16)) }; } return TAG_SIZES[t.size] || TAG_SIZES.m; }
 function defaultTagStyle(){ return { size: "m", width: 60, height: 0, fields: { cat:true, name:true, maker:true, price:true, jan:true, jannum:true }, font: "serif", bold: "bold", nameSize: 16, priceSize: 30, nameColor: "#1F2933", priceColor: "#B7402B" }; }
@@ -1021,8 +1022,8 @@ function renderTags(){
   const t = tagStyle_();
   const sz = tagSize_(t);
   const fw = t.bold === "normal" ? 500 : 700;
-  const nameStyle = 'font-family:'+fontCss(t.font)+' !important;font-size:'+t.nameSize+'px !important;color:'+t.nameColor+' !important;font-weight:'+fw+' !important';
-  const yenStyle = 'font-family:'+fontCss(t.font)+' !important;font-size:'+t.priceSize+'px !important;color:'+t.priceColor+' !important;font-weight:'+fw+' !important';
+  const nameStyle = 'font-family:'+fontCssAttr(t.font)+' !important;font-size:'+t.nameSize+'px !important;color:'+t.nameColor+' !important;font-weight:'+fw+' !important';
+  const yenStyle = 'font-family:'+fontCssAttr(t.font)+' !important;font-size:'+t.priceSize+'px !important;color:'+t.priceColor+' !important;font-weight:'+fw+' !important';
   const f = t.fields || {};
   area.innerHTML =
     '<div class="row gap" style="margin-bottom:12px"><button class="btn" onclick="window.print()">値札を印刷(' + arr.length + ' 枚)</button></div>'
@@ -1096,7 +1097,7 @@ function renderPop(){
   const copy = document.getElementById("pop-copy").value;
   const note = document.getElementById("pop-note").value;
   const pf = popFont_();
-  const ff = fontCss(pf.font);
+  const ff = fontCssAttr(pf.font);
   const x = pf.fields || {};
   let h = '<div class="pop-card ps-' + ps + '" style="font-family:'+ff+'">';
   if (ps === "sale") h += '<div class="pop-sale-badge">特売</div>';
