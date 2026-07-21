@@ -69,6 +69,8 @@ input:focus, select:focus { outline: 2px solid var(--ai); outline-offset: -1px; 
 .stat.warn .stat-num { color: var(--shu); }
 .stat-label { font-size: 11.5px; color: #5C6B78; letter-spacing: 0.1em; }
 .search { flex: 1; min-width: 180px; }
+.selall-row { flex-direction: row; align-items: center; gap: 8px; font-size: 13px; color: var(--ink); }
+.selall-row input { width: auto; }
 .select-bar { font-size: 13.5px; background: #EDF2F0; border-radius: 8px; padding: 8px 12px; display: none; }
 .stock-list { list-style: none; padding: 0; display: flex; flex-direction: column; gap: 8px; }
 .stock-item { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; background: #fff; }
@@ -261,6 +263,7 @@ table.inv tr.low-row td { background: #FDF3EF; }
       <button class="btn ghost" id="view-toggle" onclick="toggleView()">表形式</button>
       <button class="btn ghost" onclick="exportCsv()">CSV出力</button>
     </div>
+    <label class="selall-row"><input type="checkbox" id="sel-all" onchange="toggleSelectAll()"> 表示中をすべて選択(値札用)</label>
     <div class="select-bar" id="select-bar"></div>
     <div id="list-area"></div>
   </section>
@@ -280,6 +283,9 @@ table.inv tr.low-row td { background: #FDF3EF; }
               <select id="ts-size" onchange="saveTagStyle()"><option value="s">小</option><option value="m">中</option><option value="l">大</option><option value="custom">自分で指定</option></select>
             </label>
             <label id="ts-width-wrap" style="display:none">値札の幅(mm) <input type="number" id="ts-width" min="30" max="200" inputmode="numeric" onchange="saveTagStyle()"></label>
+          </div>
+          <div class="grid2" id="ts-height-wrap" style="display:none">
+            <label>値札の高さ(mm) <input type="number" id="ts-height" min="0" max="200" inputmode="numeric" placeholder="0=自動" onchange="saveTagStyle()"></label>
           </div>
           <div class="grid2">
             <label>フォント <select id="ts-font" onchange="saveTagStyle()"></select></label>
@@ -302,7 +308,7 @@ table.inv tr.low-row td { background: #FDF3EF; }
       <div class="form">
         <div class="grid2">
           <label>対象商品 <select id="pop-item" onchange="renderPop()"></select></label>
-          <label>デザイン <select id="pop-style" onchange="savePopStyle()"><option value="refined">洗練された</option><option value="fun">楽しい</option><option value="oshare">おしゃれな</option><option value="medatsu">目立つ</option><option value="sale">特売</option></select></label>
+          <label>デザイン <select id="pop-style" onchange="savePopStyle()"><option value="refined">デザイン①(洗練)</option><option value="fun">デザイン②(楽しい)</option><option value="oshare">デザイン③(おしゃれ)</option><option value="medatsu">デザイン④(目立つ)</option><option value="sale">デザイン⑤(特売)</option></select></label>
         </div>
         <div class="grid2">
           <label>キャッチコピー <input id="pop-copy" value="薬剤師おすすめ" oninput="renderPop()"></label>
@@ -757,6 +763,23 @@ function toggleSelect(id){
   selected.has(id) ? selected.delete(id) : selected.add(id);
   renderList(); renderTags();
 }
+function currentFiltered(){
+  const q = document.getElementById("q").value.trim().toLowerCase();
+  const cf = document.getElementById("cat-filter").value;
+  const arr = S.items.filter(it => {
+    if (cf !== "すべて" && it.category !== cf) return false;
+    if (!q) return true;
+    return it.name.toLowerCase().includes(q) || it.jan.includes(q) || (it.maker||"").toLowerCase().includes(q);
+  });
+  return arr;
+}
+function toggleSelectAll(){
+  const on = document.getElementById("sel-all").checked;
+  const arr = currentFiltered();
+  if (on) arr.forEach(it => selected.add(it.id));
+  else arr.forEach(it => selected.delete(it.id));
+  renderList(); renderTags();
+}
 function sortItems(arr){
   const by = (document.getElementById("sort-by")||{}).value || "new";
   const jaKey = it => (it.kana || it.name || "").normalize("NFKC");
@@ -794,6 +817,9 @@ function renderList(){
   });
   sortItems(arr);
 
+  const shown = arr;
+  const selAll = document.getElementById("sel-all");
+  if (selAll) selAll.checked = shown.length > 0 && shown.every(it => selected.has(it.id));
   const bar = document.getElementById("select-bar");
   if (selected.size){
     bar.style.display = "block";
@@ -908,14 +934,16 @@ function fontOptions(sel){
 function fontCss(k){ return (FONTS[k]||FONTS.serif).css; }
 const TAG_SIZES = { s: { w: 170, bar: 28 }, m: { w: 220, bar: 34 }, l: { w: 290, bar: 42 } };
 function tagSize_(t){ if (t.size === "custom") { const px = Math.round((t.width || 60) * 3.78); return { w: px, bar: Math.max(20, Math.round(px * 0.16)) }; } return TAG_SIZES[t.size] || TAG_SIZES.m; }
-function defaultTagStyle(){ return { size: "m", width: 60, font: "serif", bold: "bold", nameSize: 16, priceSize: 30, nameColor: "#1F2933", priceColor: "#B7402B" }; }
+function defaultTagStyle(){ return { size: "m", width: 60, height: 0, font: "serif", bold: "bold", nameSize: 16, priceSize: 30, nameColor: "#1F2933", priceColor: "#B7402B" }; }
 function tagStyle_(){ return Object.assign(defaultTagStyle(), S.tagStyle || {}); }
 function syncTagStyleInputs(){
   const t = tagStyle_();
   document.getElementById("ts-font").innerHTML = fontOptions(t.font);
   document.getElementById("ts-size").value = t.size;
   document.getElementById("ts-width").value = t.width || 60;
+  document.getElementById("ts-height").value = t.height || 0;
   document.getElementById("ts-width-wrap").style.display = t.size === "custom" ? "flex" : "none";
+  document.getElementById("ts-height-wrap").style.display = t.size === "custom" ? "grid" : "none";
   document.getElementById("ts-font").value = t.font;
   document.getElementById("ts-bold").value = t.bold;
   document.getElementById("ts-name-size").value = t.nameSize;
@@ -926,9 +954,11 @@ function syncTagStyleInputs(){
 function saveTagStyle(){
   const size = document.getElementById("ts-size").value;
   document.getElementById("ts-width-wrap").style.display = size === "custom" ? "flex" : "none";
+  document.getElementById("ts-height-wrap").style.display = size === "custom" ? "grid" : "none";
   S.tagStyle = {
     size: size,
     width: Math.min(200, Math.max(30, parseInt(document.getElementById("ts-width").value, 10) || 60)),
+    height: Math.min(200, Math.max(0, parseInt(document.getElementById("ts-height").value, 10) || 0)),
     font: document.getElementById("ts-font").value,
     bold: document.getElementById("ts-bold").value,
     nameSize: Math.min(60, Math.max(8, parseInt(document.getElementById("ts-name-size").value, 10) || 16)),
@@ -952,12 +982,12 @@ function renderTags(){
   const t = tagStyle_();
   const sz = tagSize_(t);
   const fw = t.bold === "normal" ? 500 : 700;
-  const nameStyle = 'font-family:' + fontCss(t.font) + ';font-size:' + t.nameSize + 'px;color:' + t.nameColor + ';font-weight:' + fw;
-  const yenStyle = 'font-family:' + fontCss(t.font) + ';font-size:' + t.priceSize + 'px;color:' + t.priceColor + ';font-weight:' + fw;
+  const nameStyle = 'font-family:'+fontCss(t.font)+' !important;font-size:'+t.nameSize+'px !important;color:'+t.nameColor+' !important;font-weight:'+fw+' !important';
+  const yenStyle = 'font-family:'+fontCss(t.font)+' !important;font-size:'+t.priceSize+'px !important;color:'+t.priceColor+' !important;font-weight:'+fw+' !important';
   area.innerHTML =
     '<div class="row gap" style="margin-bottom:12px"><button class="btn" onclick="window.print()">値札を印刷(' + arr.length + ' 枚)</button></div>'
     + '<div class="tag-sheet print-target size-' + t.size + '" style="grid-template-columns:repeat(auto-fill,minmax(' + sz.w + 'px,1fr))">' + arr.map(it =>
-      '<div class="price-tag">'
+      '<div class="price-tag"'+(t.size==="custom" && t.height?(' style="min-height:'+Math.round(t.height*3.78)+'px"'):'')+'>'
       + '<div class="tag-cat" style="background:'+CAT_COLOR[it.category]+'">'+it.category+'</div>'
       + (it.ranyo?'<div class="tag-ranyo">指定濫用防止医薬品</div>':'')
       + '<div class="tag-name" style="'+nameStyle+'">'+(it.name?esc(it.name):"(名称未設定)")+'</div>'
