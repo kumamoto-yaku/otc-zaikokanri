@@ -154,6 +154,13 @@ table.inv { border-collapse: collapse; font-size: 12px; min-width: 760px; width:
 table.inv th { background: var(--ai); color: #fff; padding: 6px 8px; text-align: left; white-space: nowrap; }
 table.inv td { border-top: 1px solid var(--line); padding: 6px 8px; white-space: nowrap; background: #fff; }
 table.inv tr.low-row td { background: #FDF3EF; }
+.qty-ctrl-sm { display: inline-flex; align-items: center; gap: 4px; }
+.qty-ctrl-sm button { width: 22px; height: 22px; border-radius: 50%; border: 1px solid var(--line); background: #F7F9F8; font-size: 13px; cursor: pointer; line-height: 1; padding: 0; }
+.qty-ctrl-sm span { min-width: 20px; text-align: center; font-variant-numeric: tabular-nums; }
+.row-actions { display: inline-flex; gap: 2px; }
+.row-actions button { border: none; background: none; cursor: pointer; padding: 3px; font-size: 15px; }
+.row-actions .edit { color: var(--ai); }
+.row-actions .del { color: #9AA7AF; font-size: 17px; }
 .expiry-alert { border: 1px solid #E8C4B8; border-radius: 10px; background: #FDF3EF; padding: 10px 12px; margin: 8px 0 4px; font-size: 13px; color: #6B3A2C; display: flex; flex-direction: column; gap: 6px; }
 .ea-row { line-height: 1.5; }
 .ea-expired strong { color: #C0392B; }
@@ -492,7 +499,7 @@ async function checkLogin(){
 }
 /* ============ 定数 ============ */
 const CATEGORIES = ["要指導医薬品","第1類医薬品","指定第2類医薬品","第2類医薬品","第3類医薬品","医薬部外品","サプリメント・健康食品","食品・菓子","飲料","日用品・雑貨"];
-const CAT_SHORT = {"要指導医薬品":"要指導","第1類医薬品":"第①類","指定第2類医薬品":"指定第②類","第2類医薬品":"第②類","第3類医薬品":"第③類","医薬部外品":"部外品","サプリメント・健康食品":"サプリ","食品・菓子":"食品","飲料":"飲料","日用品・雑貨":"日用品"};
+const CAT_SHORT = {"要指導医薬品":"要指導","第1類医薬品":"第1類","指定第2類医薬品":"指定第2類","第2類医薬品":"第2類","第3類医薬品":"第3類","医薬部外品":"部外品","サプリメント・健康食品":"サプリ","食品・菓子":"食品","飲料":"飲料","日用品・雑貨":"日用品"};
 const CAT_COLOR = {"要指導医薬品":"#6A3FA0","第1類医薬品":"#C0392B","指定第2類医薬品":"#D97B29","第2類医薬品":"#3E7C59","第3類医薬品":"#2E6DA4","医薬部外品":"#5C6B78","サプリメント・健康食品":"#647D8C","食品・菓子":"#8A6D3B","飲料":"#4E7F8C","日用品・雑貨":"#75808A"};
 
 /* ============ 状態 ============ */
@@ -1003,19 +1010,25 @@ function renderList(){
   }
   if (listMode === "table"){
     area.innerHTML = '<div class="table-wrap"><table class="inv"><thead><tr>'
-      + '<th>選</th><th>商品名</th><th>区分</th><th>価格</th><th>在庫</th><th>発注点</th><th>期限</th><th>メーカー</th><th>JAN</th><th>メモ</th><th>更新日</th>'
+      + '<th>選</th><th>商品名</th><th>区分</th><th>価格</th><th>在庫</th><th>発注点</th><th>期限</th><th>メーカー</th><th>JAN</th><th>メモ</th><th>更新日</th><th>操作</th>'
       + '</tr></thead><tbody>'
       + arr.map(it =>
-        '<tr class="'+(it.qty<=it.reorder?'low-row':'')+'" onclick="editItem(\''+it.id+'\')" style="cursor:pointer">'
-        + '<td onclick="event.stopPropagation()"><input type="checkbox" '+(selected.has(it.id)?'checked':'')+' onchange="toggleSelect(\''+it.id+'\')" aria-label="値札用に選択"></td>'
-        + '<td>'+(it.name?esc(it.name):"(名称未設定)")+(it.ranyo?' <span class="ranyo-flag">濫用防止</span>':'')+'</td>'
+        '<tr class="'+(it.qty<=it.reorder?'low-row':'')+'">'
+        + '<td><input type="checkbox" '+(selected.has(it.id)?'checked':'')+' onchange="toggleSelect(\''+it.id+'\')" aria-label="値札用に選択"></td>'
+        + '<td class="name-cell" onclick="editItem(\''+it.id+'\')" style="cursor:pointer">'+(it.name?esc(it.name):"(名称未設定)")+(it.ranyo?' <span class="ranyo-flag">濫用防止</span>':'')+'</td>'
         + '<td style="color:'+(CAT_COLOR[it.category]||"#5C6B78")+';font-weight:600">'+(CAT_SHORT[it.category]||it.category)+'</td>'
-        + '<td>'+yen(it.price)+'</td><td>'+it.qty+'</td><td>'+it.reorder+'</td>'
-        + '<td'+expiryTdStyle(it.expiry)+'>'+(it.expiry||"")+'</td><td>'+esc(it.maker||"")+'</td>'
+        + '<td>'+yen(it.price)+'</td>'
+        + '<td><div class="qty-ctrl-sm"><button onclick="changeQty(\''+it.id+'\',-1)">−</button><span>'+it.qty+'</span><button onclick="changeQty(\''+it.id+'\',1)">＋</button></div></td>'
+        + '<td>'+it.reorder+'</td>'
+        + '<td'+expiryTdStyle(it.expiry)+'>'+(it.expiry?fmtExpiry(it.expiry):"")+'</td><td>'+esc(it.maker||"")+'</td>'
         + '<td style="font-family:monospace">'+it.jan+'</td>'
-        + '<td>'+esc(it.memo||"")+'</td><td>'+(it.updatedAt||"")+'</td></tr>'
+        + '<td>'+esc(it.memo||"")+'</td><td>'+(it.updatedAt||"")+'</td>'
+        + '<td><div class="row-actions">'
+        +   '<button class="info-btn" onclick="openDrugInfo(\''+it.id+'\')" title="患者説明資料">📄</button>'
+        +   '<button class="del" onclick="removeItem(\''+it.id+'\')" title="削除">×</button>'
+        + '</div></td></tr>'
       ).join("")
-      + '</tbody></table></div><p class="hint" style="margin-top:6px">横にスクロールすると全ての列が見られます。行をタップすると編集、左端のチェックで値札用に選択できます。</p>';
+      + '</tbody></table></div><p class="hint" style="margin-top:6px">横にスクロールすると全ての列が見られます。右端の操作欄で説明資料・編集・削除ができます。</p>';
     return;
   }
   area.innerHTML = '<ul class="stock-list">' + arr.map(it =>
@@ -1027,7 +1040,6 @@ function renderList(){
     + '</div>'
     + '<div class="qty-ctrl"><button onclick="changeQty(\''+it.id+'\',-1)" aria-label="1減らす">−</button><span class="qty">'+it.qty+'</span><button onclick="changeQty(\''+it.id+'\',1)" aria-label="1増やす">＋</button></div>'
     + '<button class="info-btn" onclick="event.stopPropagation();openDrugInfo(\''+it.id+'\')" aria-label="患者説明資料" title="患者説明資料を開く">📄</button>'
-    + '<button class="edit" onclick="editItem(\''+it.id+'\')" aria-label="編集">✎</button>'
     + '<button class="del" onclick="removeItem(\''+it.id+'\')" aria-label="削除">×</button></li>'
   ).join("") + '</ul>';
 }
