@@ -61,7 +61,8 @@ body { min-height: 100vh; background: var(--hakuji); color: var(--ink); font-fam
 .divider::before, .divider::after { content: ""; flex: 1; height: 1px; background: var(--line); }
 .form { display: flex; flex-direction: column; gap: 12px; }
 label { display: flex; flex-direction: column; gap: 4px; font-size: 12.5px; color: #4A5761; letter-spacing: 0.04em; }
-input, select { font-family: var(--sans); font-size: 15px; padding: 9px 10px; border: 1px solid var(--line); border-radius: 7px; background: #FBFCFC; color: var(--ink); width: 100%; min-width: 0; box-sizing: border-box; -webkit-appearance: none; appearance: none; }
+input:not([type="checkbox"]):not([type="radio"]):not([type="color"]), select { font-family: var(--sans); font-size: 15px; padding: 9px 10px; border: 1px solid var(--line); border-radius: 7px; background: #FBFCFC; color: var(--ink); width: 100%; min-width: 0; box-sizing: border-box; -webkit-appearance: none; appearance: none; }
+input[type="checkbox"], input[type="radio"] { -webkit-appearance: auto; appearance: auto; width: 20px; height: 20px; min-width: 20px; accent-color: var(--ai); cursor: pointer; }
 input[type="month"], input[type="date"] { -webkit-appearance: none; appearance: none; min-height: 40px; }
 input:focus, select:focus { outline: 2px solid var(--ai); outline-offset: -1px; background: #fff; }
 .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
