@@ -299,9 +299,31 @@ table.inv tr.low-row td { background: #FDF3EF; }
         <label>リスク区分 <select id="f-category"></select></label>
       </div>
       <div class="grid3">
-        <label>販売価格(税込) <input inputmode="numeric" id="f-price" placeholder="998"></label>
+        <label>販売価格(税込) <input inputmode="numeric" id="f-price" placeholder="998" oninput="updatePriceHint()"></label>
         <label id="f-qty-label">入庫数 <input inputmode="numeric" id="f-qty" value="1"></label>
         <label>発注点 <input inputmode="numeric" id="f-reorder" value="2"></label>
+      </div>
+      <label class="chk-row"><input type="checkbox" id="f-reduced" onchange="updatePriceHint()"> 軽減税率対象(8%)商品 ※未チェックは10%</label>
+      <p class="hint" id="price-hint" style="margin-top:-4px"></p>
+      <div class="grid2">
+        <label>発注先 <select id="f-supplier" onchange="toggleSupplierOther()">
+          <option value="">— 選択 —</option>
+          <option>e健康ショップ</option>
+          <option>アステム</option>
+          <option>アトル</option>
+          <option>アルフレッサ</option>
+          <option>九州東邦</option>
+          <option>翔薬</option>
+          <option>新生堂</option>
+          <option>富田薬品</option>
+          <option>リッツメディカル</option>
+          <option value="__other">その他(自由記載)</option>
+        </select></label>
+        <label id="f-supplier-other-wrap" style="display:none">発注先(その他) <input id="f-supplier-other" placeholder="発注先名を入力"></label>
+      </div>
+      <div class="grid2">
+        <label>納入価(税抜) <input inputmode="numeric" id="f-cost" placeholder="例:600"></label>
+        <label>職員販売価格(税込) <input inputmode="numeric" id="f-staff-price" placeholder="例:800"></label>
       </div>
       <label>使用期限(年月) <input type="month" id="f-expiry"></label>
       <label>メモ <input id="f-memo" placeholder="陳列場所・仕入先など"></label>
@@ -729,6 +751,8 @@ function fillCategorySelects(){
   cf.innerHTML = "<option>すべて</option>" + CATEGORIES.map(c => "<option>"+c+"</option>").join("");
 }
 function readForm(){
+  const supSel = document.getElementById("f-supplier").value;
+  const supplier = supSel === "__other" ? document.getElementById("f-supplier-other").value.trim() : supSel;
   return {
     jan: document.getElementById("f-jan").value.replace(/\D/g,""),
     name: document.getElementById("f-name").value.trim(),
@@ -739,9 +763,14 @@ function readForm(){
     reorder: Math.max(0, parseInt(document.getElementById("f-reorder").value,10) || 0),
     expiry: document.getElementById("f-expiry").value,
     memo: document.getElementById("f-memo").value.trim(),
-    ranyo: document.getElementById("f-ranyo").checked
+    ranyo: document.getElementById("f-ranyo").checked,
+    reduced: document.getElementById("f-reduced").checked,
+    supplier: supplier,
+    cost: document.getElementById("f-cost").value.replace(/\D/g,""),
+    staffPrice: document.getElementById("f-staff-price").value.replace(/\D/g,"")
   };
 }
+const SUPPLIERS = ["e健康ショップ","アステム","アトル","アルフレッサ","九州東邦","翔薬","新生堂","富田薬品","リッツメディカル"];
 function fillForm(o){
   document.getElementById("f-jan").value = o.jan || "";
   document.getElementById("f-name").value = o.name || "";
@@ -753,6 +782,35 @@ function fillForm(o){
   document.getElementById("f-expiry").value = o.expiry || "";
   document.getElementById("f-memo").value = o.memo || "";
   document.getElementById("f-ranyo").checked = !!o.ranyo;
+  document.getElementById("f-reduced").checked = !!o.reduced;
+  document.getElementById("f-cost").value = (o.cost===0||o.cost) ? o.cost : "";
+  document.getElementById("f-staff-price").value = (o.staffPrice===0||o.staffPrice) ? o.staffPrice : "";
+  // 発注先: 既定リストにあればそれを選択、なければ「その他」
+  const sup = o.supplier || "";
+  const otherWrap = document.getElementById("f-supplier-other-wrap");
+  if (sup && SUPPLIERS.indexOf(sup) === -1){
+    document.getElementById("f-supplier").value = "__other";
+    document.getElementById("f-supplier-other").value = sup;
+    otherWrap.style.display = "flex";
+  } else {
+    document.getElementById("f-supplier").value = sup;
+    document.getElementById("f-supplier-other").value = "";
+    otherWrap.style.display = "none";
+  }
+  updatePriceHint();
+}
+function updatePriceHint(){
+  const raw = parseInt((document.getElementById("f-price").value||"").replace(/\D/g,""),10);
+  const reduced = document.getElementById("f-reduced").checked;
+  const hint = document.getElementById("price-hint");
+  if (!raw){ hint.textContent = ""; return; }
+  const rate = reduced ? 0.08 : 0.10;
+  const excl = Math.round(raw / (1 + rate));
+  hint.textContent = "税込 " + raw.toLocaleString("ja-JP") + "円(" + (reduced?"軽減8%":"10%") + ")。税抜換算 約" + excl.toLocaleString("ja-JP") + "円。値札には「税込」と表示されます。";
+}
+function toggleSupplierOther(){
+  const other = document.getElementById("f-supplier").value === "__other";
+  document.getElementById("f-supplier-other-wrap").style.display = other ? "flex" : "none";
 }
 function clearForm(){
   editingId = null;
@@ -802,7 +860,7 @@ function saveItem(){
   const f = readForm();
   if (!f.jan || !f.name){ toast("JANコードと商品名は必須です"); return; }
   if (!isValidJan(f.jan)){ toast("JANコードの形式が正しくありません(8桁または13桁)"); return; }
-  S.master[f.jan] = { name: f.name, maker: f.maker, category: f.category, price: f.price };
+  S.master[f.jan] = { name: f.name, maker: f.maker, category: f.category, price: f.price, reduced: f.reduced, supplier: f.supplier, cost: f.cost, staffPrice: f.staffPrice };
   if (editingId){
     S.items = S.items.map(it => it.id===editingId ? Object.assign({}, it, f, { updatedAt: today() }) : it);
     flash("upd", "上書き保存しました", f.name);
@@ -1076,8 +1134,8 @@ function restoreData(ev){
 }
 function exportCsv(){
   if (!S.items.length){ toast("在庫がありません"); return; }
-  const head = ["JANコード","商品名","メーカー","区分","濫用防止","販売価格","在庫数","発注点","使用期限","メモ","更新日"];
-  const rows = S.items.map(it => [it.jan,it.name,it.maker,it.category,(it.ranyo?"該当":""),it.price,it.qty,it.reorder,it.expiry,(it.memo||"").replace(/[\r\n,]/g," "),it.updatedAt]);
+  const head = ["JANコード","商品名","メーカー","区分","濫用防止","販売価格(税込)","税率","発注先","納入価(税抜)","職員販売価格(税込)","在庫数","発注点","使用期限","メモ","更新日"];
+  const rows = S.items.map(it => [it.jan,it.name,it.maker,it.category,(it.ranyo?"該当":""),it.price,(it.reduced?"8%":"10%"),(it.supplier||""),(it.cost||""),(it.staffPrice||""),it.qty,it.reorder,it.expiry,(it.memo||"").replace(/[\r\n,]/g," "),it.updatedAt]);
   const csv = "\uFEFF" + [head].concat(rows).map(r => r.join(",")).join("\r\n");
   const blob = new Blob([csv], { type: "text/csv" });
   const a = document.createElement("a");
