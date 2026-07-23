@@ -7,6 +7,9 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="OTC在庫台帳">
 <meta name="format-detection" content="telephone=no">
+<meta name="theme-color" content="#1E3A55">
+<link rel="icon" type="image/png" sizes="64x64" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAEaklEQVR42u2bW2gcVRjHv3OZmd3sbro1abZGsqEtbJOWQkRKxILkQbCP+mAUUagPmpJWaYkPgpcG1D5Z8MEWqoKCT1oQwRdFH0LthRiqxdILha5kaxOj2bpmL7Mzey4+tAMx7Ca7mdnJ7Mx+r3PZ+f/O/3zzfXvmIGggko89I6EFInPhDKr3XOQX0euFgf0svh4NyK/C63UDDor4WtpwUMTX0ogh4IGDNPrVtOKgiV8JoT0Fgg4ABdH+bQe0AXgYAMGYI4Rk4ABQQhgAABeCSCmRa7/rFQCqQo3ElgcWTr57JCe4ED+ev5Q99cU3I5SSCmNc8e1b4MnH906ntif1119+dqRY0guRjnDUOmaYlXI6M5eZeP+UuHrz9wHfAZg9/9WqxxnnjBJCy4aphzQ13L9v1D85wBIvhBRSSlkjL1AAAEqJUg+wlgGwXAjGCCOE0BoJktbrGs8DsCOAcc7KhqnvTm270ZIA7I4eJYSGNDV84s1xTCmptBQAp6zLOGfbk71Jp16NrgCYOXEIGOfMoYKJaqoSGn/xqamWAPCROQ1/HHsVMj9fLDt53yf2PdIFAGC3bG4qgNPqNUDRGLuxmC/sf+34r1+f/eWyY8mLYAwAgBESngRwWr1m1dp0sDsWfZrNxg4ffaf07U+Xrti9d7GkFw69/WHc6h08B8ASb8WCKeD5BB16iadjY0eO5e1CiHSEo//kluJWA+UpACvFWzFvcBjdquyxA8GqGD/45MupUtmIMM6ppwDUEl8NwsGjkw1DkBIkAMDNdCbsuULos9D1us6zIBxgtxqGgDHCAADfn50Z9hSAIbw0je5ZVDQbgtMdoSMAesHQNYJB1vG9gR0IzWiHyaa+3ZPrvhgkU6XQj8fmUjmTw1pd3coocAmPxmlCWVrMvffDb/nU4M7czv7ehFvibQOQgPAmxP8ekllMEajrucdKCNsGBrKD/Q9udUO8rSmApeQAAK/Q27kdHUrUzkNY0+EFnu54Y+KtfPriuYLVOzRTvC0AEt3LyByQyBr2O9N5g8NzPWRoUlx/ODc5Hr07c442W7w9APcT3hURy0YoceRhFkwBnZ2R0J27/8LeiZOutOm23wLfie6RP01W5gDOtLsA9LA6DG6FbQAEROUvoWUSGnVkjWHM3OXmn1T2AXDAyuf8ITFf5rpdF7gt3rFC6LYMDfRoJExsrDRthHhHe4HRQmqZK1Z3gpBSLi+bN0q8493gmLkLNqsUhESVbo1WBYEAIK5SFCIYqxhtqPj7SdfZGC2koA+VZw/od3APZsktKqVFxqFLU+BWqVJIhkj00+LmqTnQwpdF5zBscDRtbZCAqHDAyn68OLUH57sISPwx64sXJY4biETAI+H64igByTggzyzLu7IugACk1Tt4SXxTckCtslkiRMCD0f5Iqg0g6AAa2WDkt8hcOIPaDmgDgMb22fnJ/v9zQJAgLNfangK1yARh9Ks6wM8QqmlbVaxfdpOsNqh4vRf6QfyaDmhVRzQycP8Bo+cBG8lN8rUAAAAASUVORK5CYII=">
+<link rel="apple-touch-icon" sizes="180x180" href="data:image/png;base64,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">
 <title>OTC在庫台帳 — とみながグループ</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
 <style>
@@ -143,6 +146,8 @@ input:focus, select:focus { outline: 2px solid var(--ai); outline-offset: -1px; 
 .hit-ph { font-size: 12.5px; color: #5C6B78; }
 .chk-row { flex-direction: row; align-items: center; gap: 8px; font-size: 13px; color: var(--ink); }
 .chk-row input { width: auto; }
+.sub-cost { color: #8A6D3B; }
+.sub-sup { color: #4E7F8C; }
 .ranyo-flag { color: #8A6400; background: #FBEFC7; border: 1px solid #E3C65A; border-radius: 4px; font-size: 10.5px; padding: 1px 5px; white-space: nowrap; }
 .tag-ranyo { background: #F5D547; color: #4A3B00; font-size: 10px; letter-spacing: 0.1em; padding: 2px 0; font-weight: 600; }
 .pop-ranyo { font-size: 11.5px; color: #8A6400; background: #FBEFC7; border-radius: 4px; padding: 2px 8px; }
@@ -226,7 +231,7 @@ table.inv td { border-top: 1px solid var(--line); padding: 6px 8px; white-space:
 <body>
 <div id="login-gate">
   <div class="login-card">
-    <div style="text-align:center"><span class="brand-mark" style="display:inline-flex">薬</span></div>
+    <div style="text-align:center"><span class="brand-mark" style="display:inline-flex"><svg viewBox="0 0 48 48" width="26" height="26" aria-hidden="true"><g transform="rotate(-45 24 24)"><rect x="6" y="17" width="36" height="14" rx="7" fill="#ffffff"/><path d="M13 17h11v14H13a7 7 0 0 1-7-7 7 7 0 0 1 7-7z" fill="#B7402B"/><rect x="23" y="17" width="1.6" height="14" fill="#14283C" opacity="0.35"/><rect x="6.8" y="17.8" width="34.4" height="12.4" rx="6.2" fill="none" stroke="#14283C" stroke-opacity="0.28" stroke-width="1.2"/></g></svg></span></div>
     <h2>OTC在庫台帳</h2>
     <p class="hint" style="text-align:center">とみながグループ 専用ページです。<br>配布された会員IDとパスワードを入力してください。</p>
     <label>会員ID <input id="login-id" autocomplete="username"></label>
@@ -250,7 +255,7 @@ table.inv td { border-top: 1px solid var(--line); padding: 6px 8px; white-space:
 <div class="chrome">
   <header class="header">
     <div class="brand">
-      <span class="brand-mark">薬</span>
+      <span class="brand-mark"><svg viewBox="0 0 48 48" width="26" height="26" aria-hidden="true"><g transform="rotate(-45 24 24)"><rect x="6" y="17" width="36" height="14" rx="7" fill="#ffffff"/><path d="M13 17h11v14H13a7 7 0 0 1-7-7 7 7 0 0 1 7-7z" fill="#B7402B"/><rect x="23" y="17" width="1.6" height="14" fill="#14283C" opacity="0.35"/><rect x="6.8" y="17.8" width="34.4" height="12.4" rx="6.2" fill="none" stroke="#14283C" stroke-opacity="0.28" stroke-width="1.2"/></g></svg></span>
       <div>
         <h1>OTC在庫台帳</h1>
         <p class="brand-sub" id="brand-sub">市販薬の登録・値札・備蓄共有</p>
@@ -292,7 +297,7 @@ table.inv td { border-top: 1px solid var(--line); padding: 6px 8px; white-space:
       </label>
       <div class="grid2">
         <label>メーカー <input id="f-maker" placeholder="例:第一三共ヘルスケア"></label>
-        <label>リスク区分 <select id="f-category"></select></label>
+        <label>区分 <select id="f-category"></select></label>
       </div>
       <div class="grid2">
         <label>販売価格(税込) <input inputmode="numeric" id="f-price" placeholder="998" oninput="updatePriceHint()"></label>
@@ -327,7 +332,7 @@ table.inv td { border-top: 1px solid var(--line); padding: 6px 8px; white-space:
         <button class="btn" id="save-btn" onclick="saveItem()">在庫に登録</button>
         <button class="btn ghost" onclick="clearForm()">クリア</button>
       </div>
-      <p class="hint">スキャンすると商品データベースから商品名・リスク区分を自動取得します。一度登録した商品は自局マスタから瞬時に補完されます。</p>
+      <p class="hint">スキャンすると商品データベースから商品名・区分を自動取得します。一度登録した商品は自局マスタから瞬時に補完されます。</p>
     </div>
   </section>
 
@@ -515,9 +520,9 @@ async function checkLogin(){
   }
 }
 /* ============ 定数 ============ */
-const CATEGORIES = ["要指導医薬品","第1類医薬品","指定第2類医薬品","第2類医薬品","第3類医薬品","医薬部外品","サプリメント・健康食品","食品・菓子","飲料","日用品・雑貨"];
-const CAT_SHORT = {"要指導医薬品":"要指導","第1類医薬品":"第1類","指定第2類医薬品":"指定第2類","第2類医薬品":"第2類","第3類医薬品":"第3類","医薬部外品":"部外品","サプリメント・健康食品":"サプリ","食品・菓子":"食品","飲料":"飲料","日用品・雑貨":"日用品"};
-const CAT_COLOR = {"要指導医薬品":"#6A3FA0","第1類医薬品":"#C0392B","指定第2類医薬品":"#D97B29","第2類医薬品":"#3E7C59","第3類医薬品":"#2E6DA4","医薬部外品":"#5C6B78","サプリメント・健康食品":"#647D8C","食品・菓子":"#8A6D3B","飲料":"#4E7F8C","日用品・雑貨":"#75808A"};
+const CATEGORIES = ["要指導医薬品","第1類医薬品","指定第2類医薬品","第2類医薬品","第3類医薬品","医薬部外品","サプリメント・健康食品","食品・菓子","飲料","日用品・雑貨","その他"];
+const CAT_SHORT = {"要指導医薬品":"要指導","第1類医薬品":"第1類","指定第2類医薬品":"指定第2類","第2類医薬品":"第2類","第3類医薬品":"第3類","医薬部外品":"部外品","サプリメント・健康食品":"サプリ","食品・菓子":"食品","飲料":"飲料","日用品・雑貨":"日用品","その他":"その他"};
+const CAT_COLOR = {"要指導医薬品":"#6A3FA0","第1類医薬品":"#C0392B","指定第2類医薬品":"#D97B29","第2類医薬品":"#3E7C59","第3類医薬品":"#2E6DA4","医薬部外品":"#5C6B78","サプリメント・健康食品":"#647D8C","食品・菓子":"#8A6D3B","飲料":"#4E7F8C","日用品・雑貨":"#75808A","その他":"#8A8F94"};
 
 /* ============ 状態 ============ */
 let S = { items: [], master: {}, pharmacy: { id: rid(), name: "", area: "" }, apiKeys: { rakuten: "", rakutenKey: "", jancode: "" }, gasUrl: "", popStyle: "refined", popFont: { font: "serif", nameSize: 30, priceSize: 52, copySize: 20 }, tagStyle: { size: "m", font: "serif", bold: "bold", nameSize: 16, priceSize: 30, nameColor: "#1F2933", priceColor: "#B7402B" } };
@@ -840,7 +845,7 @@ async function applyJan(code){
   const hit = await lookupJanExternal(code);
   if (hit){
     fillForm({ jan: code, name: hit.name, maker: hit.maker, category: hit.category || "第2類医薬品" });
-    scanMsg(hit.source + " から取得しました" + (hit.category ? "(リスク区分も自動判定)" : "") + "。内容を確認して登録してください。");
+    scanMsg(hit.source + " から取得しました" + (hit.category ? "(区分も自動判定)" : "") + "。内容を確認して登録してください。");
   } else if ((S.apiKeys.rakuten && S.apiKeys.rakutenKey) || S.apiKeys.jancode){
     scanMsg("データベースに見つかりませんでした。商品名を入力してください(次回からは自動補完されます)。");
   } else {
@@ -1061,7 +1066,7 @@ function renderList(){
   }
   if (listMode === "table"){
     area.innerHTML = '<div class="table-wrap"><table class="inv"><thead><tr>'
-      + '<th>選</th><th>商品名</th><th>区分</th><th>価格</th><th>在庫</th><th>期限</th><th>メーカー</th><th>JAN</th><th>メモ</th><th>更新日</th><th>操作</th>'
+      + '<th>選</th><th>商品名</th><th>区分</th><th>販売価格</th><th>納入価</th><th>発注先</th><th>在庫</th><th>期限</th><th>メーカー</th><th>JAN</th><th>メモ</th><th>更新日</th><th>操作</th>'
       + '</tr></thead><tbody>'
       + arr.map(it =>
         '<tr>'
@@ -1069,6 +1074,8 @@ function renderList(){
         + '<td class="name-cell" onclick="editItem(\''+it.id+'\')" style="cursor:pointer">'+(it.name?esc(it.name):"(名称未設定)")+(it.ranyo?' <span class="ranyo-flag">濫用防止</span>':'')+'</td>'
         + '<td style="color:'+(CAT_COLOR[it.category]||"#5C6B78")+';font-weight:600">'+(CAT_SHORT[it.category]||it.category)+'</td>'
         + '<td>'+yen(it.price)+'</td>'
+        + '<td>'+(it.cost?yen(it.cost):"")+'</td>'
+        + '<td>'+esc(it.supplier||"")+'</td>'
         + '<td><div class="qty-ctrl-sm"><button onclick="changeQty(\''+it.id+'\',-1)">−</button><span>'+it.qty+'</span><button onclick="changeQty(\''+it.id+'\',1)">＋</button></div></td>'
         + '<td'+expiryTdStyle(it.expiry)+'>'+(it.expiry?fmtExpiry(it.expiry):"")+'</td><td>'+esc(it.maker||"")+'</td>'
         + '<td style="font-family:monospace">'+it.jan+'</td>'
@@ -1086,7 +1093,7 @@ function renderList(){
     + '<input type="checkbox" ' + (selected.has(it.id)?'checked':'') + ' onchange="toggleSelect(\''+it.id+'\')" aria-label="値札用に選択">'
     + '<div class="stock-main" onclick="editItem(\''+it.id+'\')">'
     +   '<div class="stock-top"><span class="cat-badge" style="border-color:'+CAT_COLOR[it.category]+';color:'+CAT_COLOR[it.category]+'">'+CAT_SHORT[it.category]+'</span><span class="stock-name">'+(it.name?esc(it.name):"(名称未設定)")+'</span></div>'
-    +   '<div class="stock-sub">' + (it.ranyo?'<span class="ranyo-flag">濫用防止</span>':'') + (it.maker?'<span>'+esc(it.maker)+'</span>':'') + '<span>'+yen(it.price)+'</span>' + expiryChip(it.expiry) + '</div>'
+    +   '<div class="stock-sub">' + (it.ranyo?'<span class="ranyo-flag">濫用防止</span>':'') + (it.maker?'<span>'+esc(it.maker)+'</span>':'') + '<span>'+yen(it.price)+'</span>' + (it.cost?'<span class="sub-cost">納入 '+yen(it.cost)+'</span>':'') + (it.supplier?'<span class="sub-sup">'+esc(it.supplier)+'</span>':'') + expiryChip(it.expiry) + '</div>'
     + '</div>'
     + '<div class="qty-ctrl"><button onclick="changeQty(\''+it.id+'\',-1)" aria-label="1減らす">−</button><span class="qty">'+it.qty+'</span><button onclick="changeQty(\''+it.id+'\',1)" aria-label="1増やす">＋</button></div>'
     + '<button class="info-btn" onclick="event.stopPropagation();openDrugInfo(\''+it.id+'\')" aria-label="患者説明資料" title="患者説明資料を開く">📄</button>'
