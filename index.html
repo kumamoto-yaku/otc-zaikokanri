@@ -146,19 +146,6 @@ input:focus, select:focus { outline: 2px solid var(--ai); outline-offset: -1px; 
 .saved-pop { display: flex; align-items: center; gap: 8px; border: 1px solid var(--line); border-radius: 8px; padding: 6px 10px; background: #fff; }
 .saved-pop .link { flex: 1; text-align: left; }
 .saved-pop-meta { font-size: 11.5px; color: #7B8794; }
-.order-modal { position: fixed; inset: 0; background: rgba(20,40,60,0.45); z-index: 92; display: flex; align-items: flex-start; justify-content: center; padding: 16px; overflow-y: auto; }
-.order-card { background: #fff; border-radius: 14px; padding: 16px; width: min(100%, 560px); margin: 8px 0 40px; box-shadow: 0 8px 30px rgba(0,0,0,0.25); }
-.order-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
-.order-title { font-family: var(--serif); font-size: 17px; color: var(--ai-deep); }
-.order-group { border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; margin-top: 10px; }
-.order-group-name { font-weight: 700; color: var(--ai-deep); font-size: 14px; margin-bottom: 6px; }
-.order-item { display: flex; align-items: center; gap: 8px; padding: 6px 0; border-top: 1px dashed #E4EAE7; font-size: 13.5px; }
-.order-item-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
-.order-actions { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
-.order-actions .btn { padding: 8px 12px; font-size: 12.5px; }
-.order-empty { color: #7B8794; font-size: 13px; padding: 10px 0; }
-.order-site-set { border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; display: flex; flex-direction: column; gap: 8px; }
-.oss-name { font-weight: 600; font-size: 13.5px; color: var(--ai-deep); }
 .info-pop { position: absolute; z-index: 95; background: #fff; border: 1px solid var(--line); border-radius: 10px; box-shadow: 0 6px 22px rgba(0,0,0,0.22); padding: 8px; display: flex; flex-direction: column; gap: 4px; width: 250px; }
 .info-pop-name { font-size: 12.5px; font-weight: 600; color: var(--ai-deep); padding: 2px 6px 6px; border-bottom: 1px solid var(--line); overflow: hidden; text-overflow: ellipsis; }
 .info-pop-btn { display: block; width: 100%; text-align: left; background: none; border: none; padding: 9px 8px; font-size: 13.5px; color: var(--ink); cursor: pointer; border-radius: 6px; text-decoration: none; font-family: var(--sans); }
@@ -252,6 +239,11 @@ table.inv td { border-top: 1px solid var(--line); padding: 6px 8px; white-space:
 .cat-chip { border: 1px solid var(--ai); color: var(--ai); background: #fff; border-radius: 999px; padding: 6px 12px; font-size: 13px; cursor: pointer; font-family: var(--sans); }
 .cat-chip.on { background: var(--ai); color: #fff; }
 .set-card { border: 1px solid var(--line); border-radius: 12px; padding: 14px; background: #fff; display: flex; flex-direction: column; gap: 12px; }
+details.set-card > summary { cursor: pointer; list-style: none; }
+details.set-card > summary::-webkit-details-marker { display: none; }
+details.set-card > summary::after { content: "▸"; float: right; color: #9AA7AF; transition: transform 0.15s; }
+details.set-card[open] > summary::after { transform: rotate(90deg); }
+details.set-card:not([open]) > *:not(summary) { display: none; }
 .set-h { font-family: var(--serif); font-size: 15.5px; color: var(--ai-deep); border-left: 4px solid var(--shu); padding-left: 8px; letter-spacing: 0.05em; }
 .exp { border-radius: 4px; padding: 1px 5px; font-size: 10.5px; white-space: nowrap; }
 .exp-r { background: #C0392B; color: #fff; }
@@ -348,16 +340,6 @@ table.inv td { border-top: 1px solid var(--line); padding: 6px 8px; white-space:
     <p class="hint" id="login-err" style="color:var(--shu);text-align:center"></p>
   </div>
 </div>
-<div id="order-modal" class="order-modal" style="display:none" onclick="if(event.target===this)closeOrderModal()">
-  <div class="order-card">
-    <div class="order-head">
-      <span class="order-title">🛒 発注リスト</span>
-      <button class="link" onclick="closeOrderModal()">閉じる</button>
-    </div>
-    <p class="hint">「商品リストをコピー」→「サイトを開く」→ 発注サイト内で貼り付け・検索して発注してください。ID・パスワードは「その他」タブで登録するとワンタップでコピーできます。</p>
-    <div id="order-body"></div>
-  </div>
-</div>
 <div id="info-pop" class="info-pop" style="display:none">
   <div class="info-pop-name" id="info-pop-name"></div>
   <a class="info-pop-btn" id="ip-web" target="_blank" rel="noopener" onclick="closeInfoPop()">商品情報をWeb検索</a>
@@ -419,30 +401,35 @@ table.inv td { border-top: 1px solid var(--line); padding: 6px 8px; white-space:
         <label>販売価格(税込) <input inputmode="numeric" id="f-price" placeholder="998" oninput="updatePriceHint()"></label>
         <label id="f-qty-label">入庫数 <input inputmode="numeric" id="f-qty" value="1"></label>
       </div>
-      <label class="chk-row"><input type="checkbox" id="f-reduced" onchange="updatePriceHint()"> 軽減税率対象(8%)商品 ※未チェックは10%</label>
       <p class="hint" id="price-hint" style="margin-top:-4px"></p>
-      <div class="grid2">
-        <label>発注先 <select id="f-supplier" onchange="toggleSupplierOther()">
-          <option value="">— 選択 —</option>
-          <option>e健康ショップ</option>
-          <option>アステム</option>
-          <option>アトル</option>
-          <option>アルフレッサ</option>
-          <option>九州東邦</option>
-          <option>翔薬</option>
-          <option>新生堂</option>
-          <option>富田薬品</option>
-          <option>リッツメディカル</option>
-          <option value="__other">その他(自由記載)</option>
-        </select></label>
-        <label id="f-supplier-other-wrap" style="display:none">発注先(その他) <input id="f-supplier-other" placeholder="発注先名を入力"></label>
-      </div>
-      <div class="grid2">
-        <label>納入価(税込) <input inputmode="numeric" id="f-cost" placeholder="例:600"></label>
-        <label>職員販売価格(税込) <input inputmode="numeric" id="f-staff-price" placeholder="例:800"></label>
-      </div>
       <label>使用期限(年月) <input type="month" id="f-expiry"></label>
-      <label>メモ <input id="f-memo" placeholder=""></label>
+      <details class="settings">
+        <summary>詳しい項目(任意) — 税率・発注先・納入価・職員価格・メモ</summary>
+        <div class="form" style="padding-top:10px">
+          <label class="chk-row"><input type="checkbox" id="f-reduced" onchange="updatePriceHint()"> 軽減税率対象(8%)商品 ※未チェックは10%</label>
+          <div class="grid2">
+            <label>発注先 <select id="f-supplier" onchange="toggleSupplierOther()">
+              <option value="">— 選択 —</option>
+              <option>e健康ショップ</option>
+              <option>アステム</option>
+              <option>アトル</option>
+              <option>アルフレッサ</option>
+              <option>九州東邦</option>
+              <option>翔薬</option>
+              <option>新生堂</option>
+              <option>富田薬品</option>
+              <option>リッツメディカル</option>
+              <option value="__other">その他(自由記載)</option>
+            </select></label>
+            <label id="f-supplier-other-wrap" style="display:none">発注先(その他) <input id="f-supplier-other" placeholder="発注先名を入力"></label>
+          </div>
+          <div class="grid2">
+            <label>納入価(税込) <input inputmode="numeric" id="f-cost" placeholder="例:600"></label>
+            <label>職員販売価格(税込) <input inputmode="numeric" id="f-staff-price" placeholder="例:800"></label>
+          </div>
+          <label>メモ <input id="f-memo" placeholder=""></label>
+        </div>
+      </details>
       <label class="chk-row"><input type="checkbox" id="f-ranyo"> 指定濫用防止医薬品に該当(値札・一覧に表示されます)</label>
       <div class="row gap">
         <button class="btn" id="save-btn" onclick="saveItem()">在庫に登録</button>
@@ -457,13 +444,11 @@ table.inv td { border-top: 1px solid var(--line); padding: 6px 8px; white-space:
     <div class="cat-chips" id="cat-chips"></div>
     <div class="row gap wrap">
       <input class="search" id="q" placeholder="商品名・JAN・メーカーで検索" oninput="renderList()">
-      <select id="cat-filter" onchange="renderList()"></select>
+      <select id="cat-filter" onchange="renderList()" style="display:none"></select>
       <select id="sort-by" onchange="renderList()"><option value="new">新規登録順</option><option value="aiueo">50音順</option><option value="expiry">有効期限順</option><option value="price-a">価格が安い順</option><option value="price-d">価格が高い順</option><option value="qty-a">在庫が少ない順</option></select>
       <button class="btn ghost" id="view-toggle" onclick="toggleView()">表形式</button>
-      <button class="btn ghost" onclick="exportCsv()">CSV出力</button>
-      <button class="btn ghost" id="order-chip" onclick="openOrderModal()">🛒 発注リスト(0)</button>
     </div>
-    <label class="selall-row"><input type="checkbox" id="sel-all" onchange="toggleSelectAll()"> 表示中をすべて選択(値札用)</label>
+    <label class="selall-row"><input type="checkbox" id="sel-all" onchange="toggleSelectAll()"> 表示中をすべて選択</label>
     <div class="select-bar" id="select-bar"></div>
     <div id="list-area"></div>
   </section>
@@ -590,8 +575,8 @@ table.inv td { border-top: 1px solid var(--line); padding: 6px 8px; white-space:
           </div>
         </details>
         <div class="row gap wrap">
-          <button class="btn" onclick="window.print()">表示中のPOPをすべて印刷</button>
-          <button class="btn ghost" onclick="savePop()">このPOPを保存(あとで呼び出せます)</button>
+          <button class="btn" onclick="window.print()">POPを印刷</button>
+          <button class="btn ghost" onclick="savePop()">このPOPを保存</button>
         </div>
         <div id="saved-pops"></div>
       </div>
@@ -635,20 +620,21 @@ table.inv td { border-top: 1px solid var(--line); padding: 6px 8px; white-space:
 
   <!-- ============ 会員間共有 ============ -->
   <section class="panel" id="tab-share">
-    <div class="set-card">
-      <h3 class="set-h">データの控え(バックアップ・引き継ぎ)</h3>
+    <details class="set-card" open>
+      <summary class="set-h">データの控え(バックアップ・引き継ぎ)</summary>
       <div id="storage-warn" class="storage-warn" style="display:none"></div>
       <p class="hint" id="storage-info"></p>
       <p class="hint">在庫・商品マスタ・各種設定をファイル1つに保存できます。機種変更やアドレス変更の際は、変更前に「控えを保存」し、変更後の画面で「控えから復元」してください。</p>
       <div class="row gap">
         <button class="btn ghost" onclick="backupData()">控えを保存</button>
+        <button class="btn ghost" onclick="exportCsv()">在庫をCSV出力</button>
         <button class="btn ghost" onclick="document.getElementById('restore-input').click()">控えから復元</button>
         <input type="file" id="restore-input" accept=".json,application/json" style="display:none" onchange="restoreData(event)">
       </div>
-    </div>
+    </details>
 
-    <div class="set-card">
-      <h3 class="set-h">店舗間の備蓄情報共有</h3>
+    <details class="set-card">
+      <summary class="set-h">店舗間の備蓄情報共有</summary>
       <div class="share-note">とみながグループ 店舗間の備蓄情報共有です。アップロードすると、共有サーバーに接続している<strong>すべての店舗</strong>が薬局名・品目・在庫数を閲覧できます。</div>
       <label>共有サーバーURL(管理者から配布されたもの)
         <input id="gas-url" placeholder="https://script.google.com/macros/s/……/exec" onchange="savePharmacy()">
@@ -663,49 +649,18 @@ table.inv td { border-top: 1px solid var(--line); padding: 6px 8px; white-space:
       <div class="divider"><span>備蓄をさがす</span></div>
       <input class="search" id="share-q" placeholder="商品名・JANで全店舗を横断検索" oninput="renderShared()">
       <div id="share-area"></div>
-    </div>
+    </details>
 
-    <div class="set-card">
-      <h3 class="set-h">薬局情報(画面上部に表示)</h3>
+    <details class="set-card">
+      <summary class="set-h">薬局情報(画面上部に表示)</summary>
       <div class="grid2">
         <label>薬局名 <input id="ph-name" placeholder="例:とみなが薬局 ○○店" onchange="savePharmacy()"></label>
         <label>地区 <input id="ph-area" placeholder="例:熊本市中央区" onchange="savePharmacy()"></label>
       </div>
-    </div>
+    </details>
 
-    <div class="set-card">
-      <h3 class="set-h">発注サイトの登録(発注リスト用)</h3>
-      <p class="hint">各発注サイトのログインページURLと、お使いのID・パスワードを登録すると、発注リストからワンタップで開いてコピーできます。<strong>情報はこの端末の中にだけ保存されます。</strong></p>
-      <div class="form">
-        <div class="order-site-set">
-          <div class="oss-name">Order-epi(e健康ショップ・リッツメディカル以外の卸)</div>
-          <label>ログインページURL <input id="os-epi-url" placeholder="https://…(普段お使いのページを一度貼り付け)" onchange="saveOrderSites()"></label>
-          <div class="grid2">
-            <label>ID <input id="os-epi-id" autocomplete="off" onchange="saveOrderSites()"></label>
-            <label>パスワード <input id="os-epi-pw" type="password" autocomplete="off" onchange="saveOrderSites()"></label>
-          </div>
-        </div>
-        <div class="order-site-set">
-          <div class="oss-name">e健康ショップ</div>
-          <label>ログインページURL <input id="os-eken-url" placeholder="https://…" onchange="saveOrderSites()"></label>
-          <div class="grid2">
-            <label>ID <input id="os-eken-id" autocomplete="off" onchange="saveOrderSites()"></label>
-            <label>パスワード <input id="os-eken-pw" type="password" autocomplete="off" onchange="saveOrderSites()"></label>
-          </div>
-        </div>
-        <div class="order-site-set">
-          <div class="oss-name">リッツメディカル</div>
-          <label>ログインページURL <input id="os-ritz-url" placeholder="https://…" onchange="saveOrderSites()"></label>
-          <div class="grid2">
-            <label>ID <input id="os-ritz-id" autocomplete="off" onchange="saveOrderSites()"></label>
-            <label>パスワード <input id="os-ritz-pw" type="password" autocomplete="off" onchange="saveOrderSites()"></label>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="set-card">
-      <h3 class="set-h">商品名の自動取得(外部データベース)</h3>
+    <details class="set-card">
+      <summary class="set-h">商品名の自動取得(外部データベース)</summary>
       <p class="hint">楽天ウェブサービス(Rakuten Developers)の <strong>Application ID</strong> と <strong>Access Key</strong> を設定すると、スキャンしたJANコードから商品名を自動取得します。</p>
       <label>Yahoo! Client ID(メーカー名・分類まで取得できます)
         <input id="k-yahoo" placeholder="例:dj00aiZpPT…… の形式" onchange="saveKeys()">
@@ -721,11 +676,11 @@ table.inv td { border-top: 1px solid var(--line); padding: 6px 8px; white-space:
         <input id="k-jancode" placeholder="jancodelookup.com で無料発行" onchange="saveKeys()">
       </label>
       <p class="hint">検索順: Yahoo!ショッピング → JANCODE LOOKUP → 楽天市場 → Open Food Facts(キー不要) → 手入力。<strong>Yahoo!はメーカー名と商品分類まで取得できる</strong>ため、設定を強くおすすめします。キーはこの端末にのみ保存されます。</p>
-    </div>
+    </details>
   </section>
 
   <div class="toast" id="toast"></div>
-  <footer class="foot">OTCLinker Pro — とみながグループ 店舗向けツール<br><span class="ver">版 2026-07-24 I(発注リスト対応)</span></footer>
+  <footer class="foot">OTCLinker Pro — とみながグループ 店舗向けツール<br><span class="ver">版 2026-07-24 J(シンプル表示)</span></footer>
 </div>
 
 <script>
@@ -1577,7 +1532,6 @@ function renderList(){
         + '<td style="font-family:monospace">'+it.jan+'</td>'
         + '<td>'+esc(it.memo||"")+'</td><td>'+(it.updatedAt||"")+'</td>'
         + '<td><div class="row-actions">'
-        +   '<button class="info-btn" onclick="addToOrder(\''+it.id+'\')" title="発注リストに追加">🛒</button>'
         +   '<button class="info-btn" onclick="openDrugInfo(\''+it.id+'\',event)" title="患者説明資料">📄</button>'
         +   '<button class="del" onclick="removeItem(\''+it.id+'\')" title="削除">×</button>'
         + '</div></td></tr>'
@@ -1593,7 +1547,6 @@ function renderList(){
     +   '<div class="stock-sub">' + (it.ranyo?'<span class="ranyo-flag">濫用防止</span>':'') + (it.maker?'<span>'+esc(it.maker)+'</span>':'') + '<span>'+yen(it.price)+'</span>' + (it.cost?'<span class="sub-cost">納入 '+yen(it.cost)+'</span>':'') + (it.supplier?'<span class="sub-sup">'+esc(it.supplier)+'</span>':'') + (it.staffPrice?'<span class="sub-staff">職員 '+yen(it.staffPrice)+'</span>':'') + expiryChip(it.expiry) + (it.memo?'<span class="sub-memo">'+esc(it.memo)+'</span>':'') + '</div>'
     + '</div>'
     + '<div class="qty-ctrl"><button onclick="changeQty(\''+it.id+'\',-1)" aria-label="1減らす">−</button><span class="qty">'+it.qty+'</span><button onclick="changeQty(\''+it.id+'\',1)" aria-label="1増やす">＋</button></div>'
-    + '<button class="info-btn" onclick="event.stopPropagation();addToOrder(\''+it.id+'\')" aria-label="発注リストに追加" title="発注リストに追加">🛒</button>'
     + '<button class="info-btn" onclick="event.stopPropagation();openDrugInfo(\''+it.id+'\',event)" aria-label="患者説明資料" title="患者説明資料を開く">📄</button>'
     + '<button class="del" onclick="removeItem(\''+it.id+'\')" aria-label="削除">×</button></li>'
   ).join("") + '</ul>';
@@ -1691,152 +1644,6 @@ function updatePrintSelbar_(){
       : 'まだ商品が選ばれていません — ' + goList;
   }
 }
-/* ============ 発注リスト ============ */
-const ORDER_GROUPS = {
-  epi:  { name: "Order-epi", note: "e健康ショップ・リッツメディカル以外の卸" },
-  eken: { name: "e健康ショップ", note: "" },
-  ritz: { name: "リッツメディカル", note: "" }
-};
-function orderGroupOf_(supplier){
-  if (supplier === "e健康ショップ") return "eken";
-  if (supplier === "リッツメディカル") return "ritz";
-  return "epi";
-}
-function orderList_(){ S.orderList = S.orderList || []; return S.orderList; }
-function orderSites_(){
-  S.orderSites = S.orderSites || {};
-  ["epi","eken","ritz"].forEach(function(k){ S.orderSites[k] = S.orderSites[k] || { url:"", id:"", pw:"" }; });
-  return S.orderSites;
-}
-function copyText_(t){
-  let ok = false;
-  try {
-    const ta = document.createElement("textarea");
-    ta.value = t; ta.setAttribute("readonly", "");
-    ta.style.position = "fixed"; ta.style.left = "-9999px";
-    document.body.appendChild(ta);
-    ta.select(); ta.setSelectionRange(0, t.length);
-    ok = document.execCommand("copy");
-    document.body.removeChild(ta);
-  } catch(e){}
-  try { if (navigator.clipboard) navigator.clipboard.writeText(t).then(function(){}, function(){}); } catch(e){}
-  return ok;
-}
-function addToOrder(id){
-  const it = S.items.find(function(x){ return x.id === id; });
-  if (!it) return;
-  const list = orderList_();
-  const ex = list.find(function(o){ return o.jan === it.jan; });
-  if (ex){ ex.qty += 1; toast("「" + it.name + "」の発注数を " + ex.qty + " にしました"); }
-  else { list.push({ jan: it.jan, qty: 1 }); toast("「" + it.name + "」を発注リストに追加しました"); }
-  save(); updateOrderChip();
-}
-function updateOrderChip(){
-  const el = document.getElementById("order-chip");
-  if (el) el.textContent = "🛒 発注リスト(" + orderList_().length + ")";
-}
-function openOrderModal(){
-  renderOrderModal();
-  document.getElementById("order-modal").style.display = "flex";
-}
-function closeOrderModal(){ document.getElementById("order-modal").style.display = "none"; }
-function orderQty(jan, d){
-  const list = orderList_();
-  const o = list.find(function(x){ return x.jan === jan; });
-  if (!o) return;
-  o.qty = Math.max(1, o.qty + d);
-  save(); renderOrderModal();
-}
-function orderRemove(jan){
-  S.orderList = orderList_().filter(function(x){ return x.jan !== jan; });
-  save(); renderOrderModal(); updateOrderChip();
-}
-function orderClearGroup(g){
-  if (!confirm(ORDER_GROUPS[g].name + " の分を発注済みにしてリストから消しますか?")) return;
-  S.orderList = orderList_().filter(function(o){
-    const it = S.items.find(function(x){ return x.jan === o.jan; });
-    return orderGroupOf_(it ? it.supplier : "") !== g;
-  });
-  save(); renderOrderModal(); updateOrderChip();
-  toast("発注済みにしました");
-}
-function orderCopyList(g){
-  const rows = [];
-  orderList_().forEach(function(o){
-    const it = S.items.find(function(x){ return x.jan === o.jan; });
-    if (!it || orderGroupOf_(it.supplier) !== g) return;
-    rows.push(it.name + " ×" + o.qty + "  JAN:" + o.jan);
-  });
-  if (!rows.length){ toast("この発注先の商品がありません"); return; }
-  copyText_(rows.join("\n"));
-  toast(rows.length + " 品目の商品リストをコピーしました。発注サイトに貼り付け・検索してください");
-}
-function orderCopyCred(g, kind){
-  const site = orderSites_()[g];
-  const v = kind === "id" ? site.id : site.pw;
-  if (!v){ toast("「その他」タブで先に登録してください"); return; }
-  copyText_(v);
-  toast(kind === "id" ? "IDをコピーしました" : "パスワードをコピーしました");
-}
-function orderOpenSite(g){
-  const url = orderSites_()[g].url;
-  if (!url){ toast("「その他」タブでログインページURLを登録してください"); return; }
-  window.open(url, "_blank", "noopener");
-}
-function renderOrderModal(){
-  const body = document.getElementById("order-body");
-  const list = orderList_();
-  if (!list.length){
-    body.innerHTML = '<p class="order-empty">まだ商品がありません。在庫リストの各商品の 🛒 を押すと、ここに追加されます。</p>';
-    return;
-  }
-  const sites = orderSites_();
-  body.innerHTML = ["epi","eken","ritz"].map(function(g){
-    const items = [];
-    list.forEach(function(o){
-      const it = S.items.find(function(x){ return x.jan === o.jan; });
-      if (it && orderGroupOf_(it.supplier) === g) items.push({ o: o, it: it });
-    });
-    if (!items.length) return "";
-    const gi = ORDER_GROUPS[g];
-    return '<div class="order-group">'
-      + '<div class="order-group-name">' + gi.name + (gi.note ? ' <span style="font-weight:400;color:#7B8794;font-size:11.5px">(' + gi.note + ')</span>' : '') + ' — ' + items.length + ' 品目</div>'
-      + items.map(function(x){
-          return '<div class="order-item">'
-            + '<span class="order-item-name">' + esc(x.it.name) + '<br><span style="color:#8A97A0;font-size:11px;font-family:monospace">' + x.o.jan + '</span></span>'
-            + '<span class="qty-ctrl-sm"><button onclick="orderQty(\'' + x.o.jan + '\',-1)">−</button><span>' + x.o.qty + '</span><button onclick="orderQty(\'' + x.o.jan + '\',1)">＋</button></span>'
-            + '<button class="del" onclick="orderRemove(\'' + x.o.jan + '\')" aria-label="外す">×</button>'
-            + '</div>';
-        }).join("")
-      + '<div class="order-actions">'
-      +   '<button class="btn" onclick="orderCopyList(\'' + g + '\')">商品リストをコピー</button>'
-      +   '<button class="btn ghost" onclick="orderCopyCred(\'' + g + '\',\'id\')">IDコピー</button>'
-      +   '<button class="btn ghost" onclick="orderCopyCred(\'' + g + '\',\'pw\')">パスコピー</button>'
-      +   '<button class="btn ghost" onclick="orderOpenSite(\'' + g + '\')">' + (sites[g].url ? "サイトを開く" : "サイトを開く(要設定)") + '</button>'
-      +   '<button class="btn ghost" onclick="orderClearGroup(\'' + g + '\')">発注済みにする</button>'
-      + '</div></div>';
-  }).join("") || '<p class="order-empty">対象の商品がありません。</p>';
-}
-function saveOrderSites(){
-  const sites = orderSites_();
-  ["epi","eken","ritz"].forEach(function(k){
-    sites[k].url = document.getElementById("os-" + k + "-url").value.trim();
-    sites[k].id = document.getElementById("os-" + k + "-id").value;
-    sites[k].pw = document.getElementById("os-" + k + "-pw").value;
-  });
-  save();
-}
-function syncOrderSiteInputs(){
-  const sites = orderSites_();
-  ["epi","eken","ritz"].forEach(function(k){
-    const u = document.getElementById("os-" + k + "-url");
-    if (!u) return;
-    u.value = sites[k].url || "";
-    document.getElementById("os-" + k + "-id").value = sites[k].id || "";
-    document.getElementById("os-" + k + "-pw").value = sites[k].pw || "";
-  });
-}
-
 /* ============ 育成ドットキャラ(品目数で進化) ============ */
 const DOT_PAL = { K:"#2B2B2B", W:"#FFFFFF", C:"#FFF3D6", Y:"#FFD84D", O:"#F08A3C", R:"#D0342C", P:"#F4A7B9", B:"#5FA8D3", N:"#8A5A2B", G:"#FFD700", E:"#7DC383", V:"#9B7EDE", S:"#C0C8CF", D:"#3E9B4F", M:"#FF8FB1" };
 const DOT_SPRITES = {
@@ -2814,8 +2621,6 @@ updateBrand();
 if (localStorage.getItem("otc-auth-v1") === "ok") document.getElementById("login-gate").style.display = "none";
 function bootUi_(){
   updateBrand();
-  updateOrderChip();
-  syncOrderSiteInputs();
   renderList();
   showExpiryAlert();
   showBackupAlert();
