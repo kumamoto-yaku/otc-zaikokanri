@@ -101,6 +101,16 @@ input:focus, select:focus { outline: 2px solid var(--ai); outline-offset: -1px; 
 .del { border: none; background: none; color: #9AA7AF; font-size: 18px; cursor: pointer; padding: 4px; }
 .edit { border: none; background: none; color: var(--ai); font-size: 16px; cursor: pointer; padding: 4px; }
 .info-btn { border: none; background: none; font-size: 16px; cursor: pointer; padding: 4px; }
+.ph-list { display: flex; flex-direction: column; gap: 6px; }
+.ph-row { display: flex; align-items: center; gap: 10px; border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; background: #fff; cursor: pointer; }
+.ph-row-main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+.ph-mine { font-size: 11px; color: #fff; background: var(--take); border-radius: 999px; padding: 1px 8px; align-self: flex-start; }
+.ph-arrow { color: #9AA7AF; font-size: 20px; }
+.ph-detail-head { display: flex; flex-direction: column; gap: 4px; padding-bottom: 10px; margin-bottom: 8px; border-bottom: 1px solid var(--line); }
+.ph-cat-group { margin-bottom: 14px; }
+.ph-cat-head { font-size: 13px; font-weight: 600; color: var(--ai-deep); border-left: 4px solid var(--ai); padding-left: 8px; margin-bottom: 6px; }
+.ph-cat-n { font-weight: 400; color: #7B8794; font-size: 12px; }
+.ph-detail-title { font-family: var(--serif); font-size: 17px; color: var(--ai-deep); }
 .saved-pop-list { display: flex; flex-direction: column; gap: 4px; }
 .saved-pop { display: flex; align-items: center; gap: 8px; border: 1px solid var(--line); border-radius: 8px; padding: 6px 10px; background: #fff; }
 .saved-pop .link { flex: 1; text-align: left; }
@@ -242,6 +252,7 @@ table.inv td { border-top: 1px solid var(--line); padding: 6px 8px; white-space:
 .flash-txt { min-width: 0; }
 .flash-title { font-size: 16px; font-weight: 700; letter-spacing: 0.03em; }
 .flash-name { font-size: 13px; opacity: 0.92; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ver { font-size: 11px; color: #9AA7AF; }
 .toast { position: fixed; left: 50%; bottom: 28px; transform: translateX(-50%); background: var(--ai-deep); color: #fff; padding: 10px 20px; border-radius: 999px; font-size: 13.5px; box-shadow: 0 4px 14px rgba(0,0,0,0.2); z-index: 50; display: none; }
 #login-gate { position: fixed; inset: 0; background: var(--hakuji); z-index: 100; display: flex; align-items: center; justify-content: center; padding: 20px; }
 .login-card { background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 26px 22px; width: min(100%, 380px); display: flex; flex-direction: column; gap: 12px; box-shadow: 0 6px 24px rgba(20,40,60,0.08); }
@@ -539,7 +550,7 @@ table.inv td { border-top: 1px solid var(--line); padding: 6px 8px; white-space:
   </section>
 
   <div class="toast" id="toast"></div>
-  <footer class="foot">OTC在庫台帳 — とみながグループ 店舗向けツール</footer>
+  <footer class="foot">OTC在庫台帳 — とみながグループ 店舗向けツール<br><span class="ver">版 2026-07-24 B(区分チップ対応)</span></footer>
 </div>
 
 <script>
@@ -1792,34 +1803,119 @@ async function loadShared(){
     shareMsg("共有データを読み込めませんでした。URLを確認してください。");
   }
 }
+let sharedView = null;
+let sharedCat = "すべて";   // null=薬局一覧 / 文字列=その薬局のID
+function openSharedPharmacy(id){
+  sharedView = id;
+  sharedCat = "すべて";
+  renderShared();
+  const el = document.getElementById("share-area");
+  if (el && el.scrollIntoView) el.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+function setSharedCat(c){
+  sharedCat = c;
+  renderShared();
+}
+function backToSharedList(){
+  sharedView = null;
+  renderShared();
+}
 function renderShared(){
   const area = document.getElementById("share-area");
   const q = document.getElementById("share-q").value.trim().toLowerCase();
+
+  // 検索中は全店舗横断の結果を優先
   if (q){
     const hits = [];
     for (const ph of sharedData){
       for (const it of (ph.items||[])){
         if (String(it.name).toLowerCase().includes(q) || String(it.jan).includes(q))
-          hits.push({ ph: ph.pharmacy, it: it });
+          hits.push({ ph: ph.pharmacy, phId: ph.id, it: it });
       }
     }
     area.innerHTML = hits.length
       ? '<ul class="hit-list">' + hits.map(h =>
           '<li><div class="hit-name">'+esc(h.it.name)+' <span class="hit-qty">'+h.it.qty+' 個</span></div>'
-          + '<div class="hit-ph">'+esc(h.ph&&h.ph.name||"")+(h.ph&&h.ph.area?'('+esc(h.ph.area)+')':'')+'</div></li>'
+          + '<div class="hit-ph"><button class="link" onclick="document.getElementById(\'share-q\').value=\'\';openSharedPharmacy(\''+h.phId+'\')">'
+          + esc(h.ph&&h.ph.name||"") + '</button>'
+          + (h.ph&&h.ph.area?' <span>('+esc(h.ph.area)+')</span>':'') + '</div></li>'
         ).join("") + '</ul>'
       : '<p class="hint">該当する備蓄が見つかりませんでした。</p>';
     return;
   }
-  area.innerHTML = sharedData.map(ph =>
-    '<details class="ph-card"' + (sharedData.length<=2?' open':'') + '>'
-    + '<summary><span class="ph-name">'+esc(ph.pharmacy&&ph.pharmacy.name||"名称未設定")+'</span>'
-    + '<span class="ph-meta">'+esc(ph.pharmacy&&ph.pharmacy.area||"")+' ・ '+(ph.items?ph.items.length:0)+' 品目 ・ '+String(ph.updatedAt||"").slice(0,10)+'</span></summary>'
-    + '<ul class="ph-items">' + (ph.items||[]).map(it =>
-        '<li><span class="cat-badge" style="border-color:'+(CAT_COLOR[it.category]||"#5C6B78")+';color:'+(CAT_COLOR[it.category]||"#5C6B78")+'">'+(CAT_SHORT[it.category]||"")+'</span>'
-        + '<span class="ph-item-name">'+esc(it.name)+'</span><span class="ph-item-qty">'+it.qty+' 個</span></li>'
-      ).join("") + '</ul></details>'
-  ).join("");
+
+  // 個別の薬局を表示中
+  if (sharedView){
+    const ph = sharedData.find(function(x){ return String(x.id) === String(sharedView); });
+    if (!ph){ sharedView = null; renderShared(); return; }
+    const all = (ph.items||[]).slice().sort(function(a,b){
+      return String(a.name||"").localeCompare(String(b.name||""), "ja");
+    });
+    // 区分ごとの件数
+    const counts = {};
+    all.forEach(function(it){
+      const c = it.category || "その他";
+      counts[c] = (counts[c] || 0) + 1;
+    });
+    const cats = CATEGORIES.filter(function(c){ return counts[c]; });
+    if (sharedCat !== "すべて" && !counts[sharedCat]) sharedCat = "すべて";
+    const chips = '<div class="cat-chips" style="margin:8px 0 10px">'
+      + '<button class="cat-chip' + (sharedCat==="すべて"?" on":"") + '" onclick="setSharedCat(\'すべて\')">すべて ' + all.length + '</button>'
+      + cats.map(function(c){
+          const col = CAT_COLOR[c] || "#5C6B78";
+          const on = sharedCat === c;
+          return '<button class="cat-chip" style="border-color:'+col+';'
+            + (on ? 'background:'+col+';color:#fff' : 'color:'+col)
+            + '" onclick="setSharedCat(\''+c+'\')">' + (CAT_SHORT[c]||c) + ' ' + counts[c] + '</button>';
+        }).join("")
+      + '</div>';
+
+    function itemLi(it){
+      const col = CAT_COLOR[it.category] || "#5C6B78";
+      return '<li><span class="cat-badge" style="border-color:'+col+';color:'+col+'">'+(CAT_SHORT[it.category]||"")+'</span>'
+        + '<span class="ph-item-name">'+esc(it.name)+'</span><span class="ph-item-qty">'+it.qty+' 個</span></li>';
+    }
+
+    let body = "";
+    if (!all.length){
+      body = '<p class="hint">この薬局の備蓄は登録されていません。</p>';
+    } else if (sharedCat === "すべて"){
+      // 区分ごとに見出しを付けてまとめて表示
+      body = cats.map(function(c){
+        const list = all.filter(function(it){ return (it.category||"その他") === c; });
+        return '<div class="ph-cat-group">'
+          + '<div class="ph-cat-head" style="border-left-color:'+(CAT_COLOR[c]||"#5C6B78")+'">'
+          + esc(c) + ' <span class="ph-cat-n">'+list.length+' 品目</span></div>'
+          + '<ul class="ph-items">' + list.map(itemLi).join("") + '</ul></div>';
+      }).join("");
+    } else {
+      const list = all.filter(function(it){ return (it.category||"その他") === sharedCat; });
+      body = '<ul class="ph-items">' + list.map(itemLi).join("") + '</ul>';
+    }
+
+    area.innerHTML =
+      '<div class="ph-detail-head">'
+      + '<button class="link" onclick="backToSharedList()">← 薬局一覧に戻る</button>'
+      + '<div class="ph-detail-title">'+esc(ph.pharmacy&&ph.pharmacy.name||"名称未設定")+'</div>'
+      + '<div class="ph-meta">'+esc(ph.pharmacy&&ph.pharmacy.area||"")+' ・ '+all.length+' 品目 ・ 更新 '+String(ph.updatedAt||"").slice(0,10)+'</div>'
+      + '</div>' + chips + body;
+    return;
+  }
+
+  // 薬局一覧(名前を押すとその店の備蓄を表示)
+  if (!sharedData.length){
+    area.innerHTML = '<p class="hint">まだ共有された備蓄がありません。</p>';
+    return;
+  }
+  area.innerHTML = '<ul class="ph-list">' + sharedData.map(function(ph){
+    const n = (ph.items||[]).length;
+    const mine = String(ph.id) === String(S.pharmacy.id);
+    return '<li class="ph-row" onclick="openSharedPharmacy(\''+ph.id+'\')">'
+      + '<div class="ph-row-main"><span class="ph-name">'+esc(ph.pharmacy&&ph.pharmacy.name||"名称未設定")+'</span>'
+      + (mine?'<span class="ph-mine">自局</span>':'')
+      + '<span class="ph-meta">'+esc(ph.pharmacy&&ph.pharmacy.area||"")+' ・ '+n+' 品目 ・ 更新 '+String(ph.updatedAt||"").slice(0,10)+'</span></div>'
+      + '<span class="ph-arrow">›</span></li>';
+  }).join("") + '</ul>';
 }
 
 /* ============ タブ ============ */
