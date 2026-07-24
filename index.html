@@ -145,8 +145,12 @@ input:focus, select:focus { outline: 2px solid var(--ai); outline-offset: -1px; 
 .info-pop-btn.close { color: #7B8794; border-top: 1px solid var(--line); }
 
 .empty { text-align: center; padding: 30px 10px; color: #5C6B78; display: flex; flex-direction: column; gap: 14px; align-items: center; }
+.steps { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; margin: 2px 0 12px; font-size: 12px; color: #5C6B78; }
+.steps .stp { display: inline-flex; align-items: center; gap: 5px; background: #EEF3F1; border-radius: 999px; padding: 4px 11px 4px 5px; }
+.steps .stp b { width: 17px; height: 17px; border-radius: 50%; background: var(--ai); color: #fff; font-size: 10.5px; display: inline-flex; align-items: center; justify-content: center; font-weight: 600; }
+.steps .arw { color: #B7C2C8; }
 .seg { display: flex; border: 1px solid var(--ai); border-radius: 8px; overflow: hidden; width: fit-content; }
-.seg button { border: none; background: #fff; color: var(--ai); padding: 8px 18px; font-size: 14px; cursor: pointer; font-family: var(--sans); }
+.seg button { min-height: 42px;  border: none; background: #fff; color: var(--ai); padding: 8px 18px; font-size: 14px; cursor: pointer; font-family: var(--sans); }
 .seg button.on { background: var(--ai); color: #fff; }
 .tag-sheet { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; }
 .price-tag { border: 1.5px solid var(--ink); border-radius: 0; text-align: center; background: #fff; break-inside: avoid; display: flex; flex-direction: column; box-sizing: border-box; overflow: hidden; }
@@ -176,6 +180,8 @@ input:focus, select:focus { outline: 2px solid var(--ai); outline-offset: -1px; 
 .pop-foot { display: flex; flex-direction: column; gap: 6px; align-items: center; }
 .pop-cat { color: #fff; font-size: 12px; letter-spacing: 0.12em; padding: 3px 12px; border-radius: 4px; }
 .pop-note { font-size: 13px; color: #4A5761; }
+.pop-extras-head { font-size: 12.5px; color: #7B8794; margin: 18px 0 6px; border-top: 1px dashed var(--line); padding-top: 10px; }
+@media print { .pop-extras-head { display: none !important; } .pop-card { break-inside: avoid; page-break-inside: avoid; margin-bottom: 8mm; } }
 .pop-img { margin: 8px auto; display: flex; align-items: center; justify-content: center; }
 .pop-img img { width: 100%; height: auto; object-fit: contain; }
 .pop-seal { position: absolute; right: 14px; top: 14px; width: 58px; height: 58px; border: 2px solid var(--shu); color: var(--shu); border-radius: 50%; font-family: var(--serif); font-size: 13px; display: flex; align-items: center; justify-content: center; text-align: center; line-height: 1.3; transform: rotate(6deg); }
@@ -351,6 +357,7 @@ table.inv td { border-top: 1px solid var(--line); padding: 6px 8px; white-space:
   <!-- ============ スキャン登録 ============ -->
   <section class="panel" id="tab-scan">
     <div id="flash" class="flash" style="display:none"></div>
+    <div class="steps"><span class="stp"><b>1</b>バーコードをスキャン</span><span class="arw">→</span><span class="stp"><b>2</b>内容を確認・修正</span><span class="arw">→</span><span class="stp"><b>3</b>在庫に登録</span></div>
     <div class="scan-box">
       <div class="scan-btns">
         <button class="btn scan-main" id="scan-toggle" onclick="toggleScan()"><span class="scan-ico">▚</span> カメラでスキャン</button>
@@ -435,6 +442,7 @@ table.inv td { border-top: 1px solid var(--line); padding: 6px 8px; white-space:
       <button id="seg-cards" onclick="setPrintKind('cards')">商品カード</button>
     </div>
     <div id="print-tags-wrap">
+      <div class="steps"><span class="stp"><b>1</b>在庫リストで商品にチェック</span><span class="arw">→</span><span class="stp"><b>2</b>デザインを調整</span><span class="arw">→</span><span class="stp"><b>3</b>印刷</span></div>
       <details class="settings" id="tag-style-settings">
         <summary>値札のデザイン設定(サイズ・フォント・色)</summary>
         <div class="form" style="padding-top:10px">
@@ -481,6 +489,7 @@ table.inv td { border-top: 1px solid var(--line); padding: 6px 8px; white-space:
       <div id="print-tags"></div>
     </div>
     <div id="print-pop" style="display:none">
+      <div class="steps"><span class="stp"><b>1</b>商品とデザインを選ぶ</span><span class="arw">→</span><span class="stp"><b>2</b>写真・文字を調整</span><span class="arw">→</span><span class="stp"><b>3</b>保存して印刷</span></div>
       <div class="form">
         <div class="grid2">
           <label>対象商品 <select id="pop-item" onchange="renderPop()"></select></label>
@@ -490,16 +499,18 @@ table.inv td { border-top: 1px solid var(--line); padding: 6px 8px; white-space:
           <label>キャッチコピー <input id="pop-copy" value="薬剤師おすすめ" oninput="renderPop()"></label>
           <label>ひとこと <input id="pop-note" value="お気軽にご相談ください" oninput="renderPop()"></label>
         </div>
-        <div class="grid2">
-          <label>写真
-            <span class="row gap wrap" style="align-items:center">
-              <label class="btn ghost" style="cursor:pointer;padding:7px 12px;font-size:13px">画像を選ぶ<input type="file" accept="image/*" style="display:none" onchange="popImageFile(event)"></label>
-              <button class="link" onclick="clearPopImage()">削除</button>
-            </span>
-          </label>
-          <label>写真の大きさ(%) <input type="number" id="pop-img-size" min="10" max="100" inputmode="numeric" onchange="savePopFont()"></label>
-        </div>
-        <label class="chk-row"><input type="checkbox" id="pop-img-nobg" onchange="reprocessPopImage()"> 写真の背景を削除する(白背景など無地の背景向け)</label>
+        <details class="settings">
+          <summary>写真の設定(撮影・取り込み)</summary>
+          <div class="form" style="padding-top:10px">
+            <div class="row gap wrap">
+              <label class="btn" style="cursor:pointer">📷 カメラで撮影<input type="file" accept="image/*" capture="environment" style="display:none" onchange="popImageFile(event)"></label>
+              <label class="btn ghost" style="cursor:pointer">写真を選ぶ<input type="file" accept="image/*" style="display:none" onchange="popImageFile(event)"></label>
+              <button class="btn ghost" onclick="clearPopImage()">写真を削除</button>
+            </div>
+            <label class="chk-row"><input type="checkbox" id="pop-img-nobg" onchange="reprocessPopImage()"> 背景を自動で消す(白い机・壁など無地の前で撮るときれいに消えます)</label>
+            <label>写真の大きさ(%) <input type="number" id="pop-img-size" min="10" max="100" inputmode="numeric" onchange="savePopFont()"></label>
+          </div>
+        </details>
         <details class="settings">
           <summary>POPのサイズ設定</summary>
           <div class="form" style="padding-top:10px">
@@ -542,16 +553,17 @@ table.inv td { border-top: 1px solid var(--line); padding: 6px 8px; white-space:
           </div>
         </details>
         <div class="row gap wrap">
-          <button class="btn" onclick="window.print()">POPを印刷</button>
-          <button class="btn ghost" onclick="savePop()">このPOPを保存</button>
+          <button class="btn" onclick="window.print()">表示中のPOPをすべて印刷</button>
+          <button class="btn ghost" onclick="savePop()">このPOPを保存(あとで呼び出せます)</button>
         </div>
         <div id="saved-pops"></div>
       </div>
       <div class="pop-wrap print-target" id="pop-preview"></div>
     </div>
     <div id="print-cards" style="display:none">
+      <div class="steps"><span class="stp"><b>1</b>在庫リストで商品にチェック</span><span class="arw">→</span><span class="stp"><b>2</b>写真・特徴を自動取得か撮影</span><span class="arw">→</span><span class="stp"><b>3</b>印刷</span></div>
       <div class="form">
-        <p class="hint">在庫リストでチェックした商品の「店頭用商品カード」を作ります。商品の代わりに売場に置き、お客さまにレジへ持参してもらうカードです。</p>
+        <p class="hint">商品の代わりに売場へ置き、お客さまにレジへ持参してもらうカードです。</p>
         <details class="settings">
           <summary>カードのサイズ設定</summary>
           <div class="form" style="padding-top:10px">
@@ -645,7 +657,7 @@ table.inv td { border-top: 1px solid var(--line); padding: 6px 8px; white-space:
   </section>
 
   <div class="toast" id="toast"></div>
-  <footer class="foot">OTC在庫台帳 — とみながグループ 店舗向けツール<br><span class="ver">版 2026-07-24 E(サイズ指定・写真対応)</span></footer>
+  <footer class="foot">OTC在庫台帳 — とみながグループ 店舗向けツール<br><span class="ver">版 2026-07-24 F(カメラ・複数POP対応)</span></footer>
 </div>
 
 <script>
@@ -1585,18 +1597,26 @@ function removeBackground_(dataUrl, tolerance){
       let id;
       try { id = ctx.getImageData(0, 0, w, h); } catch(e){ resolve(dataUrl); return; }
       const d = id.data;
-      const tol = (tolerance == null ? 34 : tolerance);
-      // 四隅の平均を背景色とみなす
-      function px(x, y){ const i = (y * w + x) * 4; return [d[i], d[i+1], d[i+2]]; }
-      const corners = [px(0,0), px(w-1,0), px(0,h-1), px(w-1,h-1)];
-      const bg = [0,1,2].map(function(c){
-        return Math.round(corners.reduce(function(a, p){ return a + p[c]; }, 0) / corners.length);
+      // 縁の全画素から背景色を推定(四隅だけだと実写真の影・ムラに弱い)
+      const border = [];
+      for (let x = 0; x < w; x++){ border.push((0*w+x)*4, ((h-1)*w+x)*4); }
+      for (let y = 0; y < h; y++){ border.push((y*w+0)*4, (y*w+(w-1))*4); }
+      let br = 0, bgc = 0, bb = 0;
+      border.forEach(function(i){ br += d[i]; bgc += d[i+1]; bb += d[i+2]; });
+      const n = border.length;
+      const bg = [Math.round(br/n), Math.round(bgc/n), Math.round(bb/n)];
+      // 縁の色のばらつきに応じて許容幅を自動調整(照明ムラ対応)
+      let spread = 0;
+      border.forEach(function(i){
+        const dr = d[i]-bg[0], dg = d[i+1]-bg[1], db = d[i+2]-bg[2];
+        spread += Math.sqrt(dr*dr + dg*dg + db*db);
       });
+      spread = spread / n;
+      const tol = tolerance != null ? tolerance : Math.min(110, Math.max(50, spread * 2.6 + 34));
       const near = function(i){
-        const dr = d[i] - bg[0], dg = d[i+1] - bg[1], db = d[i+2] - bg[2];
+        const dr = d[i]-bg[0], dg = d[i+1]-bg[1], db = d[i+2]-bg[2];
         return Math.sqrt(dr*dr + dg*dg + db*db) <= tol;
       };
-      // 外周からの塗りつぶし(商品内部の白は残す)
       const visited = new Uint8Array(w * h);
       const stack = [];
       for (let x = 0; x < w; x++){ stack.push(x, 0); stack.push(x, h-1); }
@@ -1612,7 +1632,6 @@ function removeBackground_(dataUrl, tolerance){
         d[i+3] = 0;
         stack.push(x+1, y); stack.push(x-1, y); stack.push(x, y+1); stack.push(x, y-1);
       }
-      // 境界を少しなめらかに
       for (let y = 1; y < h-1; y++){
         for (let x = 1; x < w-1; x++){
           const k = y * w + x, i = k * 4;
@@ -1622,7 +1641,7 @@ function removeBackground_(dataUrl, tolerance){
           if (visited[k+1]) open++;
           if (visited[k-w]) open++;
           if (visited[k+w]) open++;
-          if (open >= 2 && near(i)) d[i+3] = 90;
+          if (open >= 2) d[i+3] = Math.min(d[i+3], 110);
         }
       }
       ctx.putImageData(id, 0, 0);
@@ -1690,7 +1709,8 @@ function renderCardEdit_(){
       + '<label>商品の特徴 <input type="text" value="' + esc(m.feature || "") + '" placeholder="例:痛みに速く効く" oninput="setCardMeta(\'' + it.jan + '\',\'feature\',this.value)"></label>'
       + '<div class="card-edit-imgrow">'
       +   (m.img ? '<img class="card-edit-thumb" src="' + esc(m.img) + '">' : '<span style="color:#9AA7AF">写真なし</span>')
-      +   '<label class="link" style="cursor:pointer">画像を選ぶ<input type="file" accept="image/*" style="display:none" onchange="cardImageFile(event,\'' + it.jan + '\')"></label>'
+      +   '<label class="link" style="cursor:pointer">📷 撮影<input type="file" accept="image/*" capture="environment" style="display:none" onchange="cardImageFile(event,\'' + it.jan + '\')"></label>'
+      +   '<label class="link" style="cursor:pointer">写真を選ぶ<input type="file" accept="image/*" style="display:none" onchange="cardImageFile(event,\'' + it.jan + '\')"></label>'
       +   (m.img && !/^https?:/.test(m.img) ? '<button class="link" onclick="cardRemoveBg(\'' + it.jan + '\')">背景を削除</button>' : '')
       +   (m.img ? '<button class="link" onclick="setCardMeta(\'' + it.jan + '\',\'img\',\'\')">削除</button>' : '')
       + '</div></div>';
@@ -2059,31 +2079,41 @@ function savePop(){
   if (!id){ toast("先に対象商品を選んでください"); return; }
   const it = S.items.find(function(x){ return x.id===id; });
   if (!it) return;
-  const name = prompt("このPOPの名前を入力してください", (it.name||"POP") + " " + (S.popStyle||""));
-  if (name === null) return;
+  const styleSel = document.getElementById("pop-style");
+  const styleLabel = styleSel.options[styleSel.selectedIndex] ? styleSel.options[styleSel.selectedIndex].text : "";
   S.savedPops = S.savedPops || [];
   S.savedPops.unshift({
     id: rid(),
-    title: (name || it.name || "POP").trim(),
+    title: (it.name || "POP") + " / " + styleLabel,
     itemId: id,
     itemName: it.name || "",
     style: S.popStyle || "refined",
     font: JSON.parse(JSON.stringify(popFont_())),
     copy: document.getElementById("pop-copy").value,
     note: document.getElementById("pop-note").value,
+    print: true,
     savedAt: today()
   });
-  save(); renderSavedPops(); toast("POPを保存しました");
+  save(); renderSavedPops(); renderPop();
+  flash("new", "POPを保存しました(下の一覧から呼び出せます)", it.name);
+}
+function togglePopPrint(pid){
+  const sp = (S.savedPops||[]).find(function(x){ return x.id===pid; });
+  if (!sp) return;
+  sp.print = sp.print === false ? true : false;
+  save(); renderSavedPops(); renderPop();
 }
 function renderSavedPops(){
   const box = document.getElementById("saved-pops");
   if (!box) return;
   const list = S.savedPops || [];
   if (!list.length){ box.innerHTML = ""; return; }
-  box.innerHTML = '<div class="divider"><span>保存したPOP</span></div>'
+  box.innerHTML = '<div class="divider"><span>保存したPOP(チェックした分が一緒に印刷されます)</span></div>'
     + '<ul class="saved-pop-list">' + list.map(function(sp){
-      return '<li class="saved-pop"><button class="link" onclick="loadPop(\''+sp.id+'\')">'+esc(sp.title)+'</button>'
-        + '<span class="saved-pop-meta">'+esc(sp.itemName)+' / '+(sp.savedAt||"")+'</span>'
+      return '<li class="saved-pop">'
+        + '<input type="checkbox" ' + (sp.print !== false ? 'checked' : '') + ' onchange="togglePopPrint(\''+sp.id+'\')" aria-label="印刷に含める">'
+        + '<button class="link" onclick="loadPop(\''+sp.id+'\')">'+esc(sp.title)+'</button>'
+        + '<span class="saved-pop-meta">'+(sp.savedAt||"")+'</span>'
         + '<button class="del" onclick="deletePop(\''+sp.id+'\')" aria-label="削除">×</button></li>';
     }).join("") + '</ul>';
 }
@@ -2113,15 +2143,7 @@ function savePopStyle(){
   S.popStyle = document.getElementById("pop-style").value;
   save(); renderPop();
 }
-function renderPop(){
-  const ps = S.popStyle || "refined";
-  const id = document.getElementById("pop-item").value;
-  const it = S.items.find(x => x.id===id);
-  const area = document.getElementById("pop-preview");
-  if (!it){ area.innerHTML = ""; return; }
-  const copy = document.getElementById("pop-copy").value;
-  const note = document.getElementById("pop-note").value;
-  const pf = popFont_();
+function popCardHtml_(it, ps, pf, copy, note){
   const ff = fontCssAttr(pf.font);
   const x = pf.fields || {};
   const dim = (pf.size === "custom")
@@ -2145,7 +2167,29 @@ function renderPop(){
     h += '</div>';
   }
   h += '<div class="pop-seal">薬剤師<br>相談</div></div>';
-  area.innerHTML = h;
+  return h;
+}
+function renderPop(){
+  const ps = S.popStyle || "refined";
+  const id = document.getElementById("pop-item").value;
+  const it = S.items.find(x => x.id===id);
+  const area = document.getElementById("pop-preview");
+  const copy = document.getElementById("pop-copy").value;
+  const note = document.getElementById("pop-note").value;
+  let h = it ? popCardHtml_(it, ps, popFont_(), copy, note) : "";
+  // 保存済みで「印刷に含める」がONのPOPを続けて描画(編集中と同じ保存分は除く)
+  const extras = (S.savedPops || []).filter(function(sp){ return sp.print !== false; });
+  if (extras.length){
+    const cards = extras.map(function(sp){
+      const spIt = S.items.find(function(x){ return x.id === sp.itemId; });
+      if (!spIt) return "";
+      return popCardHtml_(spIt, sp.style || "refined", Object.assign(defaultPopFont(), sp.font || {}), sp.copy || "", sp.note || "");
+    }).filter(Boolean).join("");
+    if (cards){
+      h += '<div class="pop-extras-head">保存済みで一緒に印刷されるPOP(' + extras.length + '枚) — 外すには下の一覧でチェックを外してください</div>' + cards;
+    }
+  }
+  area.innerHTML = h || "";
 }
 
 /* ============ 会員間共有(Google Apps Script サーバー) ============ */
