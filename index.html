@@ -116,7 +116,7 @@ input:focus, select:focus { outline: 2px solid var(--ai); outline-offset: -1px; 
 .ph-cat-n { font-weight: 400; color: #7B8794; font-size: 12px; }
 .ph-detail-title { font-family: var(--serif); font-size: 17px; color: var(--ai-deep); }
 .card-sheet { display: flex; flex-wrap: wrap; gap: 4mm; margin-top: 14px; }
-.pcard { width: 52mm; border: 1.5px dashed #7FBF9A; background: #fff; display: flex; flex-direction: column; overflow: hidden; break-inside: avoid; page-break-inside: avoid; }
+.pcard { border: 1.5px dashed #7FBF9A; background: #fff; display: flex; flex-direction: column; overflow: hidden; break-inside: avoid; page-break-inside: avoid; }
 .pcard-head { background: #8FCBA8; color: #fff; font-weight: 700; text-align: center; font-size: 15px; padding: 5px 0; letter-spacing: 0.15em; }
 .pcard-note { font-size: 8.5px; text-align: center; color: #333; padding: 4px 4px 2px; line-height: 1.4; }
 .pcard-label { background: #F06A7E; color: #fff; font-weight: 700; font-size: 11px; text-align: center; margin: 4px 8px 2px; padding: 3px 4px; }
@@ -176,6 +176,8 @@ input:focus, select:focus { outline: 2px solid var(--ai); outline-offset: -1px; 
 .pop-foot { display: flex; flex-direction: column; gap: 6px; align-items: center; }
 .pop-cat { color: #fff; font-size: 12px; letter-spacing: 0.12em; padding: 3px 12px; border-radius: 4px; }
 .pop-note { font-size: 13px; color: #4A5761; }
+.pop-img { margin: 8px auto; display: flex; align-items: center; justify-content: center; }
+.pop-img img { width: 100%; height: auto; object-fit: contain; }
 .pop-seal { position: absolute; right: 14px; top: 14px; width: 58px; height: 58px; border: 2px solid var(--shu); color: var(--shu); border-radius: 50%; font-family: var(--serif); font-size: 13px; display: flex; align-items: center; justify-content: center; text-align: center; line-height: 1.3; transform: rotate(6deg); }
 .share-note { font-size: 13px; background: #FDF3EF; border: 1px solid #E8C4B8; border-radius: 8px; padding: 10px 12px; color: #6B3A2C; }
 .ph-card { border: 1px solid var(--line); border-radius: 10px; background: #fff; }
@@ -211,6 +213,7 @@ table.inv td { border-top: 1px solid var(--line); padding: 6px 8px; white-space:
 .row-actions button { border: none; background: none; cursor: pointer; padding: 3px; font-size: 15px; }
 .row-actions .edit { color: var(--ai); }
 .row-actions .del { color: #9AA7AF; font-size: 17px; }
+.storage-warn { border: 1px solid #E0B4AC; background: #FDF3EF; color: #8C2F1B; border-radius: 10px; padding: 10px 12px; margin-bottom: 8px; font-size: 13px; }
 .backup-alert { border: 1px solid #C8D6C0; border-radius: 10px; background: #F2F7EF; padding: 10px 12px; margin: 8px 0 4px; font-size: 13px; color: #35502C; display: flex; flex-direction: column; gap: 6px; }
 .expiry-alert { border: 1px solid #E8C4B8; border-radius: 10px; background: #FDF3EF; padding: 10px 12px; margin: 8px 0 4px; font-size: 13px; color: #6B3A2C; display: flex; flex-direction: column; gap: 6px; }
 .ea-row { line-height: 1.5; }
@@ -487,6 +490,35 @@ table.inv td { border-top: 1px solid var(--line); padding: 6px 8px; white-space:
           <label>キャッチコピー <input id="pop-copy" value="薬剤師おすすめ" oninput="renderPop()"></label>
           <label>ひとこと <input id="pop-note" value="お気軽にご相談ください" oninput="renderPop()"></label>
         </div>
+        <div class="grid2">
+          <label>写真
+            <span class="row gap wrap" style="align-items:center">
+              <label class="btn ghost" style="cursor:pointer;padding:7px 12px;font-size:13px">画像を選ぶ<input type="file" accept="image/*" style="display:none" onchange="popImageFile(event)"></label>
+              <button class="link" onclick="clearPopImage()">削除</button>
+            </span>
+          </label>
+          <label>写真の大きさ(%) <input type="number" id="pop-img-size" min="10" max="100" inputmode="numeric" onchange="savePopFont()"></label>
+        </div>
+        <label class="chk-row"><input type="checkbox" id="pop-img-nobg" onchange="reprocessPopImage()"> 写真の背景を削除する(白背景など無地の背景向け)</label>
+        <details class="settings">
+          <summary>POPのサイズ設定</summary>
+          <div class="form" style="padding-top:10px">
+            <div class="grid2">
+              <label>用紙サイズ
+                <select id="pop-size" onchange="savePopFont()">
+                  <option value="a6">小(A6相当 105×148mm)</option>
+                  <option value="a5">中(A5相当 148×210mm)</option>
+                  <option value="a4">大(A4相当 210×297mm)</option>
+                  <option value="custom">自分で指定</option>
+                </select>
+              </label>
+              <label id="pop-size-w-wrap" style="display:none">幅(mm) <input type="number" id="pop-width" min="40" max="300" inputmode="numeric" onchange="savePopFont()"></label>
+            </div>
+            <div class="grid2" id="pop-size-h-wrap" style="display:none">
+              <label>高さ(mm) <input type="number" id="pop-height" min="0" max="400" inputmode="numeric" placeholder="0=自動" onchange="savePopFont()"></label>
+            </div>
+          </div>
+        </details>
         <details class="settings">
           <summary>POPの文字設定(フォント・大きさ)</summary>
           <div class="form" style="padding-top:10px">
@@ -505,6 +537,7 @@ table.inv td { border-top: 1px solid var(--line); padding: 6px 8px; white-space:
               <label><input type="checkbox" id="pf-price" onchange="savePopFont()"> 価格</label>
               <label><input type="checkbox" id="pf-cat" onchange="savePopFont()"> 区分</label>
               <label><input type="checkbox" id="pf-note" onchange="savePopFont()"> ひとこと</label>
+              <label><input type="checkbox" id="pf-img" onchange="savePopFont()"> 写真</label>
             </div>
           </div>
         </details>
@@ -519,6 +552,26 @@ table.inv td { border-top: 1px solid var(--line); padding: 6px 8px; white-space:
     <div id="print-cards" style="display:none">
       <div class="form">
         <p class="hint">在庫リストでチェックした商品の「店頭用商品カード」を作ります。商品の代わりに売場に置き、お客さまにレジへ持参してもらうカードです。</p>
+        <details class="settings">
+          <summary>カードのサイズ設定</summary>
+          <div class="form" style="padding-top:10px">
+            <div class="grid2">
+              <label>カードサイズ
+                <select id="card-size" onchange="saveCardStyle()">
+                  <option value="s">小(45×65mm)</option>
+                  <option value="m">中(52×78mm)</option>
+                  <option value="l">大(65×95mm)</option>
+                  <option value="custom">自分で指定</option>
+                </select>
+              </label>
+              <label id="card-size-w-wrap" style="display:none">幅(mm) <input type="number" id="card-width" min="30" max="200" inputmode="numeric" onchange="saveCardStyle()"></label>
+            </div>
+            <div class="grid2" id="card-size-h-wrap" style="display:none">
+              <label>高さ(mm) <input type="number" id="card-height" min="0" max="300" inputmode="numeric" placeholder="0=自動" onchange="saveCardStyle()"></label>
+            </div>
+            <label class="chk-row"><input type="checkbox" id="card-nobg" onchange="saveCardStyle()"> 取り込む写真の背景を削除する</label>
+          </div>
+        </details>
         <div class="row gap wrap">
           <button class="btn ghost" onclick="fetchCardInfo()">写真・特徴を自動取得</button>
           <button class="btn" onclick="window.print()">カードを印刷</button>
@@ -535,6 +588,8 @@ table.inv td { border-top: 1px solid var(--line); padding: 6px 8px; white-space:
   <section class="panel" id="tab-share">
     <div class="set-card">
       <h3 class="set-h">データの控え(バックアップ・引き継ぎ)</h3>
+      <div id="storage-warn" class="storage-warn" style="display:none"></div>
+      <p class="hint" id="storage-info"></p>
       <p class="hint">在庫・商品マスタ・各種設定をファイル1つに保存できます。機種変更やアドレス変更の際は、変更前に「控えを保存」し、変更後の画面で「控えから復元」してください。</p>
       <div class="row gap">
         <button class="btn ghost" onclick="backupData()">控えを保存</button>
@@ -590,7 +645,7 @@ table.inv td { border-top: 1px solid var(--line); padding: 6px 8px; white-space:
   </section>
 
   <div class="toast" id="toast"></div>
-  <footer class="foot">OTC在庫台帳 — とみながグループ 店舗向けツール<br><span class="ver">版 2026-07-24 D(商品カード対応)</span></footer>
+  <footer class="foot">OTC在庫台帳 — とみながグループ 店舗向けツール<br><span class="ver">版 2026-07-24 E(サイズ指定・写真対応)</span></footer>
 </div>
 
 <script>
@@ -642,7 +697,51 @@ function load(){
     if (raw) { const d = JSON.parse(raw); S = Object.assign(S, d); if (!S.pharmacy.id) S.pharmacy.id = rid(); }
   } catch(e){}
 }
-function save(){ try { localStorage.setItem("otc-ledger-v1", JSON.stringify(S)); } catch(e){} }
+function save(){
+  try {
+    localStorage.setItem("otc-ledger-v1", JSON.stringify(S));
+    const w = document.getElementById("storage-warn");
+    if (w) w.style.display = "none";
+    return true;
+  } catch(e){
+    // 端末の保存容量を超えた場合(写真の入れすぎなど)
+    const w = document.getElementById("storage-warn");
+    if (w){
+      w.innerHTML = '<strong>保存できませんでした</strong> — 端末の保存容量がいっぱいです。'
+        + '写真の枚数を減らすか、不要な写真を削除してください。'
+        + '<div class="ea-actions"><button class="link" onclick="clearAllPhotos()">すべての写真を削除して空ける</button>'
+        + '<button class="link" onclick="backupData()">先に控えを保存</button></div>';
+      w.style.display = "block";
+    }
+    return false;
+  }
+}
+// 保存容量の目安を返す
+function storageInfo(){
+  let bytes = 0;
+  try { bytes = new Blob([JSON.stringify(S)]).size; } catch(e){ bytes = JSON.stringify(S).length; }
+  let photos = 0;
+  const cm = S.cardMeta || {};
+  Object.keys(cm).forEach(function(k){ if (cm[k] && cm[k].img && /^data:/.test(cm[k].img)) photos++; });
+  if (S.popFont && S.popFont.img) photos++;
+  return { mb: (bytes / 1048576).toFixed(2), photos: photos };
+}
+function renderStorageInfo(){
+  const el = document.getElementById("storage-info");
+  if (!el) return;
+  const i = storageInfo();
+  el.textContent = "現在の保存量: 約 " + i.mb + " MB(取り込んだ写真 " + i.photos + " 枚)。目安として5MBを超えると保存できなくなります。";
+}
+function clearAllPhotos(){
+  if (!confirm("取り込んだ写真をすべて削除します。よろしいですか?(商品データは消えません)")) return;
+  const cm = S.cardMeta || {};
+  Object.keys(cm).forEach(function(k){ if (cm[k]) cm[k].img = ""; });
+  if (S.popFont) S.popFont.img = "";
+  save(); renderStorageInfo();
+  if (printKind === "cards") renderCards();
+  if (printKind === "pop") renderPop();
+  toast("写真を削除しました");
+}
 
 function flash(kind, title, name){
   const el = document.getElementById("flash");
@@ -1448,7 +1547,116 @@ function setPrintKind(k){
   else if (k==="pop"){ fillPopSelect(); renderPop(); }
   else renderCards();
 }
+/* ============ 画像処理(縮小・背景削除) ============ */
+// ファイル→縮小したdataURL
+function readImageFile_(file, maxPx){
+  return new Promise(function(resolve, reject){
+    const fr = new FileReader();
+    fr.onerror = function(){ reject(new Error("read")); };
+    fr.onload = function(){
+      const img = new Image();
+      img.onerror = function(){ reject(new Error("decode")); };
+      img.onload = function(){
+        const max = maxPx || 600;
+        let w = img.width, h = img.height;
+        if (w > h && w > max){ h = Math.round(h * max / w); w = max; }
+        else if (h >= w && h > max){ w = Math.round(w * max / h); h = max; }
+        const cv = document.createElement("canvas");
+        cv.width = w; cv.height = h;
+        cv.getContext("2d").drawImage(img, 0, 0, w, h);
+        resolve({ dataUrl: cv.toDataURL("image/png"), w: w, h: h });
+      };
+      img.src = fr.result;
+    };
+    fr.readAsDataURL(file);
+  });
+}
+// 外周から同色をたどって透明化(無地背景向け)。PNGのdataURLを返す
+function removeBackground_(dataUrl, tolerance){
+  return new Promise(function(resolve){
+    const img = new Image();
+    img.onerror = function(){ resolve(dataUrl); };
+    img.onload = function(){
+      const w = img.width, h = img.height;
+      const cv = document.createElement("canvas");
+      cv.width = w; cv.height = h;
+      const ctx = cv.getContext("2d");
+      ctx.drawImage(img, 0, 0);
+      let id;
+      try { id = ctx.getImageData(0, 0, w, h); } catch(e){ resolve(dataUrl); return; }
+      const d = id.data;
+      const tol = (tolerance == null ? 34 : tolerance);
+      // 四隅の平均を背景色とみなす
+      function px(x, y){ const i = (y * w + x) * 4; return [d[i], d[i+1], d[i+2]]; }
+      const corners = [px(0,0), px(w-1,0), px(0,h-1), px(w-1,h-1)];
+      const bg = [0,1,2].map(function(c){
+        return Math.round(corners.reduce(function(a, p){ return a + p[c]; }, 0) / corners.length);
+      });
+      const near = function(i){
+        const dr = d[i] - bg[0], dg = d[i+1] - bg[1], db = d[i+2] - bg[2];
+        return Math.sqrt(dr*dr + dg*dg + db*db) <= tol;
+      };
+      // 外周からの塗りつぶし(商品内部の白は残す)
+      const visited = new Uint8Array(w * h);
+      const stack = [];
+      for (let x = 0; x < w; x++){ stack.push(x, 0); stack.push(x, h-1); }
+      for (let y = 0; y < h; y++){ stack.push(0, y); stack.push(w-1, y); }
+      while (stack.length){
+        const y = stack.pop(), x = stack.pop();
+        if (x < 0 || y < 0 || x >= w || y >= h) continue;
+        const k = y * w + x;
+        if (visited[k]) continue;
+        const i = k * 4;
+        if (!near(i)) continue;
+        visited[k] = 1;
+        d[i+3] = 0;
+        stack.push(x+1, y); stack.push(x-1, y); stack.push(x, y+1); stack.push(x, y-1);
+      }
+      // 境界を少しなめらかに
+      for (let y = 1; y < h-1; y++){
+        for (let x = 1; x < w-1; x++){
+          const k = y * w + x, i = k * 4;
+          if (visited[k] || d[i+3] === 0) continue;
+          let open = 0;
+          if (visited[k-1]) open++;
+          if (visited[k+1]) open++;
+          if (visited[k-w]) open++;
+          if (visited[k+w]) open++;
+          if (open >= 2 && near(i)) d[i+3] = 90;
+        }
+      }
+      ctx.putImageData(id, 0, 0);
+      resolve(cv.toDataURL("image/png"));
+    };
+    img.src = dataUrl;
+  });
+}
+
 /* ============ 店頭用商品カード ============ */
+function defaultCardStyle(){ return { size: "m", width: 52, height: 0, nobg: false }; }
+function cardStyle_(){ return Object.assign(defaultCardStyle(), S.cardStyle || {}); }
+const CARD_SIZES = { s: { w: 45, h: 65 }, m: { w: 52, h: 78 }, l: { w: 65, h: 95 } };
+function syncCardStyleInputs(){
+  const c = cardStyle_();
+  document.getElementById("card-size").value = c.size;
+  document.getElementById("card-width").value = c.width;
+  document.getElementById("card-height").value = c.height;
+  document.getElementById("card-nobg").checked = !!c.nobg;
+  const custom = c.size === "custom";
+  document.getElementById("card-size-w-wrap").style.display = custom ? "flex" : "none";
+  document.getElementById("card-size-h-wrap").style.display = custom ? "grid" : "none";
+}
+function saveCardStyle(){
+  S.cardStyle = {
+    size: document.getElementById("card-size").value,
+    width: Math.min(200, Math.max(30, parseInt(document.getElementById("card-width").value, 10) || 52)),
+    height: Math.min(300, Math.max(0, parseInt(document.getElementById("card-height").value, 10) || 0)),
+    nobg: document.getElementById("card-nobg").checked
+  };
+  save();
+  syncCardStyleInputs();
+  renderCardSheet_();
+}
 function cardMeta_(jan){
   S.cardMeta = S.cardMeta || {};
   S.cardMeta[jan] = S.cardMeta[jan] || {};
@@ -1463,6 +1671,7 @@ function setCardMeta(jan, key, val){
   renderCardSheet_();
 }
 function renderCards(){
+  syncCardStyleInputs();
   renderCardEdit_();
   renderCardSheet_();
 }
@@ -1482,6 +1691,7 @@ function renderCardEdit_(){
       + '<div class="card-edit-imgrow">'
       +   (m.img ? '<img class="card-edit-thumb" src="' + esc(m.img) + '">' : '<span style="color:#9AA7AF">写真なし</span>')
       +   '<label class="link" style="cursor:pointer">画像を選ぶ<input type="file" accept="image/*" style="display:none" onchange="cardImageFile(event,\'' + it.jan + '\')"></label>'
+      +   (m.img && !/^https?:/.test(m.img) ? '<button class="link" onclick="cardRemoveBg(\'' + it.jan + '\')">背景を削除</button>' : '')
       +   (m.img ? '<button class="link" onclick="setCardMeta(\'' + it.jan + '\',\'img\',\'\')">削除</button>' : '')
       + '</div></div>';
   }).join("");
@@ -1489,47 +1699,55 @@ function renderCardEdit_(){
 function renderCardSheet_(){
   const sheet = document.getElementById("card-sheet");
   const items = cardItems_();
+  const cs = cardStyle_();
+  const dim = cs.size === "custom"
+    ? { w: cs.width, h: cs.height }
+    : { w: CARD_SIZES[cs.size].w, h: CARD_SIZES[cs.size].h };
+  const cardCss = 'width:' + dim.w + 'mm;' + (dim.h ? 'height:' + dim.h + 'mm;' : '');
+  const scale = dim.w / 52;
+  const fs = function(px){ return (px * scale).toFixed(1) + 'px'; };
   sheet.innerHTML = items.map(function(it){
     const m = (S.cardMeta || {})[it.jan] || {};
     const label = m.label || "";
     const feature = m.feature || "";
     const catTxt = it.category ? "[" + it.category + "]" : "";
-    return '<div class="pcard">'
-      + '<div class="pcard-head">商品カード</div>'
-      + '<div class="pcard-note">お求めの際はこのカードを<br>レジまでお持ちください。</div>'
-      + (label ? '<div class="pcard-label">' + esc(label) + '</div>' : '')
-      + (catTxt ? '<div class="pcard-cat">' + esc(catTxt) + '</div>' : '')
-      + '<div class="pcard-name">' + esc(it.name || "") + '</div>'
-      + (feature ? '<div class="pcard-feature">' + esc(feature) + '</div>' : '')
+    return '<div class="pcard" style="' + cardCss + '">'
+      + '<div class="pcard-head" style="font-size:' + fs(15) + '">商品カード</div>'
+      + '<div class="pcard-note" style="font-size:' + fs(8.5) + '">お求めの際はこのカードを<br>レジまでお持ちください。</div>'
+      + (label ? '<div class="pcard-label" style="font-size:' + fs(11) + '">' + esc(label) + '</div>' : '')
+      + (catTxt ? '<div class="pcard-cat" style="font-size:' + fs(8.5) + '">' + esc(catTxt) + '</div>' : '')
+      + '<div class="pcard-name" style="font-size:' + fs(12.5) + '">' + esc(it.name || "") + '</div>'
+      + (feature ? '<div class="pcard-feature" style="font-size:' + fs(9.5) + '">' + esc(feature) + '</div>' : '')
       + '<div class="pcard-img">' + (m.img ? '<img src="' + esc(m.img) + '" onerror="this.parentNode.innerHTML=\'<div class=&quot;pcard-img-empty&quot;>画像を読み込めませんでした</div>\'">' : '<div class="pcard-img-empty">写真なし</div>') + '</div>'
       + '<div class="pcard-bottom">'
       +   '<span class="pcard-barcode">' + (it.jan ? ean13Svg(it.jan, 26, true) : '') + '</span>'
-      +   '<span class="pcard-price">' + (it.price !== "" && it.price != null ? Number(it.price).toLocaleString("ja-JP") : "") + '円<small>(税込)</small></span>'
+      +   '<span class="pcard-price" style="font-size:' + fs(15) + '">' + (it.price !== "" && it.price != null ? Number(it.price).toLocaleString("ja-JP") : "") + '円<small>(税込)</small></span>'
       + '</div></div>';
   }).join("");
 }
-function cardImageFile(ev, jan){
+async function cardImageFile(ev, jan){
   const f = ev.target.files && ev.target.files[0];
   if (!f) return;
-  const img = new Image();
-  const fr = new FileReader();
-  fr.onload = function(){
-    img.onload = function(){
-      // 300pxに縮小して保存(容量対策)
-      const max = 300;
-      let w = img.width, h = img.height;
-      if (w > h && w > max){ h = Math.round(h * max / w); w = max; }
-      else if (h > max){ w = Math.round(w * max / h); h = max; }
-      const cv = document.createElement("canvas");
-      cv.width = w; cv.height = h;
-      cv.getContext("2d").drawImage(img, 0, 0, w, h);
-      setCardMeta(jan, "img", cv.toDataURL("image/jpeg", 0.85));
-      renderCardEdit_();
-      toast("画像を取り込みました");
-    };
-    img.src = fr.result;
-  };
-  fr.readAsDataURL(f);
+  try {
+    toast("画像を処理中です…");
+    const r = await readImageFile_(f, 420);
+    let url = r.dataUrl;
+    if (cardStyle_().nobg) url = await removeBackground_(url);
+    cardMeta_(jan).img = url;
+    save();
+    renderCards();
+    toast(cardStyle_().nobg ? "画像を取り込み、背景を削除しました" : "画像を取り込みました");
+  } catch(e){ toast("画像を読み込めませんでした"); }
+}
+// 取り込み済みの写真の背景を後から削除
+async function cardRemoveBg(jan){
+  const m = cardMeta_(jan);
+  if (!m.img) return;
+  if (/^https?:/.test(m.img)){ toast("自動取得した写真は背景削除できません。手動で取り込んだ写真でご利用ください"); return; }
+  toast("背景を削除中です…");
+  m.img = await removeBackground_(m.img);
+  save(); renderCards();
+  toast("背景を削除しました");
 }
 async function fetchCardInfo(){
   const msg = document.getElementById("card-msg");
@@ -1755,8 +1973,9 @@ function fillPopSelect(){
   sel.innerHTML = '<option value="">— 商品を選択 —</option>' + S.items.map(it => '<option value="'+it.id+'">'+esc(it.name)+'</option>').join("");
   if (cur) sel.value = cur;
 }
-function defaultPopFont(){ return { font: "serif", nameSize: 30, priceSize: 52, copySize: 20, fields: { copy:true, name:true, maker:true, price:true, cat:true, note:true } }; }
+function defaultPopFont(){ return { font: "serif", nameSize: 30, priceSize: 52, copySize: 20, size: "a5", width: 148, height: 0, imgSize: 55, nobg: false, fields: { copy:true, name:true, maker:true, price:true, cat:true, note:true, img:true } }; }
 function popFont_(){ return Object.assign(defaultPopFont(), S.popFont || {}); }
+const POP_SIZES = { a6: { w: 105, h: 148 }, a5: { w: 148, h: 210 }, a4: { w: 210, h: 297 } };
 function syncPopFontInputs(){
   const f = popFont_();
   document.getElementById("pop-font").innerHTML = fontOptions(f.font);
@@ -1771,9 +1990,25 @@ function syncPopFontInputs(){
   document.getElementById("pf-price").checked = x.price !== false;
   document.getElementById("pf-cat").checked = x.cat !== false;
   document.getElementById("pf-note").checked = x.note !== false;
+  document.getElementById("pf-img").checked = x.img !== false;
+  document.getElementById("pop-size").value = f.size || "a5";
+  document.getElementById("pop-width").value = f.width || 148;
+  document.getElementById("pop-height").value = f.height || 0;
+  document.getElementById("pop-img-size").value = f.imgSize || 55;
+  document.getElementById("pop-img-nobg").checked = !!f.nobg;
+  const pcustom = (f.size || "a5") === "custom";
+  document.getElementById("pop-size-w-wrap").style.display = pcustom ? "flex" : "none";
+  document.getElementById("pop-size-h-wrap").style.display = pcustom ? "grid" : "none";
 }
 function savePopFont(){
+  const prev = popFont_();
   S.popFont = {
+    img: prev.img || "",
+    size: document.getElementById("pop-size").value,
+    width: Math.min(300, Math.max(40, parseInt(document.getElementById("pop-width").value,10) || 148)),
+    height: Math.min(400, Math.max(0, parseInt(document.getElementById("pop-height").value,10) || 0)),
+    imgSize: Math.min(100, Math.max(10, parseInt(document.getElementById("pop-img-size").value,10) || 55)),
+    nobg: document.getElementById("pop-img-nobg").checked,
     font: document.getElementById("pop-font").value,
     nameSize: Math.min(80, Math.max(14, parseInt(document.getElementById("pop-name-size").value,10) || 30)),
     priceSize: Math.min(140, Math.max(20, parseInt(document.getElementById("pop-price-size").value,10) || 52)),
@@ -1784,10 +2019,39 @@ function savePopFont(){
       maker: document.getElementById("pf-maker").checked,
       price: document.getElementById("pf-price").checked,
       cat: document.getElementById("pf-cat").checked,
-      note: document.getElementById("pf-note").checked
+      note: document.getElementById("pf-note").checked,
+      img: document.getElementById("pf-img").checked
     }
   };
+  save(); syncPopFontInputs(); renderPop();
+}
+async function popImageFile(ev){
+  const f = ev.target.files && ev.target.files[0];
+  if (!f) return;
+  try {
+    toast("画像を処理中です…");
+    const r = await readImageFile_(f, 600);
+    let url = r.dataUrl;
+    const pf = popFont_();
+    if (document.getElementById("pop-img-nobg").checked) url = await removeBackground_(url);
+    S.popFont = Object.assign(pf, { img: url });
+    save(); renderPop();
+    toast(document.getElementById("pop-img-nobg").checked ? "写真を取り込み、背景を削除しました" : "写真を取り込みました");
+  } catch(e){ toast("画像を読み込めませんでした"); }
+}
+function clearPopImage(){
+  S.popFont = Object.assign(popFont_(), { img: "" });
   save(); renderPop();
+}
+async function reprocessPopImage(){
+  savePopFont();
+  const pf = popFont_();
+  if (!pf.img || !document.getElementById("pop-img-nobg").checked) return;
+  toast("背景を削除中です…");
+  const url = await removeBackground_(pf.img);
+  S.popFont = Object.assign(popFont_(), { img: url });
+  save(); renderPop();
+  toast("背景を削除しました");
 }
 function resetPopFont(){ S.popFont = defaultPopFont(); save(); syncPopFontInputs(); renderPop(); }
 function savePop(){
@@ -1860,12 +2124,17 @@ function renderPop(){
   const pf = popFont_();
   const ff = fontCssAttr(pf.font);
   const x = pf.fields || {};
-  let h = '<div class="pop-card ps-' + ps + '" style="font-family:'+ff+' !important">';
+  const dim = (pf.size === "custom")
+    ? { w: pf.width, h: pf.height }
+    : { w: POP_SIZES[pf.size || "a5"].w, h: POP_SIZES[pf.size || "a5"].h };
+  const cardCss = 'font-family:' + ff + ' !important;width:' + dim.w + 'mm;' + (dim.h ? 'min-height:' + dim.h + 'mm;' : '');
+  let h = '<div class="pop-card ps-' + ps + '" style="' + cardCss + '">';
   if (ps === "sale") h += '<div class="pop-sale-badge">特売</div>';
   if (ps === "new") h += '<div class="pop-new-badge">NEW</div>';
   if (x.copy !== false) h += '<div class="pop-copy" style="font-family:'+ff+' !important;font-size:'+pf.copySize+'px !important">'+esc(copy)+'</div>';
   if (x.name !== false) h += '<div class="pop-name" style="font-family:'+ff+' !important;font-size:'+pf.nameSize+'px !important">'+esc(it.name)+'</div>';
   if (x.maker !== false && it.maker) h += '<div class="pop-maker">'+esc(it.maker)+'</div>';
+  if (x.img !== false && pf.img) h += '<div class="pop-img" style="width:'+(pf.imgSize||55)+'%"><img src="'+esc(pf.img)+'" alt=""></div>';
   if (x.price !== false) h += '<div class="pop-price">' + (it.price!==""?'<span class="pop-yen" style="font-family:'+ff+' !important;font-size:'+pf.priceSize+'px !important">¥'+Number(it.price).toLocaleString("ja-JP")+'</span><span class="pop-tax">税込</span>':'') + '</div>';
   const showCat = x.cat !== false, showNote = x.note !== false;
   if (showCat || showNote || it.ranyo) {
@@ -2133,6 +2402,7 @@ renderList();
 showExpiryAlert();
 showBackupAlert();
 renderSavedPops();
+renderStorageInfo();
 </script>
 </body>
 </html>
