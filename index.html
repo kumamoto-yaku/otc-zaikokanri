@@ -700,7 +700,7 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
   </section>
 
   <div class="toast" id="toast"></div>
-  <footer class="foot">OTCLinker Pro — とみながグループ 店舗向けツール<br><span class="ver">版 2026-07-25 L(バーコード実寸修正)</span></footer>
+  <footer class="foot">OTCLinker Pro — とみながグループ 店舗向けツール<br><span class="ver">版 2026-07-25 M(キャラ5刻み進化)</span></footer>
 </div>
 
 <script>
@@ -1700,36 +1700,38 @@ function updatePrintSelbar_(){
   }
 }
 /* ============ 育成ドットキャラ(品目数で進化) ============ */
-const DOT_PAL = { K:"#2B2B2B", W:"#FFFFFF", C:"#FFF3D6", Y:"#FFD84D", O:"#F08A3C", R:"#D0342C", P:"#F4A7B9", B:"#5FA8D3", N:"#8A5A2B", G:"#FFD700", E:"#7DC383", V:"#9B7EDE", S:"#C0C8CF", D:"#3E9B4F", M:"#FF8FB1" };
+const DOT_PAL = { K:"#2B2B2B", W:"#FFFFFF", C:"#FFF3D6", Y:"#FFD84D", O:"#F08A3C", R:"#D0342C", P:"#F4A7B9", B:"#5FA8D3", N:"#8A5A2B", G:"#FFD700", E:"#7DC383", V:"#9B7EDE", S:"#C0C8CF", D:"#3E9B4F", M:"#FF8FB1", A:"#7FD4F5", L:"#A8E063", T:"#5B6EE1" };
 const DOT_SPRITES = {
   egg: ["............","....KKKK....","...KCCCCK...","..KCCCCCCK..","..KCCWCCCK..",".KCCWWCCCCK.",".KCCCCCCCCK.",".KCCCCCCCCK.",".KCCCCCCCCK.","..KCCCCCCK..","...KCCCCK...","....KKKK...."],
   chick1: ["............","............","....KKKK....","...KYYYYK...","..KYKYYYYK..","..KYYYYYOK..","...KYYYYK...","...KYYYYK...","..KYYYYYYK..","..KYYYYYYK..","...KOKKOK...","............"],
-  chick2: ["............","...KKKK.....","..KYYYYK....",".KYKYYYYK...",".KYYYYYOKK..",".KYYYYYYK...",".KYYYYYYYK..","KYYKYYYYYK..","KYYKYYYYYK..",".KYYYYYYK...","..KYYYYK....","..KOK.KOK..."],
   chick3: ["....KKK.....","...KRRRK....","..KKYYYYK...",".KYKYYYYKK..",".KYYYYYYOKK.",".KYYYYYYYK..","KYYKYYYYYYK.","KYYKYYYYYYK.","KYYKYYYYYYK.",".KYYYYYYYK..","..KYYYYYK...","..KOK..KOK.."],
   rooster: ["...KRRK.....","..KRRRRK....","..KKWWWWK...",".KWKWWWWKK..",".KWWWWWWOKK.","KRKWWWWWWK..","KRRKWWWWWWK.",".KKWWWWWWWK.","KWWKWWWWWWK.",".KWWWWWWWK..","..KWWWWWK...","..KOK..KOK.."],
   legend: ["G..KRRK...G.",".GKRRRRKG...","..KKGGGGK...",".KGKGGGGKK..","GKGGGGGGOKKG","KRKGGGGGGK..","KRRKGGGGGGK.",".KKGGGGGGGK.","KGGKGGGGGGKG",".KGGGGGGGK..","G.KGGGGGK.G.","..KOK..KOKG."],
-  cat: ["............",".K.K...K.K..",".KKKK.KKKK..",".KSSSKSSSK..","KSKSSSSSKSK.","KSSSSKSSSSK.","KSSSKKKSSSK.",".KSSSSSSSK..",".KSSSSSSSK..","KSSKSSSKSSK.",".KSSSSSSSK..","..KK...KK..."],
-  frog: ["............","..KK...KK...",".KDDK.KDDK..",".KDWDKDWDK..",".KDDDDDDDK..","KDDDDDDDDDK.","KDKDDDDDKDK.","KDDDDDDDDDK.",".KDDKKKDDK..",".KDDDDDDDK..","..KDDDDDK...","..KK...KK..."],
-  robot: ["....KKKK....","...KSSSSK...","..KSKSSKSK..","..KSSSSSSK..","...KKKKKK...","..KSSSSSSK..",".KSKSSSSKSK.",".KSKSSSSKSK.","..KSSSSSSK..","...KSKKSK...","...KSK.KSK..","..KKK..KKK.."],
-  rabbit: [".KK.....KK..","KPPK...KPPK.","KPPK...KPPK.","KPPK...KPPK.",".KPPKKKPPK..",".KPPPPPPPK..","KPKPPPPPKPK.","KPPPPKPPPPK.","KPPPPPPPPPK.",".KPPPPPPPK..","..KPPPPPK...","..KK...KK..."],
-  dragon: ["..K.....K...",".KVK...KVK..","KVVVK.KVVVK.","KVKVVKVVKVK.","KVVVVVVVVVK.",".KVVKVVKVVK.",".KVVVVVVVK..","KVKVVVVVKVK.","KVVKKKKKVVK.",".KVVVVVVVK..","..KVVVVVK...","..KK...KK..."],
-  penguin: ["....KKKK....","...KKKKKK...","..KKWKKWKK..","..KKKOKKKK..",".KKWWWWWKK..",".KKWWWWWKK..","KKKWWWWWKKK.","KKKWWWWWKKK.",".KKWWWWWKK..","..KKWWWKK...","..KOK.KOK...","............"],
-  flower: ["....KMMK....","..KMMKKMMK..","..KMKGGKMK..",".KMKGGGGKMK.","..KMKGGKMK..","..KMMKKMMK..","....KDDK....","....KDDK....","..K.KDDK.K..",".KDKKDDKKDK.","..KDDDDDDK..","....KDDK...."]
+  flame: ["............",".....KK.....","....KRRK....","...KRROK....","..KROOOOK...","..KOOOOOK...",".KOOKOKOOK..",".KOOOOOOOK..",".KOYYYYYOK..",".KYYYYYYYK..","..KYYYYYK...","...KKKKK...."],
+  droplet: ["............",".....K......","....KAK.....","....KAK.....","...KAAAK....","..KAAAAAK...",".KAAKAKAAK..",".KAAAAAAAK..",".KATTTTTAK..",".KAAAAAAAK..","..KAAAAAK...","...KKKKK...."],
+  sprout: ["............","...KDK.KDK..","..KDDDKDDDK.","..KDDDKDDDK.","...KDKKKDK..","....KLLLK...","...KLLLLLK..","..KLKLLLKLK.","..KLLLLLLLK.","..KLLLLLLLK.","...KLLLLLK..","....KKKKK..."],
+  crystal: ["............","....KVVK....","...KVVVVK...","..KVVVVVVK..",".KVVVVVVVVK.",".KVKVVVVKVK.",".KVVVVVVVVK.",".KVVVKKVVVK.","..KVVVVVVK..","...KVVVVK...","....KVVK....","............"],
+  ghost: ["............","....KKKK....","...KWWWWK...","..KWWWWWWK..",".KWWWWWWWWK.",".KWKWWWWKWK.",".KWKWWWWKWK.",".KWWWWWWWWK.",".KWWKKKKWWK.",".KWWWWWWWWK.",".KWWWWWWWWK.",".KK.KK.KK.K."],
+  star: ["............",".....KK.....",".....YY.....","..K.KYYK.K..",".KYYYYYYYYK.","..KYYYYYYK..","..KYKYYKYK..","..KYYYYYYK..",".KYYYYYYYYK.",".KYK.KK.KYK.","..K...K...K.","............"],
+  mush: ["............","....KKKK....","..KKRRRRKK..",".KRRWRRWRRK.",".KRRRRRRRRK.",".KKKKKKKKKK.","...KCCCCK...","...KCKKCK...","...KCCCCK...","..KCCCCCCK..","..KCCCCCCK..","...KKKKKK..."],
+  thunder: ["............","...KKKK.....","..KSSSSKK...",".KSSSSSSSK..","KSKSSSSKSSK.","KSSSSSSSSSK.",".KKKKKKKKK..","....KYK.....","...KYYK.....","..KYYK......","...KYK......","....K......."]
 };
-const DOT_RANDOMS = ["cat","frog","robot","rabbit","dragon","penguin","flower"];
+const DOT_RANDOMS = ["flame","droplet","sprout","crystal","ghost","star","mush","thunder"];
+const DOT_NAMES = { flame:"ほのおのこ", droplet:"しずくのこ", sprout:"ふたばのこ", crystal:"クリスタル", ghost:"おばけのこ", star:"ほしのこ", mush:"きのこのこ", thunder:"かみなりのこ" };
 function dotStage(){
   const n = (S.items || []).length;
-  if (n >= 49){
-    // 品目数を種にした擬似乱数で安定的に「ランダム」なキャラを選ぶ(増えるたび変化)
-    const idx = (n * 2654435761 % 4294967296) % DOT_RANDOMS.length;
-    return { key: DOT_RANDOMS[idx], name: "なかま: " + ({cat:"ねこ",frog:"カエル",robot:"ロボット",rabbit:"ウサギ",dragon:"ドラゴン",penguin:"ペンギン",flower:"お花"})[DOT_RANDOMS[idx]], n: n, next: null };
+  if (n >= 25){
+    // 5品目ごとに仲間が入れ替わる(品目数を種にした擬似乱数)
+    const g = Math.floor(n / 5);
+    const idx = (g * 2654435761 % 4294967296) % DOT_RANDOMS.length;
+    const key = DOT_RANDOMS[idx];
+    return { key: key, name: "なかま: " + DOT_NAMES[key], n: n, next: (g + 1) * 5, random: true };
   }
-  if (n >= 48) return { key: "legend", name: "伝説の鶏", n: n, next: 49 };
-  if (n >= 40) return { key: "rooster", name: "雄の鶏", n: n, next: 48 };
-  if (n >= 30) return { key: "chick3", name: "若鶏", n: n, next: 40 };
-  if (n >= 20) return { key: "chick2", name: "ひよこ(成長中)", n: n, next: 30 };
-  if (n >= 10) return { key: "chick1", name: "ひよこ", n: n, next: 20 };
-  return { key: "egg", name: "たまご", n: n, next: 10 };
+  if (n >= 20) return { key: "legend", name: "伝説の鶏", n: n, next: 25 };
+  if (n >= 15) return { key: "rooster", name: "雄の鶏", n: n, next: 20 };
+  if (n >= 10) return { key: "chick3", name: "若鶏", n: n, next: 15 };
+  if (n >= 5)  return { key: "chick1", name: "ひよこ", n: n, next: 10 };
+  return { key: "egg", name: "たまご", n: n, next: 5 };
 }
 function dotSvg(key, px){
   const rows = DOT_SPRITES[key] || DOT_SPRITES.egg;
@@ -1753,15 +1755,15 @@ function renderDotPet(){
   if (__lastDotKey && __lastDotKey !== st.key){
     el.classList.remove("bounce"); void el.offsetWidth; el.classList.add("bounce");
     if (navigator.vibrate) navigator.vibrate(30);
-    toast("キャラクターが「" + st.name + "」になりました!");
+    toast(st.random ? "「" + DOT_NAMES[st.key] + "」があらわれた!" : "キャラクターが「" + st.name + "」に進化しました!");
   }
   __lastDotKey = st.key;
 }
 function dotPetInfo(){
   const st = dotStage();
-  const msg = st.next
-    ? st.name + "(" + st.n + "品目) — あと " + (st.next - st.n) + " 品目で進化します!"
-    : st.name + "(" + st.n + "品目) — 品目が増えると別のキャラに変化します!";
+  const msg = st.random
+    ? st.name + "(" + st.n + "品目) — あと " + (st.next - st.n) + " 品目で別のなかまに変わります!"
+    : st.name + "(" + st.n + "品目) — あと " + (st.next - st.n) + " 品目で進化します!";
   toast(msg);
   const el = document.getElementById("dot-pet");
   el.classList.remove("bounce"); void el.offsetWidth; el.classList.add("bounce");
