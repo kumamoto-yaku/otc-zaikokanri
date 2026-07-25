@@ -33,11 +33,20 @@ body { min-height: 100vh; background: var(--hakuji); color: var(--ink); font-fam
   #tab-share.active { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; align-items: start; }
 }
 .header { display: flex; align-items: center; justify-content: space-between; padding: 18px 2px 12px; gap: 10px; }
-.dot-pet { margin-left: auto; background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.25); border-radius: 10px; padding: 4px 6px 2px; cursor: pointer; line-height: 0; }
-.dot-pet svg { image-rendering: pixelated; }
+.dot-pet { margin-left: auto; background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.25); border-radius: 10px; padding: 3px 7px 2px; cursor: pointer; display: flex; align-items: flex-end; gap: 1px; flex-shrink: 0; }
+.dot-pet svg { image-rendering: pixelated; display: block; }
+.dot-pet .mate-more { color: #fff; font-size: 11px; opacity: 0.85; padding: 0 2px 3px; letter-spacing: 0; }
 .dot-pet.bounce { animation: petBounce 0.5s ease; }
+.party-stage { background: linear-gradient(180deg,#EAF2F7 0%,#DDE9F0 62%,#CFE0D6 62%,#C6DACD 100%); border: 1px solid #C3D3DC; border-radius: 10px; padding: 8px; display: flex; align-items: flex-end; gap: 3px; flex-wrap: wrap; }
+.party-stage svg { image-rendering: pixelated; display: block; }
+.party-slot { opacity: 0.28; }
+.party-text { font-size: 12.5px; color: #43596B; margin: 8px 0 4px; }
+.party-text b { color: var(--ai-deep); }
+.mate-list { display: flex; flex-wrap: wrap; gap: 6px; }
+.mate-chip { display: flex; align-items: center; gap: 5px; border: 1px solid var(--line); border-radius: 8px; padding: 4px 8px 4px 4px; font-size: 12px; background: #fff; }
+.mate-chip.yet { opacity: 0.45; }
+.mate-chip svg { image-rendering: pixelated; }
 @keyframes petBounce { 0%{transform:none} 35%{transform:translateY(-5px) scale(1.08)} 70%{transform:translateY(1px)} 100%{transform:none} }
-@media print { .dot-pet { display: none !important; } }
 .brand { display: flex; align-items: center; gap: 12px; }
 .brand-mark { width: 44px; height: 44px; border-radius: 8px; background: var(--ai); color: #fff; font-family: var(--serif); font-size: 24px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
 .brand h1 { font-family: var(--serif); font-size: 21px; font-weight: 600; letter-spacing: 0.06em; color: var(--ai-deep); }
@@ -326,9 +335,31 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
     display: none !important;
   }
   body, .chrome, .panel { display: block !important; padding: 0 !important; margin: 0 !important; max-width: none !important; border: none !important; background: #fff !important; }
-  .price-tag { break-inside: avoid; page-break-inside: avoid; }
-  .pop-wrap { display: block !important; }
-  .pop-card { break-inside: avoid; page-break-inside: avoid; }
+
+  /* 改ページ対策:
+     画面では grid / flex で並べているが、この2つは印刷の改ページ処理に
+     対応しておらず要素が上下で切れてしまう。印刷時だけ
+     「ブロック + インラインブロック」に切り替えると、
+     収まらない要素は丸ごと次のページへ送られる。 */
+  .tag-sheet, .card-sheet, .pop-wrap {
+    display: block !important;
+    gap: 0 !important;
+    grid-template-columns: none !important;
+    text-align: left !important;
+  }
+  .price-tag, .pcard, .pop-card {
+    display: inline-block !important;
+    vertical-align: top !important;
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+    -webkit-column-break-inside: avoid !important;
+    margin: 0 2mm 3mm 0 !important;
+  }
+  /* 用紙より高いPOP(A4指定など)は高さを内容なりにして切れを防ぐ */
+  .pop-card { min-height: 0 !important; max-width: 190mm !important; }
+  /* 値札の内側は縮小処理の対象なので、印刷でも同じ見え方を保つ */
+  .tag-inner { break-inside: avoid !important; page-break-inside: avoid !important; }
+  .dot-pet { display: none !important; }
 }
 </style>
 </head>
@@ -344,6 +375,15 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
     <p class="hint" id="login-err" style="color:var(--shu);text-align:center"></p>
   </div>
 </div>
+<div id="party-modal" class="order-modal" style="display:none" onclick="if(event.target===this)closePartyModal()">
+  <div class="order-card">
+    <div class="order-head">
+      <span class="order-title">なかま</span>
+      <button class="link" onclick="closePartyModal()">閉じる</button>
+    </div>
+    <div id="party-modal-body"></div>
+  </div>
+</div>
 <div id="info-pop" class="info-pop" style="display:none">
   <div class="info-pop-name" id="info-pop-name"></div>
   <a class="info-pop-btn" id="ip-web" target="_blank" rel="noopener" onclick="closeInfoPop()">商品情報をWeb検索</a>
@@ -357,10 +397,10 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
       <span class="brand-mark"><svg viewBox="0 0 48 48" width="26" height="26" aria-hidden="true"><g transform="rotate(-45 24 24)"><rect x="6" y="17" width="36" height="14" rx="7" fill="#ffffff"/><path d="M13 17h11v14H13a7 7 0 0 1-7-7 7 7 0 0 1 7-7z" fill="#B7402B"/><rect x="23" y="17" width="1.6" height="14" fill="#14283C" opacity="0.35"/><rect x="6.8" y="17.8" width="34.4" height="12.4" rx="6.2" fill="none" stroke="#14283C" stroke-opacity="0.28" stroke-width="1.2"/></g></svg></span>
       <div>
         <h1>OTCLinker Pro</h1>
-        <p class="brand-sub" id="brand-sub">市販薬の登録・値札・備蓄共有</p>
+        <p class="brand-sub" id="brand-sub">商品の登録・値札・備蓄共有</p>
       </div>
     </div>
-    <button class="dot-pet" id="dot-pet" onclick="dotPetInfo()" aria-label="育成キャラクター"></button>
+    <button class="dot-pet" id="dot-pet" onclick="openPartyModal()" aria-label="なかまを見る"></button>
   </header>
 
   <nav class="tabs" role="tablist">
@@ -700,7 +740,7 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
   </section>
 
   <div class="toast" id="toast"></div>
-  <footer class="foot">OTCLinker Pro — とみながグループ 店舗向けツール<br><span class="ver">版 2026-07-25 M(キャラ5刻み進化)</span></footer>
+  <footer class="foot">OTCLinker Pro — とみながグループ 店舗向けツール<br><span class="ver">版 2026-07-25 O(なかま表示をヘッダーへ)</span></footer>
 </div>
 
 <script>
@@ -1700,38 +1740,51 @@ function updatePrintSelbar_(){
   }
 }
 /* ============ 育成ドットキャラ(品目数で進化) ============ */
-const DOT_PAL = { K:"#2B2B2B", W:"#FFFFFF", C:"#FFF3D6", Y:"#FFD84D", O:"#F08A3C", R:"#D0342C", P:"#F4A7B9", B:"#5FA8D3", N:"#8A5A2B", G:"#FFD700", E:"#7DC383", V:"#9B7EDE", S:"#C0C8CF", D:"#3E9B4F", M:"#FF8FB1", A:"#7FD4F5", L:"#A8E063", T:"#5B6EE1" };
+const DOT_PAL = { K:"#2B2B2B", W:"#FFFFFF", C:"#FFF3D6", Y:"#FFD84D", O:"#F08A3C", R:"#D0342C", P:"#F4A7B9", B:"#5FA8D3", N:"#8A5A2B", G:"#FFD700", E:"#7DC383", V:"#9B7EDE", S:"#C0C8CF", D:"#3E9B4F", M:"#FF8FB1", A:"#7FD4F5", L:"#A8E063", T:"#5B6EE1", F:"#FFCFA8", H:"#C4443A" };
 const DOT_SPRITES = {
-  egg: ["............","....KKKK....","...KCCCCK...","..KCCCCCCK..","..KCCWCCCK..",".KCCWWCCCCK.",".KCCCCCCCCK.",".KCCCCCCCCK.",".KCCCCCCCCK.","..KCCCCCCK..","...KCCCCK...","....KKKK...."],
-  chick1: ["............","............","....KKKK....","...KYYYYK...","..KYKYYYYK..","..KYYYYYOK..","...KYYYYK...","...KYYYYK...","..KYYYYYYK..","..KYYYYYYK..","...KOKKOK...","............"],
-  chick3: ["....KKK.....","...KRRRK....","..KKYYYYK...",".KYKYYYYKK..",".KYYYYYYOKK.",".KYYYYYYYK..","KYYKYYYYYYK.","KYYKYYYYYYK.","KYYKYYYYYYK.",".KYYYYYYYK..","..KYYYYYK...","..KOK..KOK.."],
-  rooster: ["...KRRK.....","..KRRRRK....","..KKWWWWK...",".KWKWWWWKK..",".KWWWWWWOKK.","KRKWWWWWWK..","KRRKWWWWWWK.",".KKWWWWWWWK.","KWWKWWWWWWK.",".KWWWWWWWK..","..KWWWWWK...","..KOK..KOK.."],
-  legend: ["G..KRRK...G.",".GKRRRRKG...","..KKGGGGK...",".KGKGGGGKK..","GKGGGGGGOKKG","KRKGGGGGGK..","KRRKGGGGGGK.",".KKGGGGGGGK.","KGGKGGGGGGKG",".KGGGGGGGK..","G.KGGGGGK.G.","..KOK..KOKG."],
-  flame: ["............",".....KK.....","....KRRK....","...KRROK....","..KROOOOK...","..KOOOOOK...",".KOOKOKOOK..",".KOOOOOOOK..",".KOYYYYYOK..",".KYYYYYYYK..","..KYYYYYK...","...KKKKK...."],
-  droplet: ["............",".....K......","....KAK.....","....KAK.....","...KAAAK....","..KAAAAAK...",".KAAKAKAAK..",".KAAAAAAAK..",".KATTTTTAK..",".KAAAAAAAK..","..KAAAAAK...","...KKKKK...."],
-  sprout: ["............","...KDK.KDK..","..KDDDKDDDK.","..KDDDKDDDK.","...KDKKKDK..","....KLLLK...","...KLLLLLK..","..KLKLLLKLK.","..KLLLLLLLK.","..KLLLLLLLK.","...KLLLLLK..","....KKKKK..."],
-  crystal: ["............","....KVVK....","...KVVVVK...","..KVVVVVVK..",".KVVVVVVVVK.",".KVKVVVVKVK.",".KVVVVVVVVK.",".KVVVKKVVVK.","..KVVVVVVK..","...KVVVVK...","....KVVK....","............"],
-  ghost: ["............","....KKKK....","...KWWWWK...","..KWWWWWWK..",".KWWWWWWWWK.",".KWKWWWWKWK.",".KWKWWWWKWK.",".KWWWWWWWWK.",".KWWKKKKWWK.",".KWWWWWWWWK.",".KWWWWWWWWK.",".KK.KK.KK.K."],
-  star: ["............",".....KK.....",".....YY.....","..K.KYYK.K..",".KYYYYYYYYK.","..KYYYYYYK..","..KYKYYKYK..","..KYYYYYYK..",".KYYYYYYYYK.",".KYK.KK.KYK.","..K...K...K.","............"],
-  mush: ["............","....KKKK....","..KKRRRRKK..",".KRRWRRWRRK.",".KRRRRRRRRK.",".KKKKKKKKKK.","...KCCCCK...","...KCKKCK...","...KCCCCK...","..KCCCCCCK..","..KCCCCCCK..","...KKKKKK..."],
-  thunder: ["............","...KKKK.....","..KSSSSKK...",".KSSSSSSSK..","KSKSSSSKSSK.","KSSSSSSSSSK.",".KKKKKKKKK..","....KYK.....","...KYYK.....","..KYYK......","...KYK......","....K......."]
+  /* --- 主人公の成長 --- */
+  baby:       [".....KN.....","....KKKK....","...KFFFFK...","..KFFFFFFK..","..KFKFFKFK..","..KFFFFFFK..","..KFFMMFFK..","...KFFFFK...","..KAAAAAAK..",".KAAAAAAAAK.",".KAAAAAAAAK.","..KKKKKKKK.."],
+  child:      ["............","....KKKK....","...KNNNNK...","..KNFFFFNK..","..KFKFFKFK..","..KFFFFFFK..","...KFFFFK...","..KEEEEEEK..",".KFEEEEEEFK.",".KFEEEEEEFK.","..KFFKKFFK..","..KKK..KKK.."],
+  apprentice: ["............","....KKKK..K.","...KNNNNK.SK","..KNFFFFNKSK","..KFKFFKFKSK","..KFFFFFFKNK","...KFFFFK.K.","..KTTTTTTK..",".KFTTTTTTFK.",".KFTTTTTTFK.","..KFFKKFFK..","..KKK..KKK.."],
+  warrior:    ["..........K.","...KKKKK.KSK","..KSSSSSKKSK","..KSFFFFSKSK","..KFKFFKFKSK","..KSFFFFSKNK","...KSSSSK.K.","..KSSSSSSK..",".KFSSSSSSFK.",".KFSSSSSSFK.","..KNNKKNNK..","..KKK..KKK.."],
+  hero:       ["....GG...K..","...KGGK..SK.","..KGGGGK.SK.","..KGFFFFKSK.",".HKFKFFKFKN.",".HKGFFFFGK..","HHKGGGGGGK..","HHKGGGGGGKW.",".HKFGGGGFKW.","..KFGGGGFKW.","..KNNKKNNK..","..KKK..KKK.."],
+  /* --- なかま --- */
+  slime:      ["............","............",".....KK.....","....KAAK....","...KAAAAK...","..KAAAAAAK..",".KAAKAAKAAK.",".KAAAAAAAAK.","KAAAAAAAAAAK","KAAAAAAAAAAK","KAAAAAAAAAAK",".KKKKKKKKKK."],
+  sprout:     ["............","...KDK.KDK..","..KDDDKDDDK.","..KDDDKDDDK.","...KDKKKDK..","....KLLLK...","...KLLLLLK..","..KLKLLLKLK.","..KLLLLLLLK.","..KLLLLLLLK.","...KLLLLLK..","....KKKKK..."],
+  mush:       ["............","....KKKK....","..KKRRRRKK..",".KRRWRRWRRK.",".KRRRRRRRRK.",".KKKKKKKKKK.","...KCCCCK...","...KCKKCK...","...KCCCCK...","..KCCCCCCK..","..KCCCCCCK..","...KKKKKK..."],
+  bat:        ["............","..K......K..",".KVK....KVK.","KVVVK..KVVVK","KVVVKKKKVVVK","KVVKVVVVKVVK",".KVVVVVVVVK.","..KVKVVKVK..","..KVVVVVVK..","...KVVVVK...","....KVVK....",".....KK....."],
+  droplet:    ["............",".....K......","....KAK.....","....KAK.....","...KAAAK....","..KAAAAAK...",".KAAKAKAAK..",".KAAAAAAAK..",".KATTTTTAK..",".KAAAAAAAK..","..KAAAAAK...","...KKKKK...."],
+  flame:      ["............",".....KK.....","....KRRK....","...KRROK....","..KROOOOK...","..KOOOOOK...",".KOOKOKOOK..",".KOOOOOOOK..",".KOYYYYYOK..",".KYYYYYYYK..","..KYYYYYK...","...KKKKK...."],
+  ghost:      ["............","....KKKK....","...KWWWWK...","..KWWWWWWK..",".KWWWWWWWWK.",".KWKWWWWKWK.",".KWKWWWWKWK.",".KWWWWWWWWK.",".KWWKKKKWWK.",".KWWWWWWWWK.",".KWWWWWWWWK.",".KK.KK.KK.K."],
+  star:       ["............",".....KK.....",".....YY.....","..K.KYYK.K..",".KYYYYYYYYK.","..KYYYYYYK..","..KYKYYKYK..","..KYYYYYYK..",".KYYYYYYYYK.",".KYK.KK.KYK.","..K...K...K.","............"],
+  thunder:    ["............","...KKKK.....","..KSSSSKK...",".KSSSSSSSK..","KSKSSSSKSSK.","KSSSSSSSSSK.",".KKKKKKKKK..","....KYK.....","...KYYK.....","..KYYK......","...KYK......","....K......."],
+  crystal:    ["............","....KVVK....","...KVVVVK...","..KVVVVVVK..",".KVVVVVVVVK.",".KVKVVVVKVK.",".KVVVVVVVVK.",".KVVVKKVVVK.","..KVVVVVVK..","...KVVVVK...","....KVVK....","............"],
+  golem:      ["............","..KKKKKKKK..",".KSSSSSSSSK.",".KSKSSSSKSK.",".KSSSSSSSSK.",".KSSKKKKSSK.","KKSSSSSSSSKK","KSKSSSSSSKSK","KSKSSSSSSKSK",".KKSSSSSSKK.","..KSSKKSSK..","..KKK..KKK.."],
+  fairy:      ["............",".K..KKKK..K.","KAK.KFFK.KAK","KAAKKFFKKAAK","KAAAKFFKAAAK",".KAAKFFKAAK.","..KKMMMMKK..","...KMMMMK...","...KMMMMK...","....KFFK....","....KFFK....","....KKKK...."],
+  slot:       ["............",".KKKKKKKKKK.",".K........K.",".K........K.",".K........K.",".K...KK...K.",".K...KK...K.",".K........K.",".K........K.",".K........K.",".KKKKKKKKKK.","............"],
+  dragon:     ["..K......K..",".KDK....KDK.",".KDDKKKKDDK.","KDDDDDDDDDDK","KDDKDDDDKDDK","KDDDDDDDDDDK",".KDDKKKKDDK.",".KDDDDDDDDK.","KDKDDDDDDKDK","KDKDDDDDDKDK",".KKDDDDDDKK.","..KK....KK.."]
 };
-const DOT_RANDOMS = ["flame","droplet","sprout","crystal","ghost","star","mush","thunder"];
-const DOT_NAMES = { flame:"ほのおのこ", droplet:"しずくのこ", sprout:"ふたばのこ", crystal:"クリスタル", ghost:"おばけのこ", star:"ほしのこ", mush:"きのこのこ", thunder:"かみなりのこ" };
+// なかまが加わる順番(先に何が来るかは伏せて、加わるたびに名前を発表する)
+const DOT_MATES = ["slime","sprout","mush","bat","droplet","flame","ghost","star","thunder","crystal","golem","fairy","dragon"];
+const DOT_NAMES = {
+  slime:"スライム", sprout:"ふたばのこ", mush:"マッシュ", bat:"こうもり", droplet:"しずくのせい",
+  flame:"ほのおのせい", ghost:"おばけ", star:"ほしのこ", thunder:"かみなりぐも", crystal:"クリスタル",
+  golem:"ゴーレム", fairy:"ようせい", dragon:"ドラゴン"
+};
 function dotStage(){
   const n = (S.items || []).length;
-  if (n >= 25){
-    // 5品目ごとに仲間が入れ替わる(品目数を種にした擬似乱数)
-    const g = Math.floor(n / 5);
-    const idx = (g * 2654435761 % 4294967296) % DOT_RANDOMS.length;
-    const key = DOT_RANDOMS[idx];
-    return { key: key, name: "なかま: " + DOT_NAMES[key], n: n, next: (g + 1) * 5, random: true };
-  }
-  if (n >= 20) return { key: "legend", name: "伝説の鶏", n: n, next: 25 };
-  if (n >= 15) return { key: "rooster", name: "雄の鶏", n: n, next: 20 };
-  if (n >= 10) return { key: "chick3", name: "若鶏", n: n, next: 15 };
-  if (n >= 5)  return { key: "chick1", name: "ひよこ", n: n, next: 10 };
-  return { key: "egg", name: "たまご", n: n, next: 5 };
+  let key, name;
+  if (n >= 20){ key = "hero"; name = "ゆうしゃ"; }
+  else if (n >= 15){ key = "warrior"; name = "せんし"; }
+  else if (n >= 10){ key = "apprentice"; name = "みならい"; }
+  else if (n >= 5){ key = "child"; name = "こども"; }
+  else { key = "baby"; name = "あかちゃん"; }
+  // 25品目から、5品目ごとに なかま が1体ずつ加わる
+  const mateN = n < 25 ? 0 : Math.min(DOT_MATES.length, Math.floor((n - 20) / 5));
+  let next = null;
+  if (n < 20) next = (Math.floor(n / 5) + 1) * 5;
+  else if (mateN < DOT_MATES.length) next = (Math.floor(n / 5) + 1) * 5;
+  return { key: key, name: name, n: n, next: next, mateN: mateN, mates: DOT_MATES.slice(0, mateN) };
 }
 function dotSvg(key, px){
   const rows = DOT_SPRITES[key] || DOT_SPRITES.egg;
@@ -1745,29 +1798,55 @@ function dotSvg(key, px){
   }
   return r + '</svg>';
 }
-let __lastDotKey = null;
+let __lastDotKey = null, __lastMateN = null;
+const PARTY_SHOW = 3;   // ヘッダーに並べるなかまの上限(それ以上は「他N」表示)
 function renderDotPet(){
   const el = document.getElementById("dot-pet");
   if (!el) return;
   const st = dotStage();
-  el.innerHTML = dotSvg(st.key, 40);
-  el.title = st.name + "(" + st.n + " 品目)";
-  if (__lastDotKey && __lastDotKey !== st.key){
+  let h = dotSvg(st.key, 30);
+  st.mates.slice(0, PARTY_SHOW).forEach(function(k){ h += dotSvg(k, 22); });
+  const rest = st.mateN - PARTY_SHOW;
+  if (rest > 0) h += '<span class="mate-more">+' + rest + '</span>';
+  el.innerHTML = h;
+  el.title = st.name + "(" + st.n + "品目)" + (st.mateN ? " / なかま " + st.mateN + "体" : "");
+  const grew = __lastDotKey && __lastDotKey !== st.key;
+  const joined = __lastMateN !== null && st.mateN > __lastMateN;
+  if (grew || joined){
     el.classList.remove("bounce"); void el.offsetWidth; el.classList.add("bounce");
     if (navigator.vibrate) navigator.vibrate(30);
-    toast(st.random ? "「" + DOT_NAMES[st.key] + "」があらわれた!" : "キャラクターが「" + st.name + "」に進化しました!");
+    toast(grew ? "「" + st.name + "」に成長した!" : "「" + DOT_NAMES[st.mates[st.mateN-1]] + "」が なかまに なった!");
   }
   __lastDotKey = st.key;
+  __lastMateN = st.mateN;
 }
-function dotPetInfo(){
+function openPartyModal(){
   const st = dotStage();
-  const msg = st.random
-    ? st.name + "(" + st.n + "品目) — あと " + (st.next - st.n) + " 品目で別のなかまに変わります!"
-    : st.name + "(" + st.n + "品目) — あと " + (st.next - st.n) + " 品目で進化します!";
-  toast(msg);
-  const el = document.getElementById("dot-pet");
-  el.classList.remove("bounce"); void el.offsetWidth; el.classList.add("bounce");
+  const box = document.getElementById("party-modal-body");
+  // 現在のパーティ(主人公+なかま+これから増える空き枠)
+  let stage = '<div class="party-stage">' + dotSvg(st.key, 40);
+  st.mates.forEach(function(k){ stage += dotSvg(k, 30); });
+  for (let i = st.mateN; i < DOT_MATES.length; i++) stage += '<span class="party-slot">' + dotSvg("slot", 30) + '</span>';
+  stage += '</div>';
+  // 説明文
+  let msg;
+  if (st.n < 20){
+    msg = '<b>' + esc(st.name) + '</b>(' + st.n + '品目) — あと <b>' + (st.next - st.n) + '</b> 品目で成長します。20品目で ゆうしゃ になり、そこから なかま が増えていきます。';
+  } else if (st.next){
+    msg = '<b>ゆうしゃ</b> と なかま <b>' + st.mateN + '</b> 体(全' + DOT_MATES.length + '体) — あと <b>' + (st.next - st.n) + '</b> 品目で新しい なかま が加わります。';
+  } else {
+    msg = '<b>ゆうしゃ</b> と なかま 全' + DOT_MATES.length + '体がそろいました!';
+  }
+  // なかま一覧(未加入は「?」で伏せる)
+  const list = DOT_MATES.map(function(k, i){
+    return i < st.mateN
+      ? '<span class="mate-chip">' + dotSvg(k, 22) + esc(DOT_NAMES[k]) + '</span>'
+      : '<span class="mate-chip yet">' + dotSvg("slot", 22) + '？</span>';
+  }).join("");
+  box.innerHTML = stage + '<p class="party-text">' + msg + '</p><div class="mate-list">' + list + '</div>';
+  document.getElementById("party-modal").style.display = "flex";
 }
+function closePartyModal(){ document.getElementById("party-modal").style.display = "none"; }
 
 /* ============ 画像処理(縮小) ============ */
 // ファイル→縮小したdataURL
@@ -2386,7 +2465,7 @@ function renderPop(){
 /* ============ 会員間共有(Google Apps Script サーバー) ============ */
 function updateBrand(){
   const p = S.pharmacy;
-  document.getElementById("brand-sub").textContent = p.name ? p.name + (p.area ? "(" + p.area + ")" : "") : "市販薬の登録・値札・備蓄共有";
+  document.getElementById("brand-sub").textContent = p.name ? p.name + (p.area ? "(" + p.area + ")" : "") : "商品の登録・値札・備蓄共有";
 }
 function syncPharmacyInputs(){
   document.getElementById("ph-name").value = S.pharmacy.name || "";
