@@ -248,6 +248,7 @@ table.inv td { border-top: 1px solid var(--line); padding: 6px 8px; white-space:
 .ea-row { line-height: 1.5; }
 .ea-expired strong { color: #C0392B; }
 .ea-soon strong { color: #B8860B; }
+.ea-soon6 strong { color: #7A8B33; }
 .ea-actions { display: flex; gap: 12px; padding-top: 2px; }
 .cat-chips { display: flex; gap: 8px; flex-wrap: wrap; }
 .cat-chip { border: 1px solid var(--ai); color: var(--ai); background: #fff; border-radius: 999px; padding: 6px 12px; font-size: 13px; cursor: pointer; font-family: var(--sans); }
@@ -747,7 +748,7 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
   </section>
 
   <div class="toast" id="toast"></div>
-  <footer class="foot">OTCLinker Pro — とみながグループ 店舗向けツール<br><span class="ver">版 2026-07-25 P(カード検索・特徴文精度)</span></footer>
+  <footer class="foot">OTCLinker Pro — とみながグループ 店舗向けツール<br><span class="ver">版 2026-07-25 Q(6ヶ月アラート・編集後復帰)</span></footer>
 </div>
 
 <script>
@@ -1310,6 +1311,17 @@ function toggleSupplierOther(){
   document.getElementById("f-supplier-other-wrap").style.display = other ? "flex" : "none";
 }
 function clearForm(){
+  if (editingId && __editReturnTab){
+    const back = __editReturnTab;
+    __editReturnTab = null;
+    editingId = null;
+    document.getElementById("save-btn").textContent = "在庫に登録";
+    document.getElementById("f-qty-label").childNodes[0].nodeValue = "入庫数 ";
+    fillForm({}); scanMsg("");
+    showTab(back);
+    window.scrollTo({ top: 0 });
+    return;
+  }
   editingId = null;
   document.getElementById("save-btn").textContent = "在庫に登録";
   document.getElementById("f-qty-label").childNodes[0].nodeValue = "入庫数 ";
@@ -1362,6 +1374,7 @@ async function applyJan(code){
 /* ============ 登録・一覧 ============ */
 function saveItem(){
   const f = readForm();
+  const wasEditing = !!editingId;
   if (!f.jan || !f.name){ toast("JANコードと商品名は必須です"); return; }
   if (!isValidJan(f.jan)){ toast("JANコードの形式が正しくありません(8桁または13桁)"); return; }
   S.master[f.jan] = { name: f.name, kana: f.kana, maker: f.maker, category: f.category, price: f.price, reduced: f.reduced, supplier: f.supplier, cost: f.cost, staffPrice: f.staffPrice };
@@ -1380,7 +1393,14 @@ function saveItem(){
       flash("new", "新規登録しました", f.name);
     }
   }
+  const backTo = wasEditing ? __editReturnTab : null;
   save(); clearForm(); renderList(); showExpiryAlert();
+  if (backTo){
+    __editReturnTab = null;
+    showTab(backTo);
+    window.scrollTo({ top: 0 });
+    toast("「" + f.name + "」を保存しました");
+  }
 }
 let __infoKw = "";
 function openDrugInfo(id, ev){
@@ -1434,10 +1454,13 @@ function openPmdaForm(){
   toast(copied ? '「' + kw + '」をコピーしました。販売名の欄を長押し→貼り付け' : 'コピーできませんでした。商品名: ' + kw);
 }
 function closeInfoPop(){ const p = document.getElementById("info-pop"); if (p) p.style.display = "none"; }
+let __editReturnTab = null;
 function editItem(id){
   const it = S.items.find(x => x.id===id);
   if (!it) return;
   editingId = id;
+  // どの画面から編集を始めたかを覚えておき、保存後にそこへ戻る
+  __editReturnTab = (document.querySelector(".panel.active") || {}).id === "tab-list" ? "list" : null;
   fillForm(it);
   document.getElementById("save-btn").textContent = "上書き保存";
   document.getElementById("f-qty-label").childNodes[0].nodeValue = "在庫数 ";
@@ -1487,13 +1510,14 @@ function expiryLevel(e){
 function showExpiryAlert(){
   const box = document.getElementById("expiry-alert");
   if (!box) return;
-  const expired = [], soon = [];
+  const expired = [], soon = [], soon6 = [];
   S.items.forEach(it => {
     const lv = expiryLevel(it.expiry);
     if (lv === "expired") expired.push(it);
     else if (lv === "m3") soon.push(it);
+    else if (lv === "m6") soon6.push(it);
   });
-  if (!expired.length && !soon.length){ box.style.display = "none"; return; }
+  if (!expired.length && !soon.length && !soon6.length){ box.style.display = "none"; return; }
   let h = '';
   if (expired.length){
     h += '<div class="ea-row ea-expired"><strong>期限切れ '+expired.length+'件</strong>: '
@@ -1504,6 +1528,11 @@ function showExpiryAlert(){
     h += '<div class="ea-row ea-soon"><strong>期限間近(3ヶ月以内) '+soon.length+'件</strong>: '
       + soon.slice(0,6).map(it => esc(it.name)+(it.expiry?'('+fmtExpiry(it.expiry)+')':'')).join(' / ')
       + (soon.length>6?' ほか':'') + '</div>';
+  }
+  if (soon6.length){
+    h += '<div class="ea-row ea-soon6"><strong>6ヶ月以内 '+soon6.length+'件</strong>: '
+      + soon6.slice(0,6).map(it => esc(it.name)+(it.expiry?'('+fmtExpiry(it.expiry)+')':'')).join(' / ')
+      + (soon6.length>6?' ほか':'') + '</div>';
   }
   h += '<div class="ea-actions"><button class="link" onclick="showTab(\'list\');document.getElementById(\'sort-by\').value=\'expiry\';renderList()">期限順で一覧を見る</button> <button class="link" onclick="dismissExpiryAlert()">閉じる</button></div>';
   box.innerHTML = h;
