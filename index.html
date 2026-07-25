@@ -149,6 +149,7 @@ input:focus, select:focus { outline: 2px solid var(--ai); outline-offset: -1px; 
 .barcode-box { -webkit-print-color-adjust: exact; print-color-adjust: exact; background: #fff; }
 .barcode-box svg { image-rendering: -webkit-optimize-contrast; }
 @media print { .barcode-box, .barcode-box svg { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; } }
+.card-edit-list { max-height: 62vh; overflow-y: auto; border: 1px solid var(--line); border-radius: 10px; padding: 8px; background: #FAFBFB; display: flex; flex-direction: column; gap: 8px; }
 .card-edit-row { border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; background: #fff; margin-top: 8px; display: flex; flex-direction: column; gap: 6px; }
 .card-edit-name { font-weight: 600; font-size: 13.5px; }
 .card-edit-row input[type="text"] { width: 100%; }
@@ -672,6 +673,12 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
         <p class="hint" id="card-msg"></p>
         <p class="hint">印刷は用紙を<strong>横向き</strong>にすると見本のように5枚並びになります。<br>
         <strong>バーコードをレジで読み取るには、印刷設定の倍率を必ず「100%」にしてください。</strong>「用紙に合わせる」「縮小」にするとバーコードが小さくなり読み取れません。</p>
+        <div class="divider"><span>1商品ずつの内容</span></div>
+        <div class="row gap wrap">
+          <input class="search" id="card-edit-q" placeholder="商品名・ふりがな・JANで絞り込み" oninput="renderCardEdit_()">
+          <button class="btn ghost" onclick="scrollToCards()">カードの仕上がりを見る ▼</button>
+        </div>
+        <p class="hint" id="card-edit-count"></p>
         <div id="card-edit"></div>
       </div>
       <div id="card-sheet" class="card-sheet print-target"></div>
@@ -740,7 +747,7 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
   </section>
 
   <div class="toast" id="toast"></div>
-  <footer class="foot">OTCLinker Pro — とみながグループ 店舗向けツール<br><span class="ver">版 2026-07-25 O(なかま表示をヘッダーへ)</span></footer>
+  <footer class="foot">OTCLinker Pro — とみながグループ 店舗向けツール<br><span class="ver">版 2026-07-25 P(カード検索・特徴文精度)</span></footer>
 </div>
 
 <script>
@@ -1934,12 +1941,31 @@ function renderCards(){
 }
 function renderCardEdit_(){
   const box = document.getElementById("card-edit");
-  const items = cardItems_();
-  if (!items.length){
+  const cnt = document.getElementById("card-edit-count");
+  const all = cardItems_();
+  if (!all.length){
     box.innerHTML = '<div class="empty"><p>在庫リストで商品にチェックを入れると、ここに商品カードが並びます。</p><button class="btn" onclick="showTab(\'list\')">在庫リストで商品を選ぶ</button></div>';
+    if (cnt) cnt.textContent = "";
     return;
   }
-  box.innerHTML = items.map(function(it){
+  const qEl = document.getElementById("card-edit-q");
+  const q = qEl ? qEl.value.trim().toLowerCase() : "";
+  const items = q
+    ? all.filter(function(it){
+        return String(it.name||"").toLowerCase().includes(q)
+          || String(it.kana||"").toLowerCase().includes(q)
+          || String(it.maker||"").toLowerCase().includes(q)
+          || String(it.jan||"").includes(q);
+      })
+    : all;
+  if (cnt) cnt.textContent = q
+    ? "チェック中 " + all.length + " 品目のうち " + items.length + " 件を表示"
+    : "チェック中 " + all.length + " 品目(多いときは上の欄で絞り込めます)";
+  if (!items.length){
+    box.innerHTML = '<p class="hint">該当する商品がありません。</p>';
+    return;
+  }
+  box.innerHTML = '<div class="card-edit-list">' + items.map(function(it){
     const m = (S.cardMeta || {})[it.jan] || {};
     const janNg = it.jan && !janCheckOk(it.jan);
     return '<div class="card-edit-row">'
@@ -1953,7 +1979,11 @@ function renderCardEdit_(){
       +   '<label class="link" style="cursor:pointer">写真を選ぶ<input type="file" accept="image/*" style="display:none" onchange="cardImageFile(event,\'' + it.jan + '\')"></label>'
       +   (m.img ? '<button class="link" onclick="setCardMeta(\'' + it.jan + '\',\'img\',\'\')">削除</button>' : '')
       + '</div></div>';
-  }).join("");
+  }).join("") + '</div>';
+}
+function scrollToCards(){
+  const el = document.getElementById("card-sheet");
+  if (el && el.scrollIntoView) el.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 function renderCardSheet_(){
   const sheet = document.getElementById("card-sheet");
@@ -2002,30 +2032,64 @@ async function cardImageFile(ev, jan){
   } catch(e){ toast("画像を読み込めませんでした"); }
 }
 // 通販サイト由来の説明文から、商品カードに載せてはいけない文言を除く
-function cleanFeature_(txt, itemName, jan){
-  let t = String(txt || "").replace(/\s+/g, " ").trim();
+// 通販サイトの説明文から、商品カードに載せてよい「商品の特徴」だけを取り出す。
+// 通販由来の文には送料・支払い・配送・価格などの店舗都合の文言が大量に混ざるため、
+// 「載せてよいと判断できたものだけ残す」方針で厳しく削る。
+function cleanFeature_(txt, itemName, jan, maker){
+  let t = String(txt || "").replace(/[\r\n\t]+/g, " ").replace(/\s+/g, " ").trim();
   if (!t) return "";
-  // 店舗都合の案内(発送・期限・在庫・送料・ポイント等)は丸ごと除外
-  const NG = /(使用期限|賞味期限|消費期限|発送|出荷|配送|送料|在庫|入荷|取り寄せ|注文|ポイント|クーポン|セール|価格|税込|税抜|円|楽天|Yahoo|ヤフー|Amazon|ショップ|店舗|返品|交換|保証|smtb|ネコポス|メール便|宅配|あす楽|北海道|沖縄|離島)/;
-  // 文単位で判定し、問題のない文だけ残す
-  const parts = t.split(/[。\n]|(?<=】)|(?=【)/).map(function(x){ return x.trim(); }).filter(Boolean);
-  const okParts = parts.filter(function(x){
+
+  // --- 載せてはいけない語(1つでも含む文節は丸ごと捨てる) ---
+  const NG = new RegExp([
+    // 価格・支払い
+    "価格|税込|税抜|円|税別|値段|定価|割引|OFF|ｵﾌ|オフ|ポイント|還元|クーポン|セール|特価|激安|最安|お買い得|まとめ買い",
+    "paypay|ペイペイ|paypal|クレジット|カード払い|代引|決済|支払|後払|分割|領収|明細|請求",
+    // 配送・受け取り
+    "送料|配送|発送|出荷|宅配|メール便|ネコポス|ゆうパケット|クリックポスト|定形外|ポスト投函|投函|追跡|匿名配送|置き配|日時指定|時間指定|あす楽|翌日|即日|当日|営業日|土日祝|北海道|沖縄|離島",
+    // 在庫・注文・店舗運営
+    "在庫|入荷|取り寄せ|お取り寄せ|注文|受付|キャンセル|返品|交換|保証|保障|不良品|初期不良|問い合わせ|営業|店舗|ショップ|通販|ストア|出品|販売元|販売者|直営",
+    // 期限・ロット
+    "使用期限|賞味期限|消費期限|製造年月|ロット|期限は|残り",
+    // 単位・売り方
+    "バラ売り|ばら売り|小分け|分割販売|1錠あたり|一錠あたり|開封|未開封|新品|中古|訳あり|アウトレット",
+    // モール名・宣伝
+    "楽天|Yahoo|ヤフー|Amazon|アマゾン|ヤフオク|メルカリ|レビュー|口コミ|ランキング|第1位|No\\.1|ナンバーワン|人気|話題|大好評|限定|プレゼント|おまけ|キャンペーン",
+    // 法定・注意表記
+    "医薬品|副作用|薬剤師|登録販売者|相談|説明文書|添付文書|承認|指定第|第[1-3１-３一二三]類|要指導|smtb|ｽﾏﾎ|検索|キーワード"
+  ].join("|"), "i");
+
+  // --- 文節に切る(句読点・記号・区切り文字で分割) ---
+  const parts = t
+    .split(/[。．！!？?\n]|[|｜/／]|(?<=】)|(?=【)|(?<=\])|(?=\[)|[■●★☆◆▼▲※]/)
+    .map(function(x){ return x.replace(/^[\s、,・]+|[\s、,・]+$/g, "").trim(); })
+    .filter(Boolean);
+
+  const norm = function(v){ return String(v||"").normalize("NFKC").replace(/[\s\u3000]/g,"").toLowerCase(); };
+  const nn = norm(itemName), nm = norm(maker);
+
+  const ok = parts.filter(function(x){
+    const nx = norm(x);
     if (NG.test(x)) return false;
-    if (/\d{8,}/.test(x)) return false;                 // JANや型番の羅列
-    if (/^[\d\s\-()x×*.]+$/.test(x)) return false;      // 数字と記号だけ
-    if (/(JAN|jan|ＪＡＮ|コード|品番|型番|規格)/.test(x)) return false;
+    if (/\d{6,}/.test(x)) return false;                       // JAN・型番の羅列
+    if (/(JAN|jan|ＪＡＮ|コード|品番|型番|規格|入数|ケース)/.test(x)) return false;
+    if (/^[\d\s\-()x×*.,、%％]+$/.test(x)) return false;      // 数字と記号だけ
+    if (/[0-9０-９]\s*(個|袋|箱|本|枚|包|錠|カプセル|セット|入|ml|mL|g|ｇ)\s*$/.test(x)) return false; // 内容量だけ
+    if (nn && nx === nn) return false;                         // 商品名そのもの
+    if (nn && nn.indexOf(nx) >= 0 && nx.length >= 4) return false; // 商品名の一部
+    if (nm && (nx === nm || (nx.length <= nm.length + 3 && nx.indexOf(nm) >= 0))) return false; // メーカー名だけ
+    if (nx.length < 5) return false;                           // 短すぎる断片
+    if (nx.length > 40) return false;                          // 長すぎる説明は転記に不向き
+    // ひらがな・カタカナ・漢字が全く無いものは説明文ではない
+    if (!/[ぁ-んァ-ヶ一-龠]/.test(x)) return false;
     return true;
   });
-  t = okParts.join(" ").trim();
-  if (!t) return "";
-  // 商品名そのもの(や大部分が商品名)の場合は特徴として意味がないので除外
-  const norm = function(v){ return String(v||"").normalize("NFKC").replace(/[\s\u3000]/g,"").toLowerCase(); };
-  const nt = norm(t), nn = norm(itemName);
-  if (nn && (nt === nn || (nt.length <= nn.length + 4 && nn.indexOf(nt) >= 0) || (nt.indexOf(nn) >= 0 && nt.length <= nn.length + 6))) return "";
-  if (jan && nt.indexOf(String(jan)) >= 0) return "";
-  // 記号だけ、または短すぎる/長すぎるものは使わない
-  if (t.length < 5) return "";
-  return t.slice(0, 40);
+
+  if (!ok.length) return "";
+  let out = ok[0];                       // 最初に残った1文だけを使う(継ぎ足すと不自然になるため)
+  out = out.replace(/^[「『]|[」』]$/g, "").trim();
+  if (jan && norm(out).indexOf(String(jan)) >= 0) return "";
+  if (out.length < 5) return "";
+  return out.slice(0, 32);
 }
 async function fetchCardInfo(){
   const msg = document.getElementById("card-msg");
@@ -2058,7 +2122,7 @@ async function fetchCardInfo(){
             if (hits[j].headLine) ftxt = hits[j].headLine;
           }
           if (!ftxt && h0.description) ftxt = String(h0.description);
-          ftxt = cleanFeature_(cleanItemName(ftxt), it.name, it.jan);
+          ftxt = cleanFeature_(ftxt, it.name, it.jan, it.maker);
           if (ftxt) m.feature = ftxt;
         }
         done++;
