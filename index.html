@@ -52,6 +52,9 @@ body { min-height: 100vh; background: var(--hakuji); color: var(--ink); font-fam
 .dot-pet.rare-pop { animation: rarePop 1.5s ease; }
 @keyframes rarePop { 0%{transform:scale(1)} 15%{transform:scale(1.35) rotate(-6deg)} 30%{transform:scale(1.1) rotate(5deg)} 45%{transform:scale(1.25)} 60%{transform:scale(1)} 100%{transform:scale(1)} }
 .rare-glow { display: inline-block; line-height: 0; filter: drop-shadow(0 0 4px rgba(255,216,77,0.95)); }
+.goto-glow { display: inline-block; line-height: 0; filter: drop-shadow(0 0 3px rgba(126,195,131,0.9)); }
+.pet-unit.gotouchi { filter: drop-shadow(0 0 2px rgba(126,195,131,0.9)); }
+.mate-chip.gotouchi { border-color: #7DC383; background: #F3FAF4; }
 .mate-chip.rare { border-color: #E3C65A; background: #FFFBEC; }
 @media (prefers-reduced-motion: reduce) {
   .act-jump,.act-wiggle,.act-spin,.act-squash,.act-peek,.dot-pet.rare-pop { animation: none !important; }
@@ -786,7 +789,7 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
   </section>
 
   <div class="toast" id="toast"></div>
-  <footer class="foot">OTCLinker Pro — とみながグループ 店舗向けツール<br><span class="ver">版 2026-07-25 T(なかま刷新・レア・アニメ)</span></footer>
+  <footer class="foot">OTCLinker Pro — とみながグループ 店舗向けツール<br><span class="ver">版 2026-07-25 U(ご当地なかま追加)</span></footer>
 </div>
 
 <script>
@@ -1445,8 +1448,8 @@ function saveItem(){
     } else {
       S.items.unshift(Object.assign({ id: rid(), updatedAt: today() }, f));
       flash("new", "新規登録しました", f.name);
-      const got = tryRareMate_();
-      if (got) setTimeout(function(){ rareGetEffect_(got); }, 900);
+      const got = tryBonusMate_();
+      if (got) setTimeout(function(){ bonusGetEffect_(got); }, 900);
     }
   }
   const backTo = wasEditing ? __editReturnTab : null;
@@ -1854,6 +1857,19 @@ const DOT_SPRITES = {
   supp: ["................","......KK........",".....KWWK.......","....KWWWWK......","...KWWWWWWK.....","..KWWWWWWWWK....","..KWKKWWKKWK....","K.KWKKWWKKWK..K.","KKKWPWWWWPWK.KK.",".KKWWWKKWWWK....","..KWWWWWWWWK....","..KWWWWWWWWK....","..KWWWWWWWWK....","..KKKKKKKKKK....","..K........K....",".KK........KK..."],
   inhaler: ["................","....KKKKK.......","....KSSSK.......","....KSSSK.......","...KKSSSKK......","..KBBBBBBBK.....","..KKKKKKKKK.....","K.KBKKKKKBK...K.","KKKBKKKKKBK..KK.",".KKBBBBBBBK.....","..KBBKKKBBK.....","..KBBBBBBBK.....","..KBBBKKKKKKK...","..KBBBKKKKKKK...","..KKKKK.........","..K...K........."],
   inject: ["...KKKKKKK......","......KK........","......KSK.......","......KSK.......","...KKKKKKKKK....","..KWWWWWWWWWK...","..KWKKWWWKKWK...","K.KWKWWWWWKWK.K.","KKKWWWWWWWWWKKK.",".KKWAAAAAAAWK...","..KWAAAAAAAWK...","..KWWWWWWWWWK...","...KKKKKKKKK....","......KK........","......KK........","......KK........"],
+  /* --- ごとうちのなかま --- */
+  g_okigusuri: ["................","....K......K....","...KNK....KNK...","..KNNNKKKKNNNK..",".KNNNNNNNNNNNNK.",".KNKKNNNNNNKKNK.",".KNKKNNNNNNKKNK.",".KNNNNNNNNNNNNK.",".KNNNKKKKKKNNNK.",".KCCCCCCCCCCCCK.",".KCKKCKCKCKKCCK.",".KCCCCCCCCCCCCK.",".KNNNNNNNNNNNNK.",".KKKKKKKKKKKKKK.","..K..........K..",".KK..........KK."],
+  g_renkon: ["................",".....KKKKKK.....","...KKCCCCCCKK...","..KCCCCCCCCCCK..",".KCCKKCCCCKKCCK.",".KCCKKCCCCKKCCK.","KCCCCCCCCCCCCCCK","KCCCCCCCCCCCCCCA","KCCCKKKKKKCCCCKA","KCCCCCCCCCCCCCCK",".KCCKKCCCCKKCCK.",".KCCKKCCCCKKCCK.","..KCCCCCCCCCCK..","...KKCCCCCCKK...",".....KKKKKK.....","....K......K...."],
+  g_jagaimo: ["................","......K...K.....",".....KEK.KEK....","...KKKNKKKNKKK..","..KNNNNNNNNNNK..",".KNNNNNNNNNNNNK.",".KNKKNNNNNNKKNK.","KNNKKNNNNNNKKNNK","KNNNNNNNNNNNNNNK","KNNNKKKKKKKNNNNK",".KNNNNNNNNNNNNK.",".KNNNNNNNNNNNNK.","..KNNNNNNNNNNK..","...KKKKKKKKKK...","...K........K...","..KK........KK.."],
+  g_ringo: ["................","......KDK.......",".....KDDDK......","......KKK.......","...KKKKKKKK.....","..KRRRRRRRRKK...",".KRRRRRRRRRRRK..",".KRKKRRRRKKRRKKK","KRRKKRRRRKKRRK..","KRRRRRRRRRRRRK..","KRRRKKKKKKRRRK..","KRRRRRRRRRRRRK..",".KRRRRRRRRRRK...","..KRRRRRRRRK....","...KKKKKKKK.....","...K......K....."],
+  g_gyutan: ["................","K......KKKK.....","KK...KKPPPPKK...",".KK.KPPPPPPPPK..","..KKPPPPPPPPPPK.","...KPKKPPPPKKPK.","...KPKKPPPPKKPK.","...KPPPPPPPPPPK.","...KPPPKKKKPPPK.","...KPPPPPPPPPPK.","...KMMMMMMMMMK..","...KMMMMMMMMK...","....KKKKKKKK....","....K......K....","...KK......KK...","................"],
+  g_takoyaki: ["...K.K.K.K......","...KKKKKKK......","....KGGGK.......","...KKKKKKKK.....","..KOOOOOOOOK....",".KOOOOOOOOOOK...",".KOKKOOOOKKOK...","KOOKKOOOOKKOOK..","KOOOOOOOOOOOOK..","KOOOKKKKKKOOOK..","KOOOOOOOOOOOOK..",".KOOOOOOOOOOK...","..KEEEEEEEEK....","...KKKKKKKK.....","...K......K.....","..KK......KK...."],
+  g_yatsuhashi: ["................","................",".......KK.......","......KCCK......",".....KCCCCK.....","....KCCCCCCK....","...KCKKCCKKCK...","..KCCKKCCKKCCK..",".KCCCCCCCCCCCCK.",".KCCCKKKKKKCCCK.","KCCCCCCCCCCCCCCK","KCCCCCCCCCCCCCCK","KKKKKKKKKKKKKKKK","..K..........K..","..K..........K..",".KK..........KK."],
+  g_shika: ["..K..........K..","..K.K......K.K..","...KK......KK...","....KKKKKKKK....","...KNNNNNNNNK...","..KNNNNNNNNNNK..","..KNKKNNNNKKNK..","K.KNKKNNNNKKNK.K","KKKNNNNNNNNNNKKK",".KKNNNKKKKNNNNK.","..KNNNNNNNNNNK..","..KNWNNNNWNNNK..","..KNNNNNNNNNNK..","...KKKKKKKKKK...","...K........K...","..KK........KK.."],
+  g_momiji: ["................","....K.K..K.K....","...KNKNKKNKNK...","..KNNNNNNNNNNK..",".KNNNNNNNNNNNNK.",".KNKKNNNNNNKKNK.","KNNKKNNNNNNKKNNK","KNNNNNNNNNNNNNNK","KNNNNKKKKKKNNNNK","KNNNNNNNNNNNNNNK",".KNNNNNNNNNNNNK.",".KNNNNNNNNNNNNK.","..KNNNNNNNNNNK..","...KKKKKKKKKK...","...K........K...","..KK........KK.."],
+  g_udon: ["................","..KKK......KKK..",".KCCCK....KCCCK.","..KCCCKKKKCCCK..","...KCCCCCCCCK...","..KKKKKKKKKKKK..",".KWWWWWWWWWWWWK.",".KWKKWWWWWWKKWK.","KWWKKWWWWWWKKWWK","KWWWWWWWWWWWWWWK","KWWWWKKKKKKWWWWK",".KWWWWWWWWWWWWK.","..KWWWWWWWWWWK..","...KWWWWWWWWK...","....KKKKKKKK....","................"],
+  g_mentaiko: ["................","................","...KKKKKKKKKK...","..KMMMMMMMMMMK..",".KMMMMMMMMMMMMK.",".KMKKMMMMMMKKMK.","KMMKKMMMMMMKKMMK","KMMMMMMMMMMMMMMK","KMMMMKKKKKKMMMMK","KMMMMMMMMMMMMMMK","KMRMRMRMRMRMRMMK",".KMRMRMRMRMRMMK.","..KMMMMMMMMMMK..","...KKKKKKKKKK...","...K........K...","..KK........KK.."],
+  g_shisa: ["..KK........KK..",".KDDK......KDDK.",".KDDKKKKKKKKDDK.","..KDDDDDDDDDDK..",".KDDDDDDDDDDDDK.",".KDKKDDDDDDKKDK.","KDDKKDDDDDDKKDDK","KDDDDDDDDDDDDDDK","KDDDKKKKKKKKDDDK","KDDDKWWKKWWKDDDK","KDDDKKKKKKKKDDDK",".KDDDDDDDDDDDDK.","..KDDDDDDDDDDK..","...KKKKKKKKKK...","...K........K...","..KK........KK.."],
   /* --- レアなかま --- */
   r_gold: ["..K..K..K..K....","..KKKKKKKKKK....","...KGGGGGGK.....","..KKKKKKKKKK....",".KGGGGGGGGGGK...",".KGGKGGGGKGGK...",".KGGKGGGGKGGK...","KKGGGGGGGGGGKK..","KKKKKKKKKKKKKK..",".KGGGGGGGGGGK...",".KGGKKKKKKGGK...",".KGGGGGGGGGGK...",".KGGGGGGGGGGK...","..KGGGGGGGGK....","...KKKKKKKK.....","...K......K....."],
   r_rainbow: ["................",".....KKKKKK.....","...KKRRRRRRKK...","..KRROOOOOORRK..","..KROKOOOOKORK..",".KROOOOOOOOOORK.","KKOYYYYYYYYYYOKK","KKYYKYYYYYYKYYKK",".KYLLLLLLLLLLYK.",".KLLLKKKKKKLLLK.",".KLAAAAAAAAAALK.","..KAAAAAAAAAAK..","..KVVVVVVVVVVK..","...KKKKKKKKKK...","...K........K...","..KK........KK.."],
@@ -1863,26 +1879,48 @@ const DOT_SPRITES = {
 // なかまが加わる順番(先に何が来るかは伏せて、加わるたびに名前を発表する)
 const DOT_MATES = ["tablet","capsule","powder","troche","eyedrop","ointment","patch","tape","syrup","drink","supp","inhaler","inject"];
 const DOT_NAMES = {
-  tablet:"きまじめジョーザイ", capsule:"よくばりカプセル", powder:"こなふきオヤジ",
-  troche:"あなあきトローチ", eyedrop:"なきむしメグスリ", ointment:"ぬりたてナンコー",
-  patch:"ひえひえシップ", tape:"まきまきテープ", syrup:"あまえんぼシロップ",
-  drink:"げんきなドリンクざい", supp:"はずかしザヤク", inhaler:"すいこみマスター",
-  inject:"いっぱつチューシャ",
-  r_gold:"おうごんカプセル", r_rainbow:"にじいろジョーザイ", r_phantom:"まぼろしのクスリビン"
+  // おくすりのなかま
+  tablet:"ジョーダンザイ", capsule:"カプセルホテルマン", powder:"サンザイぐせ",
+  troche:"アナウメトローチ", eyedrop:"メグスリのメグちゃん", ointment:"ナンコウちゅう",
+  patch:"シップウジンライ", tape:"テープカットたいちょう", syrup:"シロップのシロー",
+  drink:"イッキノミドリンコ", supp:"ヤクにたつザヤク", inhaler:"スーハーだいおう",
+  inject:"チューシャイハン",
+  // ごとうちのなかま
+  g_okigusuri:"オキグスリのオキタさん", g_renkon:"カラシレンコンヌ", g_jagaimo:"ジャガイモンじゃ",
+  g_ringo:"リンゴかじりすけ", g_gyutan:"ギュータンゴ", g_takoyaki:"タコヤキング",
+  g_yatsuhashi:"ヤツハシわたる", g_shika:"シカたないシカ", g_momiji:"モミジマンジュウロウ",
+  g_udon:"ウドンゲンキ", g_mentaiko:"メンタイコタロウ", g_shisa:"シーサーどんまい",
+  // レアなかま
+  r_gold:"ゴールデンカプすけ", r_rainbow:"ニジイロジョーダン", r_phantom:"スケスケビンさん"
 };
-// レアなかま: 新しい商品を登録したとき、まれに仲間になる
+// ごとうち・レアは、新しい商品を登録したときにまれに現れる
+const GOTOUCHI_MATES = ["g_okigusuri","g_renkon","g_jagaimo","g_ringo","g_gyutan","g_takoyaki",
+                        "g_yatsuhashi","g_shika","g_momiji","g_udon","g_mentaiko","g_shisa"];
 const RARE_MATES = ["r_gold","r_rainbow","r_phantom"];
-const RARE_CHANCE = 0.06;
-function rareOwned_(){ return (S.rareMates || []).filter(function(k){ return RARE_MATES.indexOf(k) >= 0; }); }
-function tryRareMate_(){
-  const owned = rareOwned_();
-  const rest = RARE_MATES.filter(function(k){ return owned.indexOf(k) < 0; });
-  if (!rest.length) return null;
-  if (Math.random() > RARE_CHANCE) return null;
-  const got = rest[Math.floor(Math.random() * rest.length)];
-  S.rareMates = owned.concat([got]);
-  save();
-  return got;
+const GOTOUCHI_CHANCE = 0.14;
+const RARE_CHANCE = 0.04;
+function ownedOf_(list, store){ return (S[store] || []).filter(function(k){ return list.indexOf(k) >= 0; }); }
+function rareOwned_(){ return ownedOf_(RARE_MATES, "rareMates"); }
+function gotouchiOwned_(){ return ownedOf_(GOTOUCHI_MATES, "gotouchiMates"); }
+// 新規登録のたびに1回だけ抽選する(レア→ごとうちの順)
+function tryBonusMate_(){
+  const rOwned = rareOwned_();
+  const rRest = RARE_MATES.filter(function(k){ return rOwned.indexOf(k) < 0; });
+  if (rRest.length && Math.random() < RARE_CHANCE){
+    const got = rRest[Math.floor(Math.random() * rRest.length)];
+    S.rareMates = rOwned.concat([got]);
+    save();
+    return { kind: "rare", key: got };
+  }
+  const gOwned = gotouchiOwned_();
+  const gRest = GOTOUCHI_MATES.filter(function(k){ return gOwned.indexOf(k) < 0; });
+  if (gRest.length && Math.random() < GOTOUCHI_CHANCE){
+    const got = gRest[Math.floor(Math.random() * gRest.length)];
+    S.gotouchiMates = gOwned.concat([got]);
+    save();
+    return { kind: "gotouchi", key: got };
+  }
+  return null;
 }
 function dotStage(){
   const n = (S.items || []).length;
@@ -1917,15 +1955,21 @@ function renderDotPet(){
   const el = document.getElementById("dot-pet");
   if (!el) return;
   const st = dotStage();
-  const rares = rareOwned_();
+  const rares = rareOwned_(), goto_ = gotouchiOwned_();
+  // 珍しい順に並べ、ヘッダーには数体だけ出す(残りは +N)
+  const line = rares.map(function(k){ return { k: k, c: "rare" }; })
+    .concat(goto_.map(function(k){ return { k: k, c: "gotouchi" }; }))
+    .concat(st.mates.map(function(k){ return { k: k, c: "" }; }));
   let h = '<span class="pet-unit">' + dotSvg(st.key, 30) + '</span>';
-  st.mates.slice(0, PARTY_SHOW).forEach(function(k){ h += '<span class="pet-unit">' + dotSvg(k, 22) + '</span>'; });
-  rares.forEach(function(k){ h += '<span class="pet-unit rare">' + dotSvg(k, 22) + '</span>'; });
-  const rest = st.mateN - PARTY_SHOW;
+  line.slice(0, PARTY_SHOW).forEach(function(o){
+    h += '<span class="pet-unit ' + o.c + '">' + dotSvg(o.k, 22) + '</span>';
+  });
+  const rest = line.length - PARTY_SHOW;
   if (rest > 0) h += '<span class="mate-more">+' + rest + '</span>';
   el.innerHTML = h;
-  el.title = st.name + "(" + st.n + "品目)" + (st.mateN ? " / なかま " + st.mateN + "体" : "")
-    + (rares.length ? " / レア " + rares.length + "体" : "");
+  el.title = st.name + "(" + st.n + "品目) / なかま 全" + line.length + "体"
+    + (goto_.length ? " (ごとうち " + goto_.length + ")" : "")
+    + (rares.length ? " (レア " + rares.length + ")" : "");
   const grew = __lastDotKey && __lastDotKey !== st.key;
   const joined = __lastMateN !== null && st.mateN > __lastMateN;
   if (grew || joined){
@@ -1936,15 +1980,17 @@ function renderDotPet(){
   __lastDotKey = st.key;
   __lastMateN = st.mateN;
 }
-function rareGetEffect_(key){
+function bonusGetEffect_(got){
   const el = document.getElementById("dot-pet");
   renderDotPet();
   if (el){
     el.classList.remove("rare-pop"); void el.offsetWidth; el.classList.add("rare-pop");
     setTimeout(function(){ el.classList.remove("rare-pop"); }, 1600);
   }
-  if (navigator.vibrate) navigator.vibrate([40, 60, 120]);
-  toast("★レア★ 「" + DOT_NAMES[key] + "」が なかまに なった!");
+  if (navigator.vibrate) navigator.vibrate(got.kind === "rare" ? [40,60,120] : [30,50]);
+  toast(got.kind === "rare"
+    ? "★レア★ 「" + DOT_NAMES[got.key] + "」が なかまに なった!"
+    : "ごとうち! 「" + DOT_NAMES[got.key] + "」が なかまに なった!");
 }
 // ときどき キャラが勝手に動く
 const PET_ACTS = ["act-jump","act-wiggle","act-spin","act-squash","act-peek"];
@@ -1974,6 +2020,7 @@ function openPartyModal(){
   // 現在のパーティ(主人公+なかま+これから増える空き枠)
   let stage = '<div class="party-stage">' + dotSvg(st.key, 40);
   st.mates.forEach(function(k){ stage += dotSvg(k, 30); });
+  gotouchiOwned_().forEach(function(k){ stage += '<span class="goto-glow">' + dotSvg(k, 30) + '</span>'; });
   rareOwned_().forEach(function(k){ stage += '<span class="rare-glow">' + dotSvg(k, 30) + '</span>'; });
   for (let i = st.mateN; i < DOT_MATES.length; i++) stage += '<span class="party-slot">' + dotSvg("slot", 30) + '</span>';
   stage += '</div>';
@@ -1992,15 +2039,23 @@ function openPartyModal(){
       ? '<span class="mate-chip">' + dotSvg(k, 22) + esc(DOT_NAMES[k]) + '</span>'
       : '<span class="mate-chip yet">' + dotSvg("slot", 22) + '？</span>';
   }).join("");
-  const rares = rareOwned_();
-  const rareList = '<div class="divider"><span>レアななかま</span></div>'
-    + '<div class="mate-list">' + RARE_MATES.map(function(k){
-        return rares.indexOf(k) >= 0
-          ? '<span class="mate-chip rare">' + dotSvg(k, 22) + esc(DOT_NAMES[k]) + '</span>'
-          : '<span class="mate-chip yet">' + dotSvg("slot", 22) + '？</span>';
-      }).join("") + '</div>'
-    + '<p class="hint">レアななかまは、新しい商品を登録したときにまれに現れます(' + rares.length + '/' + RARE_MATES.length + '体)。</p>';
-  box.innerHTML = stage + '<p class="party-text">' + msg + '</p><div class="mate-list">' + list + '</div>' + rareList;
+  const rares = rareOwned_(), goto_ = gotouchiOwned_();
+  const group = function(title, keys, owned, cls, note){
+    return '<div class="divider"><span>' + title + ' ' + owned.length + '/' + keys.length + '</span></div>'
+      + '<div class="mate-list">' + keys.map(function(k){
+          return owned.indexOf(k) >= 0
+            ? '<span class="mate-chip ' + cls + '">' + dotSvg(k, 22) + esc(DOT_NAMES[k]) + '</span>'
+            : '<span class="mate-chip yet">' + dotSvg("slot", 22) + '？</span>';
+        }).join("") + '</div>'
+      + (note ? '<p class="hint">' + note + '</p>' : '');
+  };
+  box.innerHTML = stage + '<p class="party-text">' + msg + '</p>'
+    + '<div class="divider"><span>おくすりのなかま ' + st.mateN + '/' + DOT_MATES.length + '</span></div>'
+    + '<div class="mate-list">' + list + '</div>'
+    + group("ごとうちのなかま", GOTOUCHI_MATES, goto_, "gotouchi",
+        "日本各地からやってきます。新しい商品を登録したときにときどき現れます。")
+    + group("レアななかま", RARE_MATES, rares, "rare",
+        "ごくまれにしか現れません。");
   document.getElementById("party-modal").style.display = "flex";
 }
 function closePartyModal(){ document.getElementById("party-modal").style.display = "none"; }
