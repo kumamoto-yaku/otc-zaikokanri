@@ -124,6 +124,7 @@ input:focus, select:focus { outline: 2px solid var(--ai); outline-offset: -1px; 
 .ph-mine { font-size: 11px; color: #fff; background: var(--take); border-radius: 999px; padding: 1px 8px; align-self: flex-start; }
 .ph-arrow { color: #9AA7AF; font-size: 20px; }
 .ph-detail-head { display: flex; flex-direction: column; gap: 4px; padding-bottom: 10px; margin-bottom: 8px; border-bottom: 1px solid var(--line); }
+.ph-stale { color: #C0392B; font-weight: 600; }
 .ph-item-maker { font-size: 11px; color: #7B8794; }
 .ph-cat-group { margin-bottom: 14px; }
 .ph-cat-head { font-size: 13px; font-weight: 600; color: var(--ai-deep); border-left: 4px solid var(--ai); padding-left: 8px; margin-bottom: 6px; }
@@ -748,7 +749,7 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
   </section>
 
   <div class="toast" id="toast"></div>
-  <footer class="foot">OTCLinker Pro — とみながグループ 店舗向けツール<br><span class="ver">版 2026-07-25 Q(6ヶ月アラート・編集後復帰)</span></footer>
+  <footer class="foot">OTCLinker Pro — とみながグループ 店舗向けツール<br><span class="ver">版 2026-07-25 R(共有期限表示・薬キャラ)</span></footer>
 </div>
 
 <script>
@@ -1784,28 +1785,28 @@ const DOT_SPRITES = {
   apprentice: ["............","....KKKK..K.","...KNNNNK.SK","..KNFFFFNKSK","..KFKFFKFKSK","..KFFFFFFKNK","...KFFFFK.K.","..KTTTTTTK..",".KFTTTTTTFK.",".KFTTTTTTFK.","..KFFKKFFK..","..KKK..KKK.."],
   warrior:    ["..........K.","...KKKKK.KSK","..KSSSSSKKSK","..KSFFFFSKSK","..KFKFFKFKSK","..KSFFFFSKNK","...KSSSSK.K.","..KSSSSSSK..",".KFSSSSSSFK.",".KFSSSSSSFK.","..KNNKKNNK..","..KKK..KKK.."],
   hero:       ["....GG...K..","...KGGK..SK.","..KGGGGK.SK.","..KGFFFFKSK.",".HKFKFFKFKN.",".HKGFFFFGK..","HHKGGGGGGK..","HHKGGGGGGKW.",".HKFGGGGFKW.","..KFGGGGFKW.","..KNNKKNNK..","..KKK..KKK.."],
-  /* --- なかま --- */
-  slime:      ["............","............",".....KK.....","....KAAK....","...KAAAAK...","..KAAAAAAK..",".KAAKAAKAAK.",".KAAAAAAAAK.","KAAAAAAAAAAK","KAAAAAAAAAAK","KAAAAAAAAAAK",".KKKKKKKKKK."],
-  sprout:     ["............","...KDK.KDK..","..KDDDKDDDK.","..KDDDKDDDK.","...KDKKKDK..","....KLLLK...","...KLLLLLK..","..KLKLLLKLK.","..KLLLLLLLK.","..KLLLLLLLK.","...KLLLLLK..","....KKKKK..."],
-  mush:       ["............","....KKKK....","..KKRRRRKK..",".KRRWRRWRRK.",".KRRRRRRRRK.",".KKKKKKKKKK.","...KCCCCK...","...KCKKCK...","...KCCCCK...","..KCCCCCCK..","..KCCCCCCK..","...KKKKKK..."],
-  bat:        ["............","..K......K..",".KVK....KVK.","KVVVK..KVVVK","KVVVKKKKVVVK","KVVKVVVVKVVK",".KVVVVVVVVK.","..KVKVVKVK..","..KVVVVVVK..","...KVVVVK...","....KVVK....",".....KK....."],
-  droplet:    ["............",".....K......","....KAK.....","....KAK.....","...KAAAK....","..KAAAAAK...",".KAAKAKAAK..",".KAAAAAAAK..",".KATTTTTAK..",".KAAAAAAAK..","..KAAAAAK...","...KKKKK...."],
-  flame:      ["............",".....KK.....","....KRRK....","...KRROK....","..KROOOOK...","..KOOOOOK...",".KOOKOKOOK..",".KOOOOOOOK..",".KOYYYYYOK..",".KYYYYYYYK..","..KYYYYYK...","...KKKKK...."],
-  ghost:      ["............","....KKKK....","...KWWWWK...","..KWWWWWWK..",".KWWWWWWWWK.",".KWKWWWWKWK.",".KWKWWWWKWK.",".KWWWWWWWWK.",".KWWKKKKWWK.",".KWWWWWWWWK.",".KWWWWWWWWK.",".KK.KK.KK.K."],
-  star:       ["............",".....KK.....",".....YY.....","..K.KYYK.K..",".KYYYYYYYYK.","..KYYYYYYK..","..KYKYYKYK..","..KYYYYYYK..",".KYYYYYYYYK.",".KYK.KK.KYK.","..K...K...K.","............"],
-  thunder:    ["............","...KKKK.....","..KSSSSKK...",".KSSSSSSSK..","KSKSSSSKSSK.","KSSSSSSSSSK.",".KKKKKKKKK..","....KYK.....","...KYYK.....","..KYYK......","...KYK......","....K......."],
-  crystal:    ["............","....KVVK....","...KVVVVK...","..KVVVVVVK..",".KVVVVVVVVK.",".KVKVVVVKVK.",".KVVVVVVVVK.",".KVVVKKVVVK.","..KVVVVVVK..","...KVVVVK...","....KVVK....","............"],
-  golem:      ["............","..KKKKKKKK..",".KSSSSSSSSK.",".KSKSSSSKSK.",".KSSSSSSSSK.",".KSSKKKKSSK.","KKSSSSSSSSKK","KSKSSSSSSKSK","KSKSSSSSSKSK",".KKSSSSSSKK.","..KSSKKSSK..","..KKK..KKK.."],
-  fairy:      ["............",".K..KKKK..K.","KAK.KFFK.KAK","KAAKKFFKKAAK","KAAAKFFKAAAK",".KAAKFFKAAK.","..KKMMMMKK..","...KMMMMK...","...KMMMMK...","....KFFK....","....KFFK....","....KKKK...."],
-  slot:       ["............",".KKKKKKKKKK.",".K........K.",".K........K.",".K........K.",".K...KK...K.",".K...KK...K.",".K........K.",".K........K.",".K........K.",".KKKKKKKKKK.","............"],
-  dragon:     ["..K......K..",".KDK....KDK.",".KDDKKKKDDK.","KDDDDDDDDDDK","KDDKDDDDKDDK","KDDDDDDDDDDK",".KDDKKKKDDK.",".KDDDDDDDDK.","KDKDDDDDDKDK","KDKDDDDDDKDK",".KKDDDDDDKK.","..KK....KK.."]
+  /* --- なかま(お薬の剤形) --- */
+  tablet:  ["............","...KKKKKK...","..KWWWWWWK..",".KWWWWWWWWK.",".KWKWWWWKWK.",".KWWWWWWWWK.",".KWWKKKKWWK.",".KWWWWWWWWK.",".KWWWWWWWWK.","..KWWWWWWK..","...KKKKKK...","............"],
+  capsule: ["............","............","..KKKKKKKK..",".KRRRRRRRRK.",".KRKRRRRKRK.",".KRRRRRRRRK.",".KKKKKKKKKK.",".KCCCCCCCCK.",".KCCKKKKCCK.",".KCCCCCCCCK.","..KKKKKKKK..","............"],
+  powder:  ["............","..KKKKKKKK..",".KWWWWWWWWK.",".KWKWWWWKWK.",".KWWWWWWWWK.",".KWWKKKKWWK.",".KWWWWWWWWK.",".KWCCCCCCWK.",".KWCCCCCCWK.",".KWWWWWWWWK.","..KKKKKKKK..","............"],
+  troche:  ["............","...KKKKKK...","..KMMMMMMK..",".KMMMMMMMMK.",".KMKMMMMKMK.",".KMMKWWKMMK.",".KMMKWWKMMK.",".KMMMMMMMMK.",".KMMMMMMMMK.","..KMMMMMMK..","...KKKKKK...","............"],
+  eyedrop: ["............",".....KK.....",".....KB.....","....KKKK.KA.","..KWWWWWWK..","..KWKWWKWK..","..KWWWWWWK..","..KWWKKWWK..","..KWWWWWWK..","..KWWWWWWK..","..KKKKKKKK..","............"],
+  ointment:["............","....KKK.....","....KEK.....","...KKKKK....","..KWWWWWWK..","..KWKWWKWK..","..KWWWWWWK..","..KEEEEEEK..","..KWWWWWWK..","..KWWWWWWK..","..KKKKKKKK..","..KKKKKKKK.."],
+  patch:   ["............",".KKKKKKKKKK.",".KAAAAAAAAK.",".KAKAAAAKAK.",".KAAAAAAAAK.",".KAAKKKKAAK.",".KAAAAAAAAK.",".KAAAAAAAAK.",".KAAAAAAAAK.",".KAAAAAAAAK.",".KKKKKKKKKK.","............"],
+  tape:    ["............","...KKKKK....","..KCCCCCK...",".KCCCCCCCK..",".KCKCCCKCK..",".KCCKWKCCK..",".KCCCCCCCK..","..KCCCCCK...","...KKKKK....","....KCCCKK..","....KCCCCK..",".....KKKKK.."],
+  syrup:   ["............","....KKKK....","....KPPK....","...KKKKKK...","..KWWWWWWK..","..KWKWWKWK..","..KWWWWWWK..","..KMMMMMMK..","..KMMMMMMK..","..KMMMMMMK..","..KMMMMMMK..","..KKKKKKKK.."],
+  drink:   ["............","....KKKK....","....KGGK....","....KKKK....","...KNNNNK...","..KNNNNNNK..",".KNKNNNNKNK.",".KNNNNNNNNK.",".KNNKKKKNNK.",".KNWWWWWWNK.",".KNNNNNNNNK.","..KKKKKKKK.."],
+  supp:    ["............",".....KK.....","....KWWK....","...KWWWWK...","..KWWWWWWK..",".KWKWWWWKWK.",".KWWWWWWWWK.",".KWWKKKKWWK.",".KWWWWWWWWK.",".KWWWWWWWWK.",".KWWWWWWWWK.","..KKKKKKKK.."],
+  inhaler: ["............","...KKKK.....","...KSSSK....","...KSSSK....","..KKSSSKK...","..KBBBBBBK..","..KBKBBKBK..","..KBBBBBBK..","..KBBBBBBK..","..KBBBKKKK..","..KBBBK.....","..KKKKK....."],
+  inject:  ["...KKKKKK...","....KSSK....","....KSSK....","..KKKKKKKK..","..KWWWWWWK..","..KWKWWKWK..","..KWAAAAWK..","..KWAAAAWK..","..KWWWWWWK..","...KKKKKK...",".....KK.....",".....KK....."],
+  slot:       ["............",".KKKKKKKKKK.",".K........K.",".K........K.",".K........K.",".K...KK...K.",".K...KK...K.",".K........K.",".K........K.",".K........K.",".KKKKKKKKKK.","............"]
 };
 // なかまが加わる順番(先に何が来るかは伏せて、加わるたびに名前を発表する)
-const DOT_MATES = ["slime","sprout","mush","bat","droplet","flame","ghost","star","thunder","crystal","golem","fairy","dragon"];
+const DOT_MATES = ["tablet","capsule","powder","troche","eyedrop","ointment","patch","tape","syrup","drink","supp","inhaler","inject"];
 const DOT_NAMES = {
-  slime:"スライム", sprout:"ふたばのこ", mush:"マッシュ", bat:"こうもり", droplet:"しずくのせい",
-  flame:"ほのおのせい", ghost:"おばけ", star:"ほしのこ", thunder:"かみなりぐも", crystal:"クリスタル",
-  golem:"ゴーレム", fairy:"ようせい", dragon:"ドラゴン"
+  tablet:"じょうざい", capsule:"カプセル", powder:"さんざい", troche:"トローチ", eyedrop:"めぐすり",
+  ointment:"なんこう", patch:"しっぷ", tape:"テープ", syrup:"シロップ", drink:"ドリンクざい",
+  supp:"ざやく", inhaler:"きゅうにゅうざい", inject:"ちゅうしゃざい"
 };
 function dotStage(){
   const n = (S.items || []).length;
@@ -2623,7 +2624,7 @@ async function uploadShare(){
       action: "upload", id: S.pharmacy.id,
       pharmacy: { name: S.pharmacy.name, area: S.pharmacy.area },
       updatedAt: new Date().toISOString(),
-      items: S.items.map(it => ({ jan: it.jan, name: it.name, maker: it.maker, category: it.category, qty: it.qty }))
+      items: S.items.map(it => ({ jan: it.jan, name: it.name, maker: it.maker, category: it.category, qty: it.qty, expiry: it.expiry || "" }))
     };
     const r = await fetch(S.gasUrl, { method: "POST", body: JSON.stringify(payload) });
     const txt = await r.text();
@@ -2641,6 +2642,36 @@ async function uploadShare(){
     } else {
       shareMsg("アップロードに失敗しました(" + (m || "原因不明") + ")。「接続テスト」で確認してください。");
     }
+  }
+}
+// 最終更新からの経過日数(古い共有データを見つけやすくする)
+function staleDays_(updatedAt){
+  if (!updatedAt) return 9999;
+  const d = new Date(updatedAt);
+  if (isNaN(d)) return 9999;
+  return Math.floor((Date.now() - d.getTime()) / 86400000);
+}
+// 任意の薬局の共有データを削除する(端末が使えなくなった店の分を、別の端末から消せるように)
+async function removeSharedEntry(id){
+  const ph = sharedData.find(function(x){ return String(x.id) === String(id); });
+  const nm = (ph && ph.pharmacy && ph.pharmacy.name) || "この薬局";
+  const mine = ph && String(ph.id) === String(S.pharmacy.id);
+  const msg = mine
+    ? "自局(" + nm + ")の共有データを削除します。よろしいですか?"
+    : "他店舗「" + nm + "」の共有データを共有サーバーから削除します。\n\n端末の故障や機種変更で更新できなくなった店舗の情報を消すための機能です。\n削除するとその店舗の備蓄は全員に表示されなくなります(その店舗が再度アップロードすれば復活します)。\n\n本当に削除しますか?";
+  if (!confirm(msg)) return;
+  if (!S.gasUrl){ shareMsg("共有サーバーURLが未設定です。"); return; }
+  try {
+    const r = await fetch(S.gasUrl, { method: "POST", body: JSON.stringify({ action: "delete", id: id }) });
+    const txt = await r.text();
+    if (/^\s*<(!doctype|html)/i.test(txt)) throw new Error("login");
+    shareMsg("「" + esc(nm) + "」の共有データを削除しました。");
+    sharedView = null;
+    loadShared();
+  } catch(e){
+    shareMsg(String(e && e.message) === "login"
+      ? '削除できません。<strong>デプロイ設定の「アクセスできるユーザー」を「全員」</strong>にして再デプロイしてください。'
+      : "削除に失敗しました。通信環境を確認してください。");
   }
 }
 async function removeShare(){
@@ -2735,7 +2766,8 @@ function renderShared(){
     function itemLi(it){
       const col = CAT_COLOR[it.category] || "#5C6B78";
       return '<li><span class="cat-badge" style="border-color:'+col+';color:'+col+'">'+(CAT_SHORT[it.category]||"")+'</span>'
-        + '<span class="ph-item-name">'+esc(it.name)+(it.maker?' <span class="ph-item-maker">'+esc(it.maker)+'</span>':'')+'</span>'
+        + '<span class="ph-item-name">'+esc(it.name)+(it.maker?' <span class="ph-item-maker">'+esc(it.maker)+'</span>':'')
+        +   (it.expiry ? '<br>' + expiryChip(it.expiry) : '') + '</span>'
         + '<span class="ph-item-qty">'+it.qty+' 個</span></li>';
     }
 
@@ -2760,7 +2792,9 @@ function renderShared(){
       '<div class="ph-detail-head">'
       + '<button class="link" onclick="backToSharedList()">← 薬局一覧に戻る</button>'
       + '<div class="ph-detail-title">'+esc(ph.pharmacy&&ph.pharmacy.name||"名称未設定")+'</div>'
-      + '<div class="ph-meta">'+esc(ph.pharmacy&&ph.pharmacy.area||"")+' ・ '+all.length+' 品目 ・ 更新 '+String(ph.updatedAt||"").slice(0,10)+'</div>'
+      + '<div class="ph-meta">'+esc(ph.pharmacy&&ph.pharmacy.area||"")+' ・ '+all.length+' 品目 ・ 更新 '+String(ph.updatedAt||"").slice(0,10)
+      +   (staleDays_(ph.updatedAt) >= 60 ? ' <span class="ph-stale">' + staleDays_(ph.updatedAt) + '日間 更新なし</span>' : '') + '</div>'
+      + '<button class="link" style="color:var(--shu);align-self:flex-start" onclick="removeSharedEntry(\''+ph.id+'\')">この薬局の共有データを削除</button>'
       + '</div>' + chips + body;
     return;
   }
@@ -2776,7 +2810,8 @@ function renderShared(){
     return '<li class="ph-row" onclick="openSharedPharmacy(\''+ph.id+'\')">'
       + '<div class="ph-row-main"><span class="ph-name">'+esc(ph.pharmacy&&ph.pharmacy.name||"名称未設定")+'</span>'
       + (mine?'<span class="ph-mine">自局</span>':'')
-      + '<span class="ph-meta">'+esc(ph.pharmacy&&ph.pharmacy.area||"")+' ・ '+n+' 品目 ・ 更新 '+String(ph.updatedAt||"").slice(0,10)+'</span></div>'
+      + '<span class="ph-meta">'+esc(ph.pharmacy&&ph.pharmacy.area||"")+' ・ '+n+' 品目 ・ 更新 '+String(ph.updatedAt||"").slice(0,10)
+      +   (staleDays_(ph.updatedAt) >= 60 ? ' <span class="ph-stale">' + staleDays_(ph.updatedAt) + '日間 更新なし</span>' : '') + '</span></div>'
       + '<span class="ph-arrow">›</span></li>';
   }).join("") + '</ul>';
 }
