@@ -137,10 +137,13 @@ input:focus, select:focus { outline: 2px solid var(--ai); outline-offset: -1px; 
 .pcard-price small { font-weight: 400; font-size: 8.5px; }
 .pcard-barcode { width: 100%; min-width: 0; background: #fff; }
 .pcard-price { flex-shrink: 0; }
-.barcode-box { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+.barcode-box { -webkit-print-color-adjust: exact; print-color-adjust: exact; background: #fff; }
+.barcode-box svg { image-rendering: -webkit-optimize-contrast; }
+@media print { .barcode-box, .barcode-box svg { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; } }
 .card-edit-row { border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; background: #fff; margin-top: 8px; display: flex; flex-direction: column; gap: 6px; }
 .card-edit-name { font-weight: 600; font-size: 13.5px; }
 .card-edit-row input[type="text"] { width: 100%; }
+.card-jan-warn { background: #FDF3EF; border: 1px solid #E0B4AC; color: #8C2F1B; border-radius: 8px; padding: 6px 9px; font-size: 12px; }
 .card-edit-imgrow { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 12px; }
 .card-edit-thumb { width: 44px; height: 44px; object-fit: contain; border: 1px solid var(--line); border-radius: 6px; background: #fff; }
 .saved-pop-list { display: flex; flex-direction: column; gap: 4px; }
@@ -627,7 +630,8 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
           <button class="btn" onclick="window.print()">カードを印刷</button>
         </div>
         <p class="hint" id="card-msg"></p>
-        <p class="hint">印刷は用紙を<strong>横向き</strong>にすると見本のように5枚並びになります。</p>
+        <p class="hint">印刷は用紙を<strong>横向き</strong>にすると見本のように5枚並びになります。<br>
+        <strong>バーコードをレジで読み取るには、印刷設定の倍率を必ず「100%」にしてください。</strong>「用紙に合わせる」「縮小」にするとバーコードが小さくなり読み取れません。</p>
         <div id="card-edit"></div>
       </div>
       <div id="card-sheet" class="card-sheet print-target"></div>
@@ -696,7 +700,7 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
   </section>
 
   <div class="toast" id="toast"></div>
-  <footer class="foot">OTCLinker Pro — とみながグループ 店舗向けツール<br><span class="ver">版 2026-07-25 K(ふりがな・印刷改善)</span></footer>
+  <footer class="foot">OTCLinker Pro — とみながグループ 店舗向けツール<br><span class="ver">版 2026-07-25 L(バーコード実寸修正)</span></footer>
 </div>
 
 <script>
@@ -875,7 +879,17 @@ function isValidJan(code){
   if (code.length===13) return checkDigit(code.slice(0,12)) === parseInt(code[12],10);
   return true;
 }
-function ean13Svg(code, height, showNum){
+// JANの検査数字(チェックデジット)が正しいか
+function janCheckOk(code){
+  if (!/^\d{13}$/.test(code)) return false;
+  let sum = 0;
+  for (let i = 0; i < 12; i++) sum += parseInt(code[i],10) * (i % 2 ? 3 : 1);
+  return ((10 - (sum % 10)) % 10) === parseInt(code[12],10);
+}
+// EAN-13バーコード。widthMm/heightMm は印刷実寸(mm)。
+// 実寸で指定し preserveAspectRatio="none" にしないと、
+// 表示枠に合わせて縮んでスキャナが読めない大きさになる。
+function ean13Svg(code, heightMm, showNum, widthMm){
   if (showNum === undefined) showNum = true;
   if (!/^\d{13}$/.test(code)) return showNum ? ('<div class="barcode-num">' + esc(code) + '</div>') : '';
   const parity = PARITY[parseInt(code[0],10)];
@@ -883,22 +897,26 @@ function ean13Svg(code, height, showNum){
   for (let i=1;i<=6;i++){ const d = parseInt(code[i],10); m += (parity[i-1]==="L") ? L_CODES[d] : G_CODES[d]; }
   m += "01010";
   for (let i=7;i<=12;i++) m += R_CODES[parseInt(code[i],10)];
-  m += "101";   // 終端ガードバー(これが無いとスキャナが読み取れない)
-  // 規格上必要な左右の余白(クワイエットゾーン): 左11モジュール・右7モジュール
+  m += "101";   // 終端ガードバー
+  // 規格上必要な左右の余白(クワイエットゾーン): 左11・右7モジュール
   const QL = 11, QR = 7;
-  const total = QL + m.length + QR;
+  const total = QL + m.length + QR;   // = 113
+  const H = 100;                       // viewBox内の高さ(実寸はheightMmで決まる)
   let rects = "", x = QL;
   for (let i=0;i<m.length;i++){
     if (m[i]==="1"){
       let w=1; while (i+w<m.length && m[i+w]==="1") w++;
-      rects += '<rect x="'+x+'" y="0" width="'+w+'" height="'+height+'" fill="#000000"/>';
+      rects += '<rect x="'+x+'" y="0" width="'+w+'" height="'+H+'" fill="#000000"/>';
       i += w-1; x += w;
     } else x += 1;
   }
-  return '<div class="barcode-box" style="display:inline-block;text-align:center;width:100%">'
-    + '<svg viewBox="0 0 '+total+' '+height+'" width="100%" height="'+height+'" preserveAspectRatio="xMidYMid meet" style="display:block;max-width:100%" shape-rendering="crispEdges">'
-    + '<rect x="0" y="0" width="'+total+'" height="'+height+'" fill="#FFFFFF"/>' + rects + '</svg>'
-    + (showNum ? '<div class="barcode-num">'+esc(code)+'</div>' : '') + '</div>';
+  const wmm = Math.round((widthMm || 40) * 100) / 100;
+  const hmm = Math.round((heightMm || 14) * 100) / 100;
+  return '<div class="barcode-box" style="display:inline-block;text-align:center">'
+    + '<svg viewBox="0 0 '+total+' '+H+'" width="'+wmm+'mm" height="'+hmm+'mm"'
+    + ' preserveAspectRatio="none" style="display:block" shape-rendering="crispEdges">'
+    + '<rect x="0" y="0" width="'+total+'" height="'+H+'" fill="#FFFFFF"/>' + rects + '</svg>'
+    + (showNum ? '<div class="barcode-num" style="font-size:'+Math.max(5, wmm*0.19).toFixed(1)+'pt">'+esc(code)+'</div>' : '') + '</div>';
 }
 
 /* ============ 外部データベース連携 ============ */
@@ -1842,8 +1860,10 @@ function renderCardEdit_(){
   }
   box.innerHTML = items.map(function(it){
     const m = (S.cardMeta || {})[it.jan] || {};
+    const janNg = it.jan && !janCheckOk(it.jan);
     return '<div class="card-edit-row">'
       + '<div class="card-edit-name">' + esc(it.name || "(名称未設定)") + '</div>'
+      + (janNg ? '<div class="card-jan-warn">このJANコード(' + esc(it.jan) + ')は検査数字が合いません。番号が誤っている可能性があり、印刷してもレジで読み取れません。商品登録で確認してください。</div>' : '')
       + '<label>効能ラベル(ピンク帯) <input type="text" value="' + esc(m.label || "") + '" placeholder="例:解熱鎮痛・かぜ薬など" oninput="setCardMeta(\'' + it.jan + '\',\'label\',this.value)"></label>'
       + '<label>商品の特徴 <input type="text" value="' + esc(m.feature || "") + '" placeholder="例:痛みに速く効く" oninput="setCardMeta(\'' + it.jan + '\',\'feature\',this.value)"></label>'
       + '<div class="card-edit-imgrow">'
@@ -1865,6 +1885,9 @@ function renderCardSheet_(){
   const scale = dim.w / 52;
   const x = cs.fields || {};
   const fs = function(px){ return (px * scale).toFixed(1) + 'px'; };
+  // バーコードの実寸: カード幅いっぱい(左右3mm余白)に広げ、高さも確保する
+  const bcW = Math.max(30, dim.w - 6);
+  const bcH = Math.max(11, Math.min(22.85, dim.w * 0.30));
   sheet.innerHTML = items.map(function(it){
     const m = (S.cardMeta || {})[it.jan] || {};
     const label = m.label || "";
@@ -1881,7 +1904,7 @@ function renderCardSheet_(){
       + (x.img !== false ? '<div class="pcard-img"' + (dim.h ? '' : ' style="max-height:' + (30 * scale).toFixed(1) + 'mm"') + '>' + (m.img ? '<img src="' + esc(m.img) + '" onerror="this.parentNode.innerHTML=\'<div class=&quot;pcard-img-empty&quot;>画像を読み込めませんでした</div>\'">' : '<div class="pcard-img-empty">写真なし</div>') + '</div>' : '')
       + '<div class="pcard-bottom">'
       +   (x.price !== false ? '<div class="pcard-priceline"><span class="pcard-price" style="font-size:' + fs(15) + '">' + (it.price !== "" && it.price != null ? Number(it.price).toLocaleString("ja-JP") : "") + '円<small>(税込)</small></span></div>' : '')
-      +   (x.jan !== false && it.jan ? '<div class="pcard-barcode">' + ean13Svg(it.jan, 30, x.jannum !== false) + '</div>' : '')
+      +   (x.jan !== false && it.jan ? '<div class="pcard-barcode">' + ean13Svg(it.jan, bcH, x.jannum !== false, bcW) + '</div>' : '')
       + '</div></div>';
   }).join("");
 }
@@ -1987,8 +2010,8 @@ const FONT_ALIAS = { round: "maru", yugo: "sans", yumin: "serif", meiryo: "sans"
 function fontKey(k){ return FONTS[k] ? k : (FONT_ALIAS[k] || "serif"); }
 function fontCss(k){ return FONTS[fontKey(k)].css; }
 function fontCssAttr(k){ return fontCss(k); }
-const TAG_SIZES = { s: { w: 170, bar: 28 }, m: { w: 220, bar: 34 }, l: { w: 290, bar: 42 } };
-function tagSize_(t){ if (t.size === "custom") { const px = Math.round((t.width || 60) * 3.78); return { w: px, bar: Math.max(20, Math.round(px * 0.16)) }; } return TAG_SIZES[t.size] || TAG_SIZES.m; }
+const TAG_SIZES = { s: { w: 170, bar: 28, mm: 45 }, m: { w: 220, bar: 34, mm: 60 }, l: { w: 290, bar: 42, mm: 75 } };
+function tagSize_(t){ if (t.size === "custom") { const px = Math.round((t.width || 60) * 3.78); return { w: px, bar: Math.max(20, Math.round(px * 0.16)), mm: (t.width || 60) }; } return TAG_SIZES[t.size] || TAG_SIZES.m; }
 function defaultTagStyle(){ return { size: "m", width: 60, height: 0, pad: 2, catPos: "top", fields: { cat:true, name:true, maker:true, price:true, jan:true, jannum:true }, font: "serif", bold: "bold", nameSize: 16, priceSize: 30, nameColor: "#1F2933", priceColor: "#B7402B" }; }
 function tagStyle_(){ return Object.assign(defaultTagStyle(), S.tagStyle || {}); }
 function syncTagStyleInputs(){
@@ -2115,7 +2138,10 @@ function renderTags(){
       inner += '</div>';
       // 下段: バーコード
       let bot = '';
-      if (f.jan !== false) bot += ean13Svg(it.jan, sz.bar, f.jannum !== false);
+      if (f.jan !== false){
+        const tw = Math.max(30, (sz.mm || 60) - (t.pad == null ? 2 : t.pad) * 2 - 2);
+        bot += ean13Svg(it.jan, Math.max(10, Math.min(22.85, tw * 0.28)), f.jannum !== false, tw);
+      }
       else if (f.jannum !== false) bot += '<div class="barcode-num">'+esc(it.jan)+'</div>';
       inner += '<div class="tag-bot">'+bot+'</div>';
       if (cp === "bottom") inner += catBand;
