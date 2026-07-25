@@ -807,7 +807,7 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
   </section>
 
   <div class="toast" id="toast"></div>
-  <footer class="foot">OTCLinker Pro — とみながグループ 店舗向けツール<br><span class="ver">版 2026-07-25 W(なかま44体・衣装・選択)</span></footer>
+  <footer class="foot">OTCLinker Pro — とみながグループ 店舗向けツール<br><span class="ver">版 2026-07-25 X(主人公を高精細化)</span></footer>
 </div>
 
 <script>
@@ -1868,11 +1868,11 @@ function updatePrintSelbar_(){
 const DOT_PAL = { K:"#2B2B2B", W:"#FFFFFF", C:"#FFF3D6", Y:"#FFD84D", O:"#F08A3C", R:"#D0342C", P:"#F4A7B9", B:"#5FA8D3", N:"#8A5A2B", G:"#FFD700", E:"#7DC383", V:"#9B7EDE", S:"#C0C8CF", D:"#3E9B4F", M:"#FF8FB1", A:"#7FD4F5", L:"#A8E063", T:"#5B6EE1", F:"#FFCFA8", H:"#C4443A" };
 const DOT_SPRITES = {
   /* --- 主人公の成長 --- */
-  baby:       [".....KN.....","....KKKK....","...KFFFFK...","..KFFFFFFK..","..KFKFFKFK..","..KFFFFFFK..","..KFFMMFFK..","...KFFFFK...","..KAAAAAAK..",".KAAAAAAAAK.",".KAAAAAAAAK.","..KKKKKKKK.."],
-  child:      ["............","....KKKK....","...KNNNNK...","..KNFFFFNK..","..KFKFFKFK..","..KFFFFFFK..","...KFFFFK...","..KEEEEEEK..",".KFEEEEEEFK.",".KFEEEEEEFK.","..KFFKKFFK..","..KKK..KKK.."],
-  apprentice: ["............","....KKKK..K.","...KNNNNK.SK","..KNFFFFNKSK","..KFKFFKFKSK","..KFFFFFFKNK","...KFFFFK.K.","..KTTTTTTK..",".KFTTTTTTFK.",".KFTTTTTTFK.","..KFFKKFFK..","..KKK..KKK.."],
-  warrior:    ["..........K.","...KKKKK.KSK","..KSSSSSKKSK","..KSFFFFSKSK","..KFKFFKFKSK","..KSFFFFSKNK","...KSSSSK.K.","..KSSSSSSK..",".KFSSSSSSFK.",".KFSSSSSSFK.","..KNNKKNNK..","..KKK..KKK.."],
-  hero:       ["....GG...K..","...KGGK..SK.","..KGGGGK.SK.","..KGFFFFKSK.",".HKFKFFKFKN.",".HKGFFFFGK..","HHKGGGGGGK..","HHKGGGGGGKW.",".HKFGGGGFKW.","..KFGGGGFKW.","..KNNKKNNK..","..KKK..KKK.."],
+  baby: ["................","......KK........",".....K..K.......","...KKKKKKKK.....","..KFFFFFFFFK....",".KFFFFFFFFFFK...",".KFKKFFFFKKFK...",".KFKKFFFFKKFK...",".KFFFFFFFFFFK...",".KFPFKKKKFPFK...","..KFFFFFFFFK....","...KKKKKKKK.....","..KAAAAAAAAAK...",".KAAAAAAAAAAAK..",".KAAAAAAAAAAAK..","..KKKKKKKKKKK..."],
+  child: ["................","....KKKKKK......","...KNNNNNNK.....","..KNNNNNNNNK....","..KNFFFFFFNK....","..KFKKFFKKFK....","..KFFFFFFFFK....","..KFFKKKKFFK....","...KFFFFFFK.....","..KKEEEEEEKK....",".KFKEEEEEEKFK...",".KFKEEEEEEKFK...",".KKKEEEEEEKKK...","...KEEEEEEK.....","...KNNKKNNK.....","..KKKK..KKKK...."],
+  apprentice: ["............K...","....KKKKKK.KNK..","...KNNNNNNKKNK..","..KRRRRRRRRKNK..","..KNFFFFFFNKNK..","..KFKKFFKKFKNK..","..KFFFFFFFFKNK..","..KFFKKKKFFKNK..","...KFFFFFFKNK...","..KKTTTTTTKK....",".KFKTTTTTTKFK...",".KFKTTTTTTKFK...",".KKKTTTTTTKKK...","...KTTTTTTK.....","...KNNKKNNK.....","..KKKK..KKKK...."],
+  warrior: ["............K...","...KKKKKKK.KSK..","..KSSSSSSSKKSK..","..KSSSSSSSSKSK..","..KSFFFFFFSKSK..","..KFKKFFKKFKSK..","..KFFFFFFFFKSK..","..KFFKKKKFFKNK..","...KSSSSSSKNK...","..KKSSSSSSKK....",".KSKSSSSSSKSK...",".KSKSSGGSSKSK...",".KKKSSSSSSKKK...","...KSSSSSSK.....","...KNNKKNNK.....","..KKKK..KKKK...."],
+  hero: ["...G..G..G..K...","..KGGGGGGGGKKGK.","..KGGGGGGGGKKGK.","..KGFFFFFFGKKGK.","..KFKKFFKKFKKGK.","..KFFFFFFFFKKGK.","..KFFKKKKFFKKNK.",".HKKGGGGGGKKNK..","HHKGGGGGGGGKK...","HHKGGGWWGGGK....","HHKGGGWWGGGK....",".HKGGGGGGGGK....",".HKKGGGGGGKK....","..KKGGGGGGKK....","...KNNKKNNK.....","..KKKK..KKKK...."],
   /* --- なかま(お薬の剤形) --- */
   tablet: ["................",".......K........",".......K........","....KKKKKKK.....","...KWWWWWWWK....","..KWWWWWWWWWK...","..KWKKWWWKKWK...","K.KWKWWWWWKWK.K.","KKKWWWWWWWWWKKK.",".KKWWWKKKWWWWK..","..KWWWWWWWWWK...","..KWWWWWWWWWK...","...KWWWWWWWK....","....KKKKKKK.....","....K.....K.....","...KK.....KK...."],
   capsule: ["................","....KKKKKKKK....","...KRRRRRRRRK...","..KRRRRRRRRRRK..","..KRRKRRRRKRRK..","..KRRKRRRRKRRK..","..KRRRRRRRRRRK..","..KKKKKKKKKKKK..","K.KCCCCCCCCCCK.K","KKKCCKKKKKKCCKKK",".KKCKCCCCCCKCKK.","..KCCKKKKKKCCK..","..KCCCCCCCCCCK..","...KCCCCCCCCK...","....KKKKKKKK....","....K......K...."],
