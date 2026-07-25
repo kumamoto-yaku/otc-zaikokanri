@@ -57,6 +57,9 @@ body { min-height: 100vh; background: var(--hakuji); color: var(--ink); font-fam
 .mate-chip.gotouchi { border-color: #7DC383; background: #F3FAF4; }
 .mate-chip.senmon { border-color: #5FA8D3; background: #F1F8FC; }
 .mate-chip .lv { font-style: normal; color: #E3A21A; font-size: 10px; letter-spacing: -1px; }
+button.mate-chip { cursor: pointer; font-family: var(--sans); }
+.mate-chip.picked { outline: 2px solid var(--ai); outline-offset: -2px; }
+.mate-chip .onmark { font-style: normal; font-size: 9.5px; color: #fff; background: var(--ai); border-radius: 999px; padding: 1px 5px; }
 .senmon-glow { display: inline-block; line-height: 0; filter: drop-shadow(0 0 3px rgba(95,168,211,0.9)); }
 .pet-unit.senmon { filter: drop-shadow(0 0 2px rgba(95,168,211,0.9)); }
 .dot-pet.sleepy { opacity: 0.45; filter: grayscale(0.8); }
@@ -530,9 +533,9 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
   <section class="panel active" id="tab-list">
     <div class="cat-chips" id="cat-chips"></div>
     <div class="row gap wrap">
-      <input class="search" id="q" placeholder="商品名・JAN・メーカーで検索" oninput="renderList()">
+      <input class="search" id="q" placeholder="商品名・JAN・メーカーで検索" oninput="renderList();if(this.value.trim().length>=2)doQuest('find')">
       <select id="cat-filter" onchange="renderList()" style="display:none"></select>
-      <select id="sort-by" onchange="renderList()"><option value="new">新規登録順</option><option value="aiueo">50音順</option><option value="expiry">有効期限順</option><option value="price-a">価格が安い順</option><option value="price-d">価格が高い順</option><option value="qty-a">在庫が少ない順</option></select>
+      <select id="sort-by" onchange="renderList();if(this.value!=='new')doQuest('sort')"><option value="new">新規登録順</option><option value="aiueo">50音順</option><option value="expiry">有効期限順</option><option value="price-a">価格が安い順</option><option value="price-d">価格が高い順</option><option value="qty-a">在庫が少ない順</option></select>
       <button class="btn ghost" id="view-toggle" onclick="toggleView()">表形式</button>
     </div>
     <label class="selall-row"><input type="checkbox" id="sel-all" onchange="toggleSelectAll()"> 表示中をすべて選択</label>
@@ -804,7 +807,7 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
   </section>
 
   <div class="toast" id="toast"></div>
-  <footer class="foot">OTCLinker Pro — とみながグループ 店舗向けツール<br><span class="ver">版 2026-07-25 V(たまごっち要素)</span></footer>
+  <footer class="foot">OTCLinker Pro — とみながグループ 店舗向けツール<br><span class="ver">版 2026-07-25 W(なかま44体・衣装・選択)</span></footer>
 </div>
 
 <script>
@@ -1246,6 +1249,7 @@ function beep(kindKey){
   } catch(e){}
 }
 function saveBeepKind(){
+  doQuest("beep");
   S.beepKind = document.getElementById("beep-kind").value;
   save();
   beep();
@@ -1538,6 +1542,7 @@ function editItem(id){
   const it = S.items.find(x => x.id===id);
   if (!it) return;
   editingId = id;
+  doQuest("edit");
   // どの画面から編集を始めたかを覚えておき、保存後にそこへ戻る
   __editReturnTab = (document.querySelector(".panel.active") || {}).id === "tab-list" ? "list" : null;
   fillForm(it);
@@ -1548,6 +1553,7 @@ function editItem(id){
   window.scrollTo({ top: 0 });
 }
 function changeQty(id, d){
+  doQuest("qty");
   const it = S.items.find(x => x.id===id);
   if (!it) return;
   it.qty = Math.max(0, it.qty + d); it.updatedAt = today();
@@ -1682,6 +1688,7 @@ function sortItems(arr){
   // "new" は登録順(items先頭が新しい)なのでそのまま
 }
 function setCatFilter(c){
+  if (c && c !== "すべて") doQuest("catfil");
   document.getElementById("cat-filter").value = c;
   renderList();
 }
@@ -1763,6 +1770,7 @@ function renderList(){
 }
 let listMode = "card";
 function toggleView(){
+  doQuest("view");
   listMode = listMode === "card" ? "table" : "card";
   document.getElementById("view-toggle").textContent = listMode === "card" ? "表形式" : "カード形式";
   renderList();
@@ -1892,6 +1900,19 @@ const DOT_SPRITES = {
   g_udon: ["................","..KKK......KKK..",".KCCCK....KCCCK.","..KCCCKKKKCCCK..","...KCCCCCCCCK...","..KKKKKKKKKKKK..",".KWWWWWWWWWWWWK.",".KWKKWWWWWWKKWK.","KWWKKWWWWWWKKWWK","KWWWWWWWWWWWWWWK","KWWWWKKKKKKWWWWK",".KWWWWWWWWWWWWK.","..KWWWWWWWWWWK..","...KWWWWWWWWK...","....KKKKKKKK....","................"],
   g_mentaiko: ["................","................","...KKKKKKKKKK...","..KMMMMMMMMMMK..",".KMMMMMMMMMMMMK.",".KMKKMMMMMMKKMK.","KMMKKMMMMMMKKMMK","KMMMMMMMMMMMMMMK","KMMMMKKKKKKMMMMK","KMMMMMMMMMMMMMMK","KMRMRMRMRMRMRMMK",".KMRMRMRMRMRMMK.","..KMMMMMMMMMMK..","...KKKKKKKKKK...","...K........K...","..KK........KK.."],
   g_shisa: ["..KK........KK..",".KDDK......KDDK.",".KDDKKKKKKKKDDK.","..KDDDDDDDDDDK..",".KDDDDDDDDDDDDK.",".KDKKDDDDDDKKDK.","KDDKKDDDDDDKKDDK","KDDDDDDDDDDDDDDK","KDDDKKKKKKKKDDDK","KDDDKWWKKWWKDDDK","KDDDKKKKKKKKDDDK",".KDDDDDDDDDDDDK.","..KDDDDDDDDDDK..","...KKKKKKKKKK...","...K........K...","..KK........KK.."],
+  /* --- ごとうちのなかま(第2弾) --- */
+  g2_ichigo: ["................",".......KDK......","......KDDDK.....","....KKKKKKKK....","...KRRRRRRRRK...","..KRRRRRRRRRRK..",".KRRKKRRRRKKRRK.",".KRRKKRRRRKKRRK.","KRRRRRRRRRRRRRRK","KRRRWRKKKKRWRRRK","KRRRRRRRRRRRRRRK",".KRRRWRRRRWRRRK.","..KRRRRRRRRRRK..","...KRRRRRRRRK...","....KKKKKKKK....","................"],
+  g2_mikan: ["................","......KDDK......","....KKKKKKK.....","...KOOOOOOOK....","..KOOOOOOOOOK...",".KOOKKOOOOKKOOK.",".KOOKKOOOOKKOOK.","KOOOOOOOOOOOOOOK","KOOOOOKKKKOOOOOK","KOOOOOOOOOOOOOOK",".KOOOOOOOOOOOOK.",".KOOOOOOOOOOOOK.","..KOOOOOOOOOOK..","...KOOOOOOOOK...","....KKKKKKKK....","................"],
+  g2_rakkasei: ["................","....KKKKKK......","..KKCCCCCCKK....",".KCCCCCCCCCCK...",".KCKKCCCCKKCK...",".KCKKCCCCKKCK...",".KCCCCCCCCCCK...","..KCCCKKKCCCK...","...KKCCCCCKK....","....KCCCCCK.....","...KKCCCCCKK....","..KCCCCCCCCCK...","..KCCCCCCCCCK...","..KCCCCCCCCCK...","...KKKKKKKKK....","...K.......K...."],
+  g2_budou: ["................","......KDK.......",".....KDDDK......","...KVVK.KVVK....","..KVVVKKVVVK....","..KVKVVVVKVK....","..KVKVVVVKVK....","..KVVVVVVVVK....","...KVVKKVVK.....","..KVVVVVVVVK....","..KVVVVVVVVK....","...KVVVVVVK.....","....KVVVVK......",".....KVVK.......","......KK........","................"],
+  g2_megane: ["................","................","................","..KKKKKKKKKKKK..",".KSSSSKKKKSSSSK.","KSKKKSKKKKSKKKSK","KSKWKSKKKKSKWKSK","KSKKKSKKKKSKKKSK","KSSSSSKKKKSSSSSK",".KKKKKKKKKKKKKK.","................",".....KKKKKK.....","....KKKKKKKK....","................","................","................"],
+  g2_kiritanpo: ["................",".......KNK......",".......KNK......","......KKKKK.....",".....KCCCCCK....","....KCCCCCCCK...","....KCKKCCKCK...","....KCKKCCKCK...","....KCCCCCCCK...","....KCCKKKCCK...","....KCCCCCCCK...","....KCCCCCCCK...","....KCCCCCCCK...","....KCCCCCCCK...",".....KKKKKKK....",".....K.....K...."],
+  g2_soba: ["................","..KNK......KNK..","..KNNKKKKKKNNK..","...KNNNNNNNNK...","....KNNNNNNK....","..KKKKKKKKKKKK..",".KCCCCCCCCCCCCK.",".KCKKCCCCCCKKCK.","KCCKKCCCCCCKKCCK","KCCCCCCCCCCCCCCK","KCCCCKKKKKKCCCCK",".KCCCCCCCCCCCCK.","..KCCCCCCCCCCK..","...KKKKKKKKKK...","...K........K...","..KK........KK.."],
+  g2_ebifly: ["................","..............K.",".............KRK","...........KKRK.",".........KKOOK..","......KKOOOOK...","....KKOOOOKK....","..KKOKKOOKK.....",".KOOKKOOKK......",".KOKKOOKK.......",".KOOOOKK........",".KOOOKK.........","..KKKK..........","..K..K..........",".KK..KK.........","................"],
+  g2_kibidango: ["................",".....KKKK.......","....KCCCCK......","....KCKKCK......","....KCCCCK......",".....KKKK.......",".....KKKK.......","....KCCCCK......","....KCKKCK......","....KCCCCK......",".....KKKK.......","......KNK.......","......KNK.......","......KNK.......","......KNK.......","......KNK......."],
+  g2_sakuranbo: ["................",".......KDK......","......KDK.KD....",".....KDK..KD....","....KDK..KDK....","...KKKK.KKKK....","..KRRRRKRRRRK...",".KRRRRRKRRRRRK..",".KRKKRRKRKKRRK..",".KRKKRRKRKKRRK..",".KRRRRRKRRRRRK..",".KRRKKRKRRKKRK..","..KRRRRKRRRRK...","...KKKKKKKKK....","................","................"],
+  g2_ocha: ["................","...K..K..K......","....K..K..K.....","................","..KKKKKKKKKKK...","..KDDDDDDDDDK...","..KWWWWWWWWWK...","..KWKKWWWKKWK...","..KWKKWWWKKWK...","..KWWWWWWWWWK...","..KWWWKKKWWWK...","...KWWWWWWWK....","....KWWWWWK.....",".....KKKKK......","...KKKKKKKKK....","................"],
+  g2_konnyaku: ["................","................","..KKKKKKKKKKKK..",".KDDDDDDDDDDDDK.",".KDKKDDDDDDKKDK.",".KDKKDDDDDDKKDK.",".KDDDDDDDDDDDDK.",".KDDDKKKKKKDDDK.",".KDDDDDDDDDDDDK.",".KDDKDDDDDDKDDK.",".KDDDDDDDDDDDDK.",".KDDDDDDDDDDDDK.","..KKKKKKKKKKKK..","..K..........K..",".KK..........KK.","................"],
   /* --- せんもんしょくのなかま --- */
   s_hakase: ["................",".......K........","....KKKKKKK.....","...KNNNNNNNK....","..KNNNNNNNNNK...","..KWKKWWKKWWK...","..KWKKWWKKWWK...","K.KWWWWWWWWWK.K.","KKKWWWKKKWWWWKK.",".KKWWWWWWWWWK...","..KWWWWWWWWWK...",".KWWKWWWWWKWWK..",".KWWKWWWWWKWWK..",".KWWWWWWWWWWWK..","..KKKKKKKKKKK...","..K.........K..."],
   s_monshin: ["................",".....KKKKKK.....","..KKKKSSSSKKKK..","..KWWWWWWWWWWK..","..KWKKWWWWKKWK..","..KWKKWWWWKKWK..","K.KWWWWWWWWWWK.K","KKKWWWKKKKWWWKKK",".KKWWWWWWWWWWK..","..KWKKWWWWWWWK..","..KWKKWWWWWWWK..","..KWKKWWWWWWWK..","..KWWWWWWWWWWK..","..KKKKKKKKKKKK..","..K..........K..",".KK..........KK."],
@@ -1917,6 +1938,10 @@ const DOT_NAMES = {
   g_ringo:"リンゴかじりすけ", g_gyutan:"ギュータンゴ", g_takoyaki:"タコヤキング",
   g_yatsuhashi:"ヤツハシわたる", g_shika:"シカたないシカ", g_momiji:"モミジマンジュウロウ",
   g_udon:"ウドンゲンキ", g_mentaiko:"メンタイコタロウ", g_shisa:"シーサーどんまい",
+  g2_ichigo:"イチゴイチエ", g2_mikan:"ミカンセイ", g2_rakkasei:"ラッカセイカツ",
+  g2_budou:"ブドウカン", g2_megane:"メガネカケール", g2_kiritanpo:"キリタンポポ",
+  g2_soba:"ソバニイルヨ", g2_ebifly:"エビフライヤー", g2_kibidango:"キビダンゴロー",
+  g2_sakuranbo:"サクランボンボン", g2_ocha:"オチャメなオチャ", g2_konnyaku:"コンニャクロウ",
   // せんもんしょくのなかま
   s_hakase:"ハクイのハカセ", s_monshin:"モンシンヒョウジョウ",
   s_nyubachi:"ニュウバチかぶり", s_choshinki:"チョウシンキいてる",
@@ -1924,7 +1949,9 @@ const DOT_NAMES = {
   r_gold:"ゴールデンカプすけ", r_rainbow:"ニジイロジョーダン", r_phantom:"スケスケビンさん"
 };
 const GOTOUCHI_MATES = ["g_okigusuri","g_renkon","g_jagaimo","g_ringo","g_gyutan","g_takoyaki",
-                        "g_yatsuhashi","g_shika","g_momiji","g_udon","g_mentaiko","g_shisa"];
+                        "g_yatsuhashi","g_shika","g_momiji","g_udon","g_mentaiko","g_shisa",
+                        "g2_ichigo","g2_mikan","g2_rakkasei","g2_budou","g2_megane","g2_kiritanpo",
+                        "g2_soba","g2_ebifly","g2_kibidango","g2_sakuranbo","g2_ocha","g2_konnyaku"];
 const SENMON_MATES = ["s_hakase","s_monshin","s_nyubachi","s_choshinki"];
 const SENMON_NEED  = [1, 3, 6, 10];   // 要指導・第1類の在庫品目数
 const RARE_MATES = ["r_gold","r_rainbow","r_phantom"];
@@ -1943,7 +1970,19 @@ const QUESTS = [
   { id:"photo",  key:"g_momiji",     label:"商品の写真を取り込む" },
   { id:"expiry", key:"g_udon",       label:"使用期限を登録する" },
   { id:"kana",   key:"g_mentaiko",   label:"ふりがなを登録する" },
-  { id:"theme",  key:"g_shisa",      label:"テーマ色を変えてみる" }
+  { id:"theme",  key:"g_shisa",      label:"テーマ色を変えてみる" },
+  { id:"sort",   key:"g2_ichigo",     label:"在庫リストの並べ替えを使う" },
+  { id:"view",   key:"g2_mikan",      label:"表示をカード⇔表で切り替える" },
+  { id:"catfil", key:"g2_rakkasei",   label:"区分で絞り込んでみる" },
+  { id:"find",   key:"g2_budou",      label:"在庫リストで商品を検索する" },
+  { id:"qty",    key:"g2_megane",     label:"在庫数を＋−で増減する" },
+  { id:"edit",   key:"g2_kiritanpo",  label:"登録した商品を修正する" },
+  { id:"popdez", key:"g2_soba",       label:"POPのデザインを変える" },
+  { id:"popimg", key:"g2_ebifly",     label:"POPに写真を入れる" },
+  { id:"cardcol",key:"g2_kibidango",  label:"商品カードの色を変える" },
+  { id:"beep",   key:"g2_sakuranbo",  label:"スキャンの音を変えてみる" },
+  { id:"pharm",  key:"g2_ocha",       label:"薬局情報を登録する" },
+  { id:"autoget",key:"g2_konnyaku",   label:"写真・特徴の自動取得を試す" }
 ];
 function ownedOf_(list, store){ return (S[store] || []).filter(function(k){ return list.indexOf(k) >= 0; }); }
 function rareOwned_(){ return ownedOf_(RARE_MATES, "rareMates"); }
@@ -2000,6 +2039,39 @@ function genkiState_(){
   const g = genki_();
   for (let i = 0; i < GENKI_STATES.length; i++) if (g >= GENKI_STATES[i].min) return GENKI_STATES[i];
   return GENKI_STATES[GENKI_STATES.length - 1];
+}
+/* ===== 季節や日によって衣装が変わる ===== */
+const DECOS = {
+  sunglass: "サングラス", straw: "むぎわらぼうし", muffler: "マフラー", santa: "サンタぼうし",
+  sakura: "さくら", leaf: "おちば", pumpkin: "かぼちゃ", kagami: "おかざり",
+  ribbon: "リボン", tan: "ひやけ"
+};
+function seasonDeco_(){
+  const d = new Date(), m = d.getMonth() + 1, day = d.getDate();
+  if (m === 12 && day >= 18 && day <= 25) return "santa";
+  if (m === 1 && day <= 7) return "kagami";
+  if (m === 10 && day >= 24) return "pumpkin";
+  if (m >= 6 && m <= 8) return "sunglass";
+  if (m === 12 || m <= 2) return "muffler";
+  if (m >= 3 && m <= 5) return "sakura";
+  return "leaf";
+}
+// 日付とキャラ名から決まる「その日だけの気まぐれ」
+function hash32_(str){
+  let h = 2166136261;
+  for (let i = 0; i < str.length; i++){ h ^= str.charCodeAt(i); h = Math.imul(h, 16777619); }
+  return (h >>> 0);
+}
+function decoOf_(key){
+  const t = today();
+  const h = hash32_(t + "|" + key);
+  const season = seasonDeco_();
+  const roll = h % 100;
+  if (roll < 30) return season;                       // 3割は季節の衣装
+  if (roll < 38) return "ribbon";                     // たまにリボン
+  if (roll < 44 && (season === "sunglass")) return "tan";  // 夏はたまに日焼け
+  if (roll < 50 && season === "sunglass") return "straw";
+  return null;                                        // ふだんは素のまま
 }
 function mateMeta_(key){
   S.mateMeta = S.mateMeta || {};
@@ -2076,7 +2148,7 @@ function dotStage(){
   else if (mateN < DOT_MATES.length) next = (Math.floor(n / 5) + 1) * 5;
   return { key: key, name: name, n: n, next: next, mateN: mateN, mates: DOT_MATES.slice(0, mateN) };
 }
-function dotSvg(key, px, lv){
+function dotSvg(key, px, lv, deco){
   const rows = DOT_SPRITES[key] || DOT_SPRITES.baby;
   const cell = px / rows.length;   // 12×12でも16×16でも同じ大きさで描ける
   const rc = function(x, y, w, h, c){
@@ -2087,6 +2159,43 @@ function dotSvg(key, px, lv){
     for (let x = 0; x < rows[y].length; x++){
       const c = DOT_PAL[rows[y][x]];
       if (c) r += rc(x*cell, y*cell, cell, cell, c);
+    }
+  }
+  // 季節や日替わりの衣装
+  if (deco){
+    const W = px, u = cell;
+    if (deco === "sunglass"){
+      r += rc(u*2.5, W*0.36, W-u*5, u*1.6, DOT_PAL.K)
+         + rc(u*3.2, W*0.375, u*3.2, u*1.2, "#3A4A55")
+         + rc(W-u*6.4, W*0.375, u*3.2, u*1.2, "#3A4A55");
+    } else if (deco === "straw"){
+      r += rc(u*1.5, u*2.2, W-u*3, u*1.2, DOT_PAL.C)
+         + rc(u*4, u*0.9, W-u*8, u*1.5, DOT_PAL.C)
+         + rc(u*4, u*2.0, W-u*8, u*0.6, DOT_PAL.R);
+    } else if (deco === "muffler"){
+      r += rc(u*2, W*0.66, W-u*4, u*1.8, DOT_PAL.R)
+         + rc(u*3.4, W*0.66+u*1.8, u*1.6, u*2.6, DOT_PAL.R);
+    } else if (deco === "santa"){
+      r += rc(u*4, u*1.6, W-u*8, u*1.4, DOT_PAL.W)
+         + rc(u*5, u*0.4, W-u*10, u*1.4, DOT_PAL.R)
+         + rc(W-u*6, u*0, u*1.6, u*1.6, DOT_PAL.W);
+    } else if (deco === "sakura"){
+      r += rc(u*2.5, u*0.6, u*1.6, u*1.6, DOT_PAL.P)
+         + rc(W-u*4.2, u*1.4, u*1.4, u*1.4, DOT_PAL.M);
+    } else if (deco === "leaf"){
+      r += rc(u*2.5, u*0.8, u*1.8, u*1.4, DOT_PAL.O)
+         + rc(W-u*4.4, u*1.6, u*1.5, u*1.2, DOT_PAL.R);
+    } else if (deco === "pumpkin"){
+      r += rc(u*4, u*1.4, W-u*8, u*1.6, DOT_PAL.O)
+         + rc(u*5.4, u*0.3, u*1.4, u*1.4, DOT_PAL.D);
+    } else if (deco === "kagami"){
+      r += rc(u*4.4, u*1.8, W-u*8.8, u*1.3, DOT_PAL.W)
+         + rc(u*5.4, u*0.7, W-u*10.8, u*1.2, DOT_PAL.W)
+         + rc(u*6.6, u*0.1, u*1.4, u*0.9, DOT_PAL.O);
+    } else if (deco === "ribbon"){
+      r += rc(u*3.6, u*1.0, u*1.8, u*1.6, DOT_PAL.M)
+         + rc(u*5.6, u*1.0, u*1.8, u*1.6, DOT_PAL.M)
+         + rc(u*5.2, u*1.3, u*0.8, u*1.0, DOT_PAL.R);
     }
   }
   // なついた度合いを右下の小さな星であらわす
@@ -2103,6 +2212,31 @@ function dotSvg(key, px, lv){
 }
 let __lastDotKey = null, __lastMateN = null;
 const PARTY_SHOW = 3;   // ヘッダーに並べるなかまの上限(それ以上は「他N」表示)
+// ヘッダーに出すなかまを自分で選べる(最大3体・未選択なら珍しい順)
+const PET_PICK_MAX = 3;
+function petPicks_(){
+  const owned = allMates_().map(function(o){ return o.k; });
+  return (S.petPick || []).filter(function(k){ return owned.indexOf(k) >= 0; });
+}
+function togglePetPick(key){
+  const cur = (S.petPick || []).slice();
+  const i = cur.indexOf(key);
+  if (i >= 0) cur.splice(i, 1);
+  else {
+    if (cur.length >= PET_PICK_MAX) cur.shift();
+    cur.push(key);
+  }
+  S.petPick = cur;
+  save();
+  renderDotPet();
+  openPartyModal();
+  toast(i >= 0 ? "「" + DOT_NAMES[key] + "」を画面から外しました" : "「" + DOT_NAMES[key] + "」を画面に出しました");
+}
+function clearPetPick(){
+  S.petPick = [];
+  save(); renderDotPet(); openPartyModal();
+  toast("おまかせ表示に戻しました");
+}
 function allMates_(){
   const st = dotStage();
   return rareOwned_().map(function(k){ return { k: k, c: "rare" }; })
@@ -2116,11 +2250,15 @@ function renderDotPet(){
   const st = dotStage();
   const line = allMates_();
   const gs = genkiState_();
-  let h = '<span class="pet-unit">' + dotSvg(st.key, 30) + '</span>';
-  line.slice(0, PARTY_SHOW).forEach(function(o){
-    h += '<span class="pet-unit ' + o.c + '">' + dotSvg(o.k, 22, mateLv_(o.k)) + '</span>';
+  const picks = petPicks_();
+  const shown = picks.length
+    ? picks.map(function(k){ return line.filter(function(o){ return o.k === k; })[0]; }).filter(Boolean)
+    : line.slice(0, PARTY_SHOW);
+  let h = '<span class="pet-unit">' + dotSvg(st.key, 30, 0, decoOf_(st.key)) + '</span>';
+  shown.forEach(function(o){
+    h += '<span class="pet-unit ' + o.c + '">' + dotSvg(o.k, 22, mateLv_(o.k), decoOf_(o.k)) + '</span>';
   });
-  const rest = line.length - PARTY_SHOW;
+  const rest = line.length - shown.length;
   if (rest > 0) h += '<span class="mate-more">+' + rest + '</span>';
   el.innerHTML = h;
   el.className = "dot-pet" + (gs.key === "nemuri" ? " sleepy" : (gs.key === "guttari" ? " weak" : ""));
@@ -2175,9 +2313,9 @@ function openPartyModal(){
   const g = genki_();
 
   // 舞台
-  let stage = '<div class="party-stage' + (gs.key === "nemuri" ? " sleepy" : "") + '">' + dotSvg(st.key, 40);
+  let stage = '<div class="party-stage' + (gs.key === "nemuri" ? " sleepy" : "") + '">' + dotSvg(st.key, 40, 0, decoOf_(st.key));
   allMates_().forEach(function(o){
-    stage += '<span class="' + (o.c ? o.c + "-glow" : "") + '">' + dotSvg(o.k, 30, mateLv_(o.k)) + '</span>';
+    stage += '<span class="' + (o.c ? o.c + "-glow" : "") + '">' + dotSvg(o.k, 30, mateLv_(o.k), decoOf_(o.k)) + '</span>';
   });
   stage += '</div>';
 
@@ -2190,7 +2328,10 @@ function openPartyModal(){
         ? "しばらく使わなかったので、みんな眠ってしまいました。商品を登録すると目を覚まします。"
         : (g < 40 ? "しばらく開いていないと元気がなくなります。使うと回復します。"
                   : "アプリを使うほど元気になります。")) + '</div>'
-    + '<div class="genki-note">いっしょに過ごした日数: ' + careDays_() + ' 日</div></div>';
+    + '<div class="genki-note">いっしょに過ごした日数: ' + careDays_() + ' 日</div>'
+    + '<div class="genki-note">画面右上に出すなかまは、下の一覧をタップして最大' + PET_PICK_MAX + '体まで選べます'
+    + (petPicks_().length ? ' <button class="link" onclick="clearPetPick()">おまかせに戻す</button>' : '(いまはおまかせ表示)') + '</div>'
+    + '<div class="genki-note">きょうの衣装: ' + (DECOS[seasonDeco_()] || "—") + 'の季節です。日によって着替えます。</div></div>';
 
   // 主人公の状況
   let msg;
@@ -2198,12 +2339,16 @@ function openPartyModal(){
   else if (st.next) msg = '<b>ゆうしゃ</b> — あと <b>' + (st.next - st.n) + '</b> 品目で おくすりのなかま が増えます。';
   else msg = '<b>ゆうしゃ</b> — おくすりのなかま は全員そろいました!';
 
+  const picks = petPicks_();
   const chip = function(k, owned, cls){
     if (!owned) return '<span class="mate-chip yet">' + dotSvg("slot", 22) + '？</span>';
-    const lv = mateLv_(k);
-    return '<span class="mate-chip ' + cls + '" title="' + mateLvLabel_(lv) + '">'
-      + dotSvg(k, 22, lv) + esc(DOT_NAMES[k])
-      + '<i class="lv">' + (lv >= 3 ? "★★" : lv >= 2 ? "★" : "") + '</i></span>';
+    const lv = mateLv_(k), dk = decoOf_(k);
+    const on = picks.indexOf(k) >= 0;
+    return '<button class="mate-chip ' + cls + (on ? ' picked' : '') + '" onclick="togglePetPick(\'' + k + '\')"'
+      + ' title="' + mateLvLabel_(lv) + (dk ? " / " + DECOS[dk] : "") + ' — タップで画面に出す">'
+      + dotSvg(k, 22, lv, dk) + esc(DOT_NAMES[k])
+      + '<i class="lv">' + (lv >= 3 ? "★★" : lv >= 2 ? "★" : "") + '</i>'
+      + (on ? '<i class="onmark">画面</i>' : '') + '</button>';
   };
   const group = function(title, keys, owned, cls, note){
     return '<div class="divider"><span>' + title + ' ' + owned.length + '/' + keys.length + '</span></div>'
@@ -2477,6 +2622,7 @@ function cleanFeature_(txt, itemName, jan, maker){
   return out.slice(0, 32);
 }
 async function fetchCardInfo(){
+  doQuest("autoget");
   const msg = document.getElementById("card-msg");
   const items = cardItems_();
   if (!items.length){ msg.textContent = "先に在庫リストで商品をチェックしてください。"; return; }
@@ -2565,6 +2711,7 @@ function cardColors_(){
   return { head: c.head || t.card, label: c.label || t.lab };
 }
 function saveCardColor(){
+  doQuest("cardcol");
   S.cardColor = { head: document.getElementById("cc-head").value, label: document.getElementById("cc-label").value };
   save(); renderCardSheet_();
 }
@@ -2808,7 +2955,7 @@ async function popImageFile(ev){
     toast("画像を処理中です…");
     const r = await readImageFile_(f, 600);
     S.popFont = Object.assign(popFont_(), { img: r.dataUrl });
-    save(); renderPop();
+    save(); renderPop(); doQuest("popimg");
     toast("写真を取り込みました");
   } catch(e){ toast("画像を読み込めませんでした"); }
 }
@@ -2884,6 +3031,7 @@ function deletePop(pid){
   save(); renderSavedPops();
 }
 function savePopStyle(){
+  doQuest("popdez");
   S.popStyle = document.getElementById("pop-style").value;
   save(); renderPop();
 }
@@ -2963,6 +3111,7 @@ function syncPharmacyInputs(){
   document.getElementById("ph-area").value = S.pharmacy.area || "";
 }
 function savePharmacy(){
+  if (document.getElementById("ph-name").value.trim()) doQuest("pharm");
   S.pharmacy.name = document.getElementById("ph-name").value.trim();
   S.pharmacy.area = document.getElementById("ph-area").value.trim();
   S.gasUrl = document.getElementById("gas-url").value.trim().replace(/\s+/g, "");
