@@ -55,6 +55,21 @@ body { min-height: 100vh; background: var(--hakuji); color: var(--ink); font-fam
 .goto-glow { display: inline-block; line-height: 0; filter: drop-shadow(0 0 3px rgba(126,195,131,0.9)); }
 .pet-unit.gotouchi { filter: drop-shadow(0 0 2px rgba(126,195,131,0.9)); }
 .mate-chip.gotouchi { border-color: #7DC383; background: #F3FAF4; }
+.mate-chip.senmon { border-color: #5FA8D3; background: #F1F8FC; }
+.mate-chip .lv { font-style: normal; color: #E3A21A; font-size: 10px; letter-spacing: -1px; }
+.senmon-glow { display: inline-block; line-height: 0; filter: drop-shadow(0 0 3px rgba(95,168,211,0.9)); }
+.pet-unit.senmon { filter: drop-shadow(0 0 2px rgba(95,168,211,0.9)); }
+.dot-pet.sleepy { opacity: 0.45; filter: grayscale(0.8); }
+.dot-pet.weak { opacity: 0.75; filter: grayscale(0.35); }
+.party-stage.sleepy { filter: grayscale(0.8); opacity: 0.6; }
+.genki-box { border: 1px solid var(--line); border-radius: 10px; padding: 9px 11px; margin: 10px 0 4px; background: #FAFBFB; }
+.genki-row { display: flex; align-items: center; gap: 8px; font-size: 12.5px; color: #43596B; }
+.genki-bar { flex: 1; height: 9px; background: #E4EAE7; border-radius: 999px; overflow: hidden; }
+.genki-bar i { display: block; height: 100%; border-radius: 999px; transition: width 0.4s ease; }
+.genki-note { font-size: 11.5px; color: #7B8794; margin-top: 5px; }
+.quest-list { list-style: none; padding: 0; display: flex; flex-direction: column; gap: 4px; }
+.quest-list li { font-size: 12.5px; color: #43596B; border: 1px dashed var(--line); border-radius: 8px; padding: 6px 10px; background: #fff; }
+.quest-list li::before { content: "□ "; color: #9AA7AF; }
 .mate-chip.rare { border-color: #E3C65A; background: #FFFBEC; }
 @media (prefers-reduced-motion: reduce) {
   .act-jump,.act-wiggle,.act-spin,.act-squash,.act-peek,.dot-pet.rare-pop { animation: none !important; }
@@ -789,7 +804,7 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
   </section>
 
   <div class="toast" id="toast"></div>
-  <footer class="foot">OTCLinker Pro — とみながグループ 店舗向けツール<br><span class="ver">版 2026-07-25 U(ご当地なかま追加)</span></footer>
+  <footer class="foot">OTCLinker Pro — とみながグループ 店舗向けツール<br><span class="ver">版 2026-07-25 V(たまごっち要素)</span></footer>
 </div>
 
 <script>
@@ -1452,6 +1467,10 @@ function saveItem(){
       if (got) setTimeout(function(){ bonusGetEffect_(got); }, 900);
     }
   }
+  if (f.expiry) doQuest("expiry");
+  if (f.kana) doQuest("kana");
+  careFeed_(6);
+  checkSenmon_();
   const backTo = wasEditing ? __editReturnTab : null;
   save(); clearForm(); renderList(); showExpiryAlert();
   if (backTo){
@@ -1474,6 +1493,7 @@ function openDrugInfo(id, ev){
   document.getElementById("ip-use").href = "https://www.google.com/search?q=" + enc + "+" + encodeURIComponent("効能 用法 使用上の注意");
   const pop = document.getElementById("info-pop");
   pop.style.display = "flex";
+  doQuest("info");
   const btn = ev && (ev.currentTarget || ev.target);
   const pr = pop.getBoundingClientRect();
   if (btn && btn.getBoundingClientRect){
@@ -1764,6 +1784,7 @@ function showBackupAlert(){
   box.style.display = "block";
 }
 function backupData(){
+  doQuest("backup");
   S.lastBackup = new Date().toISOString();
   save();
   showBackupAlert();
@@ -1792,6 +1813,7 @@ function restoreData(ev){
   rd.readAsText(file);
 }
 function exportCsv(){
+  doQuest("csv");
   if (!S.items.length){ toast("在庫がありません"); return; }
   const head = ["JANコード","商品名","ふりがな","メーカー","区分","濫用防止","販売価格(税込)","税率","発注先","納入価(税込)","職員販売価格(税込)","在庫数","使用期限","メモ","更新日"];
   const rows = S.items.map(it => [it.jan,it.name,(it.kana||""),it.maker,it.category,(it.ranyo?"該当":""),it.price,(it.reduced?"8%":"10%"),(it.supplier||""),(it.cost||""),(it.staffPrice||""),it.qty,it.expiry,(it.memo||"").replace(/[\r\n,]/g," "),it.updatedAt]);
@@ -1870,6 +1892,11 @@ const DOT_SPRITES = {
   g_udon: ["................","..KKK......KKK..",".KCCCK....KCCCK.","..KCCCKKKKCCCK..","...KCCCCCCCCK...","..KKKKKKKKKKKK..",".KWWWWWWWWWWWWK.",".KWKKWWWWWWKKWK.","KWWKKWWWWWWKKWWK","KWWWWWWWWWWWWWWK","KWWWWKKKKKKWWWWK",".KWWWWWWWWWWWWK.","..KWWWWWWWWWWK..","...KWWWWWWWWK...","....KKKKKKKK....","................"],
   g_mentaiko: ["................","................","...KKKKKKKKKK...","..KMMMMMMMMMMK..",".KMMMMMMMMMMMMK.",".KMKKMMMMMMKKMK.","KMMKKMMMMMMKKMMK","KMMMMMMMMMMMMMMK","KMMMMKKKKKKMMMMK","KMMMMMMMMMMMMMMK","KMRMRMRMRMRMRMMK",".KMRMRMRMRMRMMK.","..KMMMMMMMMMMK..","...KKKKKKKKKK...","...K........K...","..KK........KK.."],
   g_shisa: ["..KK........KK..",".KDDK......KDDK.",".KDDKKKKKKKKDDK.","..KDDDDDDDDDDK..",".KDDDDDDDDDDDDK.",".KDKKDDDDDDKKDK.","KDDKKDDDDDDKKDDK","KDDDDDDDDDDDDDDK","KDDDKKKKKKKKDDDK","KDDDKWWKKWWKDDDK","KDDDKKKKKKKKDDDK",".KDDDDDDDDDDDDK.","..KDDDDDDDDDDK..","...KKKKKKKKKK...","...K........K...","..KK........KK.."],
+  /* --- せんもんしょくのなかま --- */
+  s_hakase: ["................",".......K........","....KKKKKKK.....","...KNNNNNNNK....","..KNNNNNNNNNK...","..KWKKWWKKWWK...","..KWKKWWKKWWK...","K.KWWWWWWWWWK.K.","KKKWWWKKKWWWWKK.",".KKWWWWWWWWWK...","..KWWWWWWWWWK...",".KWWKWWWWWKWWK..",".KWWKWWWWWKWWK..",".KWWWWWWWWWWWK..","..KKKKKKKKKKK...","..K.........K..."],
+  s_monshin: ["................",".....KKKKKK.....","..KKKKSSSSKKKK..","..KWWWWWWWWWWK..","..KWKKWWWWKKWK..","..KWKKWWWWKKWK..","K.KWWWWWWWWWWK.K","KKKWWWKKKKWWWKKK",".KKWWWWWWWWWWK..","..KWKKWWWWWWWK..","..KWKKWWWWWWWK..","..KWKKWWWWWWWK..","..KWWWWWWWWWWK..","..KKKKKKKKKKKK..","..K..........K..",".KK..........KK."],
+  s_nyubachi: ["................","...........KN...","..........KNK...",".........KNK....","........KNK.....",".KKKKKKKKKKKKK..",".KCCCCCCCCCCCK..",".KCKKCCCCKKCCK..","KKCKKCCCCKKCCKK.","KKCCCCCCCCCCCKK.",".KCCCKKKKKCCCK..",".KCCCCCCCCCCCK..","..KCCCCCCCCCK...","...KCCCCCCCK....","....KKKKKKK.....","....K.....K....."],
+  s_choshinki: ["................","..KK......KK....",".KSSK....KSSK...",".KSSK....KSSK...","..KSK....KSK....","...KSK..KSK.....","....KSKKSK......",".....KSSK.......","......KK........","....KKKKKK......","...KSSSSSSK.....","..KSKKSSKKSK....","..KSKKSSKKSK....","..KSSSKKSSSK....","...KSSSSSSK.....","....KKKKKK......"],
   /* --- レアなかま --- */
   r_gold: ["..K..K..K..K....","..KKKKKKKKKK....","...KGGGGGGK.....","..KKKKKKKKKK....",".KGGGGGGGGGGK...",".KGGKGGGGKGGK...",".KGGKGGGGKGGK...","KKGGGGGGGGGGKK..","KKKKKKKKKKKKKK..",".KGGGGGGGGGGK...",".KGGKKKKKKGGK...",".KGGGGGGGGGGK...",".KGGGGGGGGGGK...","..KGGGGGGGGK....","...KKKKKKKK.....","...K......K....."],
   r_rainbow: ["................",".....KKKKKK.....","...KKRRRRRRKK...","..KRROOOOOORRK..","..KROKOOOOKORK..",".KROOOOOOOOOORK.","KKOYYYYYYYYYYOKK","KKYYKYYYYYYKYYKK",".KYLLLLLLLLLLYK.",".KLLLKKKKKKLLLK.",".KLAAAAAAAAAALK.","..KAAAAAAAAAAK..","..KVVVVVVVVVVK..","...KKKKKKKKKK...","...K........K...","..KK........KK.."],
@@ -1890,37 +1917,149 @@ const DOT_NAMES = {
   g_ringo:"リンゴかじりすけ", g_gyutan:"ギュータンゴ", g_takoyaki:"タコヤキング",
   g_yatsuhashi:"ヤツハシわたる", g_shika:"シカたないシカ", g_momiji:"モミジマンジュウロウ",
   g_udon:"ウドンゲンキ", g_mentaiko:"メンタイコタロウ", g_shisa:"シーサーどんまい",
+  // せんもんしょくのなかま
+  s_hakase:"ハクイのハカセ", s_monshin:"モンシンヒョウジョウ",
+  s_nyubachi:"ニュウバチかぶり", s_choshinki:"チョウシンキいてる",
   // レアなかま
   r_gold:"ゴールデンカプすけ", r_rainbow:"ニジイロジョーダン", r_phantom:"スケスケビンさん"
 };
-// ごとうち・レアは、新しい商品を登録したときにまれに現れる
 const GOTOUCHI_MATES = ["g_okigusuri","g_renkon","g_jagaimo","g_ringo","g_gyutan","g_takoyaki",
                         "g_yatsuhashi","g_shika","g_momiji","g_udon","g_mentaiko","g_shisa"];
+const SENMON_MATES = ["s_hakase","s_monshin","s_nyubachi","s_choshinki"];
+const SENMON_NEED  = [1, 3, 6, 10];   // 要指導・第1類の在庫品目数
 const RARE_MATES = ["r_gold","r_rainbow","r_phantom"];
-const GOTOUCHI_CHANCE = 0.14;
-const RARE_CHANCE = 0.04;
+const RARE_CHANCE = 0.07;
+
+// ごとうちのなかまは「機能を試す」と加わる
+const QUESTS = [
+  { id:"tag",    key:"g_renkon",     label:"値札シートを作ってみる" },
+  { id:"pop",    key:"g_jagaimo",    label:"POPを保存してみる" },
+  { id:"card",   key:"g_ringo",      label:"商品カードを作ってみる" },
+  { id:"info",   key:"g_gyutan",     label:"患者説明の資料を開いてみる" },
+  { id:"share",  key:"g_okigusuri",  label:"備蓄情報を共有(アップロード)する" },
+  { id:"search", key:"g_takoyaki",   label:"他店の備蓄を検索してみる" },
+  { id:"csv",    key:"g_yatsuhashi", label:"在庫をCSVに書き出す" },
+  { id:"backup", key:"g_shika",      label:"データの控えを保存する" },
+  { id:"photo",  key:"g_momiji",     label:"商品の写真を取り込む" },
+  { id:"expiry", key:"g_udon",       label:"使用期限を登録する" },
+  { id:"kana",   key:"g_mentaiko",   label:"ふりがなを登録する" },
+  { id:"theme",  key:"g_shisa",      label:"テーマ色を変えてみる" }
+];
 function ownedOf_(list, store){ return (S[store] || []).filter(function(k){ return list.indexOf(k) >= 0; }); }
 function rareOwned_(){ return ownedOf_(RARE_MATES, "rareMates"); }
 function gotouchiOwned_(){ return ownedOf_(GOTOUCHI_MATES, "gotouchiMates"); }
-// 新規登録のたびに1回だけ抽選する(レア→ごとうちの順)
+function senmonOwned_(){ return ownedOf_(SENMON_MATES, "senmonMates"); }
+function questDone_(id){ return (S.quests || []).indexOf(id) >= 0; }
+
+/* ===== お世話(げんき)と なかまの成長 ===== */
+function daysBetween_(a, b){
+  const d1 = new Date(a + "T00:00:00"), d2 = new Date(b + "T00:00:00");
+  if (isNaN(d1) || isNaN(d2)) return 0;
+  return Math.max(0, Math.round((d2 - d1) / 86400000));
+}
+function care_(){
+  S.care = S.care || { last: today(), genki: 100, days: 1 };
+  if (S.care.genki == null) S.care.genki = 100;
+  if (S.care.days == null) S.care.days = 1;
+  return S.care;
+}
+function careDays_(){ return care_().days; }
+function genki_(){ return care_().genki; }
+// 起動時に1回:前回から空いた日数だけ元気が減り、その日はじめて開くと回復する
+function careTick_(){
+  const c = care_();
+  const t = today();
+  const gap = daysBetween_(c.last || t, t);
+  if (gap > 0){
+    c.genki = Math.max(0, c.genki - gap * 12);
+    // 眠ってしまった場合は、開いただけでは起きない(商品登録などの「お世話」で目を覚ます)
+    if (c.genki > 0) c.genki = Math.min(100, c.genki + 25);
+    c.days = c.days + 1;
+    c.last = t;
+    save();
+  }
+}
+// 商品を登録するなど「お世話」をすると少し元気になる
+function careFeed_(n){
+  const c = care_();
+  const before = c.genki;
+  c.genki = Math.min(100, c.genki + (n || 6));
+  if (c.genki !== before){
+    save();
+    if (before === 0) setTimeout(function(){ toast("なかまたちが 目を覚ました!"); renderDotPet(); }, 600);
+  }
+}
+const GENKI_STATES = [
+  { min: 70, key:"genki",   label:"げんき",     color:"#3E7C59" },
+  { min: 40, key:"futsu",   label:"ふつう",     color:"#8A6D3B" },
+  { min: 15, key:"yowari",  label:"よわってる", color:"#C05B2B" },
+  { min:  1, key:"guttari", label:"ぐったり",   color:"#C0392B" },
+  { min:  0, key:"nemuri",  label:"おやすみ中", color:"#7B8794" }
+];
+function genkiState_(){
+  const g = genki_();
+  for (let i = 0; i < GENKI_STATES.length; i++) if (g >= GENKI_STATES[i].min) return GENKI_STATES[i];
+  return GENKI_STATES[GENKI_STATES.length - 1];
+}
+function mateMeta_(key){
+  S.mateMeta = S.mateMeta || {};
+  if (!S.mateMeta[key]) S.mateMeta[key] = { got: careDays_() };
+  return S.mateMeta[key];
+}
+// なかまは いっしょに過ごした日数で育つ(1→2→3)
+function mateLv_(key){
+  const m = (S.mateMeta || {})[key];
+  if (!m) return 1;
+  const d = careDays_() - (m.got || 0);
+  return d >= 12 ? 3 : (d >= 4 ? 2 : 1);
+}
+function mateLvLabel_(lv){ return lv >= 3 ? "たっぷりなついた" : (lv >= 2 ? "なついてきた" : "であったばかり"); }
+
+/* ===== なかまが加わる ===== */
+function addMate_(key, store, kind, extra){
+  const cur = S[store] || [];
+  if (cur.indexOf(key) >= 0) return false;
+  S[store] = cur.concat([key]);
+  mateMeta_(key);
+  save();
+  setTimeout(function(){ bonusGetEffect_({ kind: kind, key: key, note: extra }); }, 800);
+  return true;
+}
+// 機能を試したときに呼ぶ
+function doQuest(id){
+  if (questDone_(id)) return;
+  const q = QUESTS.filter(function(x){ return x.id === id; })[0];
+  if (!q) return;
+  S.quests = (S.quests || []).concat([id]);
+  save();
+  addMate_(q.key, "gotouchiMates", "gotouchi", q.label);
+}
+// 要指導・第1類の在庫が増えたときに呼ぶ
+function senmonCount_(){
+  return (S.items || []).filter(function(it){
+    return it.category === "要指導医薬品" || it.category === "第1類医薬品";
+  }).length;
+}
+function checkSenmon_(){
+  const n = senmonCount_();
+  const owned = senmonOwned_();
+  for (let i = 0; i < SENMON_MATES.length; i++){
+    if (n >= SENMON_NEED[i] && owned.indexOf(SENMON_MATES[i]) < 0){
+      addMate_(SENMON_MATES[i], "senmonMates", "senmon", "要指導・第1類 " + SENMON_NEED[i] + "品目");
+      return;
+    }
+  }
+}
+// 新しい商品を登録したときのレア抽選
 function tryBonusMate_(){
-  const rOwned = rareOwned_();
-  const rRest = RARE_MATES.filter(function(k){ return rOwned.indexOf(k) < 0; });
-  if (rRest.length && Math.random() < RARE_CHANCE){
-    const got = rRest[Math.floor(Math.random() * rRest.length)];
-    S.rareMates = rOwned.concat([got]);
-    save();
-    return { kind: "rare", key: got };
-  }
-  const gOwned = gotouchiOwned_();
-  const gRest = GOTOUCHI_MATES.filter(function(k){ return gOwned.indexOf(k) < 0; });
-  if (gRest.length && Math.random() < GOTOUCHI_CHANCE){
-    const got = gRest[Math.floor(Math.random() * gRest.length)];
-    S.gotouchiMates = gOwned.concat([got]);
-    save();
-    return { kind: "gotouchi", key: got };
-  }
-  return null;
+  const owned = rareOwned_();
+  const rest = RARE_MATES.filter(function(k){ return owned.indexOf(k) < 0; });
+  if (!rest.length || Math.random() > RARE_CHANCE) return null;
+  const got = rest[Math.floor(Math.random() * rest.length)];
+  S.rareMates = owned.concat([got]);
+  mateMeta_(got);
+  save();
+  return { kind: "rare", key: got };
 }
 function dotStage(){
   const n = (S.items || []).length;
@@ -1937,48 +2076,64 @@ function dotStage(){
   else if (mateN < DOT_MATES.length) next = (Math.floor(n / 5) + 1) * 5;
   return { key: key, name: name, n: n, next: next, mateN: mateN, mates: DOT_MATES.slice(0, mateN) };
 }
-function dotSvg(key, px){
+function dotSvg(key, px, lv){
   const rows = DOT_SPRITES[key] || DOT_SPRITES.baby;
   const cell = px / rows.length;   // 12×12でも16×16でも同じ大きさで描ける
+  const rc = function(x, y, w, h, c){
+    return '<rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'" fill="'+c+'"/>';
+  };
   let r = '<svg width="'+px+'" height="'+px+'" viewBox="0 0 '+px+' '+px+'" shape-rendering="crispEdges">';
   for (let y = 0; y < rows.length; y++){
     for (let x = 0; x < rows[y].length; x++){
       const c = DOT_PAL[rows[y][x]];
-      if (c) r += '<rect x="'+(x*cell)+'" y="'+(y*cell)+'" width="'+cell+'" height="'+cell+'" fill="'+c+'"/>';
+      if (c) r += rc(x*cell, y*cell, cell, cell, c);
     }
+  }
+  // なついた度合いを右下の小さな星であらわす
+  if (lv >= 2){
+    const col = lv >= 3 ? DOT_PAL.G : DOT_PAL.M;
+    const bx = px - cell*3.2, by = px - cell*3.2;
+    r += rc(bx+cell, by, cell, cell, DOT_PAL.K)
+       + rc(bx, by+cell, cell*3, cell, DOT_PAL.K)
+       + rc(bx+cell, by+cell*2, cell, cell, DOT_PAL.K)
+       + rc(bx+cell, by+cell*0.35, cell, cell*2.3, col)
+       + rc(bx+cell*0.35, by+cell, cell*2.3, cell, col);
   }
   return r + '</svg>';
 }
 let __lastDotKey = null, __lastMateN = null;
 const PARTY_SHOW = 3;   // ヘッダーに並べるなかまの上限(それ以上は「他N」表示)
+function allMates_(){
+  const st = dotStage();
+  return rareOwned_().map(function(k){ return { k: k, c: "rare" }; })
+    .concat(senmonOwned_().map(function(k){ return { k: k, c: "senmon" }; }))
+    .concat(gotouchiOwned_().map(function(k){ return { k: k, c: "gotouchi" }; }))
+    .concat(st.mates.map(function(k){ return { k: k, c: "" }; }));
+}
 function renderDotPet(){
   const el = document.getElementById("dot-pet");
   if (!el) return;
   const st = dotStage();
-  const rares = rareOwned_(), goto_ = gotouchiOwned_();
-  // 珍しい順に並べ、ヘッダーには数体だけ出す(残りは +N)
-  const line = rares.map(function(k){ return { k: k, c: "rare" }; })
-    .concat(goto_.map(function(k){ return { k: k, c: "gotouchi" }; }))
-    .concat(st.mates.map(function(k){ return { k: k, c: "" }; }));
+  const line = allMates_();
+  const gs = genkiState_();
   let h = '<span class="pet-unit">' + dotSvg(st.key, 30) + '</span>';
   line.slice(0, PARTY_SHOW).forEach(function(o){
-    h += '<span class="pet-unit ' + o.c + '">' + dotSvg(o.k, 22) + '</span>';
+    h += '<span class="pet-unit ' + o.c + '">' + dotSvg(o.k, 22, mateLv_(o.k)) + '</span>';
   });
   const rest = line.length - PARTY_SHOW;
   if (rest > 0) h += '<span class="mate-more">+' + rest + '</span>';
   el.innerHTML = h;
-  el.title = st.name + "(" + st.n + "品目) / なかま 全" + line.length + "体"
-    + (goto_.length ? " (ごとうち " + goto_.length + ")" : "")
-    + (rares.length ? " (レア " + rares.length + ")" : "");
+  el.className = "dot-pet" + (gs.key === "nemuri" ? " sleepy" : (gs.key === "guttari" ? " weak" : ""));
+  el.title = st.name + "(" + st.n + "品目) / なかま " + line.length + "体 / " + gs.label;
   const grew = __lastDotKey && __lastDotKey !== st.key;
-  const joined = __lastMateN !== null && st.mateN > __lastMateN;
+  const joined = __lastMateN !== null && line.length > __lastMateN;
   if (grew || joined){
     el.classList.remove("bounce"); void el.offsetWidth; el.classList.add("bounce");
     if (navigator.vibrate) navigator.vibrate(30);
-    toast(grew ? "「" + st.name + "」に成長した!" : "「" + DOT_NAMES[st.mates[st.mateN-1]] + "」が なかまに なった!");
+    if (grew) toast("「" + st.name + "」に成長した!");
   }
   __lastDotKey = st.key;
-  __lastMateN = st.mateN;
+  __lastMateN = line.length;
 }
 function bonusGetEffect_(got){
   const el = document.getElementById("dot-pet");
@@ -1988,9 +2143,8 @@ function bonusGetEffect_(got){
     setTimeout(function(){ el.classList.remove("rare-pop"); }, 1600);
   }
   if (navigator.vibrate) navigator.vibrate(got.kind === "rare" ? [40,60,120] : [30,50]);
-  toast(got.kind === "rare"
-    ? "★レア★ 「" + DOT_NAMES[got.key] + "」が なかまに なった!"
-    : "ごとうち! 「" + DOT_NAMES[got.key] + "」が なかまに なった!");
+  const head = got.kind === "rare" ? "★レア★ " : (got.kind === "senmon" ? "せんもんしょく! " : "ごとうち! ");
+  toast(head + "「" + DOT_NAMES[got.key] + "」が なかまに なった!" + (got.note ? "(" + got.note + ")" : ""));
 }
 // ときどき キャラが勝手に動く
 const PET_ACTS = ["act-jump","act-wiggle","act-spin","act-squash","act-peek"];
@@ -2017,45 +2171,64 @@ function startPetIdle_(){
 function openPartyModal(){
   const st = dotStage();
   const box = document.getElementById("party-modal-body");
-  // 現在のパーティ(主人公+なかま+これから増える空き枠)
-  let stage = '<div class="party-stage">' + dotSvg(st.key, 40);
-  st.mates.forEach(function(k){ stage += dotSvg(k, 30); });
-  gotouchiOwned_().forEach(function(k){ stage += '<span class="goto-glow">' + dotSvg(k, 30) + '</span>'; });
-  rareOwned_().forEach(function(k){ stage += '<span class="rare-glow">' + dotSvg(k, 30) + '</span>'; });
-  for (let i = st.mateN; i < DOT_MATES.length; i++) stage += '<span class="party-slot">' + dotSvg("slot", 30) + '</span>';
+  const gs = genkiState_();
+  const g = genki_();
+
+  // 舞台
+  let stage = '<div class="party-stage' + (gs.key === "nemuri" ? " sleepy" : "") + '">' + dotSvg(st.key, 40);
+  allMates_().forEach(function(o){
+    stage += '<span class="' + (o.c ? o.c + "-glow" : "") + '">' + dotSvg(o.k, 30, mateLv_(o.k)) + '</span>';
+  });
   stage += '</div>';
-  // 説明文
+
+  // げんきゲージ
+  const gauge = '<div class="genki-box">'
+    + '<div class="genki-row"><span>げんき</span>'
+    + '<span class="genki-bar"><i style="width:' + g + '%;background:' + gs.color + '"></i></span>'
+    + '<b style="color:' + gs.color + '">' + gs.label + '</b></div>'
+    + '<div class="genki-note">' + (gs.key === "nemuri"
+        ? "しばらく使わなかったので、みんな眠ってしまいました。商品を登録すると目を覚まします。"
+        : (g < 40 ? "しばらく開いていないと元気がなくなります。使うと回復します。"
+                  : "アプリを使うほど元気になります。")) + '</div>'
+    + '<div class="genki-note">いっしょに過ごした日数: ' + careDays_() + ' 日</div></div>';
+
+  // 主人公の状況
   let msg;
-  if (st.n < 20){
-    msg = '<b>' + esc(st.name) + '</b>(' + st.n + '品目) — あと <b>' + (st.next - st.n) + '</b> 品目で成長します。20品目で ゆうしゃ になり、そこから なかま が増えていきます。';
-  } else if (st.next){
-    msg = '<b>ゆうしゃ</b> と なかま <b>' + st.mateN + '</b> 体(全' + DOT_MATES.length + '体) — あと <b>' + (st.next - st.n) + '</b> 品目で新しい なかま が加わります。';
-  } else {
-    msg = '<b>ゆうしゃ</b> と なかま 全' + DOT_MATES.length + '体がそろいました!';
-  }
-  // なかま一覧(未加入は「?」で伏せる)
-  const list = DOT_MATES.map(function(k, i){
-    return i < st.mateN
-      ? '<span class="mate-chip">' + dotSvg(k, 22) + esc(DOT_NAMES[k]) + '</span>'
-      : '<span class="mate-chip yet">' + dotSvg("slot", 22) + '？</span>';
-  }).join("");
-  const rares = rareOwned_(), goto_ = gotouchiOwned_();
+  if (st.n < 20) msg = '<b>' + esc(st.name) + '</b>(' + st.n + '品目) — あと <b>' + (st.next - st.n) + '</b> 品目で成長します。';
+  else if (st.next) msg = '<b>ゆうしゃ</b> — あと <b>' + (st.next - st.n) + '</b> 品目で おくすりのなかま が増えます。';
+  else msg = '<b>ゆうしゃ</b> — おくすりのなかま は全員そろいました!';
+
+  const chip = function(k, owned, cls){
+    if (!owned) return '<span class="mate-chip yet">' + dotSvg("slot", 22) + '？</span>';
+    const lv = mateLv_(k);
+    return '<span class="mate-chip ' + cls + '" title="' + mateLvLabel_(lv) + '">'
+      + dotSvg(k, 22, lv) + esc(DOT_NAMES[k])
+      + '<i class="lv">' + (lv >= 3 ? "★★" : lv >= 2 ? "★" : "") + '</i></span>';
+  };
   const group = function(title, keys, owned, cls, note){
     return '<div class="divider"><span>' + title + ' ' + owned.length + '/' + keys.length + '</span></div>'
-      + '<div class="mate-list">' + keys.map(function(k){
-          return owned.indexOf(k) >= 0
-            ? '<span class="mate-chip ' + cls + '">' + dotSvg(k, 22) + esc(DOT_NAMES[k]) + '</span>'
-            : '<span class="mate-chip yet">' + dotSvg("slot", 22) + '？</span>';
-        }).join("") + '</div>'
+      + '<div class="mate-list">' + keys.map(function(k){ return chip(k, owned.indexOf(k) >= 0, cls); }).join("") + '</div>'
       + (note ? '<p class="hint">' + note + '</p>' : '');
   };
-  box.innerHTML = stage + '<p class="party-text">' + msg + '</p>'
+
+  // やってみようリスト
+  const rest = QUESTS.filter(function(q){ return !questDone_(q.id); });
+  const quest = '<div class="divider"><span>やってみよう ' + (QUESTS.length - rest.length) + '/' + QUESTS.length + '</span></div>'
+    + (rest.length
+        ? '<ul class="quest-list">' + rest.map(function(q){ return '<li>' + esc(q.label) + '</li>'; }).join("") + '</ul>'
+          + '<p class="hint">ひとつ試すごとに、ごとうちのなかまが1体やってきます。</p>'
+        : '<p class="hint">ぜんぶ試しました!ごとうちのなかまが勢ぞろいです。</p>');
+
+  const sn = senmonCount_();
+  const senmonNote = "要指導医薬品・第1類医薬品の在庫が " + SENMON_NEED.join("・") + " 品目に届くと1体ずつ加わります(いま " + sn + " 品目)。";
+
+  box.innerHTML = stage + gauge + '<p class="party-text">' + msg + '</p>'
     + '<div class="divider"><span>おくすりのなかま ' + st.mateN + '/' + DOT_MATES.length + '</span></div>'
-    + '<div class="mate-list">' + list + '</div>'
-    + group("ごとうちのなかま", GOTOUCHI_MATES, goto_, "gotouchi",
-        "日本各地からやってきます。新しい商品を登録したときにときどき現れます。")
-    + group("レアななかま", RARE_MATES, rares, "rare",
-        "ごくまれにしか現れません。");
+    + '<div class="mate-list">' + DOT_MATES.map(function(k, i){ return chip(k, i < st.mateN, ""); }).join("") + '</div>'
+    + group("せんもんしょくのなかま", SENMON_MATES, senmonOwned_(), "senmon", senmonNote)
+    + group("ごとうちのなかま", GOTOUCHI_MATES, gotouchiOwned_(), "gotouchi", null)
+    + quest
+    + group("レアななかま", RARE_MATES, rareOwned_(), "rare", "新しい商品を登録したとき、ごくまれに現れます。");
   document.getElementById("party-modal").style.display = "flex";
 }
 function closePartyModal(){ document.getElementById("party-modal").style.display = "none"; }
@@ -2209,6 +2382,7 @@ function renderCardSheet_(){
   // バーコードの実寸: カード幅いっぱい(左右3mm余白)に広げ、高さも確保する
   const bcW = Math.max(30, dim.w - 6);
   const bcH = Math.max(11, Math.min(22.85, dim.w * 0.30));
+  if (items.length) doQuest("card");
   sheet.innerHTML = items.map(function(it){
     const m = (S.cardMeta || {})[it.jan] || {};
     const label = m.label || "";
@@ -2237,6 +2411,7 @@ async function cardImageFile(ev, jan){
     const r = await readImageFile_(f, 420);
     cardMeta_(jan).img = r.dataUrl;
     save();
+    doQuest("photo");
     renderCards();
     toast("写真を取り込みました");
   } catch(e){ toast("画像を読み込めませんでした"); }
@@ -2379,6 +2554,7 @@ function applyTheme(){
 }
 function saveTheme(){
   S.theme = document.getElementById("theme-pick").value;
+  doQuest("theme");
   save(); applyTheme();
   syncCardStyleInputs();
   if (printKind === "cards") renderCardSheet_();
@@ -2558,6 +2734,7 @@ function renderTags(){
   requestAnimationFrame(() => requestAnimationFrame(() => {
     const padPx = ((t.pad==null?2:t.pad) * 2 + 2) * 3.78;
     document.querySelectorAll("#print-tags .price-tag").forEach(el => { el.__padPx = padPx; });
+    if (arr.length) doQuest("tag");
     fitTags();
   }));
 }
@@ -2661,6 +2838,7 @@ function savePop(){
     savedAt: today()
   });
   save(); renderSavedPops(); renderPop();
+  doQuest("pop");
   flash("new", "POPを保存しました(下の一覧から呼び出せます)", it.name);
 }
 function togglePopPrint(pid){
@@ -2853,6 +3031,7 @@ async function uploadShare(){
     try { d = JSON.parse(txt); } catch(e3){}
     if (d && d.ok === false) throw new Error(d.error || "server");
     shareMsg("アップロードしました(" + S.items.length + " 品目)。");
+    doQuest("share");
     loadShared();
   } catch(e){
     const m = String(e && e.message || "");
@@ -2938,6 +3117,7 @@ function renderShared(){
 
   // 検索中は全店舗横断の結果を優先
   if (q){
+    if (q.length >= 2) doQuest("search");
     const hits = [];
     for (const ph of sharedData){
       for (const it of (ph.items||[])){
@@ -3070,6 +3250,7 @@ function fillLookOptions_(){
   }).join("");
 }
 function bootUi_(){
+  careTick_();
   applyTheme();
   fillLookOptions_();
   updateBrand();
