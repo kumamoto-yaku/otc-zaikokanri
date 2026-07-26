@@ -32,11 +32,20 @@ body { min-height: 100vh; background: var(--hakuji); color: var(--ink); font-fam
   .scan-box { max-width: 560px; }
   #tab-share.active { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; align-items: start; }
 }
-.header { display: flex; align-items: center; justify-content: space-between; padding: 18px 2px 12px; gap: 10px; }
-.dot-pet { margin-left: auto; background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.25); border-radius: 10px; padding: 3px 7px 2px; cursor: pointer; display: flex; align-items: flex-end; gap: 1px; flex-shrink: 0; }
+.header { position: relative; display: flex; align-items: center; justify-content: space-between; padding: 18px 2px 12px; gap: 10px; }
+.dot-pet { margin-left: auto; background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.25); border-radius: 10px; padding: 3px 7px 2px; cursor: pointer; display: flex; align-items: flex-end; gap: 1px; flex-shrink: 0; touch-action: manipulation; -webkit-user-select: none; user-select: none; -webkit-tap-highlight-color: transparent; }
 .dot-pet svg { image-rendering: pixelated; display: block; }
 .dot-pet .mate-more { color: #fff; font-size: 11px; opacity: 0.85; padding: 0 2px 3px; letter-spacing: 0; }
 .dot-pet.bounce { animation: petBounce 0.5s ease; }
+.pet-say { position: absolute; right: 8px; top: 100%; margin-top: 4px; z-index: 60;
+  background: #fff; color: var(--ink); border: 1px solid var(--line); border-radius: 10px;
+  padding: 6px 10px; font-size: 12px; max-width: min(74vw, 300px); line-height: 1.45;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.18); }
+.pet-say::before { content: ""; position: absolute; right: 22px; top: -6px; width: 10px; height: 10px;
+  background: #fff; border-left: 1px solid var(--line); border-top: 1px solid var(--line); transform: rotate(45deg); }
+.pet-say.pop { animation: sayPop 0.28s ease; }
+@keyframes sayPop { 0%{opacity:0;transform:translateY(-4px) scale(0.94)} 100%{opacity:1;transform:none} }
+@media print { .pet-say { display: none !important; } }
 .pet-unit { display: inline-block; line-height: 0; transform-origin: 50% 100%; }
 .pet-unit.rare { filter: drop-shadow(0 0 3px rgba(255,216,77,0.95)); }
 .act-jump   { animation: aJump 0.9s ease; }
@@ -457,7 +466,8 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
         <p class="brand-sub" id="brand-sub">商品の登録・値札・備蓄共有</p>
       </div>
     </div>
-    <button class="dot-pet" id="dot-pet" onclick="openPartyModal()" aria-label="なかまを見る"></button>
+    <button class="dot-pet" id="dot-pet" aria-label="なかまをなでる(2回タップ、または長押しでなかま画面)"></button>
+    <div class="pet-say" id="pet-say" style="display:none"></div>
   </header>
 
   <nav class="tabs" role="tablist">
@@ -821,7 +831,7 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
   </section>
 
   <div class="toast" id="toast"></div>
-  <footer class="foot">OTCLinker Pro — とみながグループ 店舗向けツール<br><span class="ver">版 2026-07-25 Z(白衣の勇者・名前・動き)</span></footer>
+  <footer class="foot">OTCLinker Pro — とみながグループ 店舗向けツール<br><span class="ver">版 2026-07-26 AB(タップ判定の修正)</span></footer>
 </div>
 
 <script>
@@ -2031,6 +2041,9 @@ function careTick_(){
     // 眠ってしまった場合は、開いただけでは起きない(商品登録などの「お世話」で目を覚ます)
     if (c.genki > 0) c.genki = Math.min(100, c.genki + 25);
     c.days = c.days + 1;
+    const p = pet_();
+    p.streak = (gap === 1) ? (p.streak || 1) + 1 : 1;   // 毎日ひらくと連続記録がのびる
+    p.best = Math.max(p.best || 1, p.streak);
     c.last = t;
     save();
   }
@@ -2314,7 +2327,8 @@ function renderDotPet(){
   if (rest > 0) h += '<span class="mate-more">+' + rest + '</span>';
   el.innerHTML = h;
   el.className = "dot-pet" + (gs.key === "nemuri" ? " sleepy" : (gs.key === "guttari" ? " weak" : ""));
-  el.title = st.name + "(" + st.n + "品目) / なかま " + line.length + "体 / " + gs.label;
+  const hn = pet_().heroName;
+  el.title = (hn ? hn + "(" + st.name + ")" : st.name) + "(" + st.n + "品目) / なかま " + line.length + "体 / " + gs.label;
   const grew = __lastDotKey && __lastDotKey !== st.key;
   const joined = __lastMateN !== null && line.length > __lastMateN;
   if (grew || joined){
@@ -2335,6 +2349,136 @@ function bonusGetEffect_(got){
   if (navigator.vibrate) navigator.vibrate(got.kind === "rare" ? [40,60,120] : [30,50]);
   const head = got.kind === "rare" ? "★レア★ " : (got.kind === "senmon" ? "せんもんしょく! " : "ごとうち! ");
   toast(head + "「" + DOT_NAMES[got.key] + "」が なかまに なった!" + (got.note ? "(" + got.note + ")" : ""));
+}
+/* ===== なでる・話しかける ===== */
+function pet_(){
+  S.pet = S.pet || { pats: 0, patDay: "", streak: 1, best: 1, heroName: "" };
+  return S.pet;
+}
+const PAT_LIMIT = 5;          // なでてげんきになるのは1日5回まで
+// 状況に合わせたひとこと(困りごとがあれば教えてくれる)
+function petLine_(){
+  const st = dotStage(), gs = genkiState_(), p = pet_();
+  const h = new Date().getHours();
+  const nm = p.heroName ? p.heroName : st.name;
+  if (gs.key === "nemuri") return ["zzz……", "sleep"];
+  if (gs.key === "guttari" || gs.key === "yowari") return ["ちょっと つかれたよ……", "shy"];
+
+  // 期限のことを教えてくれる
+  let expired = 0, soon = 0;
+  (S.items || []).forEach(function(it){
+    const lv = expiryLevel(it.expiry);
+    if (lv === "expired") expired++;
+    else if (lv === "m3") soon++;
+  });
+  const pool = [];
+  if (expired) pool.push(["きげんぎれが " + expired + "こ あるみたい……", "shock"]);
+  if (soon) pool.push(["もうすぐ きげんの おくすりが " + soon + "こ あるよ", "peek"]);
+  const restQ = QUESTS.filter(function(q){ return !questDone_(q.id); });
+  if (restQ.length) pool.push(["まだ ためしてない きのうが " + restQ.length + "こ あるよ!", "float"]);
+  if (st.next) pool.push(["あと " + (st.next - st.n) + " ひんもくで なにか おこるよ!", "jump"]);
+  if (p.streak >= 3) pool.push([p.streak + "にち れんぞく!" + (p.streak >= 7 ? " すごい!" : ""), "jump"]);
+
+  // ふだんのひとこと
+  const chat = [
+    [h < 11 ? "おはよう!きょうも がんばろう" : (h < 17 ? "おつかれさま!" : "きょうも おつかれさま"), "wiggle"],
+    ["きょうの ざいこは " + (S.items || []).length + " ひんもくだね", "float"],
+    [nm + "は げんきです!", "jump"],
+    ["なでてくれて ありがとう", "shy"],
+    ["おくすり だいすき!", "spin"],
+    ["きょうの ふくそう、にあってる?", "wiggle"],
+    ["なかまが " + allMates_().length + "たい あつまったよ", "jump"],
+    ["ちょっと ねむい……", "sleep"],
+    ["いっしょに " + careDays_() + "にち すごしたね", "float"]
+  ];
+  const all = pool.concat(chat, chat);   // 困りごとは出やすく、雑談は控えめに
+  return all[Math.floor(Math.random() * all.length)];
+}
+function renameHero(){
+  const p = pet_();
+  const cur = p.heroName || "";
+  const v = prompt("主人公のなまえをつけてください(空にすると元に戻ります)", cur);
+  if (v === null) return;
+  p.heroName = v.trim().slice(0, 12);
+  save();
+  renderDotPet(); openPartyModal();
+  toast(p.heroName ? "「" + p.heroName + "」になりました!" : "なまえを元に戻しました");
+}
+function petSay_(text){
+  const box = document.getElementById("pet-say");
+  if (!box) return;
+  box.textContent = text;
+  box.style.display = "block";
+  box.classList.remove("pop"); void box.offsetWidth; box.classList.add("pop");
+  clearTimeout(box._tm);
+  box._tm = setTimeout(function(){ box.style.display = "none"; }, 2800);
+}
+/* タップの判定
+   iOSはクリックを約300ミリ秒遅らせて送るため、クリックだけで数えると
+   2回タップに間に合わない。指が触れた瞬間(pointerdown)を直接数える。 */
+let __petTapN = 0, __petTapTimer = null, __petPressTimer = null, __petLong = false;
+const PET_DOUBLE_MS = 420;     // 2回タップとみなす間隔
+const PET_LONG_MS = 600;       // 長押しでも なかま画面をひらく
+function petOpenParty_(){
+  __petTapN = 0;
+  clearTimeout(__petTapTimer); clearTimeout(__petPressTimer);
+  const box = document.getElementById("pet-say");
+  if (box) box.style.display = "none";
+  openPartyModal();
+}
+function petTap(){ petPat_(); }        // 従来の呼び出し用に残す
+function setupPetTaps_(){
+  const el = document.getElementById("dot-pet");
+  if (!el || el.__tapReady) return;
+  el.__tapReady = true;
+  const down = function(){
+    __petLong = false;
+    clearTimeout(__petPressTimer);
+    __petPressTimer = setTimeout(function(){ __petLong = true; petOpenParty_(); }, PET_LONG_MS);
+  };
+  const up = function(e){
+    clearTimeout(__petPressTimer);
+    if (e && e.preventDefault) e.preventDefault();
+    if (__petLong){ __petLong = false; return; }
+    __petTapN++;
+    if (__petTapN === 1){
+      __petTapTimer = setTimeout(function(){ __petTapN = 0; petPat_(); }, PET_DOUBLE_MS);
+    } else {
+      petOpenParty_();
+    }
+  };
+  if (window.PointerEvent){
+    el.addEventListener("pointerdown", down);
+    el.addEventListener("pointerup", up);
+    el.addEventListener("pointercancel", function(){ clearTimeout(__petPressTimer); });
+  } else {
+    el.addEventListener("touchstart", down, { passive: true });
+    el.addEventListener("touchend", up);
+    el.addEventListener("mousedown", down);
+    el.addEventListener("mouseup", up);
+  }
+  // 指の操作で処理済みなので、あとから届くクリックは無視する
+  el.addEventListener("click", function(e){ e.preventDefault(); e.stopPropagation(); });
+}
+// なでる:反応してくれて、1日5回まで少し元気になる
+function petPat_(){
+  const p = pet_(), t = today();
+  if (p.patDay !== t){ p.patDay = t; p.pats = 0; }
+  const line = petLine_();
+  const units = petUnits_();
+  if (units.length){
+    const u = units[Math.floor(Math.random() * units.length)];
+    clearActs_(u); void u.offsetWidth;
+    u.classList.add("act-" + line[1]);
+    setTimeout(function(){ clearActs_(u); }, 1800);
+  }
+  if (p.pats < PAT_LIMIT && genkiState_().key !== "nemuri"){
+    p.pats++;
+    careFeed_(2);
+    save();
+  }
+  petSay_(line[0]);
+  if (navigator.vibrate) navigator.vibrate(12);
 }
 // ときどき キャラが勝手に動く(ひとりの動き)
 const PET_ACTS = ["act-jump","act-wiggle","act-spin","act-squash","act-peek",
@@ -2406,14 +2550,17 @@ function openPartyModal(){
         ? "しばらく使わなかったので、みんな眠ってしまいました。商品を登録すると目を覚まします。"
         : (g < 40 ? "しばらく開いていないと元気がなくなります。使うと回復します。"
                   : "アプリを使うほど元気になります。")) + '</div>'
-    + '<div class="genki-note">いっしょに過ごした日数: ' + careDays_() + ' 日</div>'
+    + '<div class="genki-note">いっしょに過ごした日数: ' + careDays_() + ' 日 ／ れんぞく ' + (pet_().streak||1) + ' 日(さいこう記録 ' + (pet_().best||1) + ' 日)</div>'
+    + '<div class="genki-note">なまえ: <b>' + esc(pet_().heroName || st.name) + '</b> <button class="link" onclick="renameHero()">なまえをつける</button></div>'
+    + '<div class="genki-note">キャラを1回タップでなでる・2回タップまたは長押しでこの画面がひらきます。</div>'
     + '<div class="genki-note">画面右上に出すなかまは、下の一覧をタップして最大' + PET_PICK_MAX + '体まで選べます'
     + (petPicks_().length ? ' <button class="link" onclick="clearPetPick()">おまかせに戻す</button>' : '(いまはおまかせ表示)') + '</div>'
     + '<div class="genki-note">きょうの衣装: ' + (DECOS[seasonDeco_()] || "—") + 'の季節です。日によって着替えます。</div></div>';
 
   // 主人公の状況
   let msg;
-  if (st.n < 20) msg = '<b>' + esc(st.name) + '</b>(' + st.n + '品目) — あと <b>' + (st.next - st.n) + '</b> 品目で成長します。';
+  const hn2 = pet_().heroName;
+  if (st.n < 20) msg = '<b>' + esc(hn2 || st.name) + '</b>(' + esc(st.name) + '・' + st.n + '品目) — あと <b>' + (st.next - st.n) + '</b> 品目で成長します。';
   else if (st.next) msg = '<b>白衣のゆうしゃ</b> — あと <b>' + (st.next - st.n) + '</b> 品目で おくすりのなかま が増えます。';
   else msg = '<b>白衣のゆうしゃ</b> — おくすりのなかま は全員そろいました!';
 
@@ -3478,6 +3625,7 @@ function fillLookOptions_(){
 }
 function bootUi_(){
   careTick_();
+  setupPetTaps_();
   applyTheme();
   fillLookOptions_();
   updateBrand();
