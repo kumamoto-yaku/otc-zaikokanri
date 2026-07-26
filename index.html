@@ -49,6 +49,20 @@ body { min-height: 100vh; background: var(--hakuji); color: var(--ink); font-fam
 @keyframes aSpin { 0%{transform:rotateY(0)} 50%{transform:rotateY(180deg)} 100%{transform:rotateY(360deg)} }
 @keyframes aSquash { 0%,100%{transform:scale(1,1)} 30%{transform:scale(1.18,0.8)} 55%{transform:scale(0.9,1.14)} 80%{transform:scale(1.05,0.96)} }
 @keyframes aPeek { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-5px) rotate(-8deg)} 60%{transform:translateX(5px) rotate(8deg)} }
+.act-vanish { animation: aVanish 1.6s ease; }
+.act-roll   { animation: aRoll 1.2s ease; }
+.act-shy    { animation: aShy 1.3s ease; }
+.act-sleep  { animation: aSleep 1.8s ease; }
+.act-dash   { animation: aDash 1.1s ease; }
+.act-shock  { animation: aShock 0.8s ease; }
+.act-float  { animation: aFloat 1.6s ease-in-out; }
+@keyframes aVanish { 0%{opacity:1;transform:scale(1)} 18%{opacity:0;transform:scale(0.5) rotate(20deg)} 62%{opacity:0;transform:scale(0.5)} 80%{opacity:1;transform:scale(1.18)} 100%{opacity:1;transform:scale(1)} }
+@keyframes aRoll { 0%{transform:translateX(0) rotate(0)} 40%{transform:translateX(-10px) rotate(-200deg)} 100%{transform:translateX(0) rotate(-360deg)} }
+@keyframes aShy { 0%,100%{transform:translateY(0)} 30%{transform:translateY(4px) scale(0.92,0.9)} 70%{transform:translateY(2px) scale(0.96,0.95)} }
+@keyframes aSleep { 0%,100%{transform:rotate(0)} 30%{transform:rotate(-12deg) translateY(2px)} 65%{transform:rotate(-12deg) translateY(2px)} }
+@keyframes aDash { 0%{transform:translateX(0)} 30%{transform:translateX(9px) skewX(-12deg)} 60%{transform:translateX(-6px) skewX(6deg)} 100%{transform:translateX(0)} }
+@keyframes aShock { 0%,100%{transform:translate(0,0)} 20%{transform:translate(-2px,-3px)} 40%{transform:translate(3px,1px)} 60%{transform:translate(-3px,2px)} 80%{transform:translate(2px,-2px)} }
+@keyframes aFloat { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-6px)} }
 .dot-pet.rare-pop { animation: rarePop 1.5s ease; }
 @keyframes rarePop { 0%{transform:scale(1)} 15%{transform:scale(1.35) rotate(-6deg)} 30%{transform:scale(1.1) rotate(5deg)} 45%{transform:scale(1.25)} 60%{transform:scale(1)} 100%{transform:scale(1)} }
 .rare-glow { display: inline-block; line-height: 0; filter: drop-shadow(0 0 4px rgba(255,216,77,0.95)); }
@@ -75,7 +89,7 @@ button.mate-chip { cursor: pointer; font-family: var(--sans); }
 .quest-list li::before { content: "□ "; color: #9AA7AF; }
 .mate-chip.rare { border-color: #E3C65A; background: #FFFBEC; }
 @media (prefers-reduced-motion: reduce) {
-  .act-jump,.act-wiggle,.act-spin,.act-squash,.act-peek,.dot-pet.rare-pop { animation: none !important; }
+  .act-jump,.act-wiggle,.act-spin,.act-squash,.act-peek,.act-vanish,.act-roll,.act-shy,.act-sleep,.act-dash,.act-shock,.act-float,.dot-pet.rare-pop { animation: none !important; }
 }
 .party-stage { background: linear-gradient(180deg,#EAF2F7 0%,#DDE9F0 62%,#CFE0D6 62%,#C6DACD 100%); border: 1px solid #C3D3DC; border-radius: 10px; padding: 8px; display: flex; align-items: flex-end; gap: 3px; flex-wrap: wrap; }
 .party-stage svg { image-rendering: pixelated; display: block; }
@@ -807,7 +821,7 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
   </section>
 
   <div class="toast" id="toast"></div>
-  <footer class="foot">OTCLinker Pro — とみながグループ 店舗向けツール<br><span class="ver">版 2026-07-25 Y(全キャラ高精細・衣装改善)</span></footer>
+  <footer class="foot">OTCLinker Pro — とみながグループ 店舗向けツール<br><span class="ver">版 2026-07-25 Z(白衣の勇者・名前・動き)</span></footer>
 </div>
 
 <script>
@@ -1871,9 +1885,9 @@ const DOT_SPRITES = {
   /* --- 主人公の成長 --- */
   baby: ["................................","................................","............KKKK................","...........KKKKKK...............","..........KK....KK..............",".........KKK....KKK.............",".......KKKKKKKKKKKKKK...........",".....KKKKKKKKKKKKKKKKKK.........",".....KKFFFFFFFFFFFFFfKK.........","...KKFFFFFFFFFFFFFFFFFfKK.......","...KKFFFFFFFFFFFFFFFFFfKK.......","..KKFFFffFFFFFFFFFFffFFfKK......","..KKFFfKKfFFFFFFFFfKKfFfKK......","..KKFfKKKKFFFFFFFfKKKKFfKK......","..KKFfKKKKFFFFFFFfKKKKFfKK......","..KKFFfKKFFFFFFFFFfKKFFfKK......","..KKFFFFFFFFFFFFFFFFFFFfKK......","..KKFFFFFFffffffffFFFFFfKK......","..KKfFPPFfKKKKKKKKFFPPFfKK......","...KKFPPFfKKKKKKKKFFPPfKK.......","...KKffFFFFFFFFFFFFFFffKK.......",".....KKffffffffffffffKK.........","......KKKKKKKKKKKKKKKKK.........","......KKKKKKKKKKKKKKKK..........",".....KKAAAAAAAAAAAAAAAAaK.......","...KKAAAAAAAAAAAAAAAAAAAaKK.....","...KKAAAAAAAAAAAAAAAAAAAaKK.....","..KKAAAAAAAAAAAAAAAAAAAAAaKK....","..KKaAAAAAAAAAAAAAAAAAAAAaKK....","...KKaaaaaaaaaaaaaaaaaaaaKK.....","...KKKKKKKKKKKKKKKKKKKKKKKK.....",".....KKKKKKKKKKKKKKKKKKKK......."],
   child: ["................................","................................",".........KKKKKKKKKK.............",".......KKKKKKKKKKKKKK...........",".......KKNNNNNNNNNnKK...........",".....KKNNNNNNNNNNNNNnKK.........",".....KKNNNNNNNNNNNNNnKK.........","....KKNNNNNNNNNNNNNNNnKK........","....KKNNNFFFFFFFFFFNNnKK........","....KKNFffffFFFFffffFnKK........","....KKFfKKKKFFFfKKKKFfKK........","....KKFfKKKKFFFfKKKKFfKK........","....KKFFFFFFFFFFFFFFFfKK........","....KKFFFFffffffffFFFfKK........","....KKfFFfKKKKKKKKFFFfKK........",".....KKFFfKKKKKKKKFFfKK.........","......KfFFFFFFFFFFFFfK..........","......KKFFFFFFFFFFFfKK..........",".....KKKEEEEEEEEEEEeKKK.........","...KKKKKEEEEEEEEEEEeKKKKK.......","...KFfKKEEEEEEEEEEEeKKFfK.......","..KKFfKKEEEEEEEEEEEeKKFfKK......","..KKFfKKEEEEEEEEEEEeKKFfKK......","..KKffKKEEEEEEEEEEEeKKffKK......","..KKKKKKEEEEEEEEEEEeKKKKKK......","...KKKKKEEEEEEEEEEEeKKKKK.......",".....KKKEEEEEEEEEEEeKKK.........","......KKEEEEeeeeEEEeKK..........","......KKnNNnKKKKnNNnKK..........",".....KKKKnnKKKKKKnnKKKK.........","....KKKKKKKKK..KKKKKKKKK........","....KKKKKKK......KKKKKKK........"],
-  apprentice: ["........................KK......",".......................KKKK.....",".........KKKKKKKKKK....KNnK.....",".......KKKKKKKKKKKKK..KKNnKK....",".......KKNNNNNNNNNnKKKKKNnKK....",".....KKKNNNNNNNNNNNnKKKKNnKK....",".....KKRRRRRRRRRRRRRrKKKNnKK....","....KKRRRRRRRRRRRRRRRrKKNnKK....","....KKNNFFFFFFFFFFFFNnKKNnKK....","....KKNFffffFFFFffffFnKKNnKK....","....KKFfKKKKFFFfKKKKFfKKNnKK....","....KKFfKKKKFFFfKKKKFfKKNnKK....","....KKFFFFFFFFFFFFFFFfKKNnKK....","....KKFFFFffffffffFFFfKKNnKK....","....KKfFFfKKKKKKKKFFFfKKNnKK....",".....KKFFfKKKKKKKKFFfKKNNnK.....","......KfFFFFFFFFFFFFfKNNnKK.....","......KKFFFFFFFFFFFfKKnnK.......",".....KKKTTTTTTTTTTTtKKKK........","...KKKKKTTTTTTTTTTTtKKKK........","...KFfKKTTTTTTTTTTTtKKFfK.......","..KKFfKKTTTTTTTTTTTtKKFfKK......","..KKFfKKTTTTTTTTTTTtKKFfKK......","..KKffKKTTTTTTTTTTTtKKffKK......","..KKKKKKTTTTTTTTTTTtKKKKKK......","...KKKKKTTTTTTTTTTTtKKKKK.......",".....KKKTTTTTTTTTTTtKKK.........","......KKTTTTttttTTTtKK..........","......KKnNNnKKKKnNNnKK..........",".....KKKKnnKKKKKKnnKKKK.........","....KKKKKKKKK..KKKKKKKKK........","....KKKKKKK......KKKKKKK........"],
-  warrior: ["........................KK......",".......................KKKK.....",".......KKKKKKKKKKKK....KSsK.....",".....KKKKKKKKKKKKKKK..KKSsKK....",".....KKSSSSSSSSSSSsKKKKKSsKK....","....KKSSSSSSSSSSSSSSsKKKSsKK....","....KKSSSSSSSSSSSSSSsKKKSsKK....","....KKSSSSSSSSSSSSSSSsKKSsKK....","....KKSSSFFFFFFFFFFSSsKKSsKK....","....KKSFffffFFFFffffFsKKSsKK....","....KKFfKKKKFFFfKKKKFfKKSsKK....","....KKFfKKKKFFFfKKKKFfKKSsKK....","....KKFFFFFFFFFFFFFFFfKKSsKK....","....KKFFFFFffffffFFFFfKKSsKK....","....KKfFFFfKKKKKKfFFFfKKNnKK....",".....KKfFfKKKKKKKKFFfKKNNnK.....","......KKSSSSSSSSSSSsKKNNnKK.....","......KKSSSSSSSSSSSsKKnnK.......",".....KKKSSSSSSSSSSSsKKKK........","...KKKKKSSSSSSSSSSSsKKKK........","...KSsKKSSSSSSSSSSSsKKSsK.......","..KKSsKKSSSSSSSSSSSsKKSsKK......","..KKSsKKSSSSGGGGSSSsKKSsKK......","..KKssKKSSSSGGGGSSSsKKssKK......","..KKKKKKSSSSSSSSSSSsKKKKKK......","...KKKKKSSSSSSSSSSSsKKKKK.......",".....KKKSSSSSSSSSSSsKKK.........","......KKSSSSssssSSSsKK..........","......KKnNNnKKKKnNNnKK..........",".....KKKKnnKKKKKKnnKKKK.........","....KKKKKKKKK..KKKKKKKKK........","....KKKKKKK......KKKKKKK........"],
-  hero: ["......Gg....Gg....Gg....KK......","......GGg..GGGg..GGGg..KKK......",".....KGGGGGGGGGGGGGGGgKKKKGgK...","....KKGGGGGGGGGGGGGGGgKKKKGgKK..","....KKGGGGGGGGGGGGGGGgKKKKGgKK..","....KKGGGGGGGGGGGGGGGgKKKKGgKK..","....KKGGGFFFFFFFFFFGGgKKKKGgKK..","....KKGFffffFFFFffffFgKKKKGgKK..","....KKFfKKKKFFFfKKKKFfKKKKGgKK..","....KKFfKKKKFFFfKKKKFfKKKKGgKK..","....KKFFFFFFFFFFFFFFFfKKKKGgKK..","....KKFFFFFffffffFFFFfKKKKGgKK..","....KKfFFFfKKKKKKfFFFfKKKKNnKK..","....KKKfFfKKKKKKKKFFfKKKKNNnK...","...hKKKKGGGGGGGGGGGgKKKKNNnKK...",".HHhKKKGGGGGGGGGGGGGgKKKnnK.....",".HHhKKKGGGGGGGGGGGGGgKKKKKK.....","HHHhKKGGGGGGGGGGGGGGGgKKK.......","HHHhKKGGGGGGGWWGGGGGGgKKK.......","HHHhKKGGGGGGWWWWGGGGGgKK........","hHHhKKGGGGGGWWWWGGGGGgKK........",".HHhKKGGGGGGGWWGGGGGGgKK........",".hHhKKgGGGGGGGGGGGGGGgKK........","..HhKKKGGGGGGGGGGGGGgKKK........","..hhKKKgGGGGGGGGGGGGgKKK........","...hKKKKGGGGGGGGGGGgKKKK........","....KKKKGGGGGGGGGGGgKKKK........",".....KKKGGGGggggGGGgKKK.........","......KKnNNnKKKKnNNnKK..........","......KKKnnKKKKKKnnKKK..........","....KKKKKKKKK..KKKKKKKKK........","....KKKKKKK......KKKKKKK........"],
+  apprentice: ["........................KK......",".......................KKKK.....",".........KKKKKKKKKK....KNnK.....",".......KKKKKKKKKKKKK..KKNnKK....",".......KKNNNNNNNNNnKKKKKNnKK....",".....KKKNNNNNNNNNNNnKKKKNnKK....",".....KKRRRRRRRRRRRRRrKKKNnKK....","....KKRRRRRRRRRRRRRRRrKKNnKK....","....KKNNFFFFFFFFFFFFNnKKNnKK....","....KKNFffffFFFFffffFnKKNnKK....","....KKFfKKKKFFFfKKKKFfKKNnKK....","....KKFfKKKKFFFfKKKKFfKKNnKK....","....KKFFFFFFFFFFFFFFFfKKNnKK....","....KKFFFFFffffffFFFFfKKNnKK....","....KKfFFFfKKKKKKfFFFfKKNnKK....",".....KKfFfKKKKKKKKFFfKKNNnK.....","......KKWWWWWWWWWWWwKKNNnKK.....","......KKWWWWWWWWWWWwKKnnK.......",".....KKKWWWWWWWWWWWwKKKK........","...KKKKKWWWWWWWWWWWwKKKK........","...KWwKKWWWWWEEWWWWwKKWwK.......","..KKWwKKWWWWEEEEWWWwKKWwKK......","..KKWwKKWWWWEEEEWWWwKKWwKK......","..KKwwKKWWWWEEEEWWWwKKwwKK......","..KKKKKKWWWWEEEEWWWwKKKKKK......","...KKKKKWWWWWEEWWWWwKKKKK.......",".....KKKWWWWWWWWWWWwKKK.........","......KKWWWWwwwwWWWwKK..........","......KKnNNnKKKKnNNnKK..........",".....KKKKnnKKKKKKnnKKKK.........","....KKKKKKKKK..KKKKKKKKK........","....KKKKKKK......KKKKKKK........"],
+  warrior: ["................................","................................",".........KKKKKKKKKK.............",".......KKKKKKKKKKKKKK...........",".......KKNNNNNNNNNnKK...........",".....KKNNNNNNNNNNNNNnKK.........",".....KKNNNNNNNNNNNNNnKK.........","....KKNNNNNNNNNNNNNNNnKK........","....KKnNNFFFFFFFFFFNNnKK........","....KKKnFFFFffffFFFFnKKK........","....KKKKWWWwKKKKWWWwKKKK........","....KKKKWWWwKKKKWWWwKKKK........","....KKKFFFFFFFFFFFFFfKKK........","....KKFFFFFffffffFFFFfKK........","....KKfFFFfKKKKKKfFFFfKK........",".....KKfFfKKKKKKKKFFfKK.........","......KKWWWWWWWWWWWwKK..........","......KKWWWWWWWWWWWwKK..........",".....KKKWWWWWWWWWWWwKKK.........","...KKKKKWWWWWWWWWWWwKKKKK.......","...KWwKKWWWWWTTWWWWwKKWwK.......","..KKWwKKWWWWTTTTWWWwKKWwKK......","..KKWwKKWWWWTTTTWWWwKKWwKK......","..KKwwKKWWWWWTTWWWWwKKwwKK......","..KKKKKKWWWWWWWWWWWwKKKKKK......","...KKKKKWWWWWWWWWWWwKKKKK.......",".....KKKWWWWWWWWWWWwKKK.........","......KKWWWWwwwwWWWwKK..........","......KKnNNnKKKKnNNnKK..........",".....KKKKnnKKKKKKnnKKKK.........","....KKKKKKKKK..KKKKKKKKK........","....KKKKKKK......KKKKKKK........"],
+  hero: ["......Gg....Gg....Gg....KK......","......GGg..GGGg..GGGg..KKK......",".....KGGGGGGGGGGGGGGGgKKKKGgK...","....KKGGGGGGGGGGGGGGGgKKKKGgKK..","....KKNNNNNNNNNNNNNNNnKKKKGgKK..","....KKNNNNNNNNNNNNNNNnKKKKGgKK..","....KKNNNFFFFFFFFFFNNnKKKKGgKK..","....KKNFffffFFFFffffFnKKKKGgKK..","....KKFfKKKKFFFfKKKKFfKKKKGgKK..","....KKFfKKKKFFFfKKKKFfKKKKGgKK..","....KKFFFFFFFFFFFFFFFfKKKKGgKK..","....KKFFFFFffffffFFFFfKKKKGgKK..","....KKfFFFfKKKKKKfFFFfKKKKNnKK..","....KKKfFfKKKKKKKKFFfKKKKNNnK...","...hKKKKWWWWWWWWWWWwKKKKNNnKK...",".HHhKKKWWWWWWWWWWWWWwKKKnnK.....",".HHhKKKWWWWWWWWWWWWWwKKKKKK.....","HHHhKKWWWWWWWWWWWWWWWwKKK.......","HHHhKKWWWWWGGGGGGWWWWwKKK.......","HHHhKKWWWWGGGGGGGGWWWwKK........","hHHhKKWWWWGGGGGGGGWWWwKK........",".HHhKKWWWWWGGGGGGWWWWwKK........",".hHhKKwWWWWWWWWWWWWWWwKK........","..HhKKKWWWWWWWWWWWWWwKKK........","..hhKKKwWWWWWWWWWWWWwKKK........","...hKKKKWWWWWWWWWWWwKKKK........","....KKKKWWWWWWWWWWWwKKKK........",".....KKKWWWWwwwwWWWwKKK.........","......KKnNNnKKKKnNNnKK..........","......KKKnnKKKKKKnnKKK..........","....KKKKKKKKK..KKKKKKKKK........","....KKKKKKK......KKKKKKK........"],
   /* --- なかま(お薬の剤形) --- */
   tablet: ["................................","................................","..............KK................","..............KK................","..............KK................",".............KKKK...............",".........KKKKKKKKKKKK...........",".......KKKKKKKKKKKKKKKK.........",".......KKWWWWWWWWWWWwKK.........",".....KKWWWWWWWWWWWWWWWwKK.......",".....KKWWWWWWWWWWWWWWWwKK.......","....KKWWWwwwWWWWWWwwwWWwKK......","....KKWWwKKKWWWWWwKKKwWwKK......","....KKWwKKKKWWWWWwKKKKWwKK......","KK..KKWwKKKWWWWWWWwKKKWwKK..KK..","KK..KKWwKKWWWWWWWWWwKKWwKK..KK..","KKKKKKWWWWWWWWWWWWWWWWWwKKKKKK..",".KKKKKWWWWWWwwwwwwWWWWWWwKKKK...",".KKKKKWWWWWwKKKKKKWWWWWWWwKKK...","...KKKWWWWWwKKKKKKWWWWWWWwK.....","...KKKWWWWWWWWWWWWWWWWWWwKK.....","....KKWWWWWWWWWWWWWWWWWwKK......","....KKwWWWWWWWWWWWWWWWWwKK......",".....KKWWWWWWWWWWWWWWWwKK.......",".....KKwwWWWWWWWWWWWWwwKK.......",".......KKwwwwwwwwwwwwKK.........",".......KKKKKKKKKKKKKKKK.........","........KKKKKKKKKKKKKK..........","........KKK........KKK..........",".......KKK..........KKK.........","......KKKK..........KKKK........","......KKK............KKK........"],
   capsule: ["................................","................................",".........KKKKKKKKKKKKKK.........",".......KKKKKKKKKKKKKKKKKK.......",".......KKRRRRRRRRRRRRRrKK.......",".....KKRRRRRRRRRRRRRRRRRrKK.....",".....KKRRRRRRRRRRRRRRRRRrKK.....","....KKRRRRrrRRRRRRRRrrRRRrKK....","....KKRRRrKKRRRRRRRrKKRRRrKK....","....KKRRRrKKRRRRRRRrKKRRRrKK....","....KKRRRrKKRRRRRRRrKKRRRrKK....","....KKRRRrKKRRRRRRRrKKRRRrKK....","....KKrRRRRRRRRRRRRRRRRRRrKK....","....KKKrrrrrrrrrrrrrrrrrrKKK....","....KKKKKKKKKKKKKKKKKKKKKKKK....","....KKKKKKKKKKKKKKKKKKKKKKKK....","KK..KKKCCCCCCCCCCCCCCCCCcKKK..KK","KK..KKCCCCccccccccccccCCCcKK..KK","KKKKKKCCCcKKKKKKKKKKKKcCCcKKKKKK",".KKKKKCCcKKKKKKKKKKKKKKcCcKKKKK.",".KKKKKCcKKCCCCCCCCCCCcKKCcKKKKK.","...KKKCcKKccccccccccccKKCcKKK...","...KKKCCcKKKKKKKKKKKKKKCCcKKK...","....KKCCCcKKKKKKKKKKKKCCCcKK....","....KKcCCCCCCCCCCCCCCCCCCcKK....",".....KKCCCCCCCCCCCCCCCCCcKK.....",".....KKccCCCCCCCCCCCCCCccKK.....",".......KKccccccccccccccKK.......",".......KKKKKKKKKKKKKKKKKK.......","........KKKKKKKKKKKKKKKK........","........KKK..........KKK........","........KK............KK........"],
@@ -1926,16 +1940,16 @@ const DOT_SPRITES = {
   slot: ["........................","........................","...KKKKKKKKKKKKKKKKKK...","..KKKKKKKKKKKKKKKKKKKK..","..KKK..............KKK..","..KK................KK..","..KK................KK..","..KK................KK..","..KK................KK..","..KK................KK..","..KK.......KK.......KK..","..KK......KKKK......KK..","..KK......KKKK......KK..","..KK.......KK.......KK..","..KK................KK..","..KK................KK..","..KK................KK..","..KK................KK..","..KK................KK..","..KKK..............KKK..","..KKKKKKKKKKKKKKKKKKKK..","...KKKKKKKKKKKKKKKKKK...","........................","........................"]
 };
 // 目の高さ(スプライトごとに自動検出。衣装をこの位置に合わせる)
-const DOT_EYE = {"baby": 0.391,"child": 0.328,"apprentice": 0.328,"warrior": 0.328,"hero": 0.266,"tablet": 0.391,"capsule": 0.266,"powder": 0.266,"troche": 0.266,"eyedrop": 0.453,"ointment": 0.391,"patch": 0.266,"tape": 0.266,"syrup": 0.391,"drink": 0.453,"supp": 0.391,"inhaler": 0.391,"inject": 0.391,"g_okigusuri": 0.328,"g_renkon": 0.266,"g_jagaimo": 0.391,"g_ringo": 0.453,"g_gyutan": 0.328,"g_takoyaki": 0.391,"g_yatsuhashi": 0.391,"g_shika": 0.391,"g_momiji": 0.38,"g_udon": 0.453,"g_mentaiko": 0.328,"g_shisa": 0.328,"g2_ichigo": 0.391,"g2_mikan": 0.328,"g2_rakkasei": 0.266,"g2_budou": 0.328,"g2_megane": 0.328,"g2_kiritanpo": 0.391,"g2_soba": 0.453,"g2_ebifly": 0.391,"g2_kibidango": 0.391,"g2_sakuranbo": 0.516,"g2_ocha": 0.453,"g2_konnyaku": 0.266,"s_hakase": 0.328,"s_monshin": 0.266,"s_nyubachi": 0.453,"s_choshinki": 0.391,"r_gold": 0.328,"r_rainbow": 0.266,"r_phantom": 0.453,"slot": 0.396};
+const DOT_EYE = {"baby": 0.391,"child": 0.328,"apprentice": 0.328,"warrior": 0.391,"hero": 0.266,"tablet": 0.391,"capsule": 0.266,"powder": 0.266,"troche": 0.266,"eyedrop": 0.453,"ointment": 0.391,"patch": 0.266,"tape": 0.266,"syrup": 0.391,"drink": 0.453,"supp": 0.391,"inhaler": 0.391,"inject": 0.391,"g_okigusuri": 0.328,"g_renkon": 0.266,"g_jagaimo": 0.391,"g_ringo": 0.453,"g_gyutan": 0.328,"g_takoyaki": 0.391,"g_yatsuhashi": 0.391,"g_shika": 0.391,"g_momiji": 0.38,"g_udon": 0.453,"g_mentaiko": 0.328,"g_shisa": 0.328,"g2_ichigo": 0.391,"g2_mikan": 0.328,"g2_rakkasei": 0.266,"g2_budou": 0.328,"g2_megane": 0.328,"g2_kiritanpo": 0.391,"g2_soba": 0.453,"g2_ebifly": 0.391,"g2_kibidango": 0.391,"g2_sakuranbo": 0.516,"g2_ocha": 0.453,"g2_konnyaku": 0.266,"s_hakase": 0.328,"s_monshin": 0.266,"s_nyubachi": 0.453,"s_choshinki": 0.391,"r_gold": 0.328,"r_rainbow": 0.266,"r_phantom": 0.453,"slot": 0.396};
 // なかまが加わる順番(先に何が来るかは伏せて、加わるたびに名前を発表する)
 const DOT_MATES = ["tablet","capsule","powder","troche","eyedrop","ointment","patch","tape","syrup","drink","supp","inhaler","inject"];
 const DOT_NAMES = {
   // おくすりのなかま
-  tablet:"ジョーダンザイ", capsule:"カプセルホテルマン", powder:"サンザイぐせ",
-  troche:"アナウメトローチ", eyedrop:"メグスリのメグちゃん", ointment:"ナンコウちゅう",
-  patch:"シップウジンライ", tape:"テープカットたいちょう", syrup:"シロップのシロー",
-  drink:"イッキノミドリンコ", supp:"ヤクにたつザヤク", inhaler:"スーハーだいおう",
-  inject:"チューシャイハン",
+  tablet:"ジョーさん", capsule:"カプちゃん", powder:"サンぞう",
+  troche:"トロちゃん", eyedrop:"メグ", ointment:"なん子",
+  patch:"シップくん", tape:"テーちゃん", syrup:"シロちゃん",
+  drink:"ドリンさん", supp:"ザヤくん", inhaler:"キューさん",
+  inject:"チューさん",
   // ごとうちのなかま
   g_okigusuri:"オキグスリのオキタさん", g_renkon:"カラシレンコンヌ", g_jagaimo:"ジャガイモンじゃ",
   g_ringo:"リンゴかじりすけ", g_gyutan:"ギュータンゴ", g_takoyaki:"タコヤキング",
@@ -1946,10 +1960,10 @@ const DOT_NAMES = {
   g2_soba:"ソバニイルヨ", g2_ebifly:"エビフライヤー", g2_kibidango:"キビダンゴロー",
   g2_sakuranbo:"サクランボンボン", g2_ocha:"オチャメなオチャ", g2_konnyaku:"コンニャクロウ",
   // せんもんしょくのなかま
-  s_hakase:"ハクイのハカセ", s_monshin:"モンシンヒョウジョウ",
-  s_nyubachi:"ニュウバチかぶり", s_choshinki:"チョウシンキいてる",
+  s_hakase:"ハカセ", s_monshin:"モンちゃん",
+  s_nyubachi:"バチさん", s_choshinki:"チョウくん",
   // レアなかま
-  r_gold:"ゴールデンカプすけ", r_rainbow:"ニジイロジョーダン", r_phantom:"スケスケビンさん"
+  r_gold:"きんのカプちゃん", r_rainbow:"にじのジョーさん", r_phantom:"すけすけビンさん"
 };
 const GOTOUCHI_MATES = ["g_okigusuri","g_renkon","g_jagaimo","g_ringo","g_gyutan","g_takoyaki",
                         "g_yatsuhashi","g_shika","g_momiji","g_udon","g_mentaiko","g_shisa",
@@ -2139,8 +2153,8 @@ function tryBonusMate_(){
 function dotStage(){
   const n = (S.items || []).length;
   let key, name;
-  if (n >= 20){ key = "hero"; name = "ゆうしゃ"; }
-  else if (n >= 15){ key = "warrior"; name = "せんし"; }
+  if (n >= 20){ key = "hero"; name = "白衣のゆうしゃ"; }
+  else if (n >= 15){ key = "warrior"; name = "やくざいし"; }
   else if (n >= 10){ key = "apprentice"; name = "みならい"; }
   else if (n >= 5){ key = "child"; name = "こども"; }
   else { key = "baby"; name = "あかちゃん"; }
@@ -2322,29 +2336,55 @@ function bonusGetEffect_(got){
   const head = got.kind === "rare" ? "★レア★ " : (got.kind === "senmon" ? "せんもんしょく! " : "ごとうち! ");
   toast(head + "「" + DOT_NAMES[got.key] + "」が なかまに なった!" + (got.note ? "(" + got.note + ")" : ""));
 }
-// ときどき キャラが勝手に動く
-const PET_ACTS = ["act-jump","act-wiggle","act-spin","act-squash","act-peek"];
-function petIdleTick_(){
+// ときどき キャラが勝手に動く(ひとりの動き)
+const PET_ACTS = ["act-jump","act-wiggle","act-spin","act-squash","act-peek",
+                  "act-vanish","act-roll","act-shy","act-sleep","act-dash","act-shock","act-float"];
+// みんなでそろってやる動き
+const PET_GROUP_ACTS = ["act-jump","act-squash","act-wiggle","act-float"];
+function petUnits_(){
   const el = document.getElementById("dot-pet");
-  if (!el) return;
-  const units = el.querySelectorAll(".pet-unit");
+  return el ? el.querySelectorAll(".pet-unit") : [];
+}
+function clearActs_(u){
+  PET_ACTS.forEach(function(c){ u.classList.remove(c); });
+  u.style.animationDelay = "";
+}
+// ひとりが何かする
+function petSolo_(){
+  const units = petUnits_();
   if (!units.length) return;
   const u = units[Math.floor(Math.random() * units.length)];
   const a = PET_ACTS[Math.floor(Math.random() * PET_ACTS.length)];
-  PET_ACTS.forEach(function(c){ u.classList.remove(c); });
-  void u.offsetWidth;
+  clearActs_(u); void u.offsetWidth;
   u.classList.add(a);
-  setTimeout(function(){ u.classList.remove(a); }, 1200);
+  setTimeout(function(){ clearActs_(u); }, 1800);
+}
+// 全員でそろってやる(順番に少しずつ遅らせて波のように)
+function petGroup_(){
+  const units = petUnits_();
+  if (units.length < 2) return;
+  const a = PET_GROUP_ACTS[Math.floor(Math.random() * PET_GROUP_ACTS.length)];
+  [].forEach.call(units, function(u, i){
+    clearActs_(u); void u.offsetWidth;
+    u.style.animationDelay = (i * 0.12) + "s";
+    u.classList.add(a);
+  });
+  setTimeout(function(){ [].forEach.call(petUnits_(), clearActs_); }, 2400);
+}
+function petIdleTick_(){
+  if (genkiState_().key === "nemuri") return;      // 眠っているときは動かない
+  if (Math.random() < 0.25) petGroup_(); else petSolo_();
 }
 function startPetIdle_(){
   if (window.__petTimer) return;
   const loop = function(){
     petIdleTick_();
-    window.__petTimer = setTimeout(loop, 5000 + Math.random() * 7000);
+    window.__petTimer = setTimeout(loop, 4500 + Math.random() * 6000);
   };
-  window.__petTimer = setTimeout(loop, 4000);
+  window.__petTimer = setTimeout(loop, 3500);
 }
 function openPartyModal(){
+  petGroup_();   // 開いたときに全員でひと動き
   const st = dotStage();
   const box = document.getElementById("party-modal-body");
   const gs = genkiState_();
@@ -2374,8 +2414,8 @@ function openPartyModal(){
   // 主人公の状況
   let msg;
   if (st.n < 20) msg = '<b>' + esc(st.name) + '</b>(' + st.n + '品目) — あと <b>' + (st.next - st.n) + '</b> 品目で成長します。';
-  else if (st.next) msg = '<b>ゆうしゃ</b> — あと <b>' + (st.next - st.n) + '</b> 品目で おくすりのなかま が増えます。';
-  else msg = '<b>ゆうしゃ</b> — おくすりのなかま は全員そろいました!';
+  else if (st.next) msg = '<b>白衣のゆうしゃ</b> — あと <b>' + (st.next - st.n) + '</b> 品目で おくすりのなかま が増えます。';
+  else msg = '<b>白衣のゆうしゃ</b> — おくすりのなかま は全員そろいました!';
 
   const picks = petPicks_();
   const chip = function(k, owned, cls){
