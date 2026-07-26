@@ -831,7 +831,7 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
   </section>
 
   <div class="toast" id="toast"></div>
-  <footer class="foot">OTCLinker Pro — とみながグループ 店舗向けツール<br><span class="ver">版 2026-07-26 AC(タップ判定の修正2)</span></footer>
+  <footer class="foot">OTCLinker Pro — とみながグループ 店舗向けツール<br><span class="ver">版 2026-07-26 AE(きょうは何の日)</span></footer>
 </div>
 
 <script>
@@ -2350,6 +2350,43 @@ function bonusGetEffect_(got){
   const head = got.kind === "rare" ? "★レア★ " : (got.kind === "senmon" ? "せんもんしょく! " : "ごとうち! ");
   toast(head + "「" + DOT_NAMES[got.key] + "」が なかまに なった!" + (got.note ? "(" + got.note + ")" : ""));
 }
+/* ===== きょうは何の日 ===== */
+// 端末だけで分かる、広く知られた記念日。薬局に関わる日は多めに入れています。
+const DAY_FACTS = {
+  "01-01":"元日", "01-07":"七草がゆの日", "01-11":"鏡開き", "01-15":"小正月",
+  "02-03":"節分", "02-11":"建国記念の日", "02-14":"バレンタインデー", "02-22":"猫の日",
+  "03-03":"ひなまつり", "03-14":"ホワイトデー", "03-24":"世界結核デー",
+  "04-01":"エイプリルフール", "04-07":"世界保健デー", "04-29":"昭和の日",
+  "05-01":"メーデー", "05-03":"憲法記念日", "05-04":"みどりの日",
+  "05-05":"こどもの日、そして薬の日", "05-12":"看護の日", "05-31":"世界禁煙デー",
+  "06-04":"むし歯予防デー", "06-06":"楽器の日", "06-14":"世界献血者デー",
+  "07-07":"七夕",
+  "08-06":"広島原爆の日", "08-09":"長崎原爆の日", "08-11":"山の日", "08-15":"終戦の日",
+  "09-01":"防災の日", "09-09":"救急の日", "09-21":"世界アルツハイマーデー",
+  "10-01":"コーヒーの日", "10-10":"目の愛護デー、そして世界メンタルヘルスデー", "10-31":"ハロウィン",
+  "11-03":"文化の日", "11-08":"いい歯の日", "11-11":"介護の日", "11-14":"世界糖尿病デー",
+  "11-23":"勤労感謝の日",
+  "12-01":"世界エイズデー", "12-25":"クリスマス", "12-31":"大みそか"
+};
+// 記念日がない日は、その月の健康の話題を伝える
+const MONTH_TIPS = {
+  1:"かぜとインフルエンザに気をつける季節だね", 2:"そろそろ花粉の準備をする時期だよ",
+  3:"花粉がいちばん多い季節だね", 4:"新生活で体調をくずしやすい時期だよ",
+  5:"紫外線が強くなってくるころだね", 6:"梅雨どき、食あたりに気をつけて",
+  7:"熱中症に気をつける季節だよ", 8:"夏バテしていないかな?",
+  9:"寒暖差で体調をくずしやすいころだね", 10:"インフルエンザの予防接種がはじまる季節だよ",
+  11:"空気が乾いて のどをいためやすい時期だね", 12:"かぜとおなかの風邪に気をつけて"
+};
+function dayFact_(){
+  const d = new Date();
+  const m = d.getMonth() + 1, day = d.getDate();
+  const key = String(m).padStart(2,"0") + "-" + String(day).padStart(2,"0");
+  if (DAY_FACTS[key]) return { text: "きょうは " + DAY_FACTS[key] + " だよ!", kind: "fact" };
+  if (m === 10 && day >= 17 && day <= 23) return { text: "きょうは 薬と健康の週間 のまっただ中!", kind: "fact" };
+  if (m === 6 && day >= 4 && day <= 10) return { text: "きょうは 歯と口の健康週間 だよ", kind: "fact" };
+  return { text: MONTH_TIPS[m] || "", kind: "tip" };
+}
+
 /* ===== なでる・話しかける ===== */
 function pet_(){
   S.pet = S.pet || { pats: 0, patDay: "", streak: 1, best: 1, heroName: "" };
@@ -2372,6 +2409,13 @@ function petLine_(){
     else if (lv === "m3") soon++;
   });
   const pool = [];
+  // きょうは何の日(記念日は出やすく)
+  const f = dayFact_();
+  if (f.text){
+    // 記念日は3回、季節の話題は2回いれて出やすくする
+    const times = (f.kind === "fact") ? 3 : 2;
+    for (let i = 0; i < times; i++) pool.push([f.text, f.kind === "fact" ? "jump" : "float"]);
+  }
   if (expired) pool.push(["きげんぎれが " + expired + "こ あるみたい……", "shock"]);
   if (soon) pool.push(["もうすぐ きげんの おくすりが " + soon + "こ あるよ", "peek"]);
   const restQ = QUESTS.filter(function(q){ return !questDone_(q.id); });
@@ -2411,7 +2455,7 @@ function petSay_(text){
   box.style.display = "block";
   box.classList.remove("pop"); void box.offsetWidth; box.classList.add("pop");
   clearTimeout(box._tm);
-  box._tm = setTimeout(function(){ box.style.display = "none"; }, 2800);
+  box._tm = setTimeout(function(){ box.style.display = "none"; }, 3200);
 }
 /* タップの判定
    iOSはクリックを約300ミリ秒遅らせて送るため、クリックだけで数えると
