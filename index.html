@@ -33,15 +33,16 @@ body { min-height: 100vh; background: var(--hakuji); color: var(--ink); font-fam
   #tab-share.active { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; align-items: start; }
 }
 .header { position: relative; display: flex; align-items: center; justify-content: space-between; padding: 18px 2px 12px; gap: 10px; }
-.dot-pet { margin-left: auto; background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.25); border-radius: 10px; padding: 3px 7px 2px; cursor: pointer; display: flex; align-items: flex-end; gap: 1px; flex-shrink: 0; touch-action: manipulation; -webkit-user-select: none; user-select: none; -webkit-tap-highlight-color: transparent; }
+.dot-pet { background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.25); border-radius: 10px; padding: 3px 7px 2px; cursor: pointer; display: flex; align-items: flex-end; gap: 1px; flex-shrink: 0; touch-action: manipulation; -webkit-user-select: none; user-select: none; -webkit-tap-highlight-color: transparent; }
 .dot-pet svg { image-rendering: pixelated; display: block; }
 .dot-pet .mate-more { color: #fff; font-size: 11px; opacity: 0.85; padding: 0 2px 3px; letter-spacing: 0; }
 .dot-pet.bounce { animation: petBounce 0.5s ease; }
-.pet-say { position: absolute; right: 8px; top: 100%; margin-top: 4px; z-index: 60;
+.pet-wrap { position: relative; margin-left: auto; flex-shrink: 0; }
+.pet-say { position: absolute; right: 0; top: calc(100% + 5px); z-index: 60;
   background: #fff; color: var(--ink); border: 1px solid var(--line); border-radius: 10px;
   padding: 6px 10px; font-size: 12px; max-width: min(74vw, 300px); line-height: 1.45;
   box-shadow: 0 4px 14px rgba(0,0,0,0.18); }
-.pet-say::before { content: ""; position: absolute; right: 22px; top: -6px; width: 10px; height: 10px;
+.pet-say::before { content: ""; position: absolute; right: 18px; top: -5px; width: 9px; height: 9px;
   background: #fff; border-left: 1px solid var(--line); border-top: 1px solid var(--line); transform: rotate(45deg); }
 .pet-say.pop { animation: sayPop 0.28s ease; }
 @keyframes sayPop { 0%{opacity:0;transform:translateY(-4px) scale(0.94)} 100%{opacity:1;transform:none} }
@@ -80,6 +81,7 @@ body { min-height: 100vh; background: var(--hakuji); color: var(--ink); font-fam
 .mate-chip.gotouchi { border-color: #7DC383; background: #F3FAF4; }
 .mate-chip.senmon { border-color: #5FA8D3; background: #F1F8FC; }
 .mate-chip .lv { font-style: normal; color: #E3A21A; font-size: 10px; letter-spacing: -1px; }
+.mate-chip .nx { font-style: normal; color: #9AA7AF; font-size: 9.5px; }
 button.mate-chip { cursor: pointer; font-family: var(--sans); }
 .mate-chip.picked { outline: 2px solid var(--ai); outline-offset: -2px; }
 .mate-chip .onmark { font-style: normal; font-size: 9.5px; color: #fff; background: var(--ai); border-radius: 999px; padding: 1px 5px; }
@@ -466,8 +468,10 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
         <p class="brand-sub" id="brand-sub">商品の登録・値札・備蓄共有</p>
       </div>
     </div>
-    <button class="dot-pet" id="dot-pet" aria-label="なかまをなでる(2回タップ、または長押しでなかま画面)"></button>
-    <div class="pet-say" id="pet-say" style="display:none"></div>
+    <div class="pet-wrap">
+      <button class="dot-pet" id="dot-pet" aria-label="なかまをなでる(2回タップ、または長押しでなかま画面)"></button>
+      <div class="pet-say" id="pet-say" style="display:none"></div>
+    </div>
   </header>
 
   <nav class="tabs" role="tablist">
@@ -831,7 +835,7 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
   </section>
 
   <div class="toast" id="toast"></div>
-  <footer class="foot">OTCLinker Pro — とみながグループ 店舗向けツール<br><span class="ver">版 2026-07-26 AE(きょうは何の日)</span></footer>
+  <footer class="foot">OTCLinker Pro — とみながグループ 店舗向けツール<br><span class="ver">版 2026-07-26 AG(吹き出しの位置)</span></footer>
 </div>
 
 <script>
@@ -2103,19 +2107,69 @@ function decoOf_(key){
   if (roll < 50 && season === "sunglass") return "straw";
   return null;                                        // ふだんは素のまま
 }
+// 進化していたら知らせる(起動時に確認)
+function checkEvolve_(){
+  const meta = S.mateMeta || {};
+  const grown = [];
+  allMates_().forEach(function(o){
+    const m = meta[o.k];
+    if (!m) return;
+    const lv = mateLv_(o.k);
+    if ((m.lv || 1) < lv){ m.lv = lv; grown.push({ k: o.k, lv: lv }); }
+  });
+  if (grown.length){
+    save();
+    grown.slice(0, 3).forEach(function(g, i){
+      setTimeout(function(){
+        toast((g.lv >= 3 ? "★さいしゅうしんか★ " : "しんか! ") + "「" + DOT_NAMES[g.k] + "」が おおきくなった!");
+        const el = document.getElementById("dot-pet");
+        if (el){ el.classList.remove("rare-pop"); void el.offsetWidth; el.classList.add("rare-pop"); }
+      }, 1200 + i * 2600);
+    });
+  }
+}
 function mateMeta_(key){
   S.mateMeta = S.mateMeta || {};
-  if (!S.mateMeta[key]) S.mateMeta[key] = { got: careDays_() };
+  if (!S.mateMeta[key]) S.mateMeta[key] = { got: careDays_(), lv: 1 };
   return S.mateMeta[key];
 }
 // なかまは いっしょに過ごした日数で育つ(1→2→3)
-function mateLv_(key){
+const MATE_LV2_DAYS = 3, MATE_LV3_DAYS = 8;   // いっしょに過ごした日数で進化する
+function mateDays_(key){
   const m = (S.mateMeta || {})[key];
-  if (!m) return 1;
-  const d = careDays_() - (m.got || 0);
-  return d >= 12 ? 3 : (d >= 4 ? 2 : 1);
+  if (!m) return 0;
+  return Math.max(0, careDays_() - (m.got || 0));
 }
-function mateLvLabel_(lv){ return lv >= 3 ? "たっぷりなついた" : (lv >= 2 ? "なついてきた" : "であったばかり"); }
+function mateLv_(key){
+  if (!(S.mateMeta || {})[key]) return 1;
+  const d = mateDays_(key);
+  return d >= MATE_LV3_DAYS ? 3 : (d >= MATE_LV2_DAYS ? 2 : 1);
+}
+// 次の進化まであと何日か(3段階目なら null)
+function mateNext_(key){
+  const lv = mateLv_(key), d = mateDays_(key);
+  if (lv >= 3) return null;
+  return (lv === 1 ? MATE_LV2_DAYS : MATE_LV3_DAYS) - d;
+}
+// スプライトでいちばん多く使われている色(進化の飾りの色に使う)
+const CAPE_COLS = ["R","T","V","D","O","M"];
+const __mainCol = {};
+function mainColorChar_(key){
+  if (__mainCol[key]) return __mainCol[key];
+  const rows = DOT_SPRITES[key] || [];
+  const cnt = {};
+  rows.forEach(function(r){
+    for (let i = 0; i < r.length; i++){
+      const c = r[i];
+      if (c !== "." && c !== "K" && c === c.toUpperCase()) cnt[c] = (cnt[c] || 0) + 1;
+    }
+  });
+  let best = "W", n = 0;
+  for (const c in cnt) if (cnt[c] > n){ n = cnt[c]; best = c; }
+  __mainCol[key] = best;
+  return best;
+}
+function mateLvLabel_(lv){ return lv >= 3 ? "さいしゅうしんか" : (lv >= 2 ? "しんかした" : "であったばかり"); }
 
 /* ===== なかまが加わる ===== */
 function addMate_(key, store, kind, extra){
@@ -2187,6 +2241,26 @@ function dotSvg(key, px, lv, deco){
   };
   const tan = (deco === "tan") ? ' style="filter:sepia(0.4) saturate(1.5) hue-rotate(-12deg)"' : '';
   let r = '<svg width="'+px+'" height="'+px+'" viewBox="0 0 '+px+' '+px+'" shape-rendering="crispEdges"'+tan+'>';
+  // 進化の飾りは体の後ろに描く
+  if (lv >= 2){
+    const W = px;
+    // キャラごとに決まった色のマント(体に隠れないよう外側まで広げる)
+    const cape = DOT_PAL[CAPE_COLS[hash32_(key) % CAPE_COLS.length]];
+    r += '<path d="M' + (W*0.20) + ' ' + (W*0.36) + 'L' + (W*0.80) + ' ' + (W*0.36)
+       + 'L' + (W*0.99) + ' ' + (W*0.93) + 'L' + (W*0.01) + ' ' + (W*0.93) + 'z" fill="' + cape + '"/>';
+    r += rc(W*0.01, W*0.895, W*0.98, W*0.04, DOT_PAL.K);
+  }
+  if (lv >= 3){
+    const W = px, wg = DOT_PAL.W, ws = DOT_PAL.w || DOT_PAL.S;
+    [[0, 1], [1, -1]].forEach(function(sd){
+      const dir = sd[1], base = dir > 0 ? W*0.14 : W*0.86;
+      const x = function(o){ return dir > 0 ? base - o : base + o - W*0.13; };
+      r += rc(x(W*0.06), W*0.30, W*0.13, W*0.055, wg)
+         + rc(x(W*0.11), W*0.355, W*0.16, W*0.055, wg)
+         + rc(x(W*0.11), W*0.41, W*0.16, W*0.055, ws)
+         + rc(x(W*0.06), W*0.465, W*0.13, W*0.055, ws);
+    });
+  }
   // 同じ色をひとつの図形にまとめて描く(端末への負担を抑えるため)
   const paths = {};
   const q = function(v){ return Math.round(v * 100) / 100; };
@@ -2263,15 +2337,30 @@ function dotSvg(key, px, lv, deco){
          + rc(W*0.44, W*0.08, W*0.12, W*0.10, DOT_PAL.R);
     }
   }
-  // なついた度合いを右下の小さな星であらわす
+  // 2だんかい目のしるし:首元のえり(体の前に描く)
   if (lv >= 2){
-    const col = lv >= 3 ? DOT_PAL.G : DOT_PAL.M;
-    const u = px / 12, bx = px - u*3.2, by = px - u*3.2;
-    r += rc(bx+u, by, u, u, DOT_PAL.K)
-       + rc(bx, by+u, u*3, u, DOT_PAL.K)
-       + rc(bx+u, by+u*2, u, u, DOT_PAL.K)
-       + rc(bx+u, by+u*0.35, u, u*2.3, col)
-       + rc(bx+u*0.35, by+u, u*2.3, u, col);
+    const W = px;
+    const cape = DOT_PAL[CAPE_COLS[hash32_(key) % CAPE_COLS.length]];
+    const ey = (DOT_EYE[key] || 0.4) * W;
+    const cy = Math.min(W * 0.72, ey + W * 0.16);
+    r += rc(W*0.22, cy, W*0.56, W*0.075, DOT_PAL.K)
+       + rc(W*0.24, cy + W*0.012, W*0.52, W*0.05, cape)
+       + rc(W*0.46, cy - W*0.03, W*0.09, W*0.06, DOT_PAL.G);
+  }
+  // 3だんかい目のかんむりと きらめき(帽子系の衣装のときは重ならないよう省く)
+  const hatDeco = (deco === "santa" || deco === "straw" || deco === "pumpkin" || deco === "kagami" || deco === "ribbon");
+  if (lv >= 3){
+    const W = px;
+    if (!hatDeco){
+      r += rc(W*0.30, W*0.085, W*0.40, W*0.06, DOT_PAL.K)
+         + rc(W*0.31, W*0.09, W*0.38, W*0.045, DOT_PAL.G)
+         + rc(W*0.29, W*0.02, W*0.08, W*0.075, DOT_PAL.G)
+         + rc(W*0.46, W*0.0, W*0.08, W*0.095, DOT_PAL.G)
+         + rc(W*0.63, W*0.02, W*0.08, W*0.075, DOT_PAL.G);
+    }
+    r += rc(W*0.03, W*0.20, W*0.05, W*0.05, DOT_PAL.G)
+       + rc(W*0.92, W*0.28, W*0.05, W*0.05, DOT_PAL.G)
+       + rc(W*0.10, W*0.86, W*0.04, W*0.04, DOT_PAL.G);
   }
   return r + '</svg>';
 }
@@ -2620,6 +2709,7 @@ function openPartyModal(){
                   : "アプリを使うほど元気になります。")) + '</div>'
     + '<div class="genki-note">いっしょに過ごした日数: ' + careDays_() + ' 日 ／ れんぞく ' + (pet_().streak||1) + ' 日(さいこう記録 ' + (pet_().best||1) + ' 日)</div>'
     + '<div class="genki-note">なまえ: <b>' + esc(pet_().heroName || st.name) + '</b> <button class="link" onclick="renameHero()">なまえをつける</button></div>'
+    + '<div class="genki-note">なかまは いっしょに過ごすと3だんかいに しんかします(3日で マント、8日で かんむりと はね)。</div>'
     + '<div class="genki-note">キャラを1回タップでなでる・2回タップまたは長押しでこの画面がひらきます。</div>'
     + '<div class="genki-note">画面右上に出すなかまは、下の一覧をタップして最大' + PET_PICK_MAX + '体まで選べます'
     + (petPicks_().length ? ' <button class="link" onclick="clearPetPick()">おまかせに戻す</button>' : '(いまはおまかせ表示)') + '</div>'
@@ -2637,10 +2727,12 @@ function openPartyModal(){
     if (!owned) return '<span class="mate-chip yet">' + dotSvg("slot", 26) + '？</span>';
     const lv = mateLv_(k), dk = decoOf_(k);
     const on = picks.indexOf(k) >= 0;
+    const nx = mateNext_(k);
     return '<button class="mate-chip ' + cls + (on ? ' picked' : '') + '" onclick="togglePetPick(\'' + k + '\')"'
       + ' title="' + mateLvLabel_(lv) + (dk ? " / " + DECOS[dk] : "") + ' — タップで画面に出す">'
       + dotSvg(k, 26, lv, dk) + esc(DOT_NAMES[k])
-      + '<i class="lv">' + (lv >= 3 ? "★★" : lv >= 2 ? "★" : "") + '</i>'
+      + '<i class="lv">' + (lv >= 3 ? "★★★" : lv >= 2 ? "★★" : "★") + '</i>'
+      + (nx !== null ? '<i class="nx">あと' + nx + '日</i>' : '')
       + (on ? '<i class="onmark">画面</i>' : '') + '</button>';
   };
   const group = function(title, keys, owned, cls, note){
@@ -3704,6 +3796,7 @@ function bootUi_(){
   renderStorageInfo();
   renderDotPet();
   startPetIdle_();
+  checkEvolve_();
 }
 // IndexedDBに保存済みデータがあればそちらを正とする(写真等でlocalStorageに入り切らない場合に備える)
 idbGet_("state").then(function(json){
