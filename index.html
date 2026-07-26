@@ -831,7 +831,7 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
   </section>
 
   <div class="toast" id="toast"></div>
-  <footer class="foot">OTCLinker Pro — とみながグループ 店舗向けツール<br><span class="ver">版 2026-07-26 AB(タップ判定の修正)</span></footer>
+  <footer class="foot">OTCLinker Pro — とみながグループ 店舗向けツール<br><span class="ver">版 2026-07-26 AC(タップ判定の修正2)</span></footer>
 </div>
 
 <script>
@@ -2418,7 +2418,7 @@ function petSay_(text){
    2回タップに間に合わない。指が触れた瞬間(pointerdown)を直接数える。 */
 let __petTapN = 0, __petTapTimer = null, __petPressTimer = null, __petLong = false;
 const PET_DOUBLE_MS = 420;     // 2回タップとみなす間隔
-const PET_LONG_MS = 600;       // 長押しでも なかま画面をひらく
+const PET_LONG_MS = 700;       // 長押しでも なかま画面をひらく
 function petOpenParty_(){
   __petTapN = 0;
   clearTimeout(__petTapTimer); clearTimeout(__petPressTimer);
@@ -2431,33 +2431,57 @@ function setupPetTaps_(){
   const el = document.getElementById("dot-pet");
   if (!el || el.__tapReady) return;
   el.__tapReady = true;
-  const down = function(){
+  let usedTouch = false;      // タッチで操作した端末では、あとから来るマウス扱いの分を無視する
+  let lastUp = 0;
+  let startX = 0, startY = 0;
+
+  const down = function(e){
     __petLong = false;
+    if (e && e.touches && e.touches[0]){ startX = e.touches[0].clientX; startY = e.touches[0].clientY; }
+    else if (e && e.clientX != null){ startX = e.clientX; startY = e.clientY; }
     clearTimeout(__petPressTimer);
     __petPressTimer = setTimeout(function(){ __petLong = true; petOpenParty_(); }, PET_LONG_MS);
   };
+  const move = function(e){
+    // 指が動いた(スクロール等)ときは長押し扱いにしない
+    const x = (e.touches && e.touches[0]) ? e.touches[0].clientX : e.clientX;
+    const y = (e.touches && e.touches[0]) ? e.touches[0].clientY : e.clientY;
+    if (x == null) return;
+    if (Math.abs(x - startX) > 12 || Math.abs(y - startY) > 12){
+      clearTimeout(__petPressTimer);
+      __petLong = false;
+    }
+  };
   const up = function(e){
     clearTimeout(__petPressTimer);
-    if (e && e.preventDefault) e.preventDefault();
+    if (e && e.cancelable && e.preventDefault) e.preventDefault();
     if (__petLong){ __petLong = false; return; }
+    // 1回の操作で複数のイベントが届くことがあるため、近すぎるものは同じタップとみなす
+    const now = Date.now();
+    if (now - lastUp < 80) return;
+    lastUp = now;
     __petTapN++;
     if (__petTapN === 1){
+      clearTimeout(__petTapTimer);
       __petTapTimer = setTimeout(function(){ __petTapN = 0; petPat_(); }, PET_DOUBLE_MS);
     } else {
       petOpenParty_();
     }
   };
+
   if (window.PointerEvent){
     el.addEventListener("pointerdown", down);
+    el.addEventListener("pointermove", move);
     el.addEventListener("pointerup", up);
-    el.addEventListener("pointercancel", function(){ clearTimeout(__petPressTimer); });
+    el.addEventListener("pointercancel", function(){ clearTimeout(__petPressTimer); __petLong = false; });
   } else {
-    el.addEventListener("touchstart", down, { passive: true });
+    el.addEventListener("touchstart", function(e){ usedTouch = true; down(e); }, { passive: true });
+    el.addEventListener("touchmove", move, { passive: true });
     el.addEventListener("touchend", up);
-    el.addEventListener("mousedown", down);
-    el.addEventListener("mouseup", up);
+    el.addEventListener("mousedown", function(e){ if (!usedTouch) down(e); });
+    el.addEventListener("mouseup", function(e){ if (!usedTouch) up(e); });
   }
-  // 指の操作で処理済みなので、あとから届くクリックは無視する
+  // 操作はすでに処理済みなので、あとから届くクリックは無視する
   el.addEventListener("click", function(e){ e.preventDefault(); e.stopPropagation(); });
 }
 // なでる:反応してくれて、1日5回まで少し元気になる
