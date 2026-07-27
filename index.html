@@ -823,10 +823,10 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
     </details>
 
     <details class="set-card">
-      <summary class="set-h">薬局情報(画面上部に表示)</summary>
+      <summary class="set-h">薬局情報(備蓄共有で使います)</summary>
       <div class="grid2">
         <label>薬局名 <input id="ph-name" placeholder="例:とみなが薬局 ○○店" onchange="savePharmacy()"></label>
-        <label>地区 <input id="ph-area" placeholder="例:熊本市中央区" onchange="savePharmacy()"></label>
+        <label>住所 <input id="ph-area" placeholder="例:熊本市中央区○○町1-2-3" onchange="savePharmacy()"></label>
       </div>
     </details>
 
@@ -851,7 +851,7 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
   </section>
 
   <div class="toast" id="toast"></div>
-  <footer class="foot">OTCLinker — とみながグループ 店舗向けツール<br><span class="ver">版 2026-07-27 AJ(薬局製剤・税制対象)</span></footer>
+  <footer class="foot">OTCLinker — とみながグループ 店舗向けツール<br><span class="ver">版 2026-07-27 AK(削除の不具合修正)</span></footer>
 </div>
 
 <script>
@@ -943,6 +943,9 @@ function idbGet_(key){
   });
 }
 function save(){
+  // どちらの保存先が新しいか判断できるよう、保存した時刻を必ず記録する
+  S.savedAt = new Date().toISOString();
+  S.rev = (S.rev || 0) + 1;
   const json = JSON.stringify(S);
   let lsOk = true;
   try { localStorage.setItem("otc-ledger-v1", json); } catch(e){ lsOk = false; }
@@ -3573,7 +3576,7 @@ function renderPop(){
 /* ============ 会員間共有(Google Apps Script サーバー) ============ */
 function updateBrand(){
   const p = S.pharmacy;
-  document.getElementById("brand-sub").textContent = p.name ? p.name + (p.area ? "(" + p.area + ")" : "") : "商品の登録・値札・備蓄共有";
+  document.getElementById("brand-sub").textContent = p.name || "商品の登録・値札・備蓄共有";
 }
 function syncPharmacyInputs(){
   document.getElementById("ph-name").value = S.pharmacy.name || "";
@@ -3748,7 +3751,7 @@ function renderShared(){
           '<li><div class="hit-name">'+esc(h.it.name)+' <span class="hit-qty">'+h.it.qty+' 個</span></div>'
           + '<div class="hit-ph"><button class="link" onclick="document.getElementById(\'share-q\').value=\'\';openSharedPharmacy(\''+h.phId+'\')">'
           + esc(h.ph&&h.ph.name||"") + '</button>'
-          + (h.ph&&h.ph.area?' <span>('+esc(h.ph.area)+')</span>':'') + '</div></li>'
+          + (h.ph&&h.ph.area?' <span>('+esc(String(h.ph.area).slice(0,12))+((h.ph.area||"").length>12?'…':'')+')</span>':'') + '</div></li>'
         ).join("") + '</ul>'
       : '<p class="hint">該当する備蓄が見つかりませんでした。</p>';
     return;
@@ -3827,7 +3830,7 @@ function renderShared(){
     return '<li class="ph-row" onclick="openSharedPharmacy(\''+ph.id+'\')">'
       + '<div class="ph-row-main"><span class="ph-name">'+esc(ph.pharmacy&&ph.pharmacy.name||"名称未設定")+'</span>'
       + (mine?'<span class="ph-mine">自局</span>':'')
-      + '<span class="ph-meta">'+esc(ph.pharmacy&&ph.pharmacy.area||"")+' ・ '+n+' 品目 ・ 更新 '+String(ph.updatedAt||"").slice(0,10)
+      + '<span class="ph-meta">'+esc(String(ph.pharmacy&&ph.pharmacy.area||"").slice(0,14))+((ph.pharmacy&&ph.pharmacy.area||"").length>14?'…':'')+' ・ '+n+' 品目 ・ 更新 '+String(ph.updatedAt||"").slice(0,10)
       +   (staleDays_(ph.updatedAt) >= 60 ? ' <span class="ph-stale">' + staleDays_(ph.updatedAt) + '日間 更新なし</span>' : '') + '</span></div>'
       + '<span class="ph-arrow">›</span></li>';
   }).join("") + '</ul>';
@@ -3889,9 +3892,16 @@ idbGet_("state").then(function(json){
     try {
       const d = JSON.parse(json);
       if (d && Array.isArray(d.items)){
-        // IndexedDB側の方が新しい/多い場合に採用(通常は同一)
-        const cur = (S.items || []).length;
-        if ((d.items.length >= cur) || (d.lastBackup || "") >= (S.lastBackup || "")) S = Object.assign(S, d);
+        // 保存時刻(なければ更新回数)が新しい方を採用する。
+        // ※以前は「品目数が多い方」を採用していたため、
+        //   商品を削除すると古い内容が復活してしまう不具合があった。
+        const mine = S.savedAt || "", theirs = d.savedAt || "";
+        let useIdb;
+        if (theirs && mine) useIdb = theirs > mine;
+        else if (theirs && !mine) useIdb = true;          // 相手だけ時刻を持つ = 相手が新しい保存形式
+        else if (!theirs && mine) useIdb = false;
+        else useIdb = (d.rev || 0) > (S.rev || 0) || (!S.items || !S.items.length);
+        if (useIdb) S = Object.assign(S, d);
       }
     } catch(e){}
   }
