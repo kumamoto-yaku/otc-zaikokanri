@@ -289,12 +289,20 @@ input:focus, select:focus { outline: 2px solid var(--ai); outline-offset: -1px; 
 .hit-name { font-weight: 600; }
 .hit-qty { color: var(--take); margin-left: 8px; }
 .hit-ph { font-size: 12.5px; color: #5C6B78; }
+.flag-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.flag-label { font-size: 12.5px; color: #5C6B78; }
+.flag-chip { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--line); border-radius: 999px; padding: 7px 14px 7px 10px; background: #fff; font-size: 13px; cursor: pointer; }
+.flag-chip input { width: 17px; height: 17px; }
+.flag-chip:has(input:checked) { border-color: var(--ai); background: #EEF3F1; font-weight: 600; }
 .chk-row { flex-direction: row; align-items: center; gap: 8px; font-size: 13px; color: var(--ink); }
 .chk-row input { width: auto; }
 .sub-cost { color: #8A6D3B; }
 .sub-staff { color: #6A3FA0; }
 .sub-memo { color: #5C6B78; font-style: italic; }
 .sub-sup { color: #4E7F8C; }
+.smt-flag { display: inline-block; font-size: 10.5px; color: #fff; background: #2E7D6B; border-radius: 4px; padding: 1px 6px; font-weight: 600; }
+.tag-smt { background: #2E7D6B; color: #fff; font-size: 9px; text-align: center; padding: 1px 0; letter-spacing: 0.02em; }
+.pcard-smt { color: #2E7D6B; font-weight: 700; }
 .ranyo-flag { color: #8A6400; background: #FBEFC7; border: 1px solid #E3C65A; border-radius: 4px; font-size: 10.5px; padding: 1px 5px; white-space: nowrap; }
 .tag-ranyo { background: #F5D547; color: #4A3B00; font-size: 10px; letter-spacing: 0.1em; padding: 2px 0; font-weight: 600; }
 .pop-ranyo { font-size: 11.5px; color: #8A6400; background: #FBEFC7; border-radius: 4px; padding: 2px 8px; }
@@ -505,7 +513,7 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
 
     <div class="form">
       <label>JANコード
-        <input inputmode="numeric" id="f-jan" placeholder="4987……(8桁 / 13桁)" onblur="onJanBlur()">
+        <input inputmode="numeric" id="f-jan" placeholder="4987……(薬局製剤など無い場合は空欄でOK)" onblur="onJanBlur()">
       </label>
       <label>商品名 *
         <input id="f-name" placeholder="例:ロキソニンS 12錠">
@@ -515,7 +523,7 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
       </label>
       <div class="grid2">
         <label>メーカー <input id="f-maker" placeholder="例:第一三共ヘルスケア"></label>
-        <label>区分 <select id="f-category"></select></label>
+        <label>区分 <select id="f-category" onchange="onCategoryChange()"></select></label>
       </div>
       <div class="grid2">
         <label>販売価格(税込) <input inputmode="numeric" id="f-price" placeholder="998" oninput="updatePriceHint()"></label>
@@ -550,7 +558,12 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
           <label>メモ <input id="f-memo" placeholder=""></label>
         </div>
       </details>
-      <label class="chk-row"><input type="checkbox" id="f-ranyo"> 指定濫用防止医薬品に該当(値札・一覧に表示されます)</label>
+      <p class="hint" id="cat-hint" style="margin-top:-4px"></p>
+      <div class="flag-row">
+        <span class="flag-label">目印</span>
+        <label class="flag-chip"><input type="checkbox" id="f-smt"><span>セルフメディケーション税制</span></label>
+        <label class="flag-chip"><input type="checkbox" id="f-ranyo"><span>濫用防止</span></label>
+      </div>
       <div class="row gap">
         <button class="btn" id="save-btn" onclick="saveItem()">在庫に登録</button>
         <button class="btn ghost" onclick="clearForm()">クリア</button>
@@ -740,6 +753,7 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
               <label><input type="checkbox" id="cf-price" onchange="saveCardStyle()"> 価格</label>
               <label><input type="checkbox" id="cf-jan" onchange="saveCardStyle()"> バーコード</label>
               <label><input type="checkbox" id="cf-jannum" onchange="saveCardStyle()"> JAN番号</label>
+              <label><input type="checkbox" id="cf-smt" onchange="saveCardStyle()"> 税制対象マーク</label>
             </div>
           </div>
         </details>
@@ -837,7 +851,7 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
   </section>
 
   <div class="toast" id="toast"></div>
-  <footer class="foot">OTCLinker — とみながグループ 店舗向けツール<br><span class="ver">版 2026-07-26 AI(動作改善)</span></footer>
+  <footer class="foot">OTCLinker — とみながグループ 店舗向けツール<br><span class="ver">版 2026-07-27 AJ(薬局製剤・税制対象)</span></footer>
 </div>
 
 <script>
@@ -867,9 +881,9 @@ async function checkLogin(){
   }
 }
 /* ============ 定数 ============ */
-const CATEGORIES = ["要指導医薬品","第1類医薬品","指定第2類医薬品","第2類医薬品","第3類医薬品","体外診断用医薬品","医薬部外品","サプリメント・健康食品","食品・菓子","飲料","日用品・雑貨","その他"];
-const CAT_SHORT = {"要指導医薬品":"要指導","第1類医薬品":"第1類","指定第2類医薬品":"指定第2類","第2類医薬品":"第2類","第3類医薬品":"第3類","体外診断用医薬品":"体外診断","医薬部外品":"部外品","サプリメント・健康食品":"サプリ","食品・菓子":"食品","飲料":"飲料","日用品・雑貨":"日用品","その他":"その他"};
-const CAT_COLOR = {"要指導医薬品":"#6A3FA0","第1類医薬品":"#C0392B","指定第2類医薬品":"#D97B29","第2類医薬品":"#3E7C59","第3類医薬品":"#2E6DA4","体外診断用医薬品":"#7B5EA7","医薬部外品":"#5C6B78","サプリメント・健康食品":"#647D8C","食品・菓子":"#8A6D3B","飲料":"#4E7F8C","日用品・雑貨":"#75808A","その他":"#8A8F94"};
+const CATEGORIES = ["要指導医薬品","第1類医薬品","指定第2類医薬品","第2類医薬品","第3類医薬品","体外診断用医薬品","薬局製剤","医薬部外品","サプリメント・健康食品","食品・菓子","飲料","日用品・雑貨","その他"];
+const CAT_SHORT = {"要指導医薬品":"要指導","第1類医薬品":"第1類","指定第2類医薬品":"指定第2類","第2類医薬品":"第2類","第3類医薬品":"第3類","体外診断用医薬品":"体外診断","薬局製剤":"薬局製剤","医薬部外品":"部外品","サプリメント・健康食品":"サプリ","食品・菓子":"食品","飲料":"飲料","日用品・雑貨":"日用品","その他":"その他"};
+const CAT_COLOR = {"要指導医薬品":"#6A3FA0","第1類医薬品":"#C0392B","指定第2類医薬品":"#D97B29","第2類医薬品":"#3E7C59","第3類医薬品":"#2E6DA4","体外診断用医薬品":"#7B5EA7","薬局製剤":"#2E7D6B","医薬部外品":"#5C6B78","サプリメント・健康食品":"#647D8C","食品・菓子":"#8A6D3B","飲料":"#4E7F8C","日用品・雑貨":"#75808A","その他":"#8A8F94"};
 
 /* ============ 状態 ============ */
 let S = { items: [], master: {}, pharmacy: { id: rid(), name: "", area: "" }, apiKeys: { yahoo: "", rakuten: "", rakutenKey: "", jancode: "" }, gasUrl: "", popStyle: "refined", popFont: { font: "serif", nameSize: 30, priceSize: 52, copySize: 20 }, tagStyle: { size: "m", font: "serif", bold: "bold", nameSize: 16, priceSize: 30, nameColor: "#1F2933", priceColor: "#B7402B" } };
@@ -1066,6 +1080,7 @@ function parseDrugCategory(name){
   if (/第[2２]類医薬品/.test(t)) return "第2類医薬品";
   if (/第[3３]類医薬品/.test(t)) return "第3類医薬品";
   if (/体外診断用医薬品|検査薬|妊娠検査|排卵検査/.test(t)) return "体外診断用医薬品";
+  if (/薬局製剤|薬局製造販売医薬品/.test(t)) return "薬局製剤";
   if (/(指定)?医薬部外品|薬用/.test(t)) return "医薬部外品";
   // ② 商品名から推定
   if (/(ビール|発泡酒|チューハイ|ハイボール|焼酎|日本酒|ワイン|ウイスキー|ジュース|お茶|緑茶|麦茶|むぎ茶|ほうじ茶|烏龍茶|ウーロン茶|ジャスミン茶|紅茶|コーヒー|珈琲|カフェオレ|カフェラテ|ラテ|ココア|炭酸水|サイダー|コーラ|ミネラルウォーター|天然水|スポーツドリンク|経口補水|乳酸菌飲料|飲料|ドリンク|牛乳|豆乳|ミルクティー|スムージー|甘酒)/.test(t)) return "飲料";
@@ -1089,7 +1104,7 @@ function learnedMakers(){
   Object.keys(mst).forEach(function(k){ const m = mst[k]; if (m && m.maker) set[m.maker] = 1; });
   return Object.keys(set).filter(function(x){ return x.length >= 2; }).sort(function(a,b){ return b.length - a.length; });
 }
-const CAT_TINY = {"要指導医薬品":"要指導","第1類医薬品":"第1類","指定第2類医薬品":"指定2類","第2類医薬品":"第2類","第3類医薬品":"第3類","体外診断用医薬品":"体外診断","医薬部外品":"部外品","サプリメント・健康食品":"サプリ","食品・菓子":"食品","飲料":"飲料","日用品・雑貨":"日用品","その他":"その他"};
+const CAT_TINY = {"要指導医薬品":"要指導","第1類医薬品":"第1類","指定第2類医薬品":"指定2類","第2類医薬品":"第2類","第3類医薬品":"第3類","体外診断用医薬品":"体外診断","薬局製剤":"薬局製剤","医薬部外品":"部外品","サプリメント・健康食品":"サプリ","食品・菓子":"食品","飲料":"飲料","日用品・雑貨":"日用品","その他":"その他"};
 function detectMaker(text){
   const t = String(text||"");
   // ① 自局で過去に登録したメーカー名を優先
@@ -1368,6 +1383,7 @@ function readForm(){
     expiry: document.getElementById("f-expiry").value,
     memo: document.getElementById("f-memo").value.trim(),
     ranyo: document.getElementById("f-ranyo").checked,
+    smt: document.getElementById("f-smt").checked,
     reduced: document.getElementById("f-reduced").checked,
     supplier: supplier,
     cost: document.getElementById("f-cost").value.replace(/\D/g,""),
@@ -1386,6 +1402,8 @@ function fillForm(o){
   document.getElementById("f-expiry").value = o.expiry || "";
   document.getElementById("f-memo").value = o.memo || "";
   document.getElementById("f-ranyo").checked = !!o.ranyo;
+  document.getElementById("f-smt").checked = !!o.smt;
+  onCategoryChange();
   document.getElementById("f-reduced").checked = !!o.reduced;
   document.getElementById("f-cost").value = (o.cost===0||o.cost) ? o.cost : "";
   document.getElementById("f-staff-price").value = (o.staffPrice===0||o.staffPrice) ? o.staffPrice : "";
@@ -1433,6 +1451,24 @@ function clearForm(){
   document.getElementById("f-qty-label").childNodes[0].nodeValue = "入庫数 ";
   fillForm({}); scanMsg("");
 }
+// 区分に応じて、入力の手間を減らす手助けをする
+function onCategoryChange(){
+  const c = document.getElementById("f-category").value;
+  const jan = document.getElementById("f-jan");
+  const hint = document.getElementById("cat-hint");
+  if (c === "薬局製剤"){
+    if (hint) hint.textContent = "薬局製剤はJANコードがなくても登録できます(空欄のままでOK)。";
+    jan.placeholder = "空欄のままでOK";
+  } else {
+    if (hint) hint.textContent = "";
+    jan.placeholder = "4987……(薬局製剤など無い場合は空欄でOK)";
+  }
+  // 食品・日用品はセルフメディケーション税制の対象外
+  const smt = document.getElementById("f-smt");
+  const target = ["要指導医薬品","第1類医薬品","指定第2類医薬品","第2類医薬品","第3類医薬品"].indexOf(c) >= 0;
+  smt.closest(".flag-chip").style.display = target ? "" : "none";
+  if (!target) smt.checked = false;
+}
 function onJanBlur(){
   const code = document.getElementById("f-jan").value.replace(/\D/g,"");
   document.getElementById("f-jan").value = code;
@@ -1460,7 +1496,7 @@ async function applyJan(code){
   }
   const m = S.master[code];
   if (m){
-    fillForm({ jan: code, name: m.name, kana: m.kana, maker: m.maker, category: m.category, price: m.price });
+    fillForm({ jan: code, name: m.name, kana: m.kana, maker: m.maker, category: m.category, price: m.price, ranyo: m.ranyo, smt: m.smt, supplier: m.supplier, cost: m.cost, staffPrice: m.staffPrice, reduced: m.reduced });
     scanMsg("商品マスタから情報を補完しました。");
     return;
   }
@@ -1481,16 +1517,17 @@ async function applyJan(code){
 function saveItem(){
   const f = readForm();
   const wasEditing = !!editingId;
-  if (!f.jan || !f.name){ toast("JANコードと商品名は必須です"); return; }
-  if (!isValidJan(f.jan)){ toast("JANコードの形式が正しくありません(8桁または13桁)"); return; }
-  S.master[f.jan] = { name: f.name, kana: f.kana, maker: f.maker, category: f.category, price: f.price, reduced: f.reduced, supplier: f.supplier, cost: f.cost, staffPrice: f.staffPrice };
+  if (!f.name){ toast("商品名は必須です"); return; }
+  // 薬局製剤などJANコードのない商品も登録できる
+  if (f.jan && !isValidJan(f.jan)){ toast("JANコードの形式が正しくありません(8桁または13桁)"); return; }
+  if (f.jan) S.master[f.jan] = { name: f.name, kana: f.kana, maker: f.maker, category: f.category, price: f.price, reduced: f.reduced, supplier: f.supplier, cost: f.cost, staffPrice: f.staffPrice, ranyo: f.ranyo, smt: f.smt };
   if (editingId){
     S.items = S.items.map(it => it.id===editingId ? Object.assign({}, it, f, { updatedAt: today() }) : it);
     flash("upd", "上書き保存しました", f.name);
   } else {
-    const ex = S.items.find(it => it.jan === f.jan);
+    const ex = f.jan ? S.items.find(it => it.jan === f.jan) : null;
     if (ex){
-      ex.name = f.name; ex.kana = f.kana; ex.maker = f.maker; ex.category = f.category; ex.price = f.price;
+      ex.name = f.name; ex.kana = f.kana; ex.maker = f.maker; ex.category = f.category; ex.price = f.price; ex.ranyo = f.ranyo; ex.smt = f.smt;
       if (f.expiry) ex.expiry = f.expiry; if (f.memo) ex.memo = f.memo;
       ex.qty += f.qty; ex.updatedAt = today();
       flash("add", "在庫を追加しました(+" + f.qty + "個 → 合計" + ex.qty + "個)", f.name);
@@ -1800,7 +1837,7 @@ function renderList(){
       + shown.map(it =>
         '<tr>'
         + '<td><input type="checkbox" '+(selected.has(it.id)?'checked':'')+' onchange="toggleSelect(\''+it.id+'\')" aria-label="値札用に選択"></td>'
-        + '<td class="name-cell" onclick="editItem(\''+it.id+'\')" style="cursor:pointer">'+(it.name?esc(it.name):"(名称未設定)")+(it.ranyo?' <span class="ranyo-flag">濫用防止</span>':'')+'</td>'
+        + '<td class="name-cell" onclick="editItem(\''+it.id+'\')" style="cursor:pointer">'+(it.name?esc(it.name):"(名称未設定)")+(it.smt?' <span class="smt-flag">税制対象</span>':'')+(it.ranyo?' <span class="ranyo-flag">濫用防止</span>':'')+'</td>'
         + '<td style="color:'+(CAT_COLOR[it.category]||"#5C6B78")+';font-weight:600">'+(CAT_SHORT[it.category]||it.category)+'</td>'
         + '<td>'+yen(it.price)+'</td>'
         + '<td>'+(it.cost?yen(it.cost):"")+'</td>'
@@ -1822,7 +1859,7 @@ function renderList(){
     + '<input type="checkbox" ' + (selected.has(it.id)?'checked':'') + ' onchange="toggleSelect(\''+it.id+'\')" aria-label="値札用に選択">'
     + '<div class="stock-main" onclick="editItem(\''+it.id+'\')">'
     +   '<div class="stock-top"><span class="cat-badge" style="border-color:'+CAT_COLOR[it.category]+';color:'+CAT_COLOR[it.category]+'">'+CAT_SHORT[it.category]+'</span><span class="stock-name">'+(it.name?esc(it.name):"(名称未設定)")+'</span></div>'
-    +   '<div class="stock-sub">' + (it.ranyo?'<span class="ranyo-flag">濫用防止</span>':'') + (it.maker?'<span>'+esc(it.maker)+'</span>':'') + '<span>'+yen(it.price)+'</span>' + (it.cost?'<span class="sub-cost">納入 '+yen(it.cost)+'</span>':'') + (it.supplier?'<span class="sub-sup">'+esc(it.supplier)+'</span>':'') + (it.staffPrice?'<span class="sub-staff">職員 '+yen(it.staffPrice)+'</span>':'') + expiryChip(it.expiry) + (it.memo?'<span class="sub-memo">'+esc(it.memo)+'</span>':'') + '</div>'
+    +   '<div class="stock-sub">' + (it.smt?'<span class="smt-flag">税制対象</span>':'') + (it.ranyo?'<span class="ranyo-flag">濫用防止</span>':'') + (it.maker?'<span>'+esc(it.maker)+'</span>':'') + '<span>'+yen(it.price)+'</span>' + (it.cost?'<span class="sub-cost">納入 '+yen(it.cost)+'</span>':'') + (it.supplier?'<span class="sub-sup">'+esc(it.supplier)+'</span>':'') + (it.staffPrice?'<span class="sub-staff">職員 '+yen(it.staffPrice)+'</span>':'') + expiryChip(it.expiry) + (it.memo?'<span class="sub-memo">'+esc(it.memo)+'</span>':'') + '</div>'
     + '</div>'
     + '<div class="qty-ctrl"><button onclick="changeQty(\''+it.id+'\',-1)" aria-label="1減らす">−</button><span class="qty">'+it.qty+'</span><button onclick="changeQty(\''+it.id+'\',1)" aria-label="1増やす">＋</button></div>'
     + '<button class="info-btn" onclick="event.stopPropagation();openDrugInfo(\''+it.id+'\',event)" aria-label="患者説明資料" title="患者説明資料を開く">📄</button>'
@@ -1896,8 +1933,8 @@ function restoreData(ev){
 function exportCsv(){
   doQuest("csv");
   if (!S.items.length){ toast("在庫がありません"); return; }
-  const head = ["JANコード","商品名","ふりがな","メーカー","区分","濫用防止","販売価格(税込)","税率","発注先","納入価(税込)","職員販売価格(税込)","在庫数","使用期限","メモ","更新日"];
-  const rows = S.items.map(it => [it.jan,it.name,(it.kana||""),it.maker,it.category,(it.ranyo?"該当":""),it.price,(it.reduced?"8%":"10%"),(it.supplier||""),(it.cost||""),(it.staffPrice||""),it.qty,it.expiry,(it.memo||"").replace(/[\r\n,]/g," "),it.updatedAt]);
+  const head = ["JANコード","商品名","ふりがな","メーカー","区分","濫用防止","税制対象","販売価格(税込)","税率","発注先","納入価(税込)","職員販売価格(税込)","在庫数","使用期限","メモ","更新日"];
+  const rows = S.items.map(it => [it.jan,it.name,(it.kana||""),it.maker,it.category,(it.ranyo?"該当":""),(it.smt?"該当":""),it.price,(it.reduced?"8%":"10%"),(it.supplier||""),(it.cost||""),(it.staffPrice||""),it.qty,it.expiry,(it.memo||"").replace(/[\r\n,]/g," "),it.updatedAt]);
   const csv = "\uFEFF" + [head].concat(rows).map(r => r.join(",")).join("\r\n");
   const blob = new Blob([csv], { type: "text/csv" });
   const a = document.createElement("a");
@@ -2834,7 +2871,7 @@ function readImageFile_(file, maxPx){
 }
 
 /* ============ 店頭用商品カード ============ */
-function defaultCardStyle(){ return { size: "m", width: 52, height: 0, fields: { head:true, note:true, label:true, cat:true, name:true, maker:false, feature:true, img:true, price:true, jan:true, jannum:true } }; }
+function defaultCardStyle(){ return { size: "m", width: 52, height: 0, fields: { head:true, note:true, label:true, cat:true, name:true, maker:false, feature:true, img:true, price:true, jan:true, jannum:true, smt:true } }; }
 function cardStyle_(){ return Object.assign(defaultCardStyle(), S.cardStyle || {}); }
 const CARD_SIZES = { s: { w: 45, h: 65 }, m: { w: 52, h: 78 }, l: { w: 65, h: 95 } };
 function syncCardStyleInputs(){
@@ -2847,7 +2884,7 @@ function syncCardStyleInputs(){
   if (hEl) hEl.value = cc.head;
   if (lEl) lEl.value = cc.label;
   const cx = c.fields || {};
-  ["head","note","label","cat","name","maker","feature","img","price","jan","jannum"].forEach(function(k){
+  ["head","note","label","cat","name","maker","feature","img","price","jan","jannum","smt"].forEach(function(k){
     const el = document.getElementById("cf-" + k);
     if (el) el.checked = cx[k] !== false;
   });
@@ -2871,7 +2908,8 @@ function saveCardStyle(){
       img: document.getElementById("cf-img").checked,
       price: document.getElementById("cf-price").checked,
       jan: document.getElementById("cf-jan").checked,
-      jannum: document.getElementById("cf-jannum").checked
+      jannum: document.getElementById("cf-jannum").checked,
+      smt: document.getElementById("cf-smt").checked
     }
   };
   save();
@@ -2967,7 +3005,7 @@ function renderCardSheet_(){
       + (x.head !== false ? '<div class="pcard-head" style="font-size:' + fs(15) + ';background:' + cc.head + '">商品カード</div>' : '')
       + (x.note !== false ? '<div class="pcard-note" style="font-size:' + fs(8.5) + '">お求めの際はこのカードを<br>レジまでお持ちください。</div>' : '')
       + (x.label !== false && label ? '<div class="pcard-label" style="font-size:' + fs(11) + ';background:' + cc.label + '">' + esc(label) + '</div>' : '')
-      + (x.cat !== false && catTxt ? '<div class="pcard-cat" style="font-size:' + fs(8.5) + '">' + esc(catTxt) + '</div>' : '')
+      + (x.cat !== false && catTxt ? '<div class="pcard-cat" style="font-size:' + fs(8.5) + '">' + esc(catTxt) + (x.smt !== false && it.smt ? ' <span class="pcard-smt">★税制対象</span>' : '') + '</div>' : '')
       + (x.name !== false ? '<div class="pcard-name" style="font-size:' + fs(12.5) + '">' + esc(it.name || "") + '</div>' : '')
       + (x.maker === true && it.maker ? '<div class="pcard-cat" style="font-size:' + fs(8.5) + '">' + esc(it.maker) + '</div>' : '')
       + (x.feature !== false && feature ? '<div class="pcard-feature" style="font-size:' + fs(9.5) + '">' + esc(feature) + '</div>' : '')
@@ -3275,6 +3313,7 @@ function renderTags(){
       let inner = '<div class="tag-inner">';
       let top = '';
       if (cp === "top") top += catBand;
+      if (it.smt) top += '<div class="tag-smt">セルフメディケーション税制対象</div>';
       if (it.ranyo) top += '<div class="tag-ranyo">指定濫用防止医薬品</div>';
       if (top) inner += '<div class="tag-top">'+top+'</div>';
       // 中段: 商品名・メーカー・価格(縦中央)
@@ -3600,7 +3639,7 @@ async function uploadShare(){
       action: "upload", id: S.pharmacy.id,
       pharmacy: { name: S.pharmacy.name, area: S.pharmacy.area },
       updatedAt: new Date().toISOString(),
-      items: S.items.map(it => ({ jan: it.jan, name: it.name, maker: it.maker, category: it.category, qty: it.qty, expiry: it.expiry || "" }))
+      items: S.items.map(it => ({ jan: it.jan, name: it.name, maker: it.maker, category: it.category, qty: it.qty, expiry: it.expiry || "", smt: !!it.smt }))
     };
     const r = await fetch(S.gasUrl, { method: "POST", body: JSON.stringify(payload) });
     const txt = await r.text();
@@ -3830,6 +3869,7 @@ function fillLookOptions_(){
 }
 function bootUi_(){
   careTick_();
+  onCategoryChange();
   setupPetTaps_();
   applyTheme();
   fillLookOptions_();
