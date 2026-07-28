@@ -162,6 +162,11 @@ button.mate-chip { cursor: pointer; font-family: var(--sans); }
 #jan-reader:not(:empty) { min-height: 260px; }
 #jan-reader video { width: 100% !important; height: auto !important; display: block; border-radius: 10px; }
 #jan-reader canvas { max-width: 100%; }
+.cam-tools { margin-top: 8px; display: flex; flex-direction: column; gap: 8px; }
+.cam-zoom { display: flex; align-items: center; gap: 10px; font-size: 12.5px; color: #5C6B78; }
+.cam-zoom input[type="range"] { flex: 1; min-width: 0; }
+.cam-zoom b { color: var(--ai-deep); font-size: 12.5px; min-width: 44px; text-align: right; }
+#jan-reader video { transition: transform 0.2s ease; }
 .scan-msg { font-size: 13px; color: var(--ai-deep); background: #EDF2F0; border-left: 3px solid var(--take); padding: 8px 10px; border-radius: 0 6px 6px 0; display: none; }
 .divider { display: flex; align-items: center; gap: 10px; color: #5C6B78; font-size: 12.5px; letter-spacing: 0.14em; }
 .divider::before, .divider::after { content: ""; flex: 1; height: 1px; background: var(--line); }
@@ -549,8 +554,20 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
         <button class="btn scan-main" id="scan-toggle" onclick="toggleScan()"><span class="scan-ico">▚</span> カメラでスキャン</button>
         <button class="btn ghost scan-sub" onclick="document.getElementById('photo-input').click()">写真から読み取る</button>
       </div>
+      <p class="hint" style="margin-top:6px">小さいバーコードが読めないときは「写真から読み取る」が確実です(カメラより高い画質で解析します)。</p>
       <input type="file" id="photo-input" accept="image/*" style="display:none" onchange="handlePhoto(event)">
       <div id="jan-reader"></div>
+      <div id="cam-tools" class="cam-tools" style="display:none">
+        <label class="cam-zoom" id="cam-zoom-wrap" style="display:none">
+          <span>拡大</span>
+          <input type="range" id="cam-zoom" min="1" max="5" step="0.1" value="1" oninput="setCamZoom(this.value)">
+          <b id="cam-zoom-val">1.0倍</b>
+        </label>
+        <div class="row gap wrap">
+          <button class="btn ghost" id="cam-torch" style="display:none" onclick="toggleTorch()">ライトを点ける</button>
+          <button class="btn ghost" onclick="camZoomStep()">もっと拡大</button>
+        </div>
+      </div>
       <div id="jan-file-reader" style="display:none"></div>
       <p class="scan-msg" id="scan-msg"></p>
     </div>
@@ -909,7 +926,7 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
   </section>
 
   <div class="toast" id="toast"></div>
-  <footer class="foot">OTCLinker — とみながグループ 店舗向けツール<br><span class="ver">版 2026-07-27 AM(バトル・そうび・マニュアル)</span></footer>
+  <footer class="foot">OTCLinker — とみながグループ 店舗向けツール<br><span class="ver">版 2026-07-28 AO(カメラ起動の修正)</span></footer>
 </div>
 
 <script>
@@ -1368,9 +1385,14 @@ async function toggleScan(){
     scanning = true;
     btn.textContent = "カメラを停止";
     scanMsg("カメラを起動しています…");
+    // 起動そのものは端末におまかせ(解像度を指定すると起動できない端末があるため)。
+    // 高画質化は起動後に applyConstraints で試みる。
     await scanner.start(
       { facingMode: "environment" },
-      { fps: 10, qrbox: (vw, vh) => { const w = Math.min(280, Math.floor(vw * 0.8)); return { width: w, height: Math.floor(w * 0.55) }; }, aspectRatio: 1.3333 },
+      { fps: 12,
+        qrbox: (vw, vh) => { const w = Math.min(300, Math.floor(vw * 0.85)); return { width: w, height: Math.floor(w * 0.5) }; },
+        aspectRatio: 1.3333,
+        experimentalFeatures: { useBarCodeDetectorIfSupported: true } },
       text => {
         const code = text.trim();
         if (/^\d{8}$/.test(code) || /^\d{13}$/.test(code)){
@@ -1383,17 +1405,140 @@ async function toggleScan(){
       },
       ()=>{}
     );
-    scanMsg("バーコードを枠内に合わせてください");
+    setupCamControls_();
+    scanMsg("バーコードを枠内に合わせてください。小さいバーコードは「拡大」で大きくしてください。");
   } catch(e){
     scanning = false;
     btn.textContent = "カメラでスキャン開始";
-    scanMsg("カメラを起動できませんでした。ブラウザのアドレスバー付近のカメラ許可を「許可」にしてから再度お試しください。このページは https:// のURLで開く必要があります。");
+    const msg = String((e && (e.name || e.message)) || "");
+    let why = "";
+    if (/NotAllowed|Permission/i.test(msg)) why = "カメラの使用が許可されていません。ブラウザのアドレスバー付近から「許可」にしてください。";
+    else if (/NotFound|Devices/i.test(msg)) why = "カメラが見つかりません。他のアプリがカメラを使っていないかご確認ください。";
+    else if (/NotReadable|Track/i.test(msg)) why = "カメラを別のアプリが使用中の可能性があります。他のアプリを閉じてお試しください。";
+    else if (/Secur|https|Insecure/i.test(msg)) why = "このページは https:// のURLで開く必要があります。";
+    else why = "しばらく待ってから、もう一度お試しください。";
+    scanMsg("カメラを起動できませんでした。" + why + "(" + (msg || "原因不明") + ")　うまくいかないときは「写真から読み取る」をお使いください。");
   }
+}
+function camTrack_(){
+  const v = document.querySelector("#jan-reader video");
+  if (!v || !v.srcObject) return null;
+  const t = v.srcObject.getVideoTracks();
+  return t && t.length ? t[0] : null;
+}
+// 端末が対応していれば、ズームとライトを使えるようにする
+async function setupCamControls_(){
+  const tools = document.getElementById("cam-tools");
+  const tr = camTrack_();
+  if (!tr){ if (tools) tools.style.display = "none"; return; }
+  tools.style.display = "block";
+  let cap = {};
+  try { cap = tr.getCapabilities ? tr.getCapabilities() : {}; } catch(e){}
+  // 起動できたあとで、できる範囲で画質を上げる(失敗しても起動済みなので影響なし)
+  try {
+    const maxW = (cap.width && cap.width.max) ? cap.width.max : 1920;
+    const want = Math.min(1920, maxW);
+    const now = tr.getSettings ? (tr.getSettings().width || 0) : 0;
+    if (want > now){
+      await tr.applyConstraints({ width: { ideal: want }, height: { ideal: Math.round(want * 9 / 16) } });
+    }
+  } catch(e){}
+  // ピントを合わせ続ける設定(対応端末のみ)
+  try {
+    if (cap.focusMode && cap.focusMode.indexOf("continuous") >= 0){
+      tr.applyConstraints({ advanced: [{ focusMode: "continuous" }] });
+    }
+  } catch(e){}
+  const zw = document.getElementById("cam-zoom-wrap");
+  if (cap.zoom){
+    const zi = document.getElementById("cam-zoom");
+    zi.min = cap.zoom.min; zi.max = Math.min(cap.zoom.max, cap.zoom.min * 6);
+    zi.step = cap.zoom.step || 0.1;
+    zi.value = tr.getSettings().zoom || cap.zoom.min;
+    zw.style.display = "flex";
+    updateZoomLabel_(zi.value);
+  } else {
+    zw.style.display = "none";
+  }
+  const tb = document.getElementById("cam-torch");
+  tb.style.display = cap.torch ? "" : "none";
+  tb.textContent = "ライトを点ける";
+  // 実際の解像度を伝える(読み取りにくいときの手がかりになる)
+  try {
+    const st = tr.getSettings();
+    if (st.width && st.width < 1000){
+      scanMsg("この端末のカメラは " + st.width + "×" + st.height + " で動いています。小さいバーコードは「拡大」を使うか、「写真から読み取る」をお試しください。");
+    }
+  } catch(e){}
+}
+function updateZoomLabel_(v){
+  const el = document.getElementById("cam-zoom-val");
+  if (el) el.textContent = Number(v).toFixed(1) + "倍";
+}
+function setCamZoom(v){
+  const tr = camTrack_();
+  if (!tr) return;
+  try { tr.applyConstraints({ advanced: [{ zoom: Number(v) }] }); updateZoomLabel_(v); } catch(e){}
+}
+// ズームに対応していない端末でも、映像を拡大して読みやすくする
+let __camStep = 1;
+function camZoomStep(){
+  const tr = camTrack_();
+  let cap = {};
+  try { cap = tr && tr.getCapabilities ? tr.getCapabilities() : {}; } catch(e){}
+  if (cap.zoom){
+    const zi = document.getElementById("cam-zoom");
+    const next = Math.min(Number(zi.max), Number(zi.value) + (Number(zi.max) - Number(zi.min)) / 4);
+    zi.value = next; setCamZoom(next);
+    return;
+  }
+  // カメラ側で拡大できない場合は、映像そのものを拡大する
+  __camStep = __camStep >= 2.5 ? 1 : __camStep + 0.5;
+  const v = document.querySelector("#jan-reader video");
+  if (v){
+    v.style.transform = "scale(" + __camStep + ")";
+    v.style.transformOrigin = "center center";
+  }
+  toast(__camStep > 1 ? "映像を " + __camStep.toFixed(1) + "倍に拡大しました" : "拡大を戻しました");
+}
+let __torchOn = false;
+function toggleTorch(){
+  const tr = camTrack_();
+  if (!tr) return;
+  __torchOn = !__torchOn;
+  try {
+    tr.applyConstraints({ advanced: [{ torch: __torchOn }] });
+    document.getElementById("cam-torch").textContent = __torchOn ? "ライトを消す" : "ライトを点ける";
+  } catch(e){ toast("この端末ではライトを使えません"); __torchOn = false; }
 }
 async function stopScan(){
   scanning = false;
+  const tools = document.getElementById("cam-tools");
+  if (tools) tools.style.display = "none";
+  __camStep = 1; __torchOn = false;
   document.getElementById("scan-toggle").textContent = "カメラでスキャン開始";
   if (scanner){ try { await scanner.stop(); scanner.clear(); } catch(e){} scanner = null; }
+}
+// 写真の中央を切り出して拡大する(小さいバーコードを読みやすくするため)
+function zoomCenter_(file, scale){
+  return new Promise(function(resolve){
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = function(){
+      try {
+        const cw = Math.round(img.width / scale), ch = Math.round(img.height / scale);
+        const sx = Math.round((img.width - cw) / 2), sy = Math.round((img.height - ch) / 2);
+        const cv = document.createElement("canvas");
+        cv.width = cw * 2; cv.height = ch * 2;          // 切り出したうえで2倍に拡大
+        const ctx = cv.getContext("2d");
+        ctx.imageSmoothingEnabled = true;
+        ctx.drawImage(img, sx, sy, cw, ch, 0, 0, cv.width, cv.height);
+        cv.toBlob(function(b){ URL.revokeObjectURL(url); resolve(b); }, "image/png");
+      } catch(e){ URL.revokeObjectURL(url); resolve(null); }
+    };
+    img.onerror = function(){ URL.revokeObjectURL(url); resolve(null); };
+    img.src = url;
+  });
 }
 async function handlePhoto(ev){
   const file = ev.target.files && ev.target.files[0];
@@ -1416,10 +1561,28 @@ async function handlePhoto(ev){
     try { s.clear(); } catch(e){}
     const code = String(text).trim();
     if (/^\d{8}$/.test(code) || /^\d{13}$/.test(code)){ beep(); scanMsg("読み取りました: " + code); applyJan(code); return; }
-    scanMsg("JANコード(数字のバーコード)を撮影してください。");
-  } catch(e){
-    scanMsg("読み取れませんでした。バーコードに近づき、明るい場所でピントを合わせて撮り直すか、数字を直接入力してください。");
-  }
+  } catch(e){}
+  // ここまでで読めない場合、写真の中央を切り出して拡大し、もう一度試す
+  try {
+    scanMsg("拡大して もう一度 解析しています…");
+    const zoomed = await zoomCenter_(file, 2.2);
+    if (zoomed && "BarcodeDetector" in window){
+      const det2 = new BarcodeDetector({ formats: ["ean_13","ean_8"] });
+      const bmp2 = await createImageBitmap(zoomed);
+      const codes2 = await det2.detect(bmp2);
+      const hit2 = codes2.find(c => /^\d{8}$/.test(c.rawValue) || /^\d{13}$/.test(c.rawValue));
+      if (hit2){ beep(); scanMsg("読み取りました: " + hit2.rawValue); applyJan(hit2.rawValue); return; }
+    }
+    if (zoomed){
+      document.getElementById("jan-file-reader").innerHTML = "";
+      const s2 = new Html5Qrcode("jan-file-reader");
+      const t2 = await s2.scanFile(new File([zoomed], "z.png", { type: "image/png" }), false);
+      try { s2.clear(); } catch(e){}
+      const c2 = String(t2).trim();
+      if (/^\d{8}$/.test(c2) || /^\d{13}$/.test(c2)){ beep(); scanMsg("読み取りました: " + c2); applyJan(c2); return; }
+    }
+  } catch(e){}
+  scanMsg("読み取れませんでした。バーコードが写真の中央に大きく写るように、10〜15cmまで近づけて撮り直してください。明るい場所だと読みやすくなります。それでも読めない場合は、バーコードの下の数字を直接入力してください。");
 }
 
 /* ============ フォーム ============ */
