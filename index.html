@@ -82,6 +82,7 @@ body { min-height: 100vh; background: var(--hakuji); color: var(--ink); font-fam
 .mate-chip.senmon { border-color: #5FA8D3; background: #F1F8FC; }
 .mate-chip .lv { font-style: normal; color: #E3A21A; font-size: 10px; letter-spacing: -1px; }
 .mate-chip .nx { font-style: normal; color: #9AA7AF; font-size: 9.5px; }
+.mate-chip .pers { font-style: normal; color: #5C6B78; font-size: 9.5px; background: #EEF3F1; border-radius: 999px; padding: 1px 6px; }
 button.mate-chip { cursor: pointer; font-family: var(--sans); }
 .mate-chip.picked { outline: 2px solid var(--ai); outline-offset: -2px; }
 .mate-chip .onmark { font-style: normal; font-size: 9.5px; color: #fff; background: var(--ai); border-radius: 999px; padding: 1px 5px; }
@@ -926,7 +927,7 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
   </section>
 
   <div class="toast" id="toast"></div>
-  <footer class="foot">OTCLinker — とみながグループ 店舗向けツール<br><span class="ver">版 2026-07-28 AO(カメラ起動の修正)</span></footer>
+  <footer class="foot">OTCLinker — とみながグループ 店舗向けツール<br><span class="ver">版 2026-07-28 AP(キャラ49人の性格)</span></footer>
 </div>
 
 <script>
@@ -2751,9 +2752,9 @@ function renderDotPet(){
   const shown = picks.length
     ? picks.map(function(k){ return line.filter(function(o){ return o.k === k; })[0]; }).filter(Boolean)
     : line.slice(0, PARTY_SHOW);
-  let h = '<span class="pet-unit">' + dotSvg(st.key, 34, 0, decoOf_(st.key), rpg_().equip) + '</span>';
+  let h = '<span class="pet-unit" data-key="' + st.key + '">' + dotSvg(st.key, 34, 0, decoOf_(st.key), rpg_().equip) + '</span>';
   shown.forEach(function(o){
-    h += '<span class="pet-unit ' + o.c + '">' + dotSvg(o.k, 26, mateLv_(o.k), decoOf_(o.k)) + '</span>';
+    h += '<span class="pet-unit ' + o.c + '" data-key="' + o.k + '">' + dotSvg(o.k, 26, mateLv_(o.k), decoOf_(o.k)) + '</span>';
   });
   const rest = line.length - shown.length;
   if (rest > 0) h += '<span class="mate-more">+' + rest + '</span>';
@@ -3078,14 +3079,89 @@ function pet_(){
 }
 const PAT_LIMIT = 5;          // なでてげんきになるのは1日5回まで
 // 状況に合わせたひとこと(困りごとがあれば教えてくれる)
-function petLine_(){
+const PERSONA = {
+  baby: { p:"あかちゃん", a:"shy", t:function(s){ return s + "でちゅ〜"; }, c:["あぶ〜、あぶぶ〜","まんま……","たかい たかい して〜"] },
+  child: { p:"げんきいっぱい", a:"jump", t:function(s){ return s + "だよ! ねえねえ!"; }, c:["そとで あそびたい!","ぼく はやく おおきくなりたい!","つぎは なにする?"] },
+  apprentice: { p:"がんばりや", a:"dash", t:function(s){ return s + "です! ぼく もっと がんばります"; }, c:["きょうも けいこ けいこ!","いつか ゆうしゃに なるんだ","まだまだ みならいです……"] },
+  warrior: { p:"たよれる先輩", a:"wiggle", t:function(s){ return s + "だ。まかせておけ"; }, c:["店のことは わたしが 見ておく","こまったら いつでも 言ってくれ","白衣は 戦闘服みたいなものだな"] },
+  hero: { p:"ゆうかんな勇者", a:"jump", t:function(s){ return s + "だ! さあ ゆこう!"; }, c:["この店は わたしが まもる!","なかまが いれば こわくない","きょうも 平和だ!"] },
+  tablet: { p:"きまじめ", a:"wiggle", t:function(s){ return s + "です。きちんと 確認しましょう"; }, c:["整理整頓は 基本です","手順どおりが いちばんです","割線は まっすぐが 美しい"] },
+  capsule: { p:"ツンデレ", a:"peek", t:function(s){ return s + "よ……べ、べつに 教えたかったわけじゃ ないんだからね"; }, c:["ふ、ふん。ひまだから 来ただけよ","なでるなら……ま、まあ いいけど","あんたのこと 心配してないから!"] },
+  powder: { p:"ダジャレ好き", a:"squash", t:function(s){ return s + "だよ。……なんてね、さんざい(散財)しちゃ ダメだよ〜"; }, c:["こなを こなす、なんちゃって","さんざい だけに サンザン だね〜","ぶんぽう(分包)より ぶんぽう(文法)が むずかしい"] },
+  troche: { p:"のんびり", a:"float", t:function(s){ return s + "だねぇ。ま、ゆっくり いこうよ"; }, c:["まんなかの あな、のぞいてみる?","ころころ ころがるの すきなんだ","あわてなくても だいじょうぶ〜"] },
+  eyedrop: { p:"なきむし", a:"shy", t:function(s){ return s + "だよ……うぅっ、なみだが とまらないよぉ"; }, c:["ひとりに しないで〜","また うるうる してきた……","やさしくされると すぐ泣いちゃう"] },
+  ointment: { p:"せわやき", a:"wiggle", t:function(s){ return s + "よ。だいじょうぶ? わたしが 見ておくね"; }, c:["きずついたら いつでも おいで","ちゃんと ごはん たべた?","ぬりぬり してあげよっか"] },
+  patch: { p:"むくち", a:"sleep", t:function(s){ return s + "だ。……以上"; }, c:["……。","ひえひえ。","……ん。"] },
+  tape: { p:"てれや", a:"shy", t:function(s){ return s + "です……あっ、じろじろ 見ないで〜"; }, c:["ま、巻かれるの 苦手で……","は、はずかしいよぉ","そんなに 近づかないで……"] },
+  syrup: { p:"あまえんぼ", a:"float", t:function(s){ return s + "だよ! ねえ もっと かまって〜"; }, c:["ぎゅーっ して ほしいな","ひとりは やだ〜","あまいものは しあわせだね"] },
+  drink: { p:"ねっけつ", a:"jump", t:function(s){ return s + "だァーッ!! もえてきたァ!!"; }, c:["気合いだ! 気合いで のりきれ!!","一気に いくぞォ!!","つかれた?ならば 飲むしかない!!"] },
+  supp: { p:"はずかしがり", a:"shy", t:function(s){ return s + "です……その、あんまり 見ないで ください"; }, c:["ぼく、うしろ向きで いいですか……","は、はずかしい 仕事なんです","でも 効きめは 一番なんですよ……"] },
+  inhaler: { p:"りくつっぽい", a:"spin", t:function(s){ return s + "です。統計的にも 妥当な結果ですね"; }, c:["呼吸とは すなわち 生命活動の基本です","効率を 考えると こうなります","つまり 論理的に 正しいわけです"] },
+  inject: { p:"おこりっぽい", a:"shock", t:function(s){ return s + "だ! さっさと やれ!!"; }, c:["チクッと いくぞ、覚悟しろ!","ぐずぐずするな!","おい、まだ 終わってないぞ!!"] },
+  s_hakase: { p:"はかせ", a:"spin", t:function(s){ return s + "だな。実に 興味深い"; }, c:["この現象には 明確な理由が あるのだよ","研究とは 積み重ねだよ、うむ","仮説を 立ててみようではないか"] },
+  s_monshin: { p:"しつもん魔", a:"peek", t:function(s){ return s + "ですね。ところで、ほかに 気になることは?"; }, c:["どこが つらいですか?","いつから ですか?","アレルギーは ありますか?"] },
+  s_nyubachi: { p:"しょくにん", a:"squash", t:function(s){ return s + "だ。……手を 動かせ"; }, c:["すり方に 心が でる","道具は 裏切らねぇ","無駄口 たたく暇があるならな"] },
+  s_choshinki: { p:"しんぱいしょう", a:"shy", t:function(s){ return s + "だよ……だいじょうぶ かなあ、心配だなあ"; }, c:["ちょっと 音が 気になって……","ねえ、ほんとに 平気?","なにか あったら すぐ言ってね……"] },
+  r_gold: { p:"たかびしゃ", a:"wiggle", t:function(s){ return s + "ですわ。……感謝なさい、教えてあげたのよ"; }, c:["わたくしに ふさわしい 店ですこと","おだまり。金には 品格が あるのよ","なでても よろしくてよ"] },
+  r_rainbow: { p:"わらいじょうご", a:"jump", t:function(s){ return s + "だよ。あははっ、おかしいっ!"; }, c:["あははっ! なんでもない けど おかしい!","ふふっ、笑うと 元気でるよね!","にじって 見るだけで 笑っちゃう"] },
+  r_phantom: { p:"なぞなぞ好き", a:"vanish", t:function(s){ return s + "だ。……ところで、なぞなぞは いかが?"; }, c:["ふふ……わたしが 見えるかね","すけて いるのは 心も 同じ","こたえは 風の中……なんてね"] },
+  g_okigusuri: { p:"りちぎな商売人", a:"wiggle", t:function(s){ return s + "でございます。先用後利、これが 商いの道"; }, c:["富山から はるばる 参りました","使った分だけ いただきます","信用が いちばんの 財産ですな"] },
+  g_renkon: { p:"からくち", a:"shock", t:function(s){ return s + "だよ。……甘いこと 言ってんじゃないよ"; }, c:["ツーンと くるでしょ?","甘い店には 客は 来ないよ","辛口で わるかったね"] },
+  g_jagaimo: { p:"おおらか", a:"float", t:function(s){ return s + "だべさ〜。まあ なんとかなるっしょ"; }, c:["ほっかいどうは でっかいどう〜","あわてない あわてない","ジャガイモは 土の中で のんびりよ"] },
+  g_ringo: { p:"くいしんぼう", a:"squash", t:function(s){ return s + "だ! ところで なにか たべもの ない?"; }, c:["おなか すいたなあ","シャリッと いい音でしょ","たべることは いきること!"] },
+  g_gyutan: { p:"おどりずき", a:"wiggle", t:function(s){ return s + "だよ! さあ いっしょに おどろう!"; }, c:["タンゴの リズムで いこう!","体を うごかすと 気分が いいよ!","ステップ ステップ ターン!"] },
+  g_takoyaki: { p:"かんさい人", a:"squash", t:function(s){ return s + "やで〜。……知らんけど"; }, c:["なんでやねん!","もうかりまっか?","アツアツのうちに どうぞ〜"] },
+  g_yatsuhashi: { p:"はんなり", a:"float", t:function(s){ return s + "どすえ。ゆるりと まいりましょう"; }, c:["京の水は やわらこおすなあ","おこしやす〜","あんじょう おきばりやす"] },
+  g_shika: { p:"あきらめ気味", a:"shy", t:function(s){ return s + "です。……まあ、シカたないですね"; }, c:["どうせ ぼくなんて……","おじぎしか とりえが ないので","まあ こんなもんです"] },
+  g_momiji: { p:"ふうりゅう", a:"float", t:function(s){ return s + "でございますな。……秋の夕暮れのようで"; }, c:["もみじの色は 心を しずめます","一句 詠みたくなりますなあ","移ろうものほど 美しい"] },
+  g_udon: { p:"おうえん団", a:"jump", t:function(s){ return s + "や! いけるぞ、ファイトーッ!!"; }, c:["コシで 勝負や!!","そこだ! いまだ! おしーっ!!","きみなら できる! ぜったい できる!"] },
+  g_mentaiko: { p:"めんどうみがいい", a:"wiggle", t:function(s){ return s + "ばい。こまっとったら 言いんしゃい"; }, c:["博多んもんは 情が あついとよ","めんたい 食うたら 元気になるばい","あんた、無理しよらんね?"] },
+  g_shisa: { p:"ポジティブ", a:"float", t:function(s){ return s + "さぁ〜。なんくるないさ〜"; }, c:["てーげー てーげー","わじわじー しても いいことないさ","海を 見たら 落ちつくよ〜"] },
+  g2_ichigo: { p:"れいぎ正しい", a:"wiggle", t:function(s){ return s + "でございます。ご報告 いたします"; }, c:["一期一会、この出会いに 感謝を","ごきげん うるわしゅう","本日も よろしくお願いいたします"] },
+  g2_mikan: { p:"自信なさげ", a:"shy", t:function(s){ return s + "……たぶん、あってると 思うんですけど……"; }, c:["ぼく、まだ 未完成なので……","すっぱかったら ごめんなさい","これで いいのかなあ……"] },
+  g2_rakkasei: { p:"けんやく家", a:"peek", t:function(s){ return s + "です。ムダづかいは いけませんよ"; }, c:["一円を 笑うものは 一円に 泣く","殻まで だいじに 使いましょう","安いときに まとめ買いです"] },
+  g2_budou: { p:"体育会系", a:"dash", t:function(s){ return s + "であります! ハイッ、了解であります!!"; }, c:["押忍!! 本日も 鍛錬であります!","声が 小さい! もう一度!!","根性で なんとかします!!"] },
+  g2_megane: { p:"分析好き", a:"spin", t:function(s){ return s + "ですね。数字で 見ると よく分かります"; }, c:["傾向を 見てみましょう","データは 嘘を つきません","前年比で 考えると……"] },
+  g2_kiritanpo: { p:"マイペース", a:"float", t:function(s){ return s + "だよ……ふぁ〜あ。まあ ぼちぼちで"; }, c:["いま ちょうど 焼けたとこ","いそがなくても 減らないよ","なべの 季節が 待ちどおしい"] },
+  g2_soba: { p:"けんしんてき", a:"wiggle", t:function(s){ return s + "です。わたしは ずっと そばに いますよ"; }, c:["どんなときも そばに います","つらいときは 呼んでください","そばに いるだけで いいんです"] },
+  g2_ebifly: { p:"ツッコミ", a:"shock", t:function(s){ return s + "や。……って、それ 先に言うてや!"; }, c:["なんでやねん! ……あ、ちがった","揚げ足 とるのが 得意です","そこ ツッコむとこ ちゃうやろ!"] },
+  g2_kibidango: { p:"おやぶん肌", a:"jump", t:function(s){ return s + "だ! さあ なかまを あつめるぞ!"; }, c:["だんごを やるから ついてこい!","なかまは 多いほど たのしい!","おれに まかせておけ!"] },
+  g2_sakuranbo: { p:"ふたごの息ぴったり", a:"wiggle", t:function(s){ return s + "だよ!「うん、そのとおり!」"; }, c:["ねえ、そうだよね?「そうだね!」","ふたりで ひとつなの","いつも いっしょなんだ「いっしょ!」"] },
+  g2_ocha: { p:"おちゃめ", a:"peek", t:function(s){ return s + "だよ。……なーんてね、おちゃらけ でした!"; }, c:["お茶目に いこうよ〜","いたずら しちゃおうかな","お茶でも どうぞ〜、ずずっ"] },
+  g2_konnyaku: { p:"とぼけ", a:"squash", t:function(s){ return s + "ですかな。……はて、なんの話でしたかな"; }, c:["ぷるぷる しております","つかみどころが ないと よく言われます","こんにゃくは 味が しみてこそ"] }
+};
+function personaOf_(key){ return PERSONA[key] || PERSONA.tablet; }
+// なぞなぞ(すけすけビンさんの担当)
+const NAZO = [
+  ["のむと 元気になるのに、たくさん のむと 元気が なくなるもの なあに?", "おさけ"],
+  ["まるくて 小さくて、割れるのに 切れないもの なあに?", "じょうざい(割線があるから)"],
+  ["いつも 口の中にいるのに、飲みこんではいけないもの なあに?", "トローチ"],
+  ["さしても いたくない はりは?", "とけいの はり"],
+  ["ぬると 消えるのに、消しゴムじゃないもの なあに?", "なんこう"],
+  ["いつも 見られているのに、自分では 見えないもの なあに?", "じぶんの せなか"],
+  ["水を 入れると 軽くなるもの なあに?", "ふうせん(うくから)"],
+  ["朝は 4本、昼は 2本、夜は 3本の あしのものは?", "にんげん"]
+];
+function petLine_(key){
   const st = dotStage(), gs = genkiState_(), p = pet_();
+  const per = personaOf_(key || st.key);
   const h = new Date().getHours();
-  const nm = p.heroName ? p.heroName : st.name;
   if (gs.key === "nemuri") return ["zzz……", "sleep"];
-  if (gs.key === "guttari" || gs.key === "yowari") return ["ちょっと つかれたよ……", "shy"];
+  if (gs.key === "guttari" || gs.key === "yowari") return [per.t("いま ちょっと おつかれ"), "shy"];
 
-  // 期限のことを教えてくれる
+  // なぞなぞ好きは、出題と こたえを 交互に
+  if (key === "r_phantom"){
+    const st2 = S.nazo || { i: -1, ans: false };
+    if (st2.ans && st2.i >= 0){
+      S.nazo = { i: st2.i, ans: false }; save();
+      return ["こたえは……「" + NAZO[st2.i][1] + "」でした。ふふ、また あそぼう", "spin"];
+    }
+    const i = Math.floor(Math.random() * NAZO.length);
+    S.nazo = { i: i, ans: true }; save();
+    return ["なぞなぞです。" + NAZO[i][0] + "(もう一度 タップで こたえ)", "vanish"];
+  }
+
+  // 知らせたいこと(そのキャラの言い方に変える)
   let expired = 0, soon = 0;
   (S.items || []).forEach(function(it){
     const lv = expiryLevel(it.expiry);
@@ -3093,33 +3169,30 @@ function petLine_(){
     else if (lv === "m3") soon++;
   });
   const pool = [];
-  // きょうは何の日(記念日は出やすく)
   const f = dayFact_();
   if (f.text){
-    // 記念日は3回、季節の話題は2回いれて出やすくする
     const times = (f.kind === "fact") ? 3 : 2;
-    for (let i = 0; i < times; i++) pool.push([f.text, f.kind === "fact" ? "jump" : "float"]);
+    for (let i = 0; i < times; i++) pool.push([per.t(f.text.replace(/!$/, "")), per.a]);
   }
-  if (expired) pool.push(["きげんぎれが " + expired + "こ あるみたい……", "shock"]);
-  if (soon) pool.push(["もうすぐ きげんの おくすりが " + soon + "こ あるよ", "peek"]);
+  if (expired) pool.push([per.t("きげんぎれが " + expired + "こ"), "shock"]);
+  if (soon) pool.push([per.t("もうすぐ きげんの おくすりが " + soon + "こ"), "peek"]);
   const restQ = QUESTS.filter(function(q){ return !questDone_(q.id); });
-  if (restQ.length) pool.push(["まだ ためしてない きのうが " + restQ.length + "こ あるよ!", "float"]);
-  if (st.next) pool.push(["あと " + (st.next - st.n) + " ひんもくで なにか おこるよ!", "jump"]);
-  if (p.streak >= 3) pool.push([p.streak + "にち れんぞく!" + (p.streak >= 7 ? " すごい!" : ""), "jump"]);
+  if (restQ.length) pool.push([per.t("まだ ためしてない きのうが " + restQ.length + "こ"), per.a]);
+  if (st.next) pool.push([per.t("つぎの お楽しみまで あと " + (st.next - st.n) + " ひんもく"), "jump"]);
+  if (p.streak >= 3) pool.push([per.t("れんぞく " + p.streak + "にちめ"), "jump"]);
+  const en = rpg_().enemy ? enemyOf_(rpg_().enemy) : null;
+  if (en) pool.push([per.t(en.name + "が おでまし"), "shock"]);
 
-  // ふだんのひとこと
-  const chat = [
-    [h < 11 ? "おはよう!きょうも がんばろう" : (h < 17 ? "おつかれさま!" : "きょうも おつかれさま"), "wiggle"],
-    ["きょうの ざいこは " + (S.items || []).length + " ひんもくだね", "float"],
-    [nm + "は げんきです!", "jump"],
-    ["なでてくれて ありがとう", "shy"],
-    ["おくすり だいすき!", "spin"],
-    ["きょうの ふくそう、にあってる?", "wiggle"],
-    ["なかまが " + allMates_().length + "たい あつまったよ", "jump"],
-    ["ちょっと ねむい……", "sleep"],
-    ["いっしょに " + careDays_() + "にち すごしたね", "float"]
+  // ふだんのひとこと(そのキャラだけのセリフ)
+  const own = per.c.map(function(c){ return [c, per.a]; });
+  const common = [
+    [per.t(h < 11 ? "きょうも いい朝" : (h < 17 ? "きょうも おつかれさま" : "そろそろ 夕暮れどき")), "wiggle"],
+    [per.t("きょうの ざいこは " + (S.items || []).length + " ひんもく"), per.a],
+    [per.t("なかまは いま " + allMates_().length + "たい"), "jump"],
+    [per.t("いっしょに すごして " + careDays_() + "にち"), "float"],
+    [per.t("なでてくれて ありがとう、の きもち"), "shy"]
   ];
-  const all = pool.concat(chat, chat);   // 困りごとは出やすく、雑談は控えめに
+  const all = pool.concat(own, own, common);
   return all[Math.floor(Math.random() * all.length)];
 }
 function renameHero(){
@@ -3139,7 +3212,7 @@ function petSay_(text){
   box.style.display = "block";
   box.classList.remove("pop"); void box.offsetWidth; box.classList.add("pop");
   clearTimeout(box._tm);
-  box._tm = setTimeout(function(){ box.style.display = "none"; }, 3200);
+  box._tm = setTimeout(function(){ box.style.display = "none"; }, 4200);
 }
 /* タップの判定
    iOSはクリックを約300ミリ秒遅らせて送るため、クリックだけで数えると
@@ -3163,8 +3236,14 @@ function setupPetTaps_(){
   let lastUp = 0;
   let startX = 0, startY = 0;
 
+  let tappedUnit = null;
   const down = function(e){
     __petLong = false;
+    // どのキャラを押したかを覚えておく
+    try {
+      const t = e && (e.target || null);
+      tappedUnit = t && t.closest ? t.closest(".pet-unit") : null;
+    } catch(err){ tappedUnit = null; }
     if (e && e.touches && e.touches[0]){ startX = e.touches[0].clientX; startY = e.touches[0].clientY; }
     else if (e && e.clientX != null){ startX = e.clientX; startY = e.clientY; }
     clearTimeout(__petPressTimer);
@@ -3191,7 +3270,8 @@ function setupPetTaps_(){
     __petTapN++;
     if (__petTapN === 1){
       clearTimeout(__petTapTimer);
-      __petTapTimer = setTimeout(function(){ __petTapN = 0; petPat_(); }, PET_DOUBLE_MS);
+      const who = tappedUnit;
+      __petTapTimer = setTimeout(function(){ __petTapN = 0; petPat_(who); }, PET_DOUBLE_MS);
     } else {
       petOpenParty_();
     }
@@ -3213,17 +3293,22 @@ function setupPetTaps_(){
   el.addEventListener("click", function(e){ e.preventDefault(); e.stopPropagation(); });
 }
 // なでる:反応してくれて、1日5回まで少し元気になる
-function petPat_(){
+function petPat_(unitEl){
   const p = pet_(), t = today();
   if (p.patDay !== t){ p.patDay = t; p.pats = 0; }
-  const line = petLine_();
   const units = petUnits_();
-  if (units.length){
-    const u = units[Math.floor(Math.random() * units.length)];
+  // タップされたキャラ本人が答える(場所が分からないときは適当に選ぶ)
+  let u = unitEl && unitEl.classList && unitEl.classList.contains("pet-unit") ? unitEl : null;
+  if (!u && units.length) u = units[Math.floor(Math.random() * units.length)];
+  const key = u ? u.getAttribute("data-key") : null;
+  const line = petLine_(key);
+  const nm = key ? (DOT_NAMES[key] || dotStage().name) : dotStage().name;
+  if (u){
     clearActs_(u); void u.offsetWidth;
     u.classList.add("act-" + line[1]);
     setTimeout(function(){ clearActs_(u); }, 1800);
   }
+  line[0] = nm + "「" + line[0] + "」";
   if (p.pats < PAT_LIMIT && genkiState_().key !== "nemuri"){
     p.pats++;
     careFeed_(2);
@@ -3324,8 +3409,8 @@ function openPartyModal(){
     const on = picks.indexOf(k) >= 0;
     const nx = mateNext_(k);
     return '<button class="mate-chip ' + cls + (on ? ' picked' : '') + '" onclick="togglePetPick(\'' + k + '\')"'
-      + ' title="' + mateLvLabel_(lv) + (dk ? " / " + DECOS[dk] : "") + ' — タップで画面に出す">'
-      + dotSvg(k, 26, lv, dk) + esc(DOT_NAMES[k])
+      + ' title="' + (PERSONA[k] ? PERSONA[k].p + " / " : "") + mateLvLabel_(lv) + (dk ? " / " + DECOS[dk] : "") + ' — タップで画面に出す">'
+      + dotSvg(k, 26, lv, dk) + esc(DOT_NAMES[k]) + (PERSONA[k] ? '<i class="pers">' + esc(PERSONA[k].p) + '</i>' : '')
       + '<i class="lv">' + (lv >= 3 ? "★★★" : lv >= 2 ? "★★" : "★") + '</i>'
       + (nx !== null ? '<i class="nx">あと' + nx + '日</i>' : '')
       + (on ? '<i class="onmark">画面</i>' : '') + '</button>';
