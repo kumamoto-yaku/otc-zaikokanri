@@ -66,6 +66,20 @@ body { min-height: 100vh; background: var(--hakuji); color: var(--ink); font-fam
 .act-dash   { animation: aDash 1.1s ease; }
 .act-shock  { animation: aShock 0.8s ease; }
 .act-float  { animation: aFloat 1.6s ease-in-out; }
+.act-hop    { animation: aHop 1.1s ease; }
+.act-wag    { animation: aWag 1.0s ease; }
+.act-howl   { animation: aHowl 1.4s ease; }
+.act-charge { animation: aCharge 1.0s ease; }
+.act-bite   { animation: aBite 0.9s ease; }
+.act-fly    { animation: aFly 1.6s ease-in-out; }
+.act-slide  { animation: aSlide 1.3s ease; }
+@keyframes aHop { 0%,100%{transform:translateY(0)} 20%{transform:translateY(-10px) scaleY(1.1)} 35%{transform:translateY(0) scaleY(0.9)} 55%{transform:translateY(-7px)} 70%{transform:translateY(0) scaleY(0.94)} 85%{transform:translateY(-3px)} }
+@keyframes aWag { 0%,100%{transform:rotate(0)} 15%{transform:rotate(7deg)} 30%{transform:rotate(-7deg)} 45%{transform:rotate(6deg)} 60%{transform:rotate(-6deg)} 75%{transform:rotate(3deg)} }
+@keyframes aHowl { 0%,100%{transform:translateY(0) rotate(0)} 25%{transform:translateY(-4px) rotate(-16deg)} 65%{transform:translateY(-5px) rotate(-18deg)} }
+@keyframes aCharge { 0%{transform:translateX(0)} 20%{transform:translateX(-7px)} 55%{transform:translateX(12px) scaleX(1.12)} 80%{transform:translateX(-3px)} 100%{transform:translateX(0)} }
+@keyframes aBite { 0%,100%{transform:scale(1)} 25%{transform:scale(1.22,0.85) translateX(5px)} 45%{transform:scale(0.9,1.14)} 70%{transform:scale(1.1,0.94)} }
+@keyframes aFly { 0%,100%{transform:translateY(0) rotate(0)} 30%{transform:translateY(-12px) rotate(-8deg)} 60%{transform:translateY(-9px) rotate(8deg)} }
+@keyframes aSlide { 0%{transform:translateX(0) rotate(0)} 30%{transform:translateX(-10px) rotate(-70deg)} 60%{transform:translateX(8px) rotate(-90deg)} 100%{transform:translateX(0) rotate(0)} }
 @keyframes aVanish { 0%{opacity:1;transform:scale(1)} 18%{opacity:0;transform:scale(0.5) rotate(20deg)} 62%{opacity:0;transform:scale(0.5)} 80%{opacity:1;transform:scale(1.18)} 100%{opacity:1;transform:scale(1)} }
 @keyframes aRoll { 0%{transform:translateX(0) rotate(0)} 40%{transform:translateX(-10px) rotate(-200deg)} 100%{transform:translateX(0) rotate(-360deg)} }
 @keyframes aShy { 0%,100%{transform:translateY(0)} 30%{transform:translateY(4px) scale(0.92,0.9)} 70%{transform:translateY(2px) scale(0.96,0.95)} }
@@ -91,6 +105,17 @@ button.mate-chip { cursor: pointer; font-family: var(--sans); }
 .dot-pet.sleepy { opacity: 0.45; filter: grayscale(0.8); }
 .dot-pet.weak { opacity: 0.75; filter: grayscale(0.35); }
 .party-stage.sleepy { filter: grayscale(0.8); opacity: 0.6; }
+.pet-unit.buddy { filter: drop-shadow(0 0 2px rgba(255,216,77,0.8)); }
+.buddy-list { display: flex; gap: 8px; flex-wrap: wrap; }
+.buddy-card { flex: 1 1 30%; min-width: 96px; display: flex; flex-direction: column; align-items: center; gap: 2px;
+  border: 1px solid var(--line); border-radius: 10px; background: #fff; padding: 8px 6px; cursor: pointer; font-family: var(--sans); }
+.buddy-card b { font-size: 12.5px; color: var(--ai-deep); }
+.buddy-card i { font-style: normal; font-size: 10px; color: #7B8794; text-align: center; line-height: 1.35; }
+.buddy-card i.fx { color: #3E7C59; }
+.buddy-card i.pg { color: var(--ai); font-weight: 600; }
+.buddy-card.on { border-color: var(--ai); background: #EEF3F1; }
+.buddy-card.yet { opacity: 0.65; cursor: default; }
+.buddy-card .onmark { background: var(--ai); color: #fff; border-radius: 999px; padding: 1px 7px; font-size: 9.5px; }
 .bt-box { border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; background: #FAFBFB; }
 .bt-appear { display: flex; align-items: center; gap: 10px; font-size: 13px; }
 .bt-side { text-align: center; margin: 6px 0; }
@@ -113,6 +138,10 @@ button.mate-chip { cursor: pointer; font-family: var(--sans); }
 .eq-item { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; border: 1px solid var(--line); border-radius: 8px; background: #fff; padding: 6px 10px; font-size: 12.5px; font-family: var(--sans); cursor: pointer; color: var(--ink); }
 .eq-item i { font-style: normal; font-size: 10.5px; color: #7B8794; }
 .eq-item.on { border-color: var(--ai); background: #EEF3F1; font-weight: 600; }
+.lv-row { display: flex; align-items: center; gap: 8px; font-size: 12.5px; color: #43596B; margin: 6px 0; }
+.lv-row b { color: var(--ai-deep); font-size: 14px; }
+.lv-bar { flex: 1; height: 8px; background: #E4EAE7; border-radius: 999px; overflow: hidden; }
+.lv-bar i { display: block; height: 100%; background: var(--ai); border-radius: 999px; transition: width 0.4s ease; }
 .genki-box { border: 1px solid var(--line); border-radius: 10px; padding: 9px 11px; margin: 10px 0 4px; background: #FAFBFB; }
 .genki-row { display: flex; align-items: center; gap: 8px; font-size: 12.5px; color: #43596B; }
 .genki-bar { flex: 1; height: 9px; background: #E4EAE7; border-radius: 999px; overflow: hidden; }
@@ -123,7 +152,7 @@ button.mate-chip { cursor: pointer; font-family: var(--sans); }
 .quest-list li::before { content: "□ "; color: #9AA7AF; }
 .mate-chip.rare { border-color: #E3C65A; background: #FFFBEC; }
 @media (prefers-reduced-motion: reduce) {
-  .act-jump,.act-wiggle,.act-spin,.act-squash,.act-peek,.act-vanish,.act-roll,.act-shy,.act-sleep,.act-dash,.act-shock,.act-float,.dot-pet.rare-pop { animation: none !important; }
+  .act-jump,.act-wiggle,.act-spin,.act-squash,.act-peek,.act-vanish,.act-roll,.act-shy,.act-sleep,.act-dash,.act-shock,.act-float,.act-hop,.act-wag,.act-howl,.act-charge,.act-bite,.act-fly,.act-slide,.dot-pet.rare-pop { animation: none !important; }
 }
 .party-stage { background: linear-gradient(180deg,#EAF2F7 0%,#DDE9F0 62%,#CFE0D6 62%,#C6DACD 100%); border: 1px solid #C3D3DC; border-radius: 10px; padding: 8px; display: flex; align-items: flex-end; gap: 3px; flex-wrap: wrap; }
 .party-stage svg { image-rendering: pixelated; display: block; }
@@ -218,6 +247,8 @@ input:focus, select:focus { outline: 2px solid var(--ai); outline-offset: -1px; 
 .ph-mine { font-size: 11px; color: #fff; background: var(--take); border-radius: 999px; padding: 1px 8px; align-self: flex-start; }
 .ph-arrow { color: #9AA7AF; font-size: 20px; }
 .ph-detail-head { display: flex; flex-direction: column; gap: 4px; padding-bottom: 10px; margin-bottom: 8px; border-bottom: 1px solid var(--line); }
+.ph-vs { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 11.5px; color: #5C6B78; background: #F4F8F6; border: 1px solid #DCE7E1; border-radius: 8px; padding: 5px 8px; margin: -2px 0 8px; }
+.ph-vs .btn { padding: 5px 12px; font-size: 12px; }
 .ph-stale { color: #C0392B; font-weight: 600; }
 .ph-item-maker { font-size: 11px; color: #7B8794; }
 .ph-cat-group { margin-bottom: 14px; }
@@ -927,7 +958,7 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
   </section>
 
   <div class="toast" id="toast"></div>
-  <footer class="foot">OTCLinker — とみながグループ 店舗向けツール<br><span class="ver">版 2026-07-28 AP(キャラ49人の性格)</span></footer>
+  <footer class="foot">OTCLinker — とみながグループ 店舗向けツール<br><span class="ver">版 2026-07-28 AR(ペット12体・レベル・他店対戦)</span></footer>
 </div>
 
 <script>
@@ -1766,6 +1797,7 @@ function saveItem(){
   if (f.expiry) doQuest("expiry");
   if (f.kana) doQuest("kana");
   careFeed_(6);
+  addExp_(12, "商品の登録");
   checkSenmon_();
   const backTo = wasEditing ? __editReturnTab : null;
   save(); clearForm(); renderList(); showExpiryAlert();
@@ -2249,6 +2281,19 @@ const DOT_SPRITES = {
   g2_sakuranbo: ["................................","................................","...............KDdKK............",".............KKDDdKKK...........",".............KDDdK...Kd.........","...........KKDDdK...KKDd........","...........KDDdKK...KKdd........",".........KKDDdK....KKdKd........",".........KDDdKK....KDDdK........",".......KKKddKK...KKKddKK........",".......KKKKKKK...KKKKKKK........",".....KKKKKKKKK..KKKKKKKKK.......",".....KKRRRRRrKKKKRRRRRrKK.......","...KKRRRRRRRRrKKRRRRRRRRrKK.....","...KKRRRRRRRRrKKRRRRRRRRrKK.....","..KKRRRrrRRRRrKKRRRrrRRRRrKK....","..KKRRrKKrRRRrKKRRrKKrRRRrKK....","..KKRrKKKKRRRrKKRrKKKKRRRrKK....","..KKRrKKKKRRRrKKRrKKKKRRRrKK....","..KKRRrKKRRRRrKKRRrKKRRRRrKK....","..KKRRRRRRRRRrKKRRRRRRRRRrKK....","..KKRRRRrrrrRrKKRRRRrrrrRrKK....","..KKrRRrKKKKRrKKRRRrKKKKRrKK....","...KKRRrKKKKRrKKRRRrKKKKRrK.....","...KKrrRRRRRRrKKrRRRRRRRrKK.....",".....KKrrrrrrKKKKrrrrrrrK.......",".....KKKKKKKKKKKKKKKKKKKK.......",".......KKKKKKKKKKKKKKKK.........","................................","................................","................................","................................"],
   g2_ocha: ["................................","................................","......KK....KK....KK............","......KKK...KKK...KKK...........",".......KKK...KKK...KKK..........","........KK....KK....KK..........","................................","................................",".....KKKKKKKKKKKKKKKKKKKK.......","....KKKKKKKKKKKKKKKKKKKKKK......","....KKKDDDDDDDDDDDDDDDdKKK......","....KKDDDDDDDDDDDDDDDDDdKK......","....KKWWWWWWWWWWWWWWWWWwKK......","....KKWWWwwWWWWWWWWwwWWwKK......","....KKWWwKKwWWWWWWwKKwWwKK......","....KKWwKKKKWWWWWwKKKKWwKK......","....KKWwKKKKWWWWWwKKKKWwKK......","....KKWWwKKWWWWWWWwKKWWwKK......","....KKWWWWWWWWWWWWWWWWWwKK......","....KKWWWWWWwwwwwwWWWWWwKK......","....KKwWWWWwKKKKKKWWWWWwKK......",".....KKWWWWwKKKKKKWWWWwKK.......",".....KKwwWWWWWWWWWWWWwwKK.......",".......KKWWWWWWWWWWWwKK.........",".......KKwwWWWWWWWWwwKK.........",".........KKwwwwwwwwKK...........","..........KKKKKKKKKK............","..........KKKKKKKKKK............","......KKKKKKKKKKKKKKKKKK........","......KKKKKKKKKKKKKKKKKK........","................................","................................"],
   g2_konnyaku: ["................................","................................","................................","................................",".....KKKKKKKKKKKKKKKKKKKKKK.....","...KKKKKKKKKKKKKKKKKKKKKKKKKK...","...KKDDDDDDDDDDDDDDDDDDDDDdKK...","..KKDDDddDDDDDDDDDDDDDDddDDdKK..","..KKDDdKKdDDDDDDDDDDDDdKKdDdKK..","..KKDdKKKKDDDDDDDDDDDdKKKKDdKK..","..KKDdKKKKDDDDDDDDDDDdKKKKDdKK..","..KKDDdKKDDDDDDDDDDDDDdKKDDdKK..","..KKDDDDDDDDDDDDDDDDDDDDDDDdKK..","..KKDDDDDDddddddddddddDDDDDdKK..","..KKDDDDDdKKKKKKKKKKKKDDDDDdKK..","..KKDDDDDdKKKKKKKKKKKKDDDDDdKK..","..KKDDDDDDDDDDDDDDDDDDDDDDDdKK..","..KKDDDDddDDDDDDDDDDDDddDDDdKK..","..KKDDDdKKDDDDDDDDDDDdKKDDDdKK..","..KKDDDdKKDDDDDDDDDDDdKKDDDdKK..","..KKDDDDDDDDDDDDDDDDDDDDDDDdKK..","..KKDDDDDDDDDDDDDDDDDDDDDDDdKK..","..KKdDDDDDDDDDDDDDDDDDDDDDDdKK..","...KKddddddddddddddddddddddKK...","...KKKKKKKKKKKKKKKKKKKKKKKKKK...","....KKKKKKKKKKKKKKKKKKKKKKKK....","....KKK..................KKK....","...KKK....................KKK...","..KKKK....................KKKK..","..KKK......................KKK..","................................","................................"],
+  /* --- あいぼう(主人公のペット) --- */
+  p_wolf: ["....KK..................KK......","...KKKK................KKKK.....","...KSsK................KSsK.....","..KKSSsKK............KKSSsKK....","..KKSSsKK............KKSSsKK....","..KKSSSSsKK........KKSSSSsKK....","..KKSSSSsKKKKKKKKKKKKSSSSsKK....",".KKSSSSSSSsKKKKKKKKSSSSSSSsKK...",".KKSSSSSSSSSSSSSSSSSSSSSSSsKK...","KKSSSSSssSSSSSSSSSSSSssSSSSsKK..","KKSSSSsKKsSSSSSSSSSSsKKsSSSsKK..","KKSSSsKKKKSSSSSSSSSsKKKKSSSsKK..","KKSSSsKKKKSSSSSSSSSsKKKKSSSsKK..","KKSSSSsKKSSSSSSSSSSSsKKSSSSsKK..","KKSSSSSSSSSSSSSSSSSSSSSSSSSsKK..","KKSSSSSSSSSssssssssSSSSSSSSsKK..","KKSSSSSSSssKKKKKKKKssSSSSSSsKK..","KKSSSSSSsKKKKKKKKKKKKsSSSSSsKK..","KKsSSSSsKKWwKKWwKKWwKKSSSSSsKK..",".KKSSSSsKKwwKKwwKKwwKKSSSSsKK...",".KKsSSSSsKKKKKKKKKKKKSSSSSsKK...","..KKSSSSSSsKKKKKKKKSSSSSSsKK....","..KKsSSSSSSSSSSSSSSSSSSSSsKK....","...KKSSSSSSSSSSSSSSSSSSSsKK.....","...KKsSSSSSSSSSSSSSSSSSSsKK.....","....KKSSSSSssssssssSSSSsKK......","....KKsSSssKKKKKKKKssSSsKK......","....KKKssKKKKKKKKKKKKssKKK......","....KKKKKKK........KKKKKKK......",".....KKKK............KKKK.......","................................","................................"],
+  p_fox: ["....KK..................KK......","...KKKK................KKKK.....","...KOoK................KOoK.....","..KKOOoKK............KKOOoKK....","..KKOOoKK............KKOOoKK....","..KKOOOOoKK........KKOOOOoKK....","..KKOOOOoKKKKKKKKKKKKOOOOoKK....",".KKOOOOOOOoKKKKKKKKOOOOOOOoKK...",".KKOOOOOOOOOOOOOOOOOOOOOOOoKK...","KKOOOOOooOOOOOOOOOOOOooOOOOoKK..","KKOOOOoKKoOOOOOOOOOOoKKoOOOoKK..","KKOOOoKKKKOOOOOOOOOoKKKKOOOoKK..","KKOOOoKKKKOOOOOOOOOoKKKKOOOoKK..","KKOOOOoKKOOOOOOOOOOOoKKOOOOoKK..","KKOOOOOOOOOOOOOOOOOOOOOOOOOoKK..","KKOOOOOOOOOOOOOOOOOOOOOOOOOoKK..","KKOOOOOOOWWWWWWWWWWWWOOOOOOoKK..","KKOOOOOOWWwwwwwwwwwwWWOOOOOoKK..","KKoOOOOOWwKKKKKKKKKKWWOOOOOoKKw.",".KKOOOOOWwKKKKKKKKKKWWOOOOoKKWWw",".KKoOOOOWWWWWWWWWWWWWWOOOOoKKWWw","..KKOOOOOWWWWWWWWWWWWOOOOoKKWWWw","..KKoOOOOOOOOOOOOOOOOOOOOoKKWWWw","...KKOOOOOOOOOOOOOOOOOOOoKKWWWw.","...KKoOOOOOOOOOOOOOOOOOOoKKWWww.","....KKOOOOOooooooooOOOOoKKWWw...","....KKoOOooKKKKKKKKooOOoKKWww...","....KKKooKKKKKKKKKKKKooKKKw.....","....KKKKKKK........KKKKKKK......",".....KKKK............KKKK.......","................................","................................"],
+  p_cat: [".....KK................KK.......","...KKKKKK............KKKKKK.....","...KKWwKK............KKWwKK.....","..KKWWWWwKK........KKWWWWwKK....","..KKWWWWwKKKKKKKKKKKKWWWWwKK....",".KKWWWWWWWwKKKKKKKKWWWWWWWwKK...",".KKWWWWWWWWWWWWWWWWWWWWWWWwKK...","KKWWWWWwwWWWWWWWWWWWWwwWWWWwKK..","KKWWWWwKKwWWWWWWWWWWwKKwWWWwKK..","KKWWWwKKKKWWWWWWWWWwKKKKWWWwKK..","KKWWWwKKKKWWWWWWWWWwKKKKWWWwKK..","KKWWWWwKKWWWWWWWWWWWwKKWWWWwKK..","KKWWWWWWWWWWWWWWWWWWWWWWWWWwKK..","KKWWwwWWWWWWWWWWWWWWWWWWwwWwKK..","KKWwKKWWWWWWWMMMMWWWWWWwKKWwKK..","KKWwKKWWWWWWmmmmmmWWWWWwKKWwKK..","KKwWWWWWWWWwKKKKKKWWWWWWWWWwKK..",".KKWWWWWWWWWwKKKKWWWWWWWWWwKK...",".KKwWWWWWWWWWWWWWWWWWWWWWWwK....","..KKWWWWWWWWWWWWWWWWWWWWWwKK....","..KKwWWWWWWWWWWWWWWWWWWWWwKKKKK.","...KKWWWWWWWWWWWWWWWWWWWwKKKKKKK","...KKwWWWWWWWWWWWWWWWWWWwKKKWwKK","....KKWWWWWwwwwwwwwWWWWwKKKKWwK.","....KKwWWwwKKKKKKKKwwWWwKKKKWw..","....KKKwwKKKKKKKKKKKKwwKKKKKw...","....KKKKKKK........KKKKKKKKK....",".....KKKK............KKKKKK.....","................................","................................","................................","................................"],
+  p_dog: [".....KK................KK.......","...KKKKKK............KKKKKK.....","...KKNnKK............KKNnKK.....","..KKNNNNnKK........KKNNNNnKK....","..KKNNNNnKKKKKKKKKKKKNNNNnKK....",".KKNNNNNNNnKKKKKKKKNNNNNNNnKK...",".KKNNNNNNNNNNNNNNNNNNNNNNNnKK...","KKNNNNNnnNNNNNNNNNNNNnnNNNNnKK..","KKNNNNnKKnNNNNNNNNNNnKKnNNNnKK..","KKNNNnKKKKNNNNNNNNNnKKKKNNNnKK..","KKNNNnKKKKNNNNNNNNNnKKKKNNNnKK..","KKNNNNnKKNNNNNNNNNNNnKKNNNNnKK..","KKNNNNNNNNNNNNNNNNNNNNNNNNNnKK..","KKNNNNNNNNNNNNNNNNNNNNNNNNNnKK..","KKNNNNNNNCCCCCCCCCCCCNNNNNNnKK..","KKNNNNNNCCccccccccccCCNNNNNnKK..","KKnNNNNNCcKKKKKKKKKKCCNNNNNnKK..",".KKNNNNNCcKKKKKKKKKKCCNNNNnKK...",".KKnNNNNCCCCCCCCCCCCCCNNNNnKK...","..KKNNNNNCCCCCCCCCCCCNNNNnKK....","..KKnNNNNNNNNNNNNNNNNNNNNnKK....","...KKNNNNNNNNNNNNNNNNNNNnKKKK...","...KKnNNNNNNNNNNNNNNNNNNnKKKK...","....KKNNNNNnnnnnnnnNNNNnKKKKKK..","....KKnNNnnKKKKKKKKnnNNnKKKKKn..","....KKKnnKKKKKKKKKKKKnnKKKKKn...","....KKKKKKK........KKKKKKKKK....",".....KKKK............KKKKKK.....","................................","................................","................................","................................"],
+  p_rabbit: [".......KK........KK.............",".....KKKKKK....KKKKKK...........",".....KKWwKK....KKWwKK...........","....KKWWWwKK..KKWWWwKK..........","....KKWWWwKK..KKWWWwKK..........","....KKWWWwKK..KKWWWwKK..........","....KKWWWwKK..KKWWWwKK..........","....KKWWWwKK..KKWWWwKK..........","....KKWWWwKKKKKKWWWwKK..........","...KKWWWWWwKKKKWWWWWwKK.........","...KKWWWWWWWWWWWWWWWwKK.........",".KKWWWWWWWWWWWWWWWWWWWwKK.......",".KKWWWWWWWWWWWWWWWWWWWwKK.......","KKWWWWWwwWWWWWWWWwwWWWWwKK......","KKWWWWwKKwWWWWWWwKKwWWWwKK......","KKWWWwKKKKWWWWWwKKKKWWWwKK......","KKWWWwKKKKWWWWWwKKKKWWWwKK......","KKWWWWwKKWWWWWWWwKKWWWWwKK......","KKWWWWWWWWWWWPPWWWWWWWWwKK......","KKWWWWWWWWwwppppwwWWWWWwKK......","KKwWWWWWWwKKKKKKKKWWWWWwKK......",".KKWWWWWWwKKKKKKKKWWWWwKK.......",".KKwWWWWWWWWWWWWWWWWWWwK........","..KKWWWWWWWWWWWWWWWWWwKK........","..KKwWWWWWWWWWWWWWWWWwKKKKK.....","...KKWWWWWWwwwwWWWWWwKKKKKKK....","...KKwwWWwwKKKKwwWWwwKKKWwKK....","....KKKwwKKKKKKKKwwKKKKKwwK.....","....KKKKKKK....KKKKKKKKKKKK.....",".....KKKK........KKKKKKKK.......","................................","................................"],
+  p_hamster: ["................................","................................",".....KK................KK.......","...KKKKKK............KKKKKK.....","...KKCcKK............KKCcKK.....","..KKCCCCcKK........KKCCCCcKK....","..KKCCCCcKKKKKKKKKKKKCCCCcKK....",".KKCCCCCCCcKKKKKKKKCCCCCCCcKK...",".KKCCCCCCCCCCCCCCCCCCCCCCCcKK...","KKCCCCCccCCCCCCCCCCCCccCCCCcKK..","KKCCCCcKKcCCCCCCCCCCcKKcCCCcKK..","KKCCCcKKKKCCCCCCCCCcKKKKCCCcKK..","KKCCCcKKKKCCCCCCCCCcKKKKCCCcKK..","KKCCCCcKKCCCCCCCCCCCcKKCCCCcKK..","KKCCCCCCCCCCCPPPPCCCCCCCCCCcKK..","KKCCCCCCCCccppppppccCCCCCCCcKK..","KKCCCCCCCcKKKKKKKKKKCCCCCCCcKK..","KKCCCCCCCcKKKKKKKKKKCCCCCCCcKK..","KKcCCCCCCCCCCCCCCCCCCCCCCCCcKK..",".KKCCCCCCCCCCCCCCCCCCCCCCCcKK...",".KKcCCCCCCCCCCCCCCCCCCCCCCcKK...","..KKCCCCCCCCCCCCCCCCCCCCCcKK....","..KKcCCCCCCCCCCCCCCCCCCCCcKK....","...KKCCCCCCCCCCCCCCCCCCCcKK.....","...KKcCCCCCCCCCCCCCCCCCCcKK.....","....KKCCCCCccccccccCCCCcKK......","....KKcCCccKKKKKKKKccCCcKK......",".....KKccKKKKKKKKKKKKccKK.......",".....KKKKKK........KKKKKK.......",".......KK............KK.........","................................","................................"],
+  p_chick: ["................................","................................","................................","................................","...........KKKKKK...............",".........KKKKKKKKKK.............",".......KKKKYYYYYyKKKK...........",".....KKKKYYYYYYYYYyKKKK.........",".....KKYYYYYYYYYYYYYyKK.........","....KKYYYyyYYYYYYyyYYyKK........","....KKYYyKKyYYYYyKKyYyKK........","....KKYyKKKKYYYyKKKKYyKK........","....KKYyKKKKYYYyKKKKYyKK........","...KKYYYyKKYYYYYyKKYYYyKK.......","...KKYYYYYYYYOOYYYYYYYyKK.......","..KKYYYYYYYYOOOOYYYYYYYyKK......","..KKYYYYYYYYOOOOYYYYYYYyKK......","..KKYYYYYYYYYOOYYYYYYYYyKK......","..KKYYYYYYYYYYYYYYYYYYYyKK......",".KKYYYYYYYYYYYYYYYYYYYYYyKK.....",".KKYYYYYYYYYYYYYYYYYYYYYyKK.....","KKYYYYYYYYYYYYYYYYYYYYYYYyKK....","KKyYYYYYYYYYYYYYYYYYYYYYYyKK....",".KKYYYYYYYYYYYYYYYYYYYYYyKK.....",".KKyyYYYYYYYYYYYYYYYYYYyyKK.....","...KKYYYYYYYYYYYYYYYYYyKK.......","...KKyyYYYYYYYYYYYYYYYyKK.......",".....KKyYYyyyyyyyyyyYyKK........",".....KKKOoKKKK..KKKKOoKK........",".......KooKKK....KKKooK.........","................................","................................"],
+  p_penguin: ["................................","................................",".........KKKKKKKKKK.............",".......KKKKKKKKKKKKKK...........",".....KKKKKKKKKKKKKKKKKK.........","...KKKKKKKKKKKKKKKKKKKKKK.......","...KKKKKKWWWWWWWWWWwKKKKK.......","..KKKKKKWWWwwWWWWwwWwKKKKK......","..KKKKKKWWwKKwWWwKKwWwKKKK......","..KKKKKKWwKKKKWwKKKKWwKKKK......","..KKKKKKWwKKKKWwKKKKWwKKKK......","..KKKKKKWWwKKKWWwKKwWwKKKK......","..KKKKKKWWWWOOOWWWwKwKKKKK......","..KKKKKKWWWWOOOOWWWwKKKKKK......","..KKKKKKWWWWOOOOWWWwKKKKKK......",".KKKKKKKWWWWWOOWWWWwKKKKKKK.....",".KKKKKKKWWWWWWWWWWWwKKKKKKK.....","KKKKKKKKWWWWWWWWWWWwKKKKKKKK....","KKKKKKKKWWWWWWWWWWWwKKKKKKKK....","KKKKKKKKWWWWWWWWWWWwKKKKKKKK....","KKKKKKKKWWWWWWWWWWWwKKKKKKKK....",".KKKKKKKWWWWWWWWWWWwKKKKKKK.....",".KKKKKKKWWWWWWWWWWWwKKKKKKK.....","..KKKKKKWWWWWWWWWWWwKKKKKK......","..KKKKKKwWWWWWWWWWWwKKKKKK......","...KKKKKKwwwwwwwwwwKKKKKK.......","...KKKKKKKKKKKKKKKKKKKKKK.......",".....KKKKKKKKKKKKKKKKKKK........",".....KKKKOoKKK..KKKOoKKK........",".......KooooK....KooooK.........","................................","................................"],
+  p_owl: ["................................","................................",".....KK................KK.......","...KKKKKK............KKKKKK.....","...KKNnKK............KKNnKK.....","..KKNNNNnKK........KKNNNNnKK....","..KKNNNNnKKKKKKKKKKKKNNNNnKK....",".KKNNNNNNNnKKKKKKKKNNNNNNNnKK...",".KKNNNNNNNNNNNNNNNNNNNNNNNnKK...","KKNNNnNNNNnNNNNNNNNnNNNNnNNnKK..","KKNNnKWWWwKnnNNNNnnKwWWwKnNnKK..","KKNnKKWWwKwKKnNNnKKwKwWwKKNnKK..","KKNnKKWwKKWwKKNnKKWwKKWwKKNnKK..","KKNnKKWwKKWwKKNnKKwwKKWwKKNnKK..","KKNnKKWWwKwKKNNNnKKwKWWwKKNnKK..","KKNNnKWWWwKNNNNNNNnKWWWwKNNnKK..","KKNNNNNNNNNNNOONNNNNNNNNNNNnKK..","KKNNNNNNNNNNOOOONNNNNNNNNNNnKK..","KKNNNNNNNNNNOOOONNNNNNNNNNNnKK..","KKNNNNNNNNNNNOONNNNNNNNNNNNnKK..","KKnNCCCNNNNNNNNNNNNNNNNCCCNnKK..",".KKNCCCCCNNNNNNNNNNNNCCCCCnKK...",".KKnNCCCCNNNNNNNNNNNNCCCCNnKK...","..KKNNNCCCCNNNNNNNNCCCCNNnKK....","..KKnNNCCCCCNNNNNNCCCCCNNnKK....","...KKNNNNCCCNNNNNNCCCNNNnKK.....","...KKnnNNNNNNNNNNNNNNNNnnKK.....",".....KKnNNNNnnnnnnNNNNnKK.......",".....KKKOOOoKK..KKOOOoKKK.......",".......KooooK....KooooK.........","................................","................................"],
+  p_tanuki: ["................................","................................",".....KK................KK.......","...KKKKKK............KKKKKK.....","...KKNnKK............KKNnKK.....","..KKNNNNnKK........KKNNNNnKK....","..KKNNNNnKKKKKKKKKKKKNNNNnKK....",".KKNNNNNNNnKKKKKKKKNNNNNNNnKK...",".KKNNNNNNNNNNNNNNNNNNNNNNNnKK...","KKNNNnnnnNNNNNNNNNNNNnnnnNNnKK..","KKNNnKKKKnNNNNNNNNNNnKKKKnNnKK..","KKNnKKKKKKNNNNNNNNNnKKKKKKNnKK..","KKNnKKWwKKNNNNNNNNNnKKWwKKNnKK..","KKNnKKwwKKNNNNNNNNNnKKwwKKNnKK..","KKNnKKKKKKNNNNNNNNNnKKKKKKNnKK..","KKNNnKKKKNNNNnnNNNNNnKKKKNNnKK..","KKNNNNNNNNNNnKKnNNNNNNNNNNNnKK..","KKNNNNNNNNNnKKKKNNNNNNNNNNNnKK..","KKNNNNNCCCCCCCCCCCCCCCCNNNNnKK..","KKNNNCCCCCCCCCCCCCCCCCCCCNNnKK..","KKnNNCCCCCCCCCCCCCCCCCCCCNNnKK..",".KKnCCCCCCCCCCCCCCCCCCCCCCnKK...",".KKKCCCCCCCCCCCCCCCCCCCCCcKK....","..KKCCCCCCCCCCCCCCCCCCCCCcKK....","..KKnCCCCCCCCCCCCCCCCCCCCnKKK...","...KKNNCCCccccccccccCCCNnKnKKK..","...KKnnNNnKKKKKKKKKKnNNnKKNnKK..","....KKKnnKKKKKKKKKKKKnnKKKnnKK..","....KKKKKKK........KKKKKKKKKKK..",".....KKKK............KKKKKKKK...","................................","................................"],
+  p_bear: ["...KK....................KK.....",".KKKKKK................KKKKKK...",".KKNnKK................KKNnKK...","KKNNNNnKK............KKNNNNnKK..","KKNNNNnKKKKKKKKKKKKKKKKNNNNnKK..","KKNNNNNNnKKKKKKKKKKKKNNNNNNnKK..","KKNNNNNNNNNNNNNNNNNNNNNNNNNnKK..","KKNNNNNnnNNNNNNNNNNNNnnNNNNnKK..","KKNNNNnKKnNNNNNNNNNNnKKnNNNnKK..","KKNNNnKKKKNNNNNNNNNnKKKKNNNnKK..","KKNNNnKKKKNNNNNNNNNnKKKKNNNnKK..","KKNNNNnKKNNNNNNNNNNNnKKNNNNnKK..","KKNNNNNNNNNNNNNNNNNNNNNNNNNnKK..","KKNNNNNNNNNnnnnnnnnNNNNNNNNnKK..","KKNNNNNNNnnKKKKKKKKnnNNNNNNnKK..","KKNNNNNNnKKKKKKKKKKKKNNNNNNnKK..","KKNNNNNNnKWwKKWwKKWwKnNNNNNnKK..","KKNNNNNnKKwwKKwwKKwwKKNNNNNnKK..","KKNNNNNnKKKKKKKKKKKKKKNNNNNnKK..","KKNNNNNNnKKKKKKKKKKKKNNNNNNnKK..","KKNNNNNNNNNNNNNNNNNNNNNNNNNnKK..","KKNNNNNNNNNNNNNNNNNNNNNNNNNnKK..","KKNNNNNNNNNNNNNNNNNNNNNNNNNnKK..","KKNNNNnnNNNNNNNNNNNNNNnnNNNnKK..","KKnNNnKKnNNNNNNNNNNNNnKKNNNnKK..","KKKNNnKKKNNNNNNNNNNNnKKKNNnKKK..","KKKnNnKKKnNNNNNNNNNNnKKKNNnKKK..","KKKKnnKKKKnnnnnnnnnnKKKKnnKKKK..","KKKK..KKKK..........KKKK..KKKK..",".KK....KK............KK....KK...","................................","................................"],
+  p_tiger: [".....KK................KK.......","...KKKKKK............KKKKKK.....","...KKOOoK............KOOoKK.....","..KKOOoooKK........KKOooOoKK....","..KKOoKKOoKKKKKKKKKKOoKKOoKK....",".KKOOoKKOOoKKKKKKKKOOoKKOOoKK...",".KKOOOOOOOOOOOOOOOOOOOOOOOoKK...","KKOOOooOOOOOOOOOOOOOOOOooOOoKK..","KKOOoKKoOOOOOOOOOOOOOOoKKoOoKK..","KKOoKKKKOOooOOOOOOooOoKKKKOoKK..","KKOoKKKKOoKKOOOOOoKKOoKKKKOoKK..","KKOOoKKOOoKKOOOOOoKKOOoKKOOoKK..","KKOOOOOOOOOOOOOOOOOOOOOOOOOoKK..","KKOOooOOOOOooooooooOOOOOooOoKK..","KKOoKKOOOooKKKKKKKKooOOoKKOoKK..","KKOoKKOOoKKKKKKKKKKKKOOoKKOoKK..","KKOOOOOOoKWwKKWwKKWwKoOOOOOoKK..","KKOOOOOoKKwwKKwwKKwwKKOOOOOoKK..","KKOOOOOoKKKKKKKKKKKKKKOOOOOoKK..","KKOOooOOoKKKKKKKKKKKKOOOooOoKK..","KKOoKKOOOOOOOOOOOOOOOOOoKKOoKK..","KKOoKKOOooOOOOOOOOOOooOoKKOoKK..","KKOOOOOoKKOOOOOOOOOoKKOOOOOoKK..","KKOOOOOoKKOOOOOOOOOoKKOOOOOoKK..","KKOOOOOOOOOOOOOOOOOOOOOOOOOoKK..","KKOOOooOOOOOOOOOOOOOOOOooOOoKK..","KKOOoKKooOOOOOOOOOOOOooKKoOoKK..","KKooKKKKKooooooooooooKKKKKooKK..","KKKK..KKKK..........KKKK..KKKK..",".KK....KK............KK....KK...","................................","................................"],
   /* --- てき(バトル用。なかま一覧には出ません) --- */
   e_hokori: ["................................","................................","....KK....KK........KK....KK....","...KKKK...KK.......KKKK...KK....","...KSsK...KKSsK....KSsK...KKSsK.","..KKSSsK..KSSSsK..KSSsKK..KSSsKK","..KKSSsKKKKSSSsKKKKSSsKKSSSSSsKK",".KKSSSSsKKSSSSSsKKSSSsKKSSSSSsKK",".KKSSSSSSSSSSSSSSSSSSSSSSSSSSsKK","KKSSSSSssSSSSSSSSSSssSSSSSSSSsKK","KKSSSSsKKsSSSSSSSSsKKsSSSSSSSsKK","KKSSSsKKKKSSSSSSSsKKKKSSSSSSSsKK","KKSSSsKKKKSSSSSSSsKKKKSSSSSSSsKK","KKSSSSsKKSSSSSSSSSsKKSSSSSSSSsKK","KKSSSSSSSSSSSSSSSSSSSSSSSSSSSsKK","KKSSSSSSssssssssssssSSSSSSSSSsKK","KKSSSSSsKKKKKKKKKKKKSSSSSSSSSsKK","KKSSSSSsKKKKKKKKKKKKSSSSSSSSSsKK","KKsSSSSSSSSSSSSSSSSSSSSSSSSSSsKK",".KKSSSSSSSSSSSSSSSSSSSSSSSSSsKK.",".KKsSSSSSSSSSSSSSSSSSSSSSSSSsKK.","..KKSSssSSSSssSSSSssSSSSssSsKK..","..KKSsKKSSSsKKSSSsKKSSSsKKSsKK..","...KssKKSSSsKKSSSsKKSSSsKKssK...","...KKKKKSSSsKKSSSsKKSSSsKKKKK...",".....KKKSSsKKKSSsKKKSSsKKKK.....","......KKSSsKKKSSsKKKSSsKKKK.....","......KKssKKKKssKKKKssKKK.......","....KKKK...KKKKKK..KKKKKK.......","....KKK......KK......KK.........","................................","................................"],
   e_shinagire: ["................................","................................",".....KKKKKKKKKKKKKKKKKKKKKK.....","...KKKKKKKKKKKKKKKKKKKKKKKKKK...","...KKNNNNNNNNNNNNNNNNNNNNNnKK...","..KKNNNnnNNNNNNNNNNNNNNnnNNnKK..","..KKNNnKKnNNNNNNNNNNNNnKKnNnKK..","..KKNnKKKKNNNNNNNNNNNnKKKKNnKK..","..KKNnKKKKNNNNNNNNNNNnKKKKNnKK..","..KKNNnKKNNNNNNNNNNNNNnKKNNnKK..","..KKNNNNNNNNNNNNNNNNNNNNNNNnKK..","..KKNNNNNNnnnnnnnnnnnnNNNNNnKK..","..KKNNNNNnKKKKKKKKKKKKNNNNNnKK..",".KKKNNNNNnKKKKKKKKKKKKNNNNNnKKK.",".KKKNNNNNNNNNNNNNNNNNNNNNNNnKKK.","KKKKNNNNNNNNNNNNNNNNNNNNNNNnKKKK","KKKWWWWWWWWWWWWWWWWWWWWWWWWWwKKK","KKWWWwwwwwwwwwwwwwwwwwwwwwwWWwKK","KKWWwKKKKKKKKKKKKKKKKKKKKKKwWwKK","KKWwKKKKKKKKKKKKKKKKKKKKKKKKWwKK","KKWwKKKWWWWWWWWWWWWWWWWWwKKKWwKK","KKWwKKWWwwwwwwwwwwwwwwwwWwKKWwKK","KKWwKKWwKKKKKKKKKKKKKKKKWwKKWwKK","KKWwKKWwKKKKKKKKKKKKKKKKWwKKWwKK","KKWwKKwWWWWWWWWWWWWWWWWWWwKKWwKK","KKWwKKKwwwwwwwwwwwwwwwwwwKKKWwKK","KKWwKKKKKKKKKKKKKKKKKKKKKKKKWwKK","KKWWwKKKKKKKKKKKKKKKKKKKKKKWWwKK","KKwWWWWWWWWWWWWWWWWWWWWWWWWWWwKK","KKKwwwwwwwwwwwwwwwwwwwwwwwwwwKKK","KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK",".KKKKKKKKKKKKKKKKKKKKKKKKKKKKKK."],
@@ -2267,7 +2312,7 @@ const DOT_SPRITES = {
   slot: ["........................","........................","...KKKKKKKKKKKKKKKKKK...","..KKKKKKKKKKKKKKKKKKKK..","..KKK..............KKK..","..KK................KK..","..KK................KK..","..KK................KK..","..KK................KK..","..KK................KK..","..KK.......KK.......KK..","..KK......KKKK......KK..","..KK......KKKK......KK..","..KK.......KK.......KK..","..KK................KK..","..KK................KK..","..KK................KK..","..KK................KK..","..KK................KK..","..KKK..............KKK..","..KKKKKKKKKKKKKKKKKKKK..","...KKKKKKKKKKKKKKKKKK...","........................","........................"]
 };
 // 目の高さ(スプライトごとに自動検出。衣装をこの位置に合わせる)
-const DOT_EYE = {"baby": 0.391,"child": 0.328,"apprentice": 0.328,"warrior": 0.391,"hero": 0.266,"tablet": 0.391,"capsule": 0.266,"powder": 0.266,"troche": 0.266,"eyedrop": 0.453,"ointment": 0.391,"patch": 0.266,"tape": 0.266,"syrup": 0.391,"drink": 0.453,"supp": 0.391,"inhaler": 0.391,"inject": 0.391,"g_okigusuri": 0.328,"g_renkon": 0.266,"g_jagaimo": 0.391,"g_ringo": 0.453,"g_gyutan": 0.328,"g_takoyaki": 0.391,"g_yatsuhashi": 0.391,"g_shika": 0.391,"g_momiji": 0.38,"g_udon": 0.453,"g_mentaiko": 0.328,"g_shisa": 0.328,"g2_ichigo": 0.391,"g2_mikan": 0.328,"g2_rakkasei": 0.266,"g2_budou": 0.328,"g2_megane": 0.328,"g2_kiritanpo": 0.391,"g2_soba": 0.453,"g2_ebifly": 0.391,"g2_kibidango": 0.391,"g2_sakuranbo": 0.516,"g2_ocha": 0.453,"g2_konnyaku": 0.266,"s_hakase": 0.328,"s_monshin": 0.266,"s_nyubachi": 0.453,"s_choshinki": 0.391,"r_gold": 0.328,"r_rainbow": 0.266,"r_phantom": 0.453,"slot": 0.396};
+const DOT_EYE = {"baby": 0.391,"child": 0.328,"apprentice": 0.328,"warrior": 0.391,"hero": 0.266,"tablet": 0.391,"capsule": 0.266,"powder": 0.266,"troche": 0.266,"eyedrop": 0.453,"ointment": 0.391,"patch": 0.266,"tape": 0.266,"syrup": 0.391,"drink": 0.453,"supp": 0.391,"inhaler": 0.391,"inject": 0.391,"g_okigusuri": 0.328,"g_renkon": 0.266,"g_jagaimo": 0.391,"g_ringo": 0.453,"g_gyutan": 0.328,"g_takoyaki": 0.391,"g_yatsuhashi": 0.391,"g_shika": 0.391,"g_momiji": 0.38,"g_udon": 0.453,"g_mentaiko": 0.328,"g_shisa": 0.328,"g2_ichigo": 0.391,"g2_mikan": 0.328,"g2_rakkasei": 0.266,"g2_budou": 0.328,"g2_megane": 0.328,"g2_kiritanpo": 0.391,"g2_soba": 0.453,"g2_ebifly": 0.391,"g2_kibidango": 0.391,"g2_sakuranbo": 0.516,"g2_ocha": 0.453,"g2_konnyaku": 0.266,"s_hakase": 0.328,"s_monshin": 0.266,"s_nyubachi": 0.453,"s_choshinki": 0.391,"r_gold": 0.328,"r_rainbow": 0.266,"r_phantom": 0.453,"slot": 0.396,"p_wolf": 0.328,"p_fox": 0.328,"p_cat": 0.266,"p_dog": 0.266,"p_rabbit": 0.453,"p_hamster": 0.328,"p_chick": 0.328,"p_penguin": 0.266,"p_owl": 0.328,"p_tanuki": 0.328,"p_bear": 0.266,"p_tiger": 0.38};
 // なかまが加わる順番(先に何が来るかは伏せて、加わるたびに名前を発表する)
 const DOT_MATES = ["tablet","capsule","powder","troche","eyedrop","ointment","patch","tape","syrup","drink","supp","inhaler","inject"];
 const DOT_NAMES = {
@@ -2359,7 +2404,8 @@ function careTick_(){
     if (c.genki > 0) c.genki = Math.min(100, c.genki + 25);
     c.days = c.days + 1;
     const p = pet_();
-    p.streak = (gap === 1) ? (p.streak || 1) + 1 : 1;   // 毎日ひらくと連続記録がのびる
+    p.streak = (gap === 1) ? (p.streak || 1) + 1 : 1;
+    setTimeout(function(){ addExp_(10 + Math.min(20, (p.streak || 1) * 2), "きょうも 来てくれた"); }, 400);   // 毎日ひらくと連続記録がのびる
     p.best = Math.max(p.best || 1, p.streak);
     c.last = t;
     save();
@@ -2501,6 +2547,7 @@ function doQuest(id){
   if (!q) return;
   S.quests = (S.quests || []).concat([id]);
   save();
+  addExp_(25, "はじめての きのう");
   addMate_(q.key, "gotouchiMates", "gotouchi", q.label);
 }
 // 要指導・第1類の在庫が増えたときに呼ぶ
@@ -2752,16 +2799,22 @@ function renderDotPet(){
   const shown = picks.length
     ? picks.map(function(k){ return line.filter(function(o){ return o.k === k; })[0]; }).filter(Boolean)
     : line.slice(0, PARTY_SHOW);
+  const buddy = activePet_();
+  // 相棒がいるときは、なかまの表示を2体にして 主人公+相棒+なかま2 の4体にそろえる
+  const showN = buddy ? 2 : PARTY_SHOW;
+  const shown2 = picks.length ? shown.slice(0, showN) : line.slice(0, showN);
   let h = '<span class="pet-unit" data-key="' + st.key + '">' + dotSvg(st.key, 34, 0, decoOf_(st.key), rpg_().equip) + '</span>';
-  shown.forEach(function(o){
+  if (buddy) h += '<span class="pet-unit buddy" data-key="' + buddy + '">' + dotSvg(buddy, 28, mateLv_(buddy), decoOf_(buddy)) + '</span>';
+  shown2.forEach(function(o){
     h += '<span class="pet-unit ' + o.c + '" data-key="' + o.k + '">' + dotSvg(o.k, 26, mateLv_(o.k), decoOf_(o.k)) + '</span>';
   });
-  const rest = line.length - shown.length;
+  const rest = line.length - shown2.length;
   if (rest > 0) h += '<span class="mate-more">+' + rest + '</span>';
   el.innerHTML = h;
   el.className = "dot-pet" + (gs.key === "nemuri" ? " sleepy" : (gs.key === "guttari" ? " weak" : ""));
   const hn = pet_().heroName;
-  el.title = (hn ? hn + "(" + st.name + ")" : st.name) + "(" + st.n + "品目) / なかま " + line.length + "体 / " + gs.label;
+  el.title = "Lv" + lvInfo_().lv + " " + (hn ? hn + "(" + st.name + ")" : st.name)
+    + "(" + st.n + "品目) / なかま " + line.length + "体 / " + gs.label;
   const grew = __lastDotKey && __lastDotKey !== st.key;
   const joined = __lastMateN !== null && line.length > __lastMateN;
   if (grew || joined){
@@ -2783,6 +2836,161 @@ function bonusGetEffect_(got){
   const head = got.kind === "rare" ? "★レア★ " : (got.kind === "senmon" ? "せんもんしょく! " : "ごとうち! ");
   toast(head + "「" + DOT_NAMES[got.key] + "」が なかまに なった!" + (got.note ? "(" + got.note + ")" : ""));
 }
+/* ===== 他店舗との たいせん ===== */
+// 自分のパーティ情報(共有データに一緒に載せて、他店から挑戦できるようにする)
+function myParty_(){
+  const pw = partyPower_(), st = dotStage(), li = lvInfo_();
+  return {
+    lv: li.lv, hero: st.key, name: pet_().heroName || st.name,
+    buddy: activePet_() || "", mates: allMates_().slice(0, 4).map(function(o){ return o.k; }),
+    atk: pw.atk, def: pw.def, hp: pw.hp, wins: rpg_().wins || 0
+  };
+}
+// 共有データから パーティ情報を取り出す(在庫一覧には出さない)
+function splitParty_(items){
+  const out = { party: null, items: [] };
+  (items || []).forEach(function(it){
+    if (it && it.jan === "__party__"){ out.party = it.party || null; }
+    else out.items.push(it);
+  });
+  return out;
+}
+function vsRec_(){ S.vs = S.vs || { win: 0, lose: 0, log: {} }; return S.vs; }
+// 他店舗に挑戦する
+function startVs(phId){
+  const ph = sharedData.filter(function(x){ return String(x.id) === String(phId); })[0];
+  if (!ph || !ph.party){ toast("この薬局は まだ たいせんに 対応していません"); return; }
+  const en = ph.party;
+  const pw = partyPower_();
+  __battle = {
+    practice: false, vs: true, vsId: String(phId), vsName: (ph.pharmacy && ph.pharmacy.name) || "他店舗",
+    en: { key: en.hero || "hero", name: (ph.pharmacy && ph.pharmacy.name || "他店舗") + " の " + (en.name || "パーティ"),
+          atk: en.atk || 20, lv: 2, party: en },
+    php: pw.hp, pmax: pw.hp, patk: pw.atk, pdef: pw.def,
+    ehp: en.hp || 120, emax: en.hp || 120, eatk: en.atk || 20, edef: en.def || 10,
+    log: [], turn: 0, done: false
+  };
+  document.getElementById("battle-modal").style.display = "flex";
+  renderBattle_();
+  setTimeout(battleTurn_, 700);
+}
+
+/* ===== レベル(けいけんち) ===== */
+// 商品登録・バトル・クエストなどで けいけんち が たまり、レベルが上がる
+function lv_(){
+  S.lv = S.lv || { exp: 0, lv: 1 };
+  return S.lv;
+}
+function lvNeed_(n){ return Math.round(20 * Math.pow(n, 1.55)); }   // 次のレベルまでに必要な合計
+function lvOf_(exp){
+  let n = 1;
+  while (n < 99 && exp >= lvNeed_(n)) n++;
+  return n;
+}
+function lvInfo_(){
+  const L = lv_();
+  const n = lvOf_(L.exp);
+  const cur = n > 1 ? lvNeed_(n - 1) : 0;
+  const next = lvNeed_(n);
+  return { lv: n, exp: L.exp, cur: cur, next: next, pct: Math.min(100, Math.round((L.exp - cur) / Math.max(1, next - cur) * 100)) };
+}
+// けいけんちを あたえる
+function addExp_(n, why){
+  const L = lv_();
+  const before = lvOf_(L.exp);
+  L.exp += n;
+  const after = lvOf_(L.exp);
+  save();
+  if (after > before){
+    setTimeout(function(){
+      toast("レベルが " + after + " に あがった!" + (why ? "(" + why + ")" : ""));
+      const el = document.getElementById("dot-pet");
+      if (el){ el.classList.remove("rare-pop"); void el.offsetWidth; el.classList.add("rare-pop"); }
+      renderDotPet();
+    }, 700);
+  }
+}
+
+/* ===== あいぼう(主人公のペット) ===== */
+// なかまとは別枠。1体だけ 主人公のとなりに ついてくる。
+const PETS = [
+  // かわいい系
+  { key:"p_chick",   name:"ヒヨコ",     act:"hop",    need:"items",  n:10,
+    how:"商品を 10品目 登録すると たまごから かえる", fx:"げんきが へりにくい", atk:1, def:2, hp:8,  drop:0, genki:1 },
+  { key:"p_dog",     name:"シバイヌ",   act:"wag",    need:"streak", n:5,
+    how:"5日 れんぞくで アプリを ひらくと なつく",     fx:"まもりが 上がる",     atk:2, def:5, hp:14, drop:0, genki:0 },
+  { key:"p_cat",     name:"ネコ",       act:"sleep",  need:"streak", n:7,
+    how:"7日 れんぞくで アプリを ひらくと なつく",     fx:"げんきが へりにくい", atk:2, def:5, hp:12, drop:0, genki:1 },
+  { key:"p_hamster", name:"ハムスター", act:"hop",    need:"mates",  n:10,
+    how:"なかまが 10体に なると 巣から でてくる",       fx:"そうびが 手に入りやすい", atk:1, def:3, hp:8, drop:1, genki:0 },
+  { key:"p_rabbit",  name:"ウサギ",     act:"hop",    need:"items",  n:30,
+    how:"商品を 30品目 登録すると あらわれる",         fx:"すばやさで 会心が でやすい", atk:4, def:3, hp:12, drop:0, genki:0 },
+  { key:"p_penguin", name:"ペンギン",   act:"slide",  need:"goto",   n:5,
+    how:"ごとうちの なかまを 5体 あつめると なかまに", fx:"まもりが 上がる",     atk:2, def:7, hp:16, drop:0, genki:0 },
+  // ちゅうかん
+  { key:"p_fox",     name:"キツネ",     act:"vanish", need:"rare",   n:1,
+    how:"レアな なかまを 1体でも 見つけると 現れる",   fx:"そうびが 手に入りやすい", atk:3, def:3, hp:12, drop:1, genki:0 },
+  { key:"p_tanuki",  name:"タヌキ",     act:"roll",   need:"quest",  n:12,
+    how:"「やってみよう」を 12こ 達成すると 化けて出る", fx:"そうびが 手に入りやすい", atk:3, def:4, hp:14, drop:1, genki:0 },
+  { key:"p_owl",     name:"フクロウ",   act:"fly",    need:"senmon", n:2,
+    how:"せんもんしょくの なかまが 2体に なると 舞い降りる", fx:"会心が でやすい", atk:5, def:4, hp:14, drop:0, genki:0 },
+  // 凶暴系
+  { key:"p_wolf",    name:"オオカミ",   act:"howl",   need:"battle", n:5,
+    how:"バトルに 5勝すると 群れから やってくる",      fx:"こうげきが 上がる",   atk:7, def:3, hp:18, drop:0, genki:0 },
+  { key:"p_bear",    name:"クマ",       act:"charge", need:"battle", n:15,
+    how:"バトルに 15勝すると 山から おりてくる",       fx:"こうげきと たいりょくが 上がる", atk:10, def:6, hp:30, drop:0, genki:0 },
+  { key:"p_tiger",   name:"トラ",       act:"bite",   need:"battle", n:30,
+    how:"バトルに 30勝すると したがえる",              fx:"こうげきが 大きく 上がる", atk:15, def:7, hp:34, drop:0, genki:0 }
+];
+function petsOwned_(){ return (S.pets || []).filter(function(k){ return PETS.some(function(x){ return x.key === k; }); }); }
+function petInfo_(key){ return PETS.filter(function(x){ return x.key === key; })[0] || null; }
+function activePet_(){
+  const own = petsOwned_();
+  if (!own.length) return null;
+  const cur = S.petBuddy;
+  if (cur === "") return null;                       // 自分で お休みにした場合
+  return own.indexOf(cur) >= 0 ? cur : own[0];
+}
+function petProgress_(x){
+  const r = rpg_(), p = pet_();
+  if (x.need === "battle") return { now: r.wins || 0, need: x.n };
+  if (x.need === "rare")   return { now: rareOwned_().length, need: x.n };
+  if (x.need === "items")  return { now: (S.items || []).length, need: x.n };
+  if (x.need === "mates")  return { now: allMates_().length, need: x.n };
+  if (x.need === "goto")   return { now: gotouchiOwned_().length, need: x.n };
+  if (x.need === "senmon") return { now: senmonOwned_().length, need: x.n };
+  if (x.need === "quest")  return { now: (S.quests || []).length, need: x.n };
+  return { now: p.best || 1, need: x.n };
+}
+// 条件を満たしたら なかまに なる(同時に満たしていれば まとめて)
+function checkPets_(){
+  const own = petsOwned_().slice();
+  const got = [];
+  PETS.forEach(function(x){
+    if (own.indexOf(x.key) >= 0) return;
+    const pr = petProgress_(x);
+    if (pr.now >= pr.need){ own.push(x.key); got.push(x); mateMeta_(x.key); }
+  });
+  if (!got.length) return;
+  S.pets = own;
+  if (!S.petBuddy && S.petBuddy !== "") S.petBuddy = got[0].key;
+  save();
+  got.slice(0, 4).forEach(function(x, i){
+    setTimeout(function(){
+      toast("🐾 " + x.name + "が なついた! あいぼうに なりました");
+      const el = document.getElementById("dot-pet");
+      if (el){ el.classList.remove("rare-pop"); void el.offsetWidth; el.classList.add("rare-pop"); }
+      renderDotPet();
+    }, 1400 + i * 2400);
+  });
+}
+function setBuddy(key){
+  if (petsOwned_().indexOf(key) < 0) return;
+  S.petBuddy = (activePet_() === key) ? "" : key;
+  save(); renderDotPet(); openPartyModal();
+  toast(S.petBuddy ? "「" + petInfo_(key).name + "」を つれて歩きます" : "あいぼうを お休みにしました");
+}
+
 /* ===== バトルと そうび ===== */
 const ENEMIES = [
   { key:"e_hokori",    name:"ホコリのかたまり", hp: 26, atk: 5,  lv:1, say:"ほこりが まいあがった!" },
@@ -2829,11 +3037,15 @@ function rpg_(){
 function partyPower_(){
   const st = dotStage();
   const heroLv = st.n >= 20 ? 5 : (st.n >= 15 ? 4 : (st.n >= 10 ? 3 : (st.n >= 5 ? 2 : 1)));
-  let atk = 6 + heroLv * 3, def = 3 + heroLv * 2, hp = 40 + heroLv * 12;
+  const L = lvInfo_().lv;
+  let atk = 6 + heroLv * 3 + L * 2, def = 3 + heroLv * 2 + L, hp = 40 + heroLv * 12 + L * 6;
   allMates_().forEach(function(o){
     const lv = mateLv_(o.k);
     atk += 1 + lv; def += lv; hp += 6 + lv * 3;
   });
+  // 相棒の分を足す
+  const bd = petInfo_(activePet_());
+  if (bd){ atk += bd.atk; def += bd.def; hp += (bd.hp || 12); }
   // そうびの分を足す
   const eq = rpg_().equip;
   EQUIP_SLOTS.forEach(function(sl){
@@ -2851,6 +3063,12 @@ function equipFx_(name){
     const e = EQUIPS[eq[sl.id]];
     if (e && e.fx === name) n++;
   });
+  // 相棒の力も加わる
+  const bd = petInfo_(activePet_());
+  if (bd){
+    if (name === "drop") n += bd.drop || 0;
+    if (name === "genki") n += bd.genki || 0;
+  }
   return n;
 }
 // アプリを開いたとき、たまに敵があらわれる(1日3回まで)
@@ -2907,7 +3125,7 @@ function battleTurn_(){
   b.turn++;
   // こちらの攻撃
   const crit = Math.random() < 0.08 + equipFx_("crit") * 0.10;
-  let dmg = Math.max(1, Math.round((b.patk * (0.85 + Math.random() * 0.3)) - b.en.atk * 0.15));
+  let dmg = Math.max(1, Math.round((b.patk * (0.85 + Math.random() * 0.3)) - (b.edef != null ? b.edef * 0.35 : b.en.atk * 0.15)));
   if (crit) dmg = Math.round(dmg * 1.8);
   b.ehp = Math.max(0, b.ehp - dmg);
   b.log.push((crit ? "会心の一撃! " : "") + "こちらの こうげき! " + dmg + " のダメージ");
@@ -2922,7 +3140,24 @@ function battleTurn_(){
 }
 function battleWin_(){
   const b = __battle, r = rpg_();
+  if (b.vs){
+    const v = vsRec_();
+    v.win = (v.win || 0) + 1;
+    v.log[b.vsId] = { r: "win", at: today() };
+    save();
+    addExp_(40, "他店舗に 勝った");
+    const c2 = care_(); c2.genki = Math.max(0, c2.genki - 4); save();
+    document.getElementById("battle-body").innerHTML = '<div class="bt-result">'
+      + '<div class="bt-win">かった!</div>'
+      + '<div class="bt-enemy">' + dotSvg(b.en.key, 56) + '</div>'
+      + '<p><b>' + esc(b.vsName) + '</b> との たいせんに 勝ちました!</p>'
+      + '<p class="hint">つうさん ' + v.win + '勝 ' + (v.lose || 0) + '敗</p>'
+      + '<button class="btn" onclick="closeBattle()">とじる</button></div>';
+    return;
+  }
   r.wins = (r.wins || 0) + 1;
+  addExp_(b.practice ? 8 : 30 + b.en.lv * 15, "バトルに 勝った");
+  setTimeout(checkPets_, 100);
   let got = null;
   // 練習では手に入りにくい。そうびの効果で確率が上がる
   const rate = (b.practice ? 0.25 : 0.75) + equipFx_("drop") * 0.12;
@@ -2954,7 +3189,22 @@ function battleWin_(){
 }
 function battleLose_(){
   const b = __battle, r = rpg_();
+  if (b.vs){
+    const v = vsRec_();
+    v.lose = (v.lose || 0) + 1;
+    v.log[b.vsId] = { r: "lose", at: today() };
+    save();
+    addExp_(10, "よく たたかった");
+    document.getElementById("battle-body").innerHTML = '<div class="bt-result">'
+      + '<div class="bt-lose">まけた……</div>'
+      + '<div class="bt-enemy">' + dotSvg(b.en.key, 56) + '</div>'
+      + '<p><b>' + esc(b.vsName) + '</b> は 強かった。レベルを 上げて 挑もう。</p>'
+      + '<p class="hint">つうさん ' + (v.win || 0) + '勝 ' + v.lose + '敗 ／ 負けても なくすものは ありません</p>'
+      + '<button class="btn" onclick="closeBattle()">とじる</button></div>';
+    return;
+  }
   r.loses = (r.loses || 0) + 1;
+  addExp_(6, "よく たたかった");
   if (!b.practice) r.enemy = null;
   save();
   document.getElementById("battle-body").innerHTML = '<div class="bt-result">'
@@ -2975,7 +3225,7 @@ function renderBattle_(){
     + '<div class="bt-bar"><i style="width:' + ep + '%;background:#C0392B"></i></div></div>'
     + '<div class="bt-vs">VS</div>'
     + '<div class="bt-side"><div class="bt-name">' + esc(pet_().heroName || st.name) + ' たち</div>'
-    + '<div class="bt-party">' + dotSvg(st.key, 46, 0, null) + allMates_().slice(0, 3).map(function(o){
+    + '<div class="bt-party">' + dotSvg(st.key, 46, 0, null) + (activePet_() ? dotSvg(activePet_(), 38) : "") + allMates_().slice(0, 3).map(function(o){
         return dotSvg(o.k, 34, mateLv_(o.k), null);
       }).join("") + '</div>'
     + '<div class="bt-bar"><i style="width:' + pp + '%;background:#3E7C59"></i></div></div>'
@@ -2983,8 +3233,31 @@ function renderBattle_(){
 }
 
 /* ===== そうびの着せかえ ===== */
+function buddySection_(){
+  const own = petsOwned_(), cur = activePet_();
+  let h = '<div class="divider"><span>あいぼう ' + own.length + '/' + PETS.length + '</span></div>'
+        + '<p class="hint">主人公の となりを 歩く どうぶつです。1体だけ つれて歩けます。</p>'
+        + '<div class="buddy-list">';
+  PETS.forEach(function(x){
+    const has = own.indexOf(x.key) >= 0;
+    const pr = petProgress_(x);
+    if (has){
+      h += '<button class="buddy-card' + (cur === x.key ? ' on' : '') + '" onclick="setBuddy(\'' + x.key + '\')">'
+        + dotSvg(x.key, 40, mateLv_(x.key), decoOf_(x.key))
+        + '<b>' + esc(x.name) + '</b>'
+        + '<i>' + esc(PERSONA[x.key] ? PERSONA[x.key].p : "") + '</i>'
+        + '<i class="fx">' + esc(x.fx) + '</i>'
+        + (cur === x.key ? '<i class="onmark">つれてる</i>' : '') + '</button>';
+    } else {
+      h += '<div class="buddy-card yet">' + dotSvg("slot", 40)
+        + '<b>？？？</b><i class="fx">' + esc(x.how) + '</i>'
+        + '<i class="pg">' + Math.min(pr.now, pr.need) + ' / ' + pr.need + '</i></div>';
+    }
+  });
+  return h + '</div>';
+}
 function battleSection_(){
-  const r = rpg_(), pw = partyPower_();
+  const r = rpg_(), pw = partyPower_(), li = lvInfo_(), v = vsRec_();
   const en = r.enemy ? enemyOf_(r.enemy) : null;
   const eqCount = EQUIP_SLOTS.filter(function(sl){ return r.equip[sl.id]; }).length;
   return '<div class="divider"><span>バトル & そうび</span></div>'
@@ -2997,8 +3270,13 @@ function battleSection_(){
     +   '<button class="btn ghost" onclick="startBattle(true)">れんしゅう</button>'
     +   '<button class="btn ghost" onclick="openEquip()">そうび(' + eqCount + '/4)</button>'
     + '</div>'
+    + '<div class="lv-row"><b>Lv ' + li.lv + '</b><span class="lv-bar"><i style="width:' + li.pct + '%"></i></span>'
+    +   '<span>つぎまで ' + Math.max(0, li.next - li.exp) + '</span></div>'
     + '<p class="hint">つよさ: こうげき ' + pw.atk + ' / まもり ' + pw.def + ' / たいりょく ' + pw.hp
-    +   ' ／ せんせき ' + (r.wins || 0) + '勝 ' + (r.loses || 0) + '敗</p>'
+    +   ' ／ せんせき ' + (r.wins || 0) + '勝 ' + (r.loses || 0) + '敗'
+    +   ((v.win || v.lose) ? ' ／ 他店舗と ' + (v.win || 0) + '勝 ' + (v.lose || 0) + '敗' : '') + '</p>'
+    + '<p class="hint">他店舗との たいせんは「その他」→「店舗間の備蓄情報共有」の 薬局一覧から できます。'
+    +   '自分の パーティは 備蓄をアップロードすると 相手にも 見えるようになります。</p>'
     + '<p class="hint">なかまが増える・なかまが しんかする・げんきが高い ほど強くなります。負けても なくすものは ありません。</p>'
     + '</div>';
 }
@@ -3080,6 +3358,30 @@ function pet_(){
 const PAT_LIMIT = 5;          // なでてげんきになるのは1日5回まで
 // 状況に合わせたひとこと(困りごとがあれば教えてくれる)
 const PERSONA = {
+  p_chick: { p:"ぴよぴよ", a:"hop", t:function(s){ return s + "ぴよ〜"; },
+    c:["ぴよ? ぴよぴよ!","たまごの ときの ゆめを 見たぴよ","ついていっても いいぴよ?"] },
+  p_dog: { p:"ちゅうけん(忠犬)", a:"wag", t:function(s){ return s + "ワン! おまかせください!"; },
+    c:["ごしゅじんさま、おかえりなさい!","しっぽが とまらないワン","おともします、どこまでも!"] },
+  p_hamster: { p:"ほおぶくろ", a:"hop", t:function(s){ return s + "……もぐもぐ。ほっぺに ためとくね"; },
+    c:["ひまわりのタネ、ある?","ほっぺが いっぱいで しゃべれない","くるくる 走るの すきなの"] },
+  p_rabbit: { p:"さみしがりや", a:"hop", t:function(s){ return s + "……ねえ、そばに いてくれる?"; },
+    c:["ひとりだと さみしくて……","ぴょんっ! おどろいた?","みみが 長いから よく聞こえるの"] },
+  p_penguin: { p:"れいせい", a:"slide", t:function(s){ return s + "。……以上、報告おわり"; },
+    c:["氷の上なら 誰にも 負けない","スッ……(すべっていった)","冷たいのは 体だけです"] },
+  p_owl: { p:"ものしり", a:"fly", t:function(s){ return s + "。ホゥ……覚えておくと よいぞ"; },
+    c:["夜のことなら わしに 聞け","首は 270度 まわるのじゃ","知は 力なり、ホゥ"] },
+  p_tanuki: { p:"ばけるのが好き", a:"roll", t:function(s){ return s + "ぽん! ……って、化けてみただけ"; },
+    c:["ぽんぽこ ぽん!","葉っぱを 頭に のせてみた","つぎは なにに 化けようかな"] },
+  p_bear: { p:"どうもう(獰猛)", a:"charge", t:function(s){ return s + "だ。……ガアアッ!!"; },
+    c:["グルルル……近づくな","ハチミツを よこせ","この腕、丸太より 太いぞ"] },
+  p_tiger: { p:"ひゃくじゅうの王", a:"bite", t:function(s){ return s + "だ。……ガオオオオッ!!"; },
+    c:["ガオッ! したがえ!","この しま模様が 目に入らぬか","狩りの 時間だ"] },
+  p_wolf: { p:"こうは(硬派)", a:"dash", t:function(s){ return s + "だ。……ぬかるなよ"; },
+    c:["おれが ついている かぎり 心配ない","群れは 一人を 見すてない","遠吠えの ひとつも したい夜だ"] },
+  p_fox: { p:"いたずら好き", a:"vanish", t:function(s){ return s + "だコン。……なーんて、ウソかもよ?"; },
+    c:["ボクに 化かされてみる?","しっぽの数、かぞえてごらん","こっそり ついてってるコン"] },
+  p_cat: { p:"きまぐれ", a:"sleep", t:function(s){ return s + "だニャ。……ま、どうでもいいけどニャ"; },
+    c:["……ふぁ〜あ。ねむいニャ","なでるなら 気が向いたときだけニャ","ひなたが あいてるニャ"] },
   baby: { p:"あかちゃん", a:"shy", t:function(s){ return s + "でちゅ〜"; }, c:["あぶ〜、あぶぶ〜","まんま……","たかい たかい して〜"] },
   child: { p:"げんきいっぱい", a:"jump", t:function(s){ return s + "だよ! ねえねえ!"; }, c:["そとで あそびたい!","ぼく はやく おおきくなりたい!","つぎは なにする?"] },
   apprentice: { p:"がんばりや", a:"dash", t:function(s){ return s + "です! ぼく もっと がんばります"; }, c:["きょうも けいこ けいこ!","いつか ゆうしゃに なるんだ","まだまだ みならいです……"] },
@@ -3305,7 +3607,9 @@ function petPat_(unitEl){
   const nm = key ? (DOT_NAMES[key] || dotStage().name) : dotStage().name;
   if (u){
     clearActs_(u); void u.offsetWidth;
-    u.classList.add("act-" + line[1]);
+    // 相棒には それぞれ 決まった動きがある
+    const bi = petInfo_(key);
+    u.classList.add("act-" + (bi ? bi.act : line[1]));
     setTimeout(function(){ clearActs_(u); }, 1800);
   }
   line[0] = nm + "「" + line[0] + "」";
@@ -3319,7 +3623,8 @@ function petPat_(unitEl){
 }
 // ときどき キャラが勝手に動く(ひとりの動き)
 const PET_ACTS = ["act-jump","act-wiggle","act-spin","act-squash","act-peek",
-                  "act-vanish","act-roll","act-shy","act-sleep","act-dash","act-shock","act-float"];
+                  "act-vanish","act-roll","act-shy","act-sleep","act-dash","act-shock","act-float",
+                  "act-hop","act-wag","act-howl","act-charge","act-bite","act-fly","act-slide"];
 // みんなでそろってやる動き
 const PET_GROUP_ACTS = ["act-jump","act-squash","act-wiggle","act-float"];
 function petUnits_(){
@@ -3439,6 +3744,7 @@ function openPartyModal(){
     + group("ごとうちのなかま", GOTOUCHI_MATES, gotouchiOwned_(), "gotouchi", null)
     + quest
     + group("レアななかま", RARE_MATES, rareOwned_(), "rare", "新しい商品を登録したとき、ごくまれに現れます。")
+    + buddySection_()
     + battleSection_();
   document.getElementById("party-modal").style.display = "flex";
 }
@@ -4239,6 +4545,7 @@ async function uploadShare(){
       pharmacy: { name: S.pharmacy.name, area: S.pharmacy.area },
       updatedAt: new Date().toISOString(),
       items: S.items.map(it => ({ jan: it.jan, name: it.name, maker: it.maker, category: it.category, qty: it.qty, expiry: it.expiry || "", smt: !!it.smt }))
+        .concat([{ jan: "__party__", party: myParty_() }])
     };
     const r = await fetch(S.gasUrl, { method: "POST", body: JSON.stringify(payload) });
     const txt = await r.text();
@@ -4304,6 +4611,10 @@ async function loadShared(){
     const r = await fetch(S.gasUrl + "?action=list");
     const d = await r.json();
     sharedData = Array.isArray(d) ? d : [];
+    sharedData.forEach(function(ph){
+      const sp = splitParty_(ph.items);
+      ph.party = sp.party; ph.items = sp.items;
+    });
     sharedData.sort((a,b) => String(b.updatedAt||"").localeCompare(String(a.updatedAt||"")));
     shareMsg(sharedData.length ? "" : "まだ共有データがありません。最初の1件をアップロードしましょう。");
     renderShared();
@@ -4428,7 +4739,11 @@ function renderShared(){
       + (mine?'<span class="ph-mine">自局</span>':'')
       + '<span class="ph-meta">'+esc(String(ph.pharmacy&&ph.pharmacy.area||"").slice(0,14))+((ph.pharmacy&&ph.pharmacy.area||"").length>14?'…':'')+' ・ '+n+' 品目 ・ 更新 '+String(ph.updatedAt||"").slice(0,10)
       +   (staleDays_(ph.updatedAt) >= 60 ? ' <span class="ph-stale">' + staleDays_(ph.updatedAt) + '日間 更新なし</span>' : '') + '</span></div>'
-      + '<span class="ph-arrow">›</span></li>';
+      + '<span class="ph-arrow">›</span></li>'
+      + (ph.party && String(ph.id) !== String(S.pharmacy.id)
+          ? '<div class="ph-vs"><span>Lv' + (ph.party.lv || 1) + ' / こうげき' + (ph.party.atk || 0) + ' まもり' + (ph.party.def || 0) + '</span>'
+            + '<button class="btn ghost" onclick="event.stopPropagation();startVs(\'' + ph.id + '\')">たいせん</button></div>'
+          : '');
   }).join("") + '</ul>';
 }
 
@@ -4481,6 +4796,7 @@ function bootUi_(){
   renderDotPet();
   startPetIdle_();
   checkEvolve_();
+  checkPets_();
   rpgOnOpen_();
 }
 // IndexedDBに保存済みデータがあればそちらを正とする(写真等でlocalStorageに入り切らない場合に備える)
