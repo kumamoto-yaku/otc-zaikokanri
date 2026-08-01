@@ -1086,7 +1086,7 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
   </section>
 
   <div class="toast" id="toast"></div>
-  <footer class="foot">OTCLinker — とみながグループ 店舗向けツール<br><span class="ver">版 2026-07-29 AZ(たたかいの画面)</span></footer>
+  <footer class="foot">OTCLinker — とみながグループ 店舗向けツール<br><span class="ver">版 2026-07-29 BA(カメラ起動の強化)</span></footer>
 </div>
 
 <script>
@@ -1246,10 +1246,11 @@ function toast(msg){
   t.textContent = msg; t.style.display = "block";
   clearTimeout(t._tm); t._tm = setTimeout(()=>{ t.style.display = "none"; }, 2600);
 }
-function scanMsg(msg){
+function scanMsg(msg, asHtml){
   const el = document.getElementById("scan-msg");
   if (!msg) { el.style.display = "none"; return; }
-  el.textContent = msg; el.style.display = "block";
+  if (asHtml) el.innerHTML = msg; else el.textContent = msg;
+  el.style.display = "block";
 }
 
 /* ============ EAN-13 ============ */
@@ -1537,22 +1538,79 @@ function saveBeepKind(){
   save();
   beep();
 }
+// 起動できるまで、条件を変えながら 何度か試す
+async function startScannerWithFallback_(onFound){
+  const qrbox = function(vw, vh){ const w = Math.min(300, Math.floor(vw * 0.85)); return { width: w, height: Math.floor(w * 0.5) }; };
+  const tries = [
+    { cam: { facingMode: "environment" }, cfg: { fps: 10, qrbox: qrbox } },
+    { cam: { facingMode: "environment" }, cfg: { fps: 10 } },
+    { cam: { facingMode: { ideal: "environment" } }, cfg: { fps: 10 } },
+    { cam: true, cfg: { fps: 10 } }
+  ];
+  let last = null;
+  for (let i = 0; i < tries.length; i++){
+    try {
+      await scanner.start(tries[i].cam, tries[i].cfg, onFound, function(){});
+      __scanTry = i + 1;
+      return;
+    } catch(e){
+      last = e;
+      try { await scanner.stop(); } catch(e2){}
+    }
+  }
+  // 背面カメラでだめなら、端末のカメラを一覧から順に試す
+  try {
+    const cams = await Html5Qrcode.getCameras();
+    if (cams && cams.length){
+      const back = cams.filter(function(c){ return /back|rear|環境|背面/i.test(c.label || ""); });
+      const list = back.concat(cams);
+      for (let j = 0; j < list.length; j++){
+        try {
+          await scanner.start(list[j].id, { fps: 10 }, onFound, function(){});
+          __scanTry = 90 + j;
+          return;
+        } catch(e3){ last = e3; try { await scanner.stop(); } catch(e4){} }
+      }
+    }
+  } catch(e5){ last = last || e5; }
+  throw last || new Error("カメラを起動できませんでした");
+}
+let __scanTry = 0;
 async function toggleScan(){
   if (scanning) { await stopScan(); return; }
   const btn = document.getElementById("scan-toggle");
+  // たたかいの画面などが残っていると カメラの映像が隠れるので、先に片づける
   try {
+    const sc = document.getElementById("rpg-screen");
+    if (sc) sc.style.display = "none";
+    document.body.style.overflow = "";
+    const pb = document.getElementById("pet-battle");
+    if (pb) pb.style.display = "none";
+    const pm = document.getElementById("party-modal");
+    if (pm) pm.style.display = "none";
+    const bm = document.getElementById("battle-modal");
+    if (bm) bm.style.display = "none";
+  } catch(e){}
+  // 読み取りの部品が読み込めているか
+  if (typeof Html5Qrcode === "undefined"){
+    scanMsg("読み取り部品を 読み込めませんでした。通信環境を確認して、画面を下に引っ張って読み込み直してください。それでもだめなときは「写真から読み取る」をお使いください。");
+    return;
+  }
+  if (!window.isSecureContext && location.protocol !== "https:" && location.hostname !== "localhost"){
+    scanMsg("このページは https:// のURLで開く必要があります。ブックマークのURLをご確認ください。");
+    return;
+  }
+  try {
+    document.getElementById("jan-reader").innerHTML = "";
     scanner = new Html5Qrcode("jan-reader");
     scanning = true;
     btn.textContent = "カメラを停止";
     scanMsg("カメラを起動しています…");
     // 起動そのものは端末におまかせ(解像度を指定すると起動できない端末があるため)。
     // 高画質化は起動後に applyConstraints で試みる。
-    await scanner.start(
-      { facingMode: "environment" },
-      { fps: 12,
-        qrbox: (vw, vh) => { const w = Math.min(300, Math.floor(vw * 0.85)); return { width: w, height: Math.floor(w * 0.5) }; },
-        aspectRatio: 1.3333,
-        experimentalFeatures: { useBarCodeDetectorIfSupported: true } },
+    // 端末によっては 指定が多いと 起動に失敗する。まずは いちばん素直な指定で起動し、
+    // だめだったときだけ 順に条件をゆるめて 何度か試す。
+    await startScannerWithFallback_(
       text => {
         const code = text.trim();
         if (/^\d{8}$/.test(code) || /^\d{13}$/.test(code)){
@@ -1562,11 +1620,10 @@ async function toggleScan(){
           scanMsg("読み取りました: " + code);
           applyJan(code);
         }
-      },
-      ()=>{}
-    );
+      });
     setupCamControls_();
-    scanMsg("バーコードを枠内に合わせてください。小さいバーコードは「拡大」で大きくしてください。");
+    scanMsg("バーコードを枠内に合わせてください。小さいバーコードは「拡大」で大きくしてください。"
+      + (__scanTry > 1 ? "(方法" + __scanTry + "で起動)" : ""));
   } catch(e){
     scanning = false;
     btn.textContent = "カメラでスキャン開始";
@@ -1577,7 +1634,11 @@ async function toggleScan(){
     else if (/NotReadable|Track/i.test(msg)) why = "カメラを別のアプリが使用中の可能性があります。他のアプリを閉じてお試しください。";
     else if (/Secur|https|Insecure/i.test(msg)) why = "このページは https:// のURLで開く必要があります。";
     else why = "しばらく待ってから、もう一度お試しください。";
-    scanMsg("カメラを起動できませんでした。" + why + "(" + (msg || "原因不明") + ")　うまくいかないときは「写真から読み取る」をお使いください。");
+    scanMsg("カメラを起動できませんでした。" + why
+      + '<br><span class="hint">くわしい情報: ' + esc(msg || "原因不明")
+      + ' ／ 保護された接続: ' + (window.isSecureContext ? "はい" : "いいえ")
+      + ' ／ 部品: ' + (typeof Html5Qrcode !== "undefined" ? "あり" : "なし") + '</span>'
+      + '<br>うまくいかないときは「写真から読み取る」をお使いください。', true);
   }
 }
 function camTrack_(){
