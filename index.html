@@ -147,6 +147,20 @@ button.mate-chip { cursor: pointer; font-family: var(--sans); }
 .dot-pet.weak { opacity: 0.75; filter: grayscale(0.35); }
 .party-stage.sleepy { filter: grayscale(0.8); opacity: 0.6; }
 .pet-unit.buddy { filter: drop-shadow(0 0 2px rgba(255,216,77,0.8)); align-self: flex-end; }
+.boss-box { border: 1px solid #E0B4AC; border-radius: 10px; padding: 9px 11px; background: #FDF6F3; margin-top: 10px; }
+.boss-title { font-size: 13px; font-weight: 700; color: #8C2F1B; margin-bottom: 7px; }
+.boss-row { display: flex; align-items: center; gap: 9px; padding: 6px 0; border-top: 1px dashed #E8CFC7; }
+.boss-row:first-of-type { border-top: none; }
+.boss-ico { display: flex; align-items: center; justify-content: center; width: 36px; }
+.boss-q { font-size: 20px; color: #C9A79E; font-weight: 700; }
+.boss-info { flex: 1; display: flex; flex-direction: column; }
+.boss-info b { font-size: 12.5px; color: #8C2F1B; }
+.boss-info i { font-style: normal; font-size: 10.5px; color: #A8756A; }
+.boss-row .btn { padding: 6px 14px; font-size: 12.5px; }
+.boss-row.locked { opacity: 0.62; }
+.boss-lock { font-size: 15px; }
+.boss-done { font-size: 10.5px; color: #fff; background: #8C2F1B; border-radius: 999px; padding: 2px 8px; }
+.hime-get { display: flex; align-items: center; gap: 10px; justify-content: center; background: #FFF7FA; border: 1px solid #F3C9D4; border-radius: 10px; padding: 8px 10px; margin: 8px 0; }
 .buddy-list { display: flex; gap: 8px; flex-wrap: wrap; }
 .buddy-card { flex: 1 1 30%; min-width: 96px; display: flex; flex-direction: column; align-items: center; gap: 2px;
   border: 1px solid var(--line); border-radius: 10px; background: #fff; padding: 8px 6px; cursor: pointer; font-family: var(--sans); }
@@ -1004,7 +1018,7 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
   </section>
 
   <div class="toast" id="toast"></div>
-  <footer class="foot">OTCLinker — とみながグループ 店舗向けツール<br><span class="ver">版 2026-07-29 AU(なかま表示の修正)</span></footer>
+  <footer class="foot">OTCLinker — とみながグループ 店舗向けツール<br><span class="ver">版 2026-07-29 AV(ボス3体・おひめさま)</span></footer>
 </div>
 
 <script>
@@ -2340,7 +2354,14 @@ const DOT_SPRITES = {
   p_tanuki: ["................................","................................",".....KK................KK.......","...KKKKKK............KKKKKK.....","...KKNnKK............KKNnKK.....","..KKNNNNnKK........KKNNNNnKK....","..KKNNNNnKKKKKKKKKKKKNNNNnKK....",".KKNNNNNNNnKKKKKKKKNNNNNNNnKK...",".KKNNNNNNNNNNNNNNNNNNNNNNNnKK...","KKNNNnnnnNNNNNNNNNNNNnnnnNNnKK..","KKNNnKKKKnNNNNNNNNNNnKKKKnNnKK..","KKNnKKKKKKNNNNNNNNNnKKKKKKNnKK..","KKNnKKWwKKNNNNNNNNNnKKWwKKNnKK..","KKNnKKwwKKNNNNNNNNNnKKwwKKNnKK..","KKNnKKKKKKNNNNNNNNNnKKKKKKNnKK..","KKNNnKKKKNNNNnnNNNNNnKKKKNNnKK..","KKNNNNNNNNNNnKKnNNNNNNNNNNNnKK..","KKNNNNNNNNNnKKKKNNNNNNNNNNNnKK..","KKNNNNNCCCCCCCCCCCCCCCCNNNNnKK..","KKNNNCCCCCCCCCCCCCCCCCCCCNNnKK..","KKnNNCCCCCCCCCCCCCCCCCCCCNNnKK..",".KKnCCCCCCCCCCCCCCCCCCCCCCnKK...",".KKKCCCCCCCCCCCCCCCCCCCCCcKK....","..KKCCCCCCCCCCCCCCCCCCCCCcKK....","..KKnCCCCCCCCCCCCCCCCCCCCnKKK...","...KKNNCCCccccccccccCCCNnKnKKK..","...KKnnNNnKKKKKKKKKKnNNnKKNnKK..","....KKKnnKKKKKKKKKKKKnnKKKnnKK..","....KKKKKKK........KKKKKKKKKKK..",".....KKKK............KKKKKKKK...","................................","................................"],
   p_bear: ["...KK....................KK.....",".KKKKKK................KKKKKK...",".KKNnKK................KKNnKK...","KKNNNNnKK............KKNNNNnKK..","KKNNNNnKKKKKKKKKKKKKKKKNNNNnKK..","KKNNNNNNnKKKKKKKKKKKKNNNNNNnKK..","KKNNNNNNNNNNNNNNNNNNNNNNNNNnKK..","KKNNNNNnnNNNNNNNNNNNNnnNNNNnKK..","KKNNNNnKKnNNNNNNNNNNnKKnNNNnKK..","KKNNNnKKKKNNNNNNNNNnKKKKNNNnKK..","KKNNNnKKKKNNNNNNNNNnKKKKNNNnKK..","KKNNNNnKKNNNNNNNNNNNnKKNNNNnKK..","KKNNNNNNNNNNNNNNNNNNNNNNNNNnKK..","KKNNNNNNNNNnnnnnnnnNNNNNNNNnKK..","KKNNNNNNNnnKKKKKKKKnnNNNNNNnKK..","KKNNNNNNnKKKKKKKKKKKKNNNNNNnKK..","KKNNNNNNnKWwKKWwKKWwKnNNNNNnKK..","KKNNNNNnKKwwKKwwKKwwKKNNNNNnKK..","KKNNNNNnKKKKKKKKKKKKKKNNNNNnKK..","KKNNNNNNnKKKKKKKKKKKKNNNNNNnKK..","KKNNNNNNNNNNNNNNNNNNNNNNNNNnKK..","KKNNNNNNNNNNNNNNNNNNNNNNNNNnKK..","KKNNNNNNNNNNNNNNNNNNNNNNNNNnKK..","KKNNNNnnNNNNNNNNNNNNNNnnNNNnKK..","KKnNNnKKnNNNNNNNNNNNNnKKNNNnKK..","KKKNNnKKKNNNNNNNNNNNnKKKNNnKKK..","KKKnNnKKKnNNNNNNNNNNnKKKNNnKKK..","KKKKnnKKKKnnnnnnnnnnKKKKnnKKKK..","KKKK..KKKK..........KKKK..KKKK..",".KK....KK............KK....KK...","................................","................................"],
   p_tiger: [".....KK................KK.......","...KKKKKK............KKKKKK.....","...KKOOoK............KOOoKK.....","..KKOOoooKK........KKOooOoKK....","..KKOoKKOoKKKKKKKKKKOoKKOoKK....",".KKOOoKKOOoKKKKKKKKOOoKKOOoKK...",".KKOOOOOOOOOOOOOOOOOOOOOOOoKK...","KKOOOooOOOOOOOOOOOOOOOOooOOoKK..","KKOOoKKoOOOOOOOOOOOOOOoKKoOoKK..","KKOoKKKKOOooOOOOOOooOoKKKKOoKK..","KKOoKKKKOoKKOOOOOoKKOoKKKKOoKK..","KKOOoKKOOoKKOOOOOoKKOOoKKOOoKK..","KKOOOOOOOOOOOOOOOOOOOOOOOOOoKK..","KKOOooOOOOOooooooooOOOOOooOoKK..","KKOoKKOOOooKKKKKKKKooOOoKKOoKK..","KKOoKKOOoKKKKKKKKKKKKOOoKKOoKK..","KKOOOOOOoKWwKKWwKKWwKoOOOOOoKK..","KKOOOOOoKKwwKKwwKKwwKKOOOOOoKK..","KKOOOOOoKKKKKKKKKKKKKKOOOOOoKK..","KKOOooOOoKKKKKKKKKKKKOOOooOoKK..","KKOoKKOOOOOOOOOOOOOOOOOoKKOoKK..","KKOoKKOOooOOOOOOOOOOooOoKKOoKK..","KKOOOOOoKKOOOOOOOOOoKKOOOOOoKK..","KKOOOOOoKKOOOOOOOOOoKKOOOOOoKK..","KKOOOOOOOOOOOOOOOOOOOOOOOOOoKK..","KKOOOooOOOOOOOOOOOOOOOOooOOoKK..","KKOOoKKooOOOOOOOOOOOOooKKoOoKK..","KKooKKKKKooooooooooooKKKKKooKK..","KKKK..KKKK..........KKKK..KKKK..",".KK....KK............KK....KK...","................................","................................"],
+  /* --- おひめさま(超ボスに勝つと なかまに なる) --- */
+  m_hime: ["........KK..KK..KK..KK..........",".......KKK..KK..KK..KK..........",".......KKKKKKKKKKKKKKK..........","......KKKKKKKKKKKKKKKK..........","......KKGGGGGGGGGGGgKK..........",".....KKKggggggggggggKKK.........",".....KKKKKKKKKKKKKKKKKK.........","....KKKKKKKKKKKKKKKKKKKK........","....KKKNNNNNNNNNNNNNnKKK........","....KKNNNNNNNNNNNNNNNnKK........","....KKNNNFFFFFFFFFFNNnKK........","....KKNFffffFFFFffffFnKK........","....KKFfKKKKFFFfKKKKFfKK........","....KKFfKKKKFFFfKKKKFfKK........","....KKFFFFFFFFFFFFFFFfKK........","....KKFFFFFffffffFFFFfKK........","....KKfFFFfKKKKKKfFFFfKK........",".....KKfFfKKKKKKKKFFfKK.........","......KKMMMMMMMMMMMmKK..........","......KMMMMMMMMMMMMMmK..........",".....KKMMMMMMMMMMMMMmKK.........","...KKMMMMMMMMMMMMMMMMMmKK.......","...KKMMMMMMMMMMMMMMMMMmKK.......","..KKMMMMMMMMMMMMMMMMMMMmKK......","..KKMMMMMMPPPPPPPPMMMMMmKK......",".KKMMMMMMMPPPPPPPPMMMMMMmKK.....",".KKMMMMMMMMMMMMMMMMMMMMMmKK.....","KKMMMMMMMMMMMMMMMMMMMMMMMmKK....","KKmMMMMMMMMMMMMMMMMMMMMMMmKK....","KKKmmmmmmmmmmmmmmmmmmmmmmKKK....","KKKKKKKKKKKKKKKKKKKKKKKKKKKK....",".KKKKKKKKKKKKKKKKKKKKKKKKKK....."],
   /* --- てき(バトル用。なかま一覧には出ません) --- */
+  e_moushinsei: ["................................","................................",".....KKKKKKKKKKKKKKKKKK.........","...KKKKKKKKKKKKKKKKKKKKKK.......","...KKWWWWWWWWWWWWWWWWWwKK.......","..KKWWWwwWWWWWWWWWWwwWWwKK......","..KKWWwKKwWWWWWWWWwKKwWwKK......","..KKWwKKKKWWWWWWWwKKKKWwKK......","..KKWwKKKKWWWWWWWwKKKKWwKK......","..KKWWwKKWWWWWWWWWwKKWWwKK......","..KKWWWWWWWWWWWWWWWWWWWwKK......","..KKWWWWWWWwwwwwwWWWWWWwKK......","..KKwWWWWwwKKKKKKwwWWWWwKK......",".KKKKwwwwKKKKKKKKKKwwwwKKKK.....",".KKKKKKKKKKKKKKKKKKKKKKKKKK.....","KKKKKKKKKKKKKKKKKKKKKKKKKKKK....","KKKWWWWWWWWWWWWWWWWWWWWWwKKK....","KKWWwwwwwwwwwwwwwwwwwwwwWwKK....","KKWwKKKKKKKKKKKKKKKKKKKKWwKK....","KKWwKKKKKKKKKKKKKKKKKKKKWwKK....","KKwWWWWWWWWWWWWWWWWWWWWWWwKK....","KKKwwwwwwwwwwwwwwwwwwwwwwKKK....","KKKKKKKKKKKKKKKKKKKKKKKKKKKK....",".KKKKKKKKKKKKKKKKKKKKKKKKKK.....",".KKKWWWWWWWWWWWWWWWWWWWwKKK.....","..KKwwwwwwwwwwwwwwwwwwwwKK......","..KKKKKKKKKKKKKKKKKKKKKKKK......","..KKKKKKKKKKKKKKKKKKKKKKKK......","..KKK..................KKK......",".KKK....................KKK.....","KKKK....................KKKK....","KKK......................KKK...."],
+  e_hokan: ["................................","................................","...KKKKKKKKKKKKKKKKKKKKKKKK.....","..KKKKKKKKKKKKKKKKKKKKKKKKKK....","..KKKNNNNNNNNNNNNNNNNNNNnKKK....","..KKNNNnnNNNNNNNNNNNNnnNNnKK....","..KKNNnKKnNNNNNNNNNNnKKnNnKK....","..KKNnKKKKNNNNNNNNNnKKKKNnKK....","..KKNnKKKKNNNNNNNNNnKKKKNnKK....","..KKNNnKKNNNNNNNNNNNnKKNNnKK....","..KKNNNNNNNNNNNNNNNNNNNNNnKK....","..KKNNNNNNNnnnnnnnnNNNNNNnKK....","..KKnNNNNnnKKKKKKKKnnNNNNnKK....","..KKKnnnnKKKKKKKKKKKKnnnnKKK....","..KKKKKKKKKKKKKKKKKKKKKKKKKK....","..KKKKKKKKKKKKKKKKKKKKKKKKKK....","..KKCCCcKKKKCCCcKKKKCCCcKKKK....","..KKccccKKKKccccKKKKccccKKKK....","..KKKKKKKKKKKKKKKKKKKKKKKKKK....","..KKKKKKKKKKKKKKKKKKKKKKKKKK....","..KKCCCcKKKKCCCcKKKKCCCcKKKK....","..KKccccKKKKccccKKKKccccKKKK....","..KKKKKKKKKKKKKKKKKKKKKKKKKK....","..KKKKKKKKKKKKKKKKKKKKKKKKKK....","..KKNNNNNNNNNNNNNNNNNNNNNnKK....","..KKnnnnnnnnnnnnnnnnnnnnnnKK....","..KKKKKKKKKKKKKKKKKKKKKKKKKK....","...KKKKKKKKKKKKKKKKKKKKKKKK.....","....KKK................KKK......","....KK..................KK......","..KKKK..................KKKK....","..KKK....................KKK...."],
+  b_kaishu: ["....KK....................KK....","....KKK..................KKK....","....KKK..................KKK....","...KKKKKK..............KKKKKK...","...KKRrKKKKKKKKKKKKKKKKKKRrKK...",".KKRRRRRrKKKKKKKKKKKKKKRRRRRrKK.",".KKRRRRRRRRRRRRRRRRRRRRRRRRRrKK.","KKRRRRRrrRRRRRRRRRRRRRRrrRRRRrKK","KKRRRRrKKrRRRRRRRRRRRRrKKrRRRrKK","KKRRRrKKKKRRRRRRRRRRRrKKKKRRRrKK","KKRRRrKKKKRRRRRRRRRRRrKKKKRRRrKK","KKRRRRrKKRRRRRRRRRRRRRrKKRRRRrKK","KKRRRRRRRRRRRRRRRRRRRRRRRRRRRrKK","KKRRRRRrrrrrrrrrrrrrrrrrrRRRRrKK","KKRRRRrKKKKKKKKKKKKKKKKKKrRRRrKK","KKRRRrKKKKKKKKKKKKKKKKKKKKRRRrKK","KKRRRrKKWWWwKKKKKKKKWWWwKKRRRrKK","KKRRRrKKwwwwKKKKKKKKwwwwKKRRRrKK","KKRRRrKKKKKKKKKKKKKKKKKKKKRRRrKK","KKRRRRrKKKKKKKKKKKKKKKKKKRRRRrKK","KKRRRRRRRRRRRRRRRRRRRRRRRRRRRrKK","KKRRRRRRRRRRRRRRRRRRRRRRRRRRRrKK","KKRRRRRRRRRRRRRRRRRRRRRRRRRRRrKK","KKRRRRrrRRRRRRRRRRRRRRRRrrRRRrKK","KKrRRrKKrRRRRRRRRRRRRRRrKKRRRrKK","KKKRRrKKKRRRRRRRRRRRRRrKKKRRrKKK","KKKrRrKKKrrRRRRRRRRRRrrKKKRRrKKK","KKKKrrKKKKKrrrrrrrrrrKKKKKrrKKKK","KKKKKKK..KKKKKKKKKKKKKK..KKKKKKK",".KKKK......KKKKKKKKKK......KKKK.",".KKKK......KKKK..KKKK......KKKK.","..KK........KK....KK........KK.."],
+  b_tanaoroshi: ["KK..KK..KK..KK..KK..KK..KK..KK..","KK..KK..KK..KK..KK..KK..KK..KKK.","KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK.","KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK","KKKVVVVVVVVVVVVVVVVVVVVVVVVVvKKK","KKVVVVVvvVVVVVVVVVVVVVVvvVVVVvKK","KKVVVVvKKvVVVVVVVVVVVVvKKvVVVvKK","KKVVVvKKKKVVVVVVVVVVVvKKKKVVVvKK","KKVVVvKKKKVVVVVVVVVVVvKKKKVVVvKK","KKVVVVvKKVVVVVVVVVVVVVvKKVVVVvKK","KKVVVVVVVVVVVVVVVVVVVVVVVVVVVvKK","KKVVVVVvvvvvvvvvvvvvvvvvvVVVVvKK","KKVVVVvKKKKKKKKKKKKKKKKKKvVVVvKK","KKVVVvKKKKKKKKKKKKKKKKKKKKVVVvKK","KKVVVvKKKWwKKKKKKKKKKWwKKKVVVvKK","KKVVVvKKWWWwKKKKKKKKWWWwKKVVVvKK","KKVVVvKKwWWwKKKKKKKKwWWwKKVVVvKK","KKVVVvKKKwwKKKKKKKKKKwwKKKVVVvKK","KKVVVvKKKKKKKKKKKKKKKKKKKKVVVvKK","KKVVVVvKKKKKKKKKKKKKKKKKKVVVVvKK","KKVVVVVVVVVVVVVVVVVVVVVVVVVVVvKK","KKVVVVVVvvVVVVVVVVVVVVvvVVVVVvKK","KKVVVVVvKKVVVVVVVVVVVvKKVVVVVvKK","KKVVVVVvKKVVVVVVVVVVVvKKVVVVVvKK","KKvVVVVvKKvVVVVVVVVVVvKKVVVVVvKK","KKKVVVVvKKKVVVVVVVVVvKKKVVVVvKKK","KKKvvVVvKKKvvVVVVVVvvKKKvVVvvKKK","KKKKKvvKKKKKKvvvvvvKKKKKKvvKKKKK","KKKKKKKKKK..KKKKKKKK..KKKKKKKKKK",".KKKKKKKK....KKKKKK....KKKKKKKK.",".KKK..KKK....KKKK......KKK..KKK.","..KK..KK......KK........KK..KK.."],
+  b_yakuo: ["KK..KK....KK..KK..KK....KK..KK..","KK..KKK..KKK..KK..KKK..KKK..KK..",".K.KKKKKKKKKKKKKKKKKKKKKKKKKKK..","..KKKKKKKKKKKKKKKKKKKKKKKKKKKK..","..KKKGGGGGGGGGGGGGGGGGGGGGgKKK..",".KKGGGGGGggGGGGGGGGGGggGGGGGgKK.",".KKGGGGGgKKgGGGGGGGGgKKgGGGGgKK.","KKGGGGGgKKKKGGGGGGGgKKKKGGGGGgKK","KKGGGGGgKKKKGGGGGGGgKKKKGGGGGgKK","KKGGGGGGgKKGGGGGGGGGgKKGGGGGGgKK","KKGGGGGGGGGGGGGGGGGGGGGGGGGGGgKK","KKGGGGGggggggggggggggggggGGGGgKK","KKGGGGgKKKKKKKKKKKKKKKKKKgGGGgKK","KKGGGgKKKKKKKKKKKKKKKKKKKKGGGgKK","KKGGGgKKKRrKKKKKKKKKKRrKKKGGGgKK","KKGGGgKKRRRrKKKKKKKKRRRrKKGGGgKK","KKGGGgKKrRRrKKKKKKKKrRRrKKGGGgKK","KKGGGgKKKrrKKKKKKKKKKrrKKKGGGgKK","KKGGGgKKKKKKKKKKKKKKKKKKKKGGGgKK","KKGGGGgKKKKKKKKKKKKKKKKKKGGGGgKK","KKGGGGGGGGGGGGGGGGGGGGGGGGGGGgKK","KKGGGGGGGGGGGGGGGGGGGGGGGGGGGgKK","KKGGGVVGGGGGGGGGGGGGGGGGGVVGGgKK","KKGGVVVVGGGGGGGGGGGGGGGGVVVVGgKK","KKgGVVVVGGGGGGGGGGGGGGGGVVVVGgKK","KKKGGVVVVGGGGGGGGGGGGGGVVVVGgKKK","KKKggVVVVVGGGGGGGGGGGGVVVVVggKKK","KKKKKGGVVVGggggggggggGVVVGgKKKKK","KKKKKgGGGggKKKKKKKKKKggGGGgKKKKK",".KKKKKgggKKKKKKKKKKKKKKgggKKKKK.",".KKKKK..KKKKK......KKKKK..KKKKK.","...KK....KK..........KK....KK..."],
   e_hokori: ["................................","................................","....KK....KK........KK....KK....","...KKKK...KK.......KKKK...KK....","...KSsK...KKSsK....KSsK...KKSsK.","..KKSSsK..KSSSsK..KSSsKK..KSSsKK","..KKSSsKKKKSSSsKKKKSSsKKSSSSSsKK",".KKSSSSsKKSSSSSsKKSSSsKKSSSSSsKK",".KKSSSSSSSSSSSSSSSSSSSSSSSSSSsKK","KKSSSSSssSSSSSSSSSSssSSSSSSSSsKK","KKSSSSsKKsSSSSSSSSsKKsSSSSSSSsKK","KKSSSsKKKKSSSSSSSsKKKKSSSSSSSsKK","KKSSSsKKKKSSSSSSSsKKKKSSSSSSSsKK","KKSSSSsKKSSSSSSSSSsKKSSSSSSSSsKK","KKSSSSSSSSSSSSSSSSSSSSSSSSSSSsKK","KKSSSSSSssssssssssssSSSSSSSSSsKK","KKSSSSSsKKKKKKKKKKKKSSSSSSSSSsKK","KKSSSSSsKKKKKKKKKKKKSSSSSSSSSsKK","KKsSSSSSSSSSSSSSSSSSSSSSSSSSSsKK",".KKSSSSSSSSSSSSSSSSSSSSSSSSSsKK.",".KKsSSSSSSSSSSSSSSSSSSSSSSSSsKK.","..KKSSssSSSSssSSSSssSSSSssSsKK..","..KKSsKKSSSsKKSSSsKKSSSsKKSsKK..","...KssKKSSSsKKSSSsKKSSSsKKssK...","...KKKKKSSSsKKSSSsKKSSSsKKKKK...",".....KKKSSsKKKSSsKKKSSsKKKK.....","......KKSSsKKKSSsKKKSSsKKKK.....","......KKssKKKKssKKKKssKKK.......","....KKKK...KKKKKK..KKKKKK.......","....KKK......KK......KK.........","................................","................................"],
   e_shinagire: ["................................","................................",".....KKKKKKKKKKKKKKKKKKKKKK.....","...KKKKKKKKKKKKKKKKKKKKKKKKKK...","...KKNNNNNNNNNNNNNNNNNNNNNnKK...","..KKNNNnnNNNNNNNNNNNNNNnnNNnKK..","..KKNNnKKnNNNNNNNNNNNNnKKnNnKK..","..KKNnKKKKNNNNNNNNNNNnKKKKNnKK..","..KKNnKKKKNNNNNNNNNNNnKKKKNnKK..","..KKNNnKKNNNNNNNNNNNNNnKKNNnKK..","..KKNNNNNNNNNNNNNNNNNNNNNNNnKK..","..KKNNNNNNnnnnnnnnnnnnNNNNNnKK..","..KKNNNNNnKKKKKKKKKKKKNNNNNnKK..",".KKKNNNNNnKKKKKKKKKKKKNNNNNnKKK.",".KKKNNNNNNNNNNNNNNNNNNNNNNNnKKK.","KKKKNNNNNNNNNNNNNNNNNNNNNNNnKKKK","KKKWWWWWWWWWWWWWWWWWWWWWWWWWwKKK","KKWWWwwwwwwwwwwwwwwwwwwwwwwWWwKK","KKWWwKKKKKKKKKKKKKKKKKKKKKKwWwKK","KKWwKKKKKKKKKKKKKKKKKKKKKKKKWwKK","KKWwKKKWWWWWWWWWWWWWWWWWwKKKWwKK","KKWwKKWWwwwwwwwwwwwwwwwwWwKKWwKK","KKWwKKWwKKKKKKKKKKKKKKKKWwKKWwKK","KKWwKKWwKKKKKKKKKKKKKKKKWwKKWwKK","KKWwKKwWWWWWWWWWWWWWWWWWWwKKWwKK","KKWwKKKwwwwwwwwwwwwwwwwwwKKKWwKK","KKWwKKKKKKKKKKKKKKKKKKKKKKKKWwKK","KKWWwKKKKKKKKKKKKKKKKKKKKKKWWwKK","KKwWWWWWWWWWWWWWWWWWWWWWWWWWWwKK","KKKwwwwwwwwwwwwwwwwwwwwwwwwwwKKK","KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK",".KKKKKKKKKKKKKKKKKKKKKKKKKKKKKK."],
   e_chirakari: ["................................","................................",".......KKKK..........KKKK.......",".....KKKKKKKK......KKKKKKKK.....",".....KKWWWwKKKKKKKKKKWWWwKK.....","...KKWWWWWWWwKKKKKKWWWWWWWwKK...","...KKWWWWWWWWWWWWWWWWWWWWWwKK...","..KKWWWwwWWWWWWWWWWWWWWwwWWwKK..","..KKWWwKKwWWWWWWWWWWWWwKKwWwKK..","..KKWwKKKKWWWWWWWWWWWwKKKKWwKK..","..KKWwKKKKWWWWWWWWWWWwKKKKWwKK..",".KKWWWwKKWWWWWWWWWWWWWwKKWWWwKK.",".KKWWWWWWWWWWWWWWWWWWWWWWWWWwKK.","KKWWWWWWwwwwwwwwwwwwwwwwWWWWWwKK","KKWWWWWwKKKKKKKKKKKKKKKKWWWWWwKK","KKWWWWWwKKKKKKKKKKKKKKKKWWWWWwKK","KKwWWWWWWWWWWWWWWWWWWWWWWWWWWwKK",".KKWWWWWWWWWWWWWWWWWWWWWWWWWwKK.","..KwWWWWWWWWWWWWWWWWWWWWWWWWwK..","..KKWWWWWwwwWWWWWWWWwwwWWWWwKK..",".KKKWWWwwKKKWWWWWWWwKKKwwWWwKKK.","KKKWWWwKKKKKWWWWWWWwKKKKKwWWwKKK","KKWWWwKKKKKWWWWWWWWWwKKKKKwWWwKK",".KwwwKKKKWWWWwwwwwwWWWwKKKKwwwK.",".KKKKwKWWWWwwKKKKKKwwWWWwKwKKKK.","...KKKWWWWwKKKKKKKKKKWWWWwKKK...","...KKKwWWwwKKKK..KKKKwwWWwKKK...",".....KKwwKKKK......KKKKwwKK.....",".....KKKKKK..........KKKKKK.....",".......KK..............KK.......","................................","................................"],
@@ -2358,7 +2379,7 @@ const DOT_SPRITES = {
   slot: ["........................","........................","...KKKKKKKKKKKKKKKKKK...","..KKKKKKKKKKKKKKKKKKKK..","..KKK..............KKK..","..KK................KK..","..KK................KK..","..KK................KK..","..KK................KK..","..KK................KK..","..KK.......KK.......KK..","..KK......KKKK......KK..","..KK......KKKK......KK..","..KK.......KK.......KK..","..KK................KK..","..KK................KK..","..KK................KK..","..KK................KK..","..KK................KK..","..KKK..............KKK..","..KKKKKKKKKKKKKKKKKKKK..","...KKKKKKKKKKKKKKKKKK...","........................","........................"]
 };
 // 目の高さ(スプライトごとに自動検出。衣装をこの位置に合わせる)
-const DOT_EYE = {"baby": 0.391,"child": 0.328,"apprentice": 0.328,"warrior": 0.391,"hero": 0.266,"tablet": 0.391,"capsule": 0.266,"powder": 0.266,"troche": 0.266,"eyedrop": 0.453,"ointment": 0.391,"patch": 0.266,"tape": 0.266,"syrup": 0.391,"drink": 0.453,"supp": 0.391,"inhaler": 0.391,"inject": 0.391,"g_okigusuri": 0.328,"g_renkon": 0.266,"g_jagaimo": 0.391,"g_ringo": 0.453,"g_gyutan": 0.328,"g_takoyaki": 0.391,"g_yatsuhashi": 0.391,"g_shika": 0.391,"g_momiji": 0.38,"g_udon": 0.453,"g_mentaiko": 0.328,"g_shisa": 0.328,"g2_ichigo": 0.391,"g2_mikan": 0.328,"g2_rakkasei": 0.266,"g2_budou": 0.328,"g2_megane": 0.328,"g2_kiritanpo": 0.391,"g2_soba": 0.453,"g2_ebifly": 0.391,"g2_kibidango": 0.391,"g2_sakuranbo": 0.516,"g2_ocha": 0.453,"g2_konnyaku": 0.266,"s_hakase": 0.328,"s_monshin": 0.266,"s_nyubachi": 0.453,"s_choshinki": 0.391,"r_gold": 0.328,"r_rainbow": 0.266,"r_phantom": 0.453,"slot": 0.396,"p_wolf": 0.328,"p_fox": 0.328,"p_cat": 0.266,"p_dog": 0.266,"p_rabbit": 0.453,"p_hamster": 0.328,"p_chick": 0.328,"p_penguin": 0.266,"p_owl": 0.328,"p_tanuki": 0.328,"p_bear": 0.266,"p_tiger": 0.38};
+const DOT_EYE = {"baby": 0.391,"child": 0.328,"apprentice": 0.328,"warrior": 0.391,"hero": 0.266,"tablet": 0.391,"capsule": 0.266,"powder": 0.266,"troche": 0.266,"eyedrop": 0.453,"ointment": 0.391,"patch": 0.266,"tape": 0.266,"syrup": 0.391,"drink": 0.453,"supp": 0.391,"inhaler": 0.391,"inject": 0.391,"g_okigusuri": 0.328,"g_renkon": 0.266,"g_jagaimo": 0.391,"g_ringo": 0.453,"g_gyutan": 0.328,"g_takoyaki": 0.391,"g_yatsuhashi": 0.391,"g_shika": 0.391,"g_momiji": 0.38,"g_udon": 0.453,"g_mentaiko": 0.328,"g_shisa": 0.328,"g2_ichigo": 0.391,"g2_mikan": 0.328,"g2_rakkasei": 0.266,"g2_budou": 0.328,"g2_megane": 0.328,"g2_kiritanpo": 0.391,"g2_soba": 0.453,"g2_ebifly": 0.391,"g2_kibidango": 0.391,"g2_sakuranbo": 0.516,"g2_ocha": 0.453,"g2_konnyaku": 0.266,"s_hakase": 0.328,"s_monshin": 0.266,"s_nyubachi": 0.453,"s_choshinki": 0.391,"r_gold": 0.328,"r_rainbow": 0.266,"r_phantom": 0.453,"slot": 0.396,"p_wolf": 0.328,"p_fox": 0.328,"p_cat": 0.266,"p_dog": 0.266,"p_rabbit": 0.453,"p_hamster": 0.328,"p_chick": 0.328,"p_penguin": 0.266,"p_owl": 0.328,"p_tanuki": 0.328,"p_bear": 0.266,"p_tiger": 0.38,"e_moushinsei": 0.203,"e_hokan": 0.203,"b_kaishu": 0.266,"b_tanaoroshi": 0.203,"b_yakuo": 0.203,"m_hime": 0.391};
 // なかまが加わる順番(先に何が来るかは伏せて、加わるたびに名前を発表する)
 const DOT_MATES = ["tablet","capsule","powder","troche","eyedrop","ointment","patch","tape","syrup","drink","supp","inhaler","inject"];
 const DOT_NAMES = {
@@ -3041,8 +3062,18 @@ const PETS = [
   { key:"p_tiger", size:44,   name:"トラ",       act:"bite",   need:"battle", n:30,
     how:"バトルに 30勝すると したがえる",              fx:"こうげきが 大きく 上がる", atk:15, def:7, hp:34, drop:0, genki:0 }
 ];
-function petsOwned_(){ return (S.pets || []).filter(function(k){ return PETS.some(function(x){ return x.key === k; }); }); }
-function petInfo_(key){ return PETS.filter(function(x){ return x.key === key; })[0] || null; }
+function petsOwned_(){
+  const own = (S.pets || []).filter(function(k){ return PETS.some(function(x){ return x.key === k; }); });
+  if (S.hime) own.push("m_hime");     // 薬王をたおすと つれて歩ける
+  return own;
+}
+const HIME = { key:"m_hime", name:"おひめさま", act:"float", size:34,
+  need:"boss", n:1, how:"薬王(超ボス)を たおすと なかまに なる",
+  fx:"すべてが 少し 上がる", atk:8, def:8, hp:24, drop:1, genki:1 };
+function petInfo_(key){
+  if (key === "m_hime") return HIME;
+  return PETS.filter(function(x){ return x.key === key; })[0] || null;
+}
 function activePet_(){
   const own = petsOwned_();
   if (!own.length) return null;
@@ -3059,6 +3090,7 @@ function petProgress_(x){
   if (x.need === "goto")   return { now: gotouchiOwned_().length, need: x.n };
   if (x.need === "senmon") return { now: senmonOwned_().length, need: x.n };
   if (x.need === "quest")  return { now: (S.quests || []).length, need: x.n };
+  if (x.need === "boss")   return { now: S.hime ? 1 : 0, need: x.n };
   return { now: p.best || 1, need: x.n };
 }
 // 条件を満たしたら なかまに なる(同時に満たしていれば まとめて)
@@ -3092,12 +3124,42 @@ function setBuddy(key){
 
 /* ===== バトルと そうび ===== */
 const ENEMIES = [
-  { key:"e_hokori",    name:"ホコリのかたまり", hp: 26, atk: 5,  lv:1, say:"ほこりが まいあがった!" },
-  { key:"e_chirakari", name:"ちらかり",         hp: 34, atk: 7,  lv:1, say:"うりばが ちらかっている!" },
-  { key:"e_shinagire", name:"しなぎれ",         hp: 44, atk: 9,  lv:2, say:"たなが からっぽだ!" },
-  { key:"e_kigengire", name:"きげんぎれ",       hp: 56, atk: 12, lv:2, say:"きげんが せまっている!" },
-  { key:"e_nushi",     name:"ザイコのぬし",     hp: 88, atk: 16, lv:3, say:"ザイコのぬしが あらわれた!" }
+  // ふつうの てき
+  { key:"e_hokori",     name:"ホコリのかたまり", hp: 26,  atk: 5,  def: 1,  lv:1, size:44, say:"ほこりが まいあがった!" },
+  { key:"e_chirakari",  name:"ちらかり",         hp: 34,  atk: 7,  def: 2,  lv:1, size:44, say:"うりばが ちらかっている!" },
+  { key:"e_shinagire",  name:"しなぎれ",         hp: 44,  atk: 9,  def: 3,  lv:2, size:46, say:"たなが からっぽだ!" },
+  { key:"e_hokan",      name:"ほかんちがい",     hp: 52,  atk: 11, def: 4,  lv:2, size:46, say:"おく場所が まちがっている!" },
+  { key:"e_kigengire",  name:"きげんぎれ",       hp: 60,  atk: 13, def: 5,  lv:2, size:46, say:"きげんが せまっている!" },
+  { key:"e_moushinsei", name:"しょるいの山",     hp: 72,  atk: 15, def: 6,  lv:3, size:48, say:"しょるいが 山づみだ!" },
+  { key:"e_nushi",      name:"ザイコのぬし",     hp: 92,  atk: 18, def: 8,  lv:3, size:52, say:"ザイコのぬしが あらわれた!" },
+  // 中ボス・大ボス
+  { key:"b_kaishu",     name:"かいしゅうのぬし", hp: 265, atk: 44, def: 24, lv:4, size:66, boss:1,
+    say:"【中ボス】かいしゅうのぬしが 立ちはだかった!" },
+  { key:"b_tanaoroshi", name:"たなおろしの魔王", hp: 505, atk: 64, def: 36, lv:5, size:74, boss:2,
+    say:"【大ボス】たなおろしの魔王が 目をさました!" },
+  // 超ボス
+  { key:"b_yakuo",      name:"薬王(やくおう)",   hp: 900, atk: 88, def: 48, lv:9, size:88, boss:3,
+    say:"【超ボス】薬王が あらわれた……!" }
 ];
+// ボスは ふつうには出ない。条件を満たすと 挑めるようになる
+const BOSS_COND = {
+  b_kaishu:     { wins: 10, lv: 5,  label: "バトル10勝 かつ レベル5" },
+  b_tanaoroshi: { wins: 25, lv: 12, label: "バトル25勝 かつ レベル12" },
+  b_yakuo:      { wins: 50, lv: 25, equip: 4, label: "バトル50勝・レベル25・そうび4か所すべて" }
+};
+function bossReady_(key){
+  const c = BOSS_COND[key];
+  if (!c) return false;
+  const r = rpg_();
+  if ((r.wins || 0) < c.wins) return false;
+  if (lvInfo_().lv < c.lv) return false;
+  if (c.equip){
+    const n = EQUIP_SLOTS.filter(function(sl){ return r.equip[sl.id]; }).length;
+    if (n < c.equip) return false;
+  }
+  return true;
+}
+function bossBeaten_(key){ return ((rpg_().bosses || []).indexOf(key) >= 0); }
 // そうびは 4か所(あたま・からだ・て・アクセ)
 const EQUIP_SLOTS = [
   { id:"head", name:"あたま" }, { id:"body", name:"からだ" },
@@ -3179,7 +3241,7 @@ function rpgOnOpen_(){
   if (genkiState_().key === "nemuri") return;  // 眠っているときは出ない
   if (Math.random() > 0.12) return;
   const pw = partyPower_();
-  const pool = ENEMIES.filter(function(e){ return e.lv <= (pw.heroLv >= 4 ? 3 : (pw.heroLv >= 2 ? 2 : 1)); });
+  const pool = ENEMIES.filter(function(e){ return !e.boss && e.lv <= (pw.heroLv >= 4 ? 3 : (pw.heroLv >= 2 ? 2 : 1)); });
   const e = pool[Math.floor(Math.random() * pool.length)];
   r.enemy = e.key;
   r.count++;
@@ -3219,6 +3281,23 @@ function startBattle(practice){
     ehp: practice ? Math.round(en.hp * 0.6) : en.hp,
     emax: practice ? Math.round(en.hp * 0.6) : en.hp,
     eatk: practice ? Math.round(en.atk * 0.6) : en.atk,
+    edef: practice ? Math.round((en.def || 0) * 0.6) : (en.def || 0),
+    log: [], turn: 0, done: false
+  };
+  showBattleBox_();
+  renderBattle_();
+  setTimeout(battleTurn_, 700);
+}
+// ボスに いどむ
+function startBoss(key){
+  if (!bossReady_(key)){ toast("まだ 条件を みたしていません"); return; }
+  const en = ENEMIES.filter(function(e){ return e.key === key; })[0];
+  if (!en) return;
+  const pw = partyPower_();
+  __battle = {
+    practice: false, boss: key, en: en,
+    php: pw.hp, pmax: pw.hp, patk: pw.atk, pdef: pw.def,
+    ehp: en.hp, emax: en.hp, eatk: en.atk, edef: en.def || 0,
     log: [], turn: 0, done: false
   };
   showBattleBox_();
@@ -3255,6 +3334,31 @@ function battleTurn_(){
 }
 function battleWin_(){
   const b = __battle, r = rpg_();
+  if (b.boss){
+    r.bosses = (r.bosses || []).concat([b.boss]).filter(function(v, i, a){ return a.indexOf(v) === i; });
+    r.wins = (r.wins || 0) + 1;
+    const en2 = b.en;
+    addExp_(en2.boss === 3 ? 800 : (en2.boss === 2 ? 300 : 150), "ボスを たおした");
+    // ボスは かならず よいそうびを 落とす
+    const rank = en2.boss >= 3 ? [4] : (en2.boss >= 2 ? [3,4] : [2,3]);
+    const pool = Object.keys(EQUIPS).filter(function(k){ return rank.indexOf(EQUIPS[k].rank) >= 0 && (r.inv || []).indexOf(k) < 0; });
+    let got = null;
+    if (pool.length){ got = pool[Math.floor(Math.random() * pool.length)]; r.inv = (r.inv || []).concat([got]); }
+    const c3 = care_(); c3.genki = Math.max(0, c3.genki - 8);
+    // 超ボスに勝つと おひめさま が なかまに なる
+    let hime = false;
+    if (b.boss === "b_yakuo" && (S.hime !== true)){ S.hime = true; hime = true; }
+    save();
+    setTimeout(checkPets_, 100);
+    battleBox_().innerHTML = '<div class="bt-result">'
+      + '<div class="bt-win">' + (en2.boss >= 3 ? "★ 薬王を たおした! ★" : "ボスを たおした!") + '</div>'
+      + '<div class="bt-enemy">' + dotSvg(en2.key, Math.min(64, en2.size || 56)) + '</div>'
+      + (got ? '<p><b>' + esc(EQUIPS[got].name) + '</b> を 手に入れた!</p>' : '<p>けいけんちを たくさん もらった!</p>')
+      + (hime ? '<div class="hime-get">' + dotSvg("m_hime", 56) + '<p><b>おひめさま</b>が なかまに なった!<br>'
+                + '<span class="hint">「なかま」画面から つれて歩けます</span></p></div>' : '')
+      + '<button class="btn" onclick="closeBattle()">とじる</button></div>';
+    return;
+  }
   if (b.vs){
     const v = vsRec_();
     v.win = (v.win || 0) + 1;
@@ -3264,7 +3368,7 @@ function battleWin_(){
     const c2 = care_(); c2.genki = Math.max(0, c2.genki - 4); save();
     battleBox_().innerHTML = '<div class="bt-result">'
       + '<div class="bt-win">かった!</div>'
-      + '<div class="bt-enemy">' + dotSvg(b.en.key, 56) + '</div>'
+      + '<div class="bt-enemy">' + dotSvg(b.en.key, b.en.size || 56) + '</div>'
       + '<p><b>' + esc(b.vsName) + '</b> との たいせんに 勝ちました!</p>'
       + '<p class="hint">つうさん ' + v.win + '勝 ' + (v.lose || 0) + '敗</p>'
       + '<button class="btn" onclick="closeBattle()">とじる</button></div>';
@@ -3295,7 +3399,7 @@ function battleWin_(){
   const key = dup ? got.replace("|dup", "") : got;
   box.innerHTML = '<div class="bt-result">'
     + '<div class="bt-win">かった!</div>'
-    + '<div class="bt-enemy">' + dotSvg(b.en.key, 56) + '</div>'
+    + '<div class="bt-enemy">' + dotSvg(b.en.key, b.en.size || 56) + '</div>'
     + (key
         ? '<p>' + (dup ? "もう持っている " : "") + '<b>' + esc(EQUIPS[key].name) + '</b> を' + (dup ? "見つけた" : "手に入れた!") + '</p>'
           + (dup ? '' : '<p class="hint">「なかま」画面の そうび から着せかえられます</p>')
@@ -3304,6 +3408,18 @@ function battleWin_(){
 }
 function battleLose_(){
   const b = __battle, r = rpg_();
+  if (b.boss){
+    r.loses = (r.loses || 0) + 1;
+    addExp_(20, "ボスに いどんだ");
+    save();
+    battleBox_().innerHTML = '<div class="bt-result">'
+      + '<div class="bt-lose">まけた……</div>'
+      + '<div class="bt-enemy">' + dotSvg(b.en.key, Math.min(64, b.en.size || 56)) + '</div>'
+      + '<p><b>' + esc(b.en.name) + '</b> は 強かった。</p>'
+      + '<p class="hint">レベルを 上げ、そうびを ととのえ、なかまを ふやして また いどもう。</p>'
+      + '<button class="btn" onclick="closeBattle()">とじる</button></div>';
+    return;
+  }
   if (b.vs){
     const v = vsRec_();
     v.lose = (v.lose || 0) + 1;
@@ -3312,7 +3428,7 @@ function battleLose_(){
     addExp_(10, "よく たたかった");
     battleBox_().innerHTML = '<div class="bt-result">'
       + '<div class="bt-lose">まけた……</div>'
-      + '<div class="bt-enemy">' + dotSvg(b.en.key, 56) + '</div>'
+      + '<div class="bt-enemy">' + dotSvg(b.en.key, b.en.size || 56) + '</div>'
       + '<p><b>' + esc(b.vsName) + '</b> は 強かった。レベルを 上げて 挑もう。</p>'
       + '<p class="hint">つうさん ' + (v.win || 0) + '勝 ' + v.lose + '敗 ／ 負けても なくすものは ありません</p>'
       + '<button class="btn" onclick="closeBattle()">とじる</button></div>';
@@ -3324,7 +3440,7 @@ function battleLose_(){
   save();
   battleBox_().innerHTML = '<div class="bt-result">'
     + '<div class="bt-lose">にげだした!</div>'
-    + '<div class="bt-enemy">' + dotSvg(b.en.key, 56) + '</div>'
+    + '<div class="bt-enemy">' + dotSvg(b.en.key, b.en.size || 56) + '</div>'
     + '<p>なかまを ふやしたり そうびを ととのえると 強くなれます。</p>'
     + '<p class="hint">負けても なくすものは ありません。</p>'
     + '<button class="btn" onclick="closeBattle()">とじる</button></div>';
@@ -3336,7 +3452,7 @@ function renderBattle_(){
   const pp = Math.round(b.php / b.pmax * 100), ep = Math.round(b.ehp / b.emax * 100);
   battleBox_().innerHTML =
       '<div class="bt-side"><div class="bt-name">' + esc(b.en.name) + (b.practice ? "(れんしゅう)" : "") + '</div>'
-    + '<div class="bt-enemy' + (b.turn % 2 === 1 ? ' hit' : '') + '">' + dotSvg(b.en.key, 56) + '</div>'
+    + '<div class="bt-enemy' + (b.turn % 2 === 1 ? ' hit' : '') + '">' + dotSvg(b.en.key, b.en.size || 56) + '</div>'
     + '<div class="bt-bar"><i style="width:' + ep + '%;background:#C0392B"></i></div></div>'
     + '<div class="bt-vs">VS</div>'
     + '<div class="bt-side"><div class="bt-name">' + esc(pet_().heroName || st.name) + ' たち</div>'
@@ -3348,12 +3464,29 @@ function renderBattle_(){
 }
 
 /* ===== そうびの着せかえ ===== */
+function bossList_(){
+  const bosses = ENEMIES.filter(function(e){ return e.boss; });
+  let h = '<div class="boss-box"><div class="boss-title">⚔ ボスに いどむ</div>';
+  bosses.forEach(function(e){
+    const ok = bossReady_(e.key), done = bossBeaten_(e.key);
+    const c = BOSS_COND[e.key];
+    h += '<div class="boss-row' + (ok ? '' : ' locked') + '">'
+      + '<span class="boss-ico">' + (ok || done ? dotSvg(e.key, 34) : '<span class="boss-q">?</span>') + '</span>'
+      + '<span class="boss-info"><b>' + (ok || done ? esc(e.name) : "？？？") + '</b>'
+      + '<i>' + esc(c.label) + '</i></span>'
+      + (done ? '<span class="boss-done">たおした</span>' : '')
+      + (ok ? '<button class="btn" onclick="startBoss(\'' + e.key + '\')">いどむ</button>' : '<span class="boss-lock">🔒</span>')
+      + '</div>';
+  });
+  if (S.hime) h += '<p class="hint">薬王を たおして おひめさま を なかまに しました。</p>';
+  return h + '</div>';
+}
 function buddySection_(){
   const own = petsOwned_(), cur = activePet_();
-  let h = '<div class="divider"><span>あいぼう ' + own.length + '/' + PETS.length + '</span></div>'
+  let h = '<div class="divider"><span>あいぼう ' + own.length + '/' + (PETS.length + 1) + '</span></div>'
         + '<p class="hint">主人公の となりを 歩く どうぶつです。1体だけ つれて歩けます。</p>'
         + '<div class="buddy-list">';
-  PETS.forEach(function(x){
+  PETS.concat([HIME]).forEach(function(x){
     const has = own.indexOf(x.key) >= 0;
     const pr = petProgress_(x);
     if (has){
@@ -3390,6 +3523,7 @@ function battleSection_(){
     + '<p class="hint">つよさ: こうげき ' + pw.atk + ' / まもり ' + pw.def + ' / たいりょく ' + pw.hp
     +   ' ／ せんせき ' + (r.wins || 0) + '勝 ' + (r.loses || 0) + '敗'
     +   ((v.win || v.lose) ? ' ／ 他店舗と ' + (v.win || 0) + '勝 ' + (v.lose || 0) + '敗' : '') + '</p>'
+    + bossList_()
     + '<p class="hint">他店舗との たいせんは「その他」→「店舗間の備蓄情報共有」の 薬局一覧から できます。'
     +   '自分の パーティは 備蓄をアップロードすると 相手にも 見えるようになります。</p>'
     + '<p class="hint">なかまが増える・なかまが しんかする・げんきが高い ほど強くなります。負けても なくすものは ありません。</p>'
@@ -3473,6 +3607,8 @@ function pet_(){
 const PAT_LIMIT = 5;          // なでてげんきになるのは1日5回まで
 // 状況に合わせたひとこと(困りごとがあれば教えてくれる)
 const PERSONA = {
+  m_hime: { p:"けだかい(気高い)", a:"float", t:function(s){ return s + "ですわ。……よろしくてよ"; },
+    c:["わたくしが ついておりますわ","おきばりなさいませ","この店を まもりましょう"] },
   p_chick: { p:"ぴよぴよ", a:"hop", t:function(s){ return s + "ぴよ〜"; },
     c:["ぴよ? ぴよぴよ!","たまごの ときの ゆめを 見たぴよ","ついていっても いいぴよ?"] },
   p_dog: { p:"ちゅうけん(忠犬)", a:"wag", t:function(s){ return s + "ワン! おまかせください!"; },
