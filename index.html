@@ -198,6 +198,19 @@ button.mate-chip { cursor: pointer; font-family: var(--sans); }
 .lv-row b { color: var(--ai-deep); font-size: 14px; }
 .lv-bar { flex: 1; height: 8px; background: #E4EAE7; border-radius: 999px; overflow: hidden; }
 .lv-bar i { display: block; height: 100%; background: var(--ai); border-radius: 999px; transition: width 0.4s ease; }
+.pt-tabs { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 10px; }
+.pt-tab { flex: 1 1 30%; min-width: 0; border: 1px solid var(--line); background: #fff; color: #5C6B78;
+  border-radius: 8px; padding: 7px 4px; font-size: 12px; font-family: var(--sans); cursor: pointer; white-space: nowrap; }
+.pt-tab i { font-style: normal; font-size: 10px; color: #9AA7AF; margin-left: 3px; }
+.pt-tab.on { border-color: var(--ai); background: var(--ai); color: #fff; font-weight: 600; }
+.pt-tab.on i { color: rgba(255,255,255,0.8); }
+.pt-top { margin: 8px 0 4px; }
+.pt-body { margin-top: 6px; }
+.stage-more { align-self: center; font-size: 11px; color: #5C6B78; }
+.st-box { border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+.st-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 8px 11px; font-size: 12.5px; color: #5C6B78; border-top: 1px solid var(--line); }
+.st-row:first-child { border-top: none; }
+.st-row b { color: var(--ai-deep); font-size: 13px; text-align: right; }
 .genki-box { border: 1px solid var(--line); border-radius: 10px; padding: 9px 11px; margin: 10px 0 4px; background: #FAFBFB; }
 .genki-row { display: flex; align-items: center; gap: 8px; font-size: 12.5px; color: #43596B; }
 .genki-bar { flex: 1; height: 9px; background: #E4EAE7; border-radius: 999px; overflow: hidden; }
@@ -579,7 +592,8 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
   .pop-card { min-height: 0 !important; max-width: 190mm !important; }
   /* 値札の内側は縮小処理の対象なので、印刷でも同じ見え方を保つ */
   .tag-inner { break-inside: avoid !important; page-break-inside: avoid !important; }
-  .dot-pet, .order-modal, .info-pop, .toast { display: none !important; }
+  .dot-pet, .pet-say, .pet-battle, .order-modal, .info-pop, .toast,
+  .steps, .expiry-alert, .list-more, .cam-tools, .backup-alert, .storage-warn { display: none !important; }
 }
 </style>
 </head>
@@ -1024,7 +1038,7 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
   </section>
 
   <div class="toast" id="toast"></div>
-  <footer class="foot">OTCLinker — とみながグループ 店舗向けツール<br><span class="ver">版 2026-07-29 AW(動物の姿・他店対戦の修正)</span></footer>
+  <footer class="foot">OTCLinker — とみながグループ 店舗向けツール<br><span class="ver">版 2026-07-29 AX(取得漏れ修正・画面整理)</span></footer>
 </div>
 
 <script>
@@ -1864,7 +1878,7 @@ function saveItem(){
   if (f.kana) doQuest("kana");
   careFeed_(6);
   addExp_(12, "商品の登録");
-  checkSenmon_();
+  checkAll_();
   const backTo = wasEditing ? __editReturnTab : null;
   save(); clearForm(); renderList(); showExpiryAlert();
   if (backTo){
@@ -1944,6 +1958,7 @@ function editItem(id){
 }
 function changeQty(id, d){
   doQuest("qty");
+  setTimeout(checkAll_, 200);
   const it = S.items.find(x => x.id===id);
   if (!it) return;
   it.qty = Math.max(0, it.qty + d); it.updatedAt = today();
@@ -1954,14 +1969,14 @@ function removeItem(id){
   if (it && !confirm("「" + (it.name || "この商品") + "」を在庫から削除しますか?")) return;
   S.items = S.items.filter(x => x.id!==id);
   selected.delete(id);
-  save(); renderList(); toast("削除しました");
+  save(); renderList(); checkAll_(); toast("削除しました");
 }
 function removeSelected(){
   if (!selected.size) return;
   if (!confirm(selected.size + " 品目をまとめて在庫から削除しますか?")) return;
   S.items = S.items.filter(it => !selected.has(it.id));
   selected.clear();
-  save(); renderList(); toast("削除しました");
+  save(); renderList(); checkAll_(); toast("削除しました");
 }
 function expiryLevel(e){
   if (!e) return null;
@@ -2610,6 +2625,7 @@ function addMate_(key, store, kind, extra){
   S[store] = cur.concat([key]);
   mateMeta_(key);
   save();
+  checkAll_();
   setTimeout(function(){ bonusGetEffect_({ kind: kind, key: key, note: extra }); }, 800);
   return true;
 }
@@ -2622,6 +2638,7 @@ function doQuest(id){
   save();
   addExp_(25, "はじめての きのう");
   addMate_(q.key, "gotouchiMates", "gotouchi", q.label);
+  checkAll_();
 }
 // 要指導・第1類の在庫が増えたときに呼ぶ
 function senmonCount_(){
@@ -3044,6 +3061,7 @@ function addExp_(n, why){
   if (after > before){
     setTimeout(function(){
       toast("レベルが " + after + " に あがった!" + (why ? "(" + why + ")" : ""));
+      checkAll_();
       const el = document.getElementById("dot-pet");
       if (el){ el.classList.remove("rare-pop"); void el.offsetWidth; el.classList.add("rare-pop"); }
       renderDotPet();
@@ -3114,6 +3132,17 @@ function petProgress_(x){
   return { now: p.best || 1, need: x.n };
 }
 // 条件を満たしたら なかまに なる(同時に満たしていれば まとめて)
+// なにかが変わったら、取りこぼしがないよう すべての条件を まとめて確認する
+let __checkTimer = null;
+function checkAll_(){
+  clearTimeout(__checkTimer);
+  __checkTimer = setTimeout(function(){
+    try { checkSenmon_(); } catch(e){}
+    try { checkEvolve_(); } catch(e){}
+    try { checkPets_(); } catch(e){}
+    try { renderDotPet(); } catch(e){}
+  }, 120);
+}
 function checkPets_(){
   const own = petsOwned_().slice();
   const got = [];
@@ -3369,7 +3398,7 @@ function battleWin_(){
     let hime = false;
     if (b.boss === "b_yakuo" && (S.hime !== true)){ S.hime = true; hime = true; }
     save();
-    setTimeout(checkPets_, 100);
+    checkAll_();
     battleBox_().innerHTML = '<div class="bt-result">'
       + '<div class="bt-win">' + (en2.boss >= 3 ? "★ 薬王を たおした! ★" : "ボスを たおした!") + '</div>'
       + '<div class="bt-enemy">' + dotSvg(en2.key, Math.min(64, en2.size || 56)) + '</div>'
@@ -3396,7 +3425,7 @@ function battleWin_(){
   }
   r.wins = (r.wins || 0) + 1;
   addExp_(b.practice ? 8 : 30 + b.en.lv * 15, "バトルに 勝った");
-  setTimeout(checkPets_, 100);
+  checkAll_();
   let got = null;
   // 練習では手に入りにくい。そうびの効果で確率が上がる
   const rate = (b.practice ? 0.25 : 0.75) + equipFx_("drop") * 0.12;
@@ -3484,6 +3513,20 @@ function renderBattle_(){
 }
 
 /* ===== そうびの着せかえ ===== */
+// たおした敵の一覧
+function defeatedList_(){
+  const r = rpg_();
+  const beaten = r.bosses || [];
+  let h = '<div class="divider"><span>たおした敵</span></div><div class="mate-list">';
+  ENEMIES.forEach(function(e){
+    const done = e.boss ? beaten.indexOf(e.key) >= 0 : (r.wins || 0) > 0;
+    h += done
+      ? '<span class="mate-chip' + (e.boss ? ' rare' : '') + '">' + dotSvg(e.key, 26) + esc(e.name) + (e.boss ? '<i class="pers">ボス</i>' : '') + '</span>'
+      : '<span class="mate-chip yet">' + dotSvg("slot", 26) + '？</span>';
+  });
+  h += '</div><p class="hint">ボスは たおすと ここに 記録されます。</p>';
+  return h;
+}
 function bossList_(){
   const bosses = ENEMIES.filter(function(e){ return e.boss; });
   let h = '<div class="boss-box"><div class="boss-title">⚔ ボスに いどむ</div>';
@@ -3500,6 +3543,69 @@ function bossList_(){
   });
   if (S.hime) h += '<p class="hint">薬王を たおして おひめさま を なかまに しました。</p>';
   return h + '</div>';
+}
+// そうび(着せかえ)
+function equipSection_(){
+  const r = rpg_(), inv = r.inv || [];
+  let h = '<div class="eq-preview">' + dotSvg(dotStage().key, 64, 0, null, r.equip) + '</div>';
+  EQUIP_SLOTS.forEach(function(sl){
+    const have = inv.filter(function(k){ return EQUIPS[k].slot === sl.id; });
+    h += '<div class="eq-slot"><div class="eq-slot-name">' + sl.name + '</div><div class="eq-list">';
+    h += '<button class="eq-item' + (!r.equip[sl.id] ? ' on' : '') + '" onclick="setEquipIn(\'' + sl.id + '\',\'\')">なし</button>';
+    have.forEach(function(k){
+      const e = EQUIPS[k];
+      h += '<button class="eq-item' + (r.equip[sl.id] === k ? ' on' : '') + '" onclick="setEquipIn(\'' + sl.id + '\',\'' + k + '\')">'
+         + esc(e.name) + '<i>攻+' + e.atk + ' 守+' + e.def + (e.fx ? ' / ' + EQUIP_FX[e.fx] : '') + '</i></button>';
+    });
+    if (!have.length) h += '<span class="hint">まだ 持っていません</span>';
+    h += '</div></div>';
+  });
+  const pw = partyPower_();
+  h += '<p class="hint">いまの つよさ: こうげき ' + pw.atk + ' / まもり ' + pw.def + ' / たいりょく ' + pw.hp + '</p>'
+     + '<p class="hint">そうびは バトルに 勝つと 手に入ります(全' + Object.keys(EQUIPS).length + '種のうち ' + inv.length + '種)。</p>';
+  return h;
+}
+function setEquipIn(slot, key){
+  const r = rpg_();
+  if (key) r.equip[slot] = key; else delete r.equip[slot];
+  save(); renderDotPet(); openPartyModal();
+}
+// ステータス
+function statusSection_(){
+  const st = dotStage(), pw = partyPower_(), li = lvInfo_(), r = rpg_(), v = vsRec_(), p = pet_();
+  const row = function(k, val){ return '<div class="st-row"><span>' + k + '</span><b>' + val + '</b></div>'; };
+  const bd = petInfo_(activePet_());
+  return '<div class="st-box">'
+    + row("なまえ", esc(p.heroName || st.name) + '<button class="link" onclick="renameHero()">変更</button>')
+    + row("すがた", esc(st.name) + '(' + st.n + ' 品目)')
+    + row("レベル", "Lv " + li.lv + "(けいけんち " + li.exp + " / つぎまで " + Math.max(0, li.next - li.exp) + ")")
+    + row("こうげき", pw.atk) + row("まもり", pw.def) + row("たいりょく", pw.hp)
+    + row("げんき", genki_() + " / 100(" + genkiState_().label + ")")
+    + row("いっしょに", careDays_() + " 日 ／ れんぞく " + (p.streak || 1) + " 日(さいこう " + (p.best || 1) + " 日)")
+    + row("なかま", allMates_().length + " 体")
+    + row("あいぼう", bd ? esc(bd.name) : "つれていない")
+    + row("そうび", EQUIP_SLOTS.filter(function(sl){ return r.equip[sl.id]; }).length + " / 4 か所")
+    + row("せんせき", (r.wins || 0) + " 勝 " + (r.loses || 0) + " 敗")
+    + row("他店舗と", (v.win || 0) + " 勝 " + (v.lose || 0) + " 敗")
+    + '</div>'
+    + '<p class="hint">つよさは レベル・なかまの数・なかまの しんか・あいぼう・そうび・げんき で決まります。</p>';
+}
+// その他(せつめい)
+function otherSection_(){
+  return '<div class="divider"><span>あそびかた</span></div>'
+    + '<ul class="quest-list">'
+    + '<li>キャラを 1回タップ:なでる(ひとこと返してくれます)</li>'
+    + '<li>2回タップ・長押し:この画面がひらきます</li>'
+    + '<li>商品を登録するほど 主人公が成長し、なかまが増えます</li>'
+    + '<li>アプリを使わないと げんきが へり、9日ほどで 眠ってしまいます</li>'
+    + '<li>なかまは いっしょに過ごすと 3だんかいに しんかします</li>'
+    + '</ul>'
+    + '<div class="divider"><span>きょうの ようす</span></div>'
+    + '<p class="hint">きょうの衣装: ' + (DECOS[seasonDeco_()] || "—") + 'の季節です。日によって着替えます。</p>'
+    + '<p class="hint">' + esc(dayFact_().text || "") + '</p>'
+    + '<div class="divider"><span>こまったとき</span></div>'
+    + '<p class="hint">キャラクターは おまけの機能です。業務には影響しません。'
+    + '数がふえて 見づらいときは「なかま」から 画面に出す3体を えらべます。</p>';
 }
 function buddySection_(){
   const own = petsOwned_(), cur = activePet_();
@@ -3536,7 +3642,6 @@ function battleSection_(){
     + '<div class="row gap wrap" style="margin-top:8px">'
     +   (en ? '<button class="btn" onclick="startBattle(false)">たたかう</button>' : '')
     +   '<button class="btn ghost" onclick="startBattle(true)">れんしゅう</button>'
-    +   '<button class="btn ghost" onclick="openEquip()">そうび(' + eqCount + '/4)</button>'
     + '</div>'
     + '<div class="lv-row"><b>Lv ' + li.lv + '</b><span class="lv-bar"><i style="width:' + li.pct + '%"></i></span>'
     +   '<span>つぎまで ' + Math.max(0, li.next - li.exp) + '</span></div>'
@@ -3547,7 +3652,8 @@ function battleSection_(){
     + '<p class="hint">他店舗との たいせんは「その他」→「店舗間の備蓄情報共有」の 薬局一覧から できます。'
     +   '自分の パーティは 備蓄をアップロードすると 相手にも 見えるようになります。</p>'
     + '<p class="hint">なかまが増える・なかまが しんかする・げんきが高い ほど強くなります。負けても なくすものは ありません。</p>'
-    + '</div>';
+    + '</div>'
+    + defeatedList_();
 }
 function openEquip(){
   const r = rpg_();
@@ -3960,53 +4066,51 @@ function startPetIdle_(){
   };
   window.__petTimer = setTimeout(loop, 3500);
 }
+let __partyTab = "mates";
+function setPartyTab(t){ __partyTab = t; openPartyModal(); }
 function openPartyModal(){
-  petGroup_();   // 開いたときに全員でひと動き
+  petGroup_();
   const st = dotStage();
   const box = document.getElementById("party-modal-body");
-  const gs = genkiState_();
-  const g = genki_();
+  const gs = genkiState_(), g = genki_();
+  const li = lvInfo_();
 
-  // 舞台
-  let stage = '<div class="party-stage' + (gs.key === "nemuri" ? " sleepy" : "") + '">' + dotSvg(st.key, 46, 0, decoOf_(st.key));
-  allMates_().forEach(function(o){
+  // 上の見出し(どこを見るか えらぶ)
+  const own = petsOwned_();
+  const tabs = [
+    { id:"mates",  label:"なかま",     n: allMates_().length },
+    { id:"buddy",  label:"あいぼう",   n: own.length },
+    { id:"equip",  label:"そうび",     n: EQUIP_SLOTS.filter(function(sl){ return rpg_().equip[sl.id]; }).length },
+    { id:"battle", label:"たおした敵", n: (rpg_().bosses || []).length + (rpg_().wins || 0) },
+    { id:"status", label:"ステータス", n: null },
+    { id:"other",  label:"その他",     n: null }
+  ];
+  let head = '<div class="pt-tabs">' + tabs.map(function(t){
+    return '<button class="pt-tab' + (__partyTab === t.id ? ' on' : '') + '" onclick="setPartyTab(\'' + t.id + '\')">'
+      + esc(t.label) + (t.n !== null ? '<i>' + t.n + '</i>' : '') + '</button>';
+  }).join("") + '</div>';
+
+  // つねに いちばん上に出す 舞台と げんき
+  let stage = '<div class="party-stage' + (gs.key === "nemuri" ? " sleepy" : "") + '">' + dotSvg(st.key, 46, 0, decoOf_(st.key), rpg_().equip);
+  allMates_().slice(0, 8).forEach(function(o){
     stage += '<span class="' + (o.c ? o.c + "-glow" : "") + '">' + dotSvg(o.k, 34, mateLv_(o.k), decoOf_(o.k)) + '</span>';
   });
+  if (allMates_().length > 8) stage += '<span class="stage-more">+' + (allMates_().length - 8) + '</span>';
   stage += '</div>';
-
-  // げんきゲージ
-  const gauge = '<div class="genki-box">'
-    + '<div class="genki-row"><span>げんき</span>'
-    + '<span class="genki-bar"><i style="width:' + g + '%;background:' + gs.color + '"></i></span>'
-    + '<b style="color:' + gs.color + '">' + gs.label + '</b></div>'
-    + '<div class="genki-note">' + (gs.key === "nemuri"
-        ? "しばらく使わなかったので、みんな眠ってしまいました。商品を登録すると目を覚まします。"
-        : (g < 40 ? "しばらく開いていないと元気がなくなります。使うと回復します。"
-                  : "アプリを使うほど元気になります。")) + '</div>'
-    + '<div class="genki-note">いっしょに過ごした日数: ' + careDays_() + ' 日 ／ れんぞく ' + (pet_().streak||1) + ' 日(さいこう記録 ' + (pet_().best||1) + ' 日)</div>'
-    + '<div class="genki-note">なまえ: <b>' + esc(pet_().heroName || st.name) + '</b> <button class="link" onclick="renameHero()">なまえをつける</button></div>'
-    + '<div class="genki-note">なかまは いっしょに過ごすと3だんかいに しんかします(3日で マント、8日で かんむりと はね)。</div>'
-    + '<div class="genki-note">キャラを1回タップでなでる・2回タップまたは長押しでこの画面がひらきます。</div>'
-    + '<div class="genki-note">画面右上に出すなかまは、下の一覧をタップして最大' + PET_PICK_MAX + '体まで選べます'
-    + (petPicks_().length ? ' <button class="link" onclick="clearPetPick()">おまかせに戻す</button>' : '(いまはおまかせ表示)') + '</div>'
-    + '<div class="genki-note">きょうの衣装: ' + (DECOS[seasonDeco_()] || "—") + 'の季節です。日によって着替えます。</div></div>';
-
-  // 主人公の状況
-  let msg;
-  const hn2 = pet_().heroName;
-  if (st.n < 20) msg = '<b>' + esc(hn2 || st.name) + '</b>(' + esc(st.name) + '・' + st.n + '品目) — あと <b>' + (st.next - st.n) + '</b> 品目で成長します。';
-  else if (st.next) msg = '<b>白衣のゆうしゃ</b> — あと <b>' + (st.next - st.n) + '</b> 品目で おくすりのなかま が増えます。';
-  else msg = '<b>白衣のゆうしゃ</b> — おくすりのなかま は全員そろいました!';
+  const bar = '<div class="pt-top">'
+    + '<div class="lv-row"><b>Lv ' + li.lv + '</b><span class="lv-bar"><i style="width:' + li.pct + '%"></i></span><span>つぎまで ' + Math.max(0, li.next - li.exp) + '</span></div>'
+    + '<div class="genki-row"><span>げんき</span><span class="genki-bar"><i style="width:' + g + '%;background:' + gs.color + '"></i></span><b style="color:' + gs.color + '">' + gs.label + '</b></div>'
+    + '</div>';
 
   const picks = petPicks_();
   const chip = function(k, owned, cls){
     if (!owned) return '<span class="mate-chip yet">' + dotSvg("slot", 26) + '？</span>';
-    const lv = mateLv_(k), dk = decoOf_(k);
+    const lv = mateLv_(k), dk = decoOf_(k), nx = mateNext_(k);
     const on = picks.indexOf(k) >= 0;
-    const nx = mateNext_(k);
     return '<button class="mate-chip ' + cls + (on ? ' picked' : '') + '" onclick="togglePetPick(\'' + k + '\')"'
       + ' title="' + (PERSONA[k] ? PERSONA[k].p + " / " : "") + mateLvLabel_(lv) + (dk ? " / " + DECOS[dk] : "") + ' — タップで画面に出す">'
-      + dotSvg(k, 26, lv, dk) + esc(DOT_NAMES[k]) + (PERSONA[k] ? '<i class="pers">' + esc(PERSONA[k].p) + '</i>' : '')
+      + dotSvg(k, 26, lv, dk) + esc(DOT_NAMES[k])
+      + (PERSONA[k] ? '<i class="pers">' + esc(PERSONA[k].p) + '</i>' : '')
       + '<i class="lv">' + (lv >= 3 ? "★★★" : lv >= 2 ? "★★" : "★") + '</i>'
       + (nx !== null ? '<i class="nx">あと' + nx + '日</i>' : '')
       + (on ? '<i class="onmark">画面</i>' : '') + '</button>';
@@ -4017,26 +4121,35 @@ function openPartyModal(){
       + (note ? '<p class="hint">' + note + '</p>' : '');
   };
 
-  // やってみようリスト
-  const rest = QUESTS.filter(function(q){ return !questDone_(q.id); });
-  const quest = '<div class="divider"><span>やってみよう ' + (QUESTS.length - rest.length) + '/' + QUESTS.length + '</span></div>'
-    + (rest.length
-        ? '<ul class="quest-list">' + rest.map(function(q){ return '<li>' + esc(q.label) + '</li>'; }).join("") + '</ul>'
-          + '<p class="hint">ひとつ試すごとに、ごとうちのなかまが1体やってきます。</p>'
-        : '<p class="hint">ぜんぶ試しました!ごとうちのなかまが勢ぞろいです。</p>');
+  let body = "";
+  if (__partyTab === "mates"){
+    const rest = QUESTS.filter(function(q){ return !questDone_(q.id); });
+    body = '<p class="hint">タップすると 画面右上に出す なかまを えらべます(最大' + PET_PICK_MAX + '体)'
+      + (picks.length ? ' <button class="link" onclick="clearPetPick()">おまかせに戻す</button>' : '') + '</p>'
+      + '<div class="divider"><span>おくすりのなかま ' + st.mateN + '/' + DOT_MATES.length + '</span></div>'
+      + '<div class="mate-list">' + DOT_MATES.map(function(k, i){ return chip(k, i < st.mateN, ""); }).join("") + '</div>'
+      + group("せんもんしょくのなかま", SENMON_MATES, senmonOwned_(), "senmon",
+          "要指導医薬品・第1類医薬品の在庫が " + SENMON_NEED.join("・") + " 品目に届くと1体ずつ加わります(いま " + senmonCount_() + " 品目)。")
+      + group("ごとうちのなかま", GOTOUCHI_MATES, gotouchiOwned_(), "gotouchi", null)
+      + '<div class="divider"><span>やってみよう ' + (QUESTS.length - rest.length) + '/' + QUESTS.length + '</span></div>'
+      + (rest.length
+          ? '<ul class="quest-list">' + rest.map(function(q){ return '<li>' + esc(q.label) + '</li>'; }).join("") + '</ul>'
+            + '<p class="hint">ひとつ試すごとに、ごとうちのなかまが1体やってきます。</p>'
+          : '<p class="hint">ぜんぶ試しました!ごとうちのなかまが勢ぞろいです。</p>')
+      + group("レアななかま", RARE_MATES, rareOwned_(), "rare", "新しい商品を登録したとき、ごくまれに現れます。");
+  } else if (__partyTab === "buddy"){
+    body = buddySection_();
+  } else if (__partyTab === "equip"){
+    body = equipSection_();
+  } else if (__partyTab === "battle"){
+    body = battleSection_();
+  } else if (__partyTab === "status"){
+    body = statusSection_();
+  } else {
+    body = otherSection_();
+  }
 
-  const sn = senmonCount_();
-  const senmonNote = "要指導医薬品・第1類医薬品の在庫が " + SENMON_NEED.join("・") + " 品目に届くと1体ずつ加わります(いま " + sn + " 品目)。";
-
-  box.innerHTML = stage + gauge + '<p class="party-text">' + msg + '</p>'
-    + '<div class="divider"><span>おくすりのなかま ' + st.mateN + '/' + DOT_MATES.length + '</span></div>'
-    + '<div class="mate-list">' + DOT_MATES.map(function(k, i){ return chip(k, i < st.mateN, ""); }).join("") + '</div>'
-    + group("せんもんしょくのなかま", SENMON_MATES, senmonOwned_(), "senmon", senmonNote)
-    + group("ごとうちのなかま", GOTOUCHI_MATES, gotouchiOwned_(), "gotouchi", null)
-    + quest
-    + group("レアななかま", RARE_MATES, rareOwned_(), "rare", "新しい商品を登録したとき、ごくまれに現れます。")
-    + buddySection_()
-    + battleSection_();
+  box.innerHTML = head + stage + bar + '<div class="pt-body">' + body + '</div>';
   document.getElementById("party-modal").style.display = "flex";
 }
 function closePartyModal(){ document.getElementById("party-modal").style.display = "none"; }
@@ -5084,8 +5197,7 @@ function bootUi_(){
   renderStorageInfo();
   renderDotPet();
   startPetIdle_();
-  checkEvolve_();
-  checkPets_();
+  checkAll_();
   rpgOnOpen_();
 }
 // IndexedDBに保存済みデータがあればそちらを正とする(写真等でlocalStorageに入り切らない場合に備える)
