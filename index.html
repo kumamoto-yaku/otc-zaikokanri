@@ -50,9 +50,10 @@ body { min-height: 100vh; background: var(--hakuji); color: var(--ink); font-fam
   background: #fff; color: var(--ink); border: 1px solid var(--line); border-radius: 10px;
   padding: 6px 10px; font-size: 12px; max-width: min(74vw, 300px); line-height: 1.45;
   box-shadow: 0 4px 14px rgba(0,0,0,0.18); }
-.pet-say::before { content: ""; position: absolute; right: 18px; top: -5px; width: 9px; height: 9px;
+.pet-say::before { content: ""; position: absolute; right: var(--arrow, 18px); top: -5px; width: 9px; height: 9px;
   background: #fff; border-left: 1px solid var(--line); border-top: 1px solid var(--line); transform: rotate(45deg); }
 .pet-say.pop { animation: sayPop 0.28s ease; }
+.say-move { display: block; margin-top: 3px; font-size: 11px; color: #7B8794; }
 @keyframes sayPop { 0%{opacity:0;transform:translateY(-4px) scale(0.94)} 100%{opacity:1;transform:none} }
 @media print { .pet-say { display: none !important; } }
 .pet-unit { display: inline-block; line-height: 0; transform-origin: 50% 100%; }
@@ -183,6 +184,46 @@ button.mate-chip { cursor: pointer; font-family: var(--sans); }
 .bt-bar i { display: block; height: 100%; transition: width 0.4s ease; }
 .bt-vs { text-align: center; color: #9AA7AF; font-size: 12px; margin: 2px 0; }
 .bt-log { margin-top: 8px; font-size: 12.5px; color: #43596B; background: #F4F8F6; border-radius: 8px; padding: 8px 10px; min-height: 56px; }
+
+/* ===== たたかいの画面(黒地に白抜き) ===== */
+.rpg-screen { position: fixed; inset: 0; z-index: 200; background: #000; color: #fff;
+  display: flex; align-items: center; justify-content: center; padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom); }
+.rpg-inner { width: min(560px, 100%); height: 100%; display: flex; flex-direction: column; padding: 10px 12px 14px; }
+.rpg-stage { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; min-height: 0; }
+.rpg-enemy { display: flex; justify-content: center; image-rendering: pixelated; }
+.rpg-enemy svg { image-rendering: pixelated; }
+.rpg-enemy.hit { animation: rpgHit 0.36s ease; }
+@keyframes rpgHit { 0%,100%{transform:translate(0,0);opacity:1} 20%{transform:translate(-7px,2px);opacity:0.35} 40%{transform:translate(6px,-2px);opacity:1} 60%{transform:translate(-4px,1px);opacity:0.55} }
+.rpg-ename { font-family: var(--sans); font-size: 15px; letter-spacing: 0.08em; color: #fff; }
+.rpg-ebar { width: min(280px, 70%); height: 8px; border: 2px solid #fff; background: #000; }
+.rpg-ebar i { display: block; height: 100%; background: #fff; transition: width 0.35s ease; }
+.rpg-party { display: flex; align-items: flex-end; justify-content: center; gap: 3px; margin-top: 10px; }
+.rpg-party svg { image-rendering: pixelated; }
+/* メッセージ窓(白い二重枠) */
+.rpg-win { border: 3px solid #fff; border-radius: 6px; background: #000; padding: 10px 12px; margin-top: 10px;
+  box-shadow: inset 0 0 0 2px #000, inset 0 0 0 4px #fff; min-height: 116px; }
+.rpg-status { display: flex; justify-content: space-between; gap: 10px; font-family: var(--sans);
+  font-size: 13px; letter-spacing: 0.06em; padding-bottom: 6px; border-bottom: 2px solid #fff; margin-bottom: 8px; }
+.rpg-hpbar { height: 7px; border: 2px solid #fff; background: #000; margin-bottom: 9px; }
+.rpg-hpbar i { display: block; height: 100%; background: #fff; transition: width 0.35s ease; }
+.rpg-msg { font-family: var(--sans); font-size: 14px; line-height: 1.85; letter-spacing: 0.05em; }
+.rpg-msg div { animation: rpgLine 0.25s ease; }
+@keyframes rpgLine { from{opacity:0} to{opacity:1} }
+.rpg-cmd { height: 22px; text-align: right; padding-right: 6px; }
+.rpg-wait { display: inline-block; font-size: 14px; animation: rpgBlink 0.9s steps(2) infinite; }
+@keyframes rpgBlink { 0%,50%{opacity:1} 51%,100%{opacity:0} }
+/* 勝敗の表示 */
+.rpg-result { text-align: center; font-family: var(--sans); }
+.rpg-win-t { font-size: 19px; letter-spacing: 0.14em; margin-bottom: 8px; }
+.rpg-lose-t { font-size: 18px; letter-spacing: 0.14em; margin-bottom: 8px; color: #C9CFD4; }
+.rpg-res-ico { display: flex; justify-content: center; margin-bottom: 8px; }
+.rpg-result p { font-size: 13.5px; line-height: 1.8; margin: 4px 0; }
+.rpg-result .hint { color: #9AA7AF; font-size: 12px; }
+.rpg-result b { color: #FFE24D; }
+.rpg-result .hime-get { background: #000; border: 2px solid #F3C9D4; }
+.rpg-result .btn { background: #000; color: #fff; border: 2px solid #fff; margin-top: 10px; }
+@media print { .rpg-screen { display: none !important; } }
+@media (max-width: 400px) { .rpg-msg { font-size: 13px; } .rpg-ename { font-size: 14px; } .rpg-win { min-height: 104px; } }
 .bt-result { text-align: center; padding: 6px 0; }
 .bt-win { font-size: 20px; font-weight: 700; color: var(--take); margin-bottom: 6px; }
 .bt-lose { font-size: 18px; font-weight: 700; color: #7B8794; margin-bottom: 6px; }
@@ -607,6 +648,13 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
     <label>パスワード <input type="password" id="login-pass" autocomplete="current-password" onkeydown="if(event.key==='Enter')checkLogin()"></label>
     <button class="btn big" onclick="checkLogin()">入室する</button>
     <p class="hint" id="login-err" style="color:var(--shu);text-align:center"></p>
+  </div>
+</div>
+<div id="rpg-screen" class="rpg-screen" style="display:none">
+  <div class="rpg-inner">
+    <div class="rpg-stage" id="rpg-stage"></div>
+    <div class="rpg-win" id="rpg-win"></div>
+    <div class="rpg-cmd" id="rpg-cmd"></div>
   </div>
 </div>
 <div id="battle-modal" class="order-modal" style="display:none" onclick="if(event.target===this)closeBattle()">
@@ -1038,7 +1086,7 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
   </section>
 
   <div class="toast" id="toast"></div>
-  <footer class="foot">OTCLinker — とみながグループ 店舗向けツール<br><span class="ver">版 2026-07-29 AX(取得漏れ修正・画面整理)</span></footer>
+  <footer class="foot">OTCLinker — とみながグループ 店舗向けツール<br><span class="ver">版 2026-07-29 AZ(たたかいの画面)</span></footer>
 </div>
 
 <script>
@@ -2972,7 +3020,7 @@ function petMove_(key){
 
 /* ===== あいぼうの 鳴き声 ===== */
 // あいぼうは 言葉ではなく 鳴き声で こたえる
-const PET_CRY = {"p_chick": ["ぴよ!", "ぴよぴよ〜", "ぴ、ぴよ……", "ぴよっ?"], "p_dog": ["ワン!", "ワンワン!", "わおーん", "クゥーン……"], "p_cat": ["ニャー", "にゃ〜ん", "ゴロゴロ……", "ニャッ!"], "p_hamster": ["キュッ", "キューッ!", "もぐもぐ……", "キュキュッ"], "p_rabbit": ["キューッ", "プゥ……", "(鼻を ぴくぴく)", "ダンッ!(足ダン)"], "p_penguin": ["クワァ", "グェーッ", "クワクワ!", "ペチペチ(羽)"], "p_fox": ["コーン!", "キャン!", "クゥーン", "コンコン!"], "p_tanuki": ["ポンポコ!", "ポンッ!", "クゥーン", "ポコポコ〜"], "p_owl": ["ホゥ……", "ホーホー", "ホッホゥ!", "ゴロスケ ホッホー"], "p_wolf": ["ウォーーン!", "グルル……", "ガルルッ!", "アオーン"], "p_bear": ["ガアアッ!!", "グオオオ……", "ゴアッ!", "ウゥゥ……"], "p_tiger": ["ガオオオオッ!!", "シャーッ!", "グルルルル", "ガウッ!"]};
+const PET_CRY = {"p_chick": ["ぴよ!", "ぴよぴよ〜", "ぴ、ぴよ……", "ぴよっ?"], "p_dog": ["ワン!", "ワンワン!", "わおーん", "クゥーン……"], "p_cat": ["ニャー", "にゃ〜ん", "ゴロゴロ……", "ニャッ!"], "p_hamster": ["キュッ", "キューッ!", "もぐもぐ……", "キュキュッ"], "p_rabbit": ["キューッ", "プゥ……", "フンフン", "ダンダンッ!"], "p_penguin": ["クワァ", "グェーッ", "クワクワ!", "ペチペチ"], "p_fox": ["コーン!", "キャン!", "クゥーン", "コンコン!"], "p_tanuki": ["ポンポコ!", "ポンッ!", "クゥーン", "ポコポコ〜"], "p_owl": ["ホゥ……", "ホーホー", "ホッホゥ!", "ゴロスケ ホッホー"], "p_wolf": ["ウォーーン!", "グルル……", "ガルルッ!", "アオーン"], "p_bear": ["ガアアッ!!", "グオオオ……", "ゴアッ!", "ウゥゥ……"], "p_tiger": ["ガオオオオッ!!", "シャーッ!", "グルルルル", "ガウッ!"]};
 function isPet_(key){ return !!PET_CRY[key]; }
 function petCry_(key){
   const list = PET_CRY[key] || ["……"];
@@ -3306,17 +3354,19 @@ function enemyOf_(key){ return ENEMIES.filter(function(e){ return e.key === key;
 /* ===== 戦闘の進行(オート) ===== */
 let __battle = null;
 // 戦闘の表示先(画面右上のパネル)
-function battleBox_(){ return document.getElementById("pet-battle"); }
+function battleBox_(){ return document.getElementById("rpg-win"); }
+// バトルは画面いっぱいで行う(ほかの画面は閉じる)
 function showBattleBox_(){
-  const b = battleBox_();
-  if (b) b.style.display = "block";
   const say = document.getElementById("pet-say");
   if (say) say.style.display = "none";
-  // 「なかま」画面を開いていたら閉じて、右上で戦う
+  const pb = document.getElementById("pet-battle");
+  if (pb) pb.style.display = "none";
   const pm = document.getElementById("party-modal");
   if (pm) pm.style.display = "none";
   const bm = document.getElementById("battle-modal");
   if (bm) bm.style.display = "none";
+  const sc = document.getElementById("rpg-screen");
+  if (sc){ sc.style.display = "block"; document.body.style.overflow = "hidden"; }
 }
 function startBattle(practice){
   const r = rpg_();
@@ -3349,13 +3399,17 @@ function startBoss(key){
     ehp: en.hp, emax: en.hp, eatk: en.atk, edef: en.def || 0,
     log: [], turn: 0, done: false
   };
+  __battle.log.push(en.name + "が あらわれた!");
   showBattleBox_();
   renderBattle_();
-  setTimeout(battleTurn_, 700);
+  setTimeout(battleTurn_, 1100);
 }
 function closeBattle(){
-  const bx = battleBox_();
-  if (bx){ bx.style.display = "none"; bx.innerHTML = ""; }
+  const sc = document.getElementById("rpg-screen");
+  if (sc) sc.style.display = "none";
+  document.body.style.overflow = "";
+  const pb = document.getElementById("pet-battle");
+  if (pb){ pb.style.display = "none"; pb.innerHTML = ""; }
   const bm = document.getElementById("battle-modal");
   if (bm) bm.style.display = "none";
   __battle = null;
@@ -3371,15 +3425,18 @@ function battleTurn_(){
   let dmg = Math.max(1, Math.round((b.patk * (0.85 + Math.random() * 0.3)) - (b.edef != null ? b.edef * 0.35 : b.en.atk * 0.15)));
   if (crit) dmg = Math.round(dmg * 1.8);
   b.ehp = Math.max(0, b.ehp - dmg);
-  b.log.push((crit ? "会心の一撃! " : "") + "こちらの こうげき! " + dmg + " のダメージ");
-  if (b.ehp <= 0){ b.done = true; renderBattle_(); setTimeout(battleWin_, 800); return; }
+  const who = pet_().heroName || dotStage().name;
+  b.log.push(who + "の こうげき!");
+  b.log.push((crit ? "会心の一撃!　" : "") + b.en.name + "に " + dmg + " のダメージ!");
+  if (b.ehp <= 0){ b.done = true; b.log.push(b.en.name + "を たおした!"); renderBattle_(); setTimeout(battleWin_, 1400); return; }
   // 敵の攻撃
   let edmg = Math.max(1, Math.round((b.eatk * (0.85 + Math.random() * 0.3)) - b.pdef * 0.35));
   b.php = Math.max(0, b.php - edmg);
-  b.log.push(b.en.name + "の こうげき! " + edmg + " のダメージ");
-  if (b.php <= 0){ b.done = true; renderBattle_(); setTimeout(battleLose_, 800); return; }
+  b.log.push(b.en.name + "の こうげき!");
+  b.log.push((pet_().heroName || dotStage().name) + "は " + edmg + " のダメージを うけた!");
+  if (b.php <= 0){ b.done = true; b.log.push("ぜんめつしてしまった……"); renderBattle_(); setTimeout(battleLose_, 1400); return; }
   renderBattle_();
-  setTimeout(battleTurn_, 850);
+  setTimeout(battleTurn_, 1250);
 }
 function battleWin_(){
   const b = __battle, r = rpg_();
@@ -3399,9 +3456,9 @@ function battleWin_(){
     if (b.boss === "b_yakuo" && (S.hime !== true)){ S.hime = true; hime = true; }
     save();
     checkAll_();
-    battleBox_().innerHTML = '<div class="bt-result">'
-      + '<div class="bt-win">' + (en2.boss >= 3 ? "★ 薬王を たおした! ★" : "ボスを たおした!") + '</div>'
-      + '<div class="bt-enemy">' + dotSvg(en2.key, Math.min(64, en2.size || 56)) + '</div>'
+    battleBox_().innerHTML = '<div class="rpg-result">'
+      + '<div class="rpg-win-t">' + (en2.boss >= 3 ? "★ 薬王を たおした! ★" : "ボスを たおした!") + '</div>'
+      + '<div class="rpg-res-ico">' + dotSvg(en2.key, Math.min(64, en2.size || 56)) + '</div>'
       + (got ? '<p><b>' + esc(EQUIPS[got].name) + '</b> を 手に入れた!</p>' : '<p>けいけんちを たくさん もらった!</p>')
       + (hime ? '<div class="hime-get">' + dotSvg("m_hime", 56) + '<p><b>おひめさま</b>が なかまに なった!<br>'
                 + '<span class="hint">「なかま」画面から つれて歩けます</span></p></div>' : '')
@@ -3415,9 +3472,9 @@ function battleWin_(){
     save();
     addExp_(40, "他店舗に 勝った");
     const c2 = care_(); c2.genki = Math.max(0, c2.genki - 4); save();
-    battleBox_().innerHTML = '<div class="bt-result">'
-      + '<div class="bt-win">かった!</div>'
-      + '<div class="bt-enemy">' + dotSvg(b.en.key, b.en.size || 56) + '</div>'
+    battleBox_().innerHTML = '<div class="rpg-result">'
+      + '<div class="rpg-win-t">かった!</div>'
+      + '<div class="rpg-res-ico">' + dotSvg(b.en.key, b.en.size || 56) + '</div>'
       + '<p><b>' + esc(b.vsName) + '</b> との たいせんに 勝ちました!</p>'
       + '<p class="hint">つうさん ' + v.win + '勝 ' + (v.lose || 0) + '敗</p>'
       + '<button class="btn" onclick="closeBattle()">とじる</button></div>';
@@ -3446,9 +3503,9 @@ function battleWin_(){
   const box = battleBox_();
   const dup = got && got.indexOf("|dup") > 0;
   const key = dup ? got.replace("|dup", "") : got;
-  box.innerHTML = '<div class="bt-result">'
-    + '<div class="bt-win">かった!</div>'
-    + '<div class="bt-enemy">' + dotSvg(b.en.key, b.en.size || 56) + '</div>'
+  box.innerHTML = '<div class="rpg-result">'
+    + '<div class="rpg-win-t">かった!</div>'
+    + '<div class="rpg-res-ico">' + dotSvg(b.en.key, b.en.size || 56) + '</div>'
     + (key
         ? '<p>' + (dup ? "もう持っている " : "") + '<b>' + esc(EQUIPS[key].name) + '</b> を' + (dup ? "見つけた" : "手に入れた!") + '</p>'
           + (dup ? '' : '<p class="hint">「なかま」画面の そうび から着せかえられます</p>')
@@ -3461,9 +3518,9 @@ function battleLose_(){
     r.loses = (r.loses || 0) + 1;
     addExp_(20, "ボスに いどんだ");
     save();
-    battleBox_().innerHTML = '<div class="bt-result">'
-      + '<div class="bt-lose">まけた……</div>'
-      + '<div class="bt-enemy">' + dotSvg(b.en.key, Math.min(64, b.en.size || 56)) + '</div>'
+    battleBox_().innerHTML = '<div class="rpg-result">'
+      + '<div class="rpg-lose-t">まけた……</div>'
+      + '<div class="rpg-res-ico">' + dotSvg(b.en.key, Math.min(64, b.en.size || 56)) + '</div>'
       + '<p><b>' + esc(b.en.name) + '</b> は 強かった。</p>'
       + '<p class="hint">レベルを 上げ、そうびを ととのえ、なかまを ふやして また いどもう。</p>'
       + '<button class="btn" onclick="closeBattle()">とじる</button></div>';
@@ -3475,9 +3532,9 @@ function battleLose_(){
     v.log[b.vsId] = { r: "lose", at: today() };
     save();
     addExp_(10, "よく たたかった");
-    battleBox_().innerHTML = '<div class="bt-result">'
-      + '<div class="bt-lose">まけた……</div>'
-      + '<div class="bt-enemy">' + dotSvg(b.en.key, b.en.size || 56) + '</div>'
+    battleBox_().innerHTML = '<div class="rpg-result">'
+      + '<div class="rpg-lose-t">まけた……</div>'
+      + '<div class="rpg-res-ico">' + dotSvg(b.en.key, b.en.size || 56) + '</div>'
       + '<p><b>' + esc(b.vsName) + '</b> は 強かった。レベルを 上げて 挑もう。</p>'
       + '<p class="hint">つうさん ' + (v.win || 0) + '勝 ' + v.lose + '敗 ／ 負けても なくすものは ありません</p>'
       + '<button class="btn" onclick="closeBattle()">とじる</button></div>';
@@ -3487,9 +3544,9 @@ function battleLose_(){
   addExp_(6, "よく たたかった");
   if (!b.practice) r.enemy = null;
   save();
-  battleBox_().innerHTML = '<div class="bt-result">'
-    + '<div class="bt-lose">にげだした!</div>'
-    + '<div class="bt-enemy">' + dotSvg(b.en.key, b.en.size || 56) + '</div>'
+  battleBox_().innerHTML = '<div class="rpg-result">'
+    + '<div class="rpg-lose-t">にげだした!</div>'
+    + '<div class="rpg-res-ico">' + dotSvg(b.en.key, b.en.size || 56) + '</div>'
     + '<p>なかまを ふやしたり そうびを ととのえると 強くなれます。</p>'
     + '<p class="hint">負けても なくすものは ありません。</p>'
     + '<button class="btn" onclick="closeBattle()">とじる</button></div>';
@@ -3498,18 +3555,35 @@ function renderBattle_(){
   const b = __battle;
   if (!b) return;
   const st = dotStage();
-  const pp = Math.round(b.php / b.pmax * 100), ep = Math.round(b.ehp / b.emax * 100);
-  battleBox_().innerHTML =
-      '<div class="bt-side"><div class="bt-name">' + esc(b.en.name) + (b.practice ? "(れんしゅう)" : "") + '</div>'
-    + '<div class="bt-enemy' + (b.turn % 2 === 1 ? ' hit' : '') + '">' + dotSvg(b.en.key, b.en.size || 56) + '</div>'
-    + '<div class="bt-bar"><i style="width:' + ep + '%;background:#C0392B"></i></div></div>'
-    + '<div class="bt-vs">VS</div>'
-    + '<div class="bt-side"><div class="bt-name">' + esc(pet_().heroName || st.name) + ' たち</div>'
-    + '<div class="bt-party">' + dotSvg(st.key, 46, 0, null) + (activePet_() ? dotSvg(activePet_(), 38) : "") + allMates_().slice(0, 3).map(function(o){
-        return dotSvg(o.k, 34, mateLv_(o.k), null);
-      }).join("") + '</div>'
-    + '<div class="bt-bar"><i style="width:' + pp + '%;background:#3E7C59"></i></div></div>'
-    + '<div class="bt-log">' + b.log.slice(-3).map(function(x){ return '<div>' + esc(x) + '</div>'; }).join("") + '</div>';
+  const pp = Math.max(0, Math.round(b.php / b.pmax * 100));
+  const ep = Math.max(0, Math.round(b.ehp / b.emax * 100));
+  // 上:てき / 下:こちらの ようす と メッセージ
+  const stage = document.getElementById("rpg-stage");
+  if (stage){
+    stage.innerHTML =
+        '<div class="rpg-enemy' + (b.turn % 2 === 1 ? ' hit' : '') + '">'
+      +   dotSvg(b.en.key, Math.round((b.en.size || 56) * 1.7))
+      + '</div>'
+      + '<div class="rpg-ename">' + esc(b.en.name) + (b.practice ? "(れんしゅう)" : "") + '</div>'
+      + '<div class="rpg-ebar"><i style="width:' + ep + '%"></i></div>'
+      + '<div class="rpg-party">' + dotSvg(st.key, 44, 0, null, rpg_().equip)
+      +   (activePet_() ? dotSvg(activePet_(), 36) : "")
+      +   allMates_().slice(0, 3).map(function(o){ return dotSvg(o.k, 32, mateLv_(o.k), null); }).join("")
+      + '</div>';
+  }
+  const win = battleBox_();
+  if (win){
+    win.innerHTML =
+        '<div class="rpg-status">'
+      +   '<span>' + esc(pet_().heroName || st.name) + '</span>'
+      +   '<span>Lv ' + lvInfo_().lv + '</span>'
+      +   '<span>HP ' + Math.max(0, b.php) + '</span>'
+      + '</div>'
+      + '<div class="rpg-hpbar"><i style="width:' + pp + '%"></i></div>'
+      + '<div class="rpg-msg">' + b.log.slice(-3).map(function(x){ return '<div>' + esc(x) + '</div>'; }).join("") + '</div>';
+  }
+  const cmd = document.getElementById("rpg-cmd");
+  if (cmd) cmd.innerHTML = b.done ? "" : '<span class="rpg-wait">▼</span>';
 }
 
 /* ===== そうびの着せかえ ===== */
@@ -3829,7 +3903,8 @@ function petLine_(key){
     // 3回に2回は しぐさ付きで こたえる
     if (Math.random() < 0.66){
       const mv = petMove_(key);
-      return [petCry_(key) + " " + mv.s, mv.a];
+      // かっこが二重にならないよう、しぐさは 別の行に わけて出す
+      return [petCry_(key), mv.a, mv.s.replace(/^\(|\)$/g, "")];
     }
     return [petCry_(key), bi ? bi.act : "hop"];
   }
@@ -3894,11 +3969,24 @@ function renameHero(){
   renderDotPet(); openPartyModal();
   toast(p.heroName ? "「" + p.heroName + "」になりました!" : "なまえを元に戻しました");
 }
-function petSay_(text){
+function petSay_(text, unitEl, sub){
   const box = document.getElementById("pet-say");
   if (!box) return;
-  box.textContent = text;
+  box.innerHTML = esc(text) + (sub ? '<span class="say-move">' + esc(sub) + '</span>' : "");
   box.style.display = "block";
+  // しゃべっているキャラの 真下を さすように 三角の位置を あわせる
+  try {
+    const wrap = document.querySelector(".pet-wrap");
+    if (unitEl && wrap){
+      const w = wrap.getBoundingClientRect(), u = unitEl.getBoundingClientRect(), b = box.getBoundingClientRect();
+      // 吹き出しは右そろえなので、右端からの距離で 三角の位置を決める
+      const fromRight = (w.right - (u.left + u.width / 2)) - (w.width - b.width);
+      const x = Math.max(10, Math.min(b.width - 18, fromRight));
+      box.style.setProperty("--arrow", x.toFixed(0) + "px");
+    } else {
+      box.style.removeProperty("--arrow");
+    }
+  } catch(e){ box.style.removeProperty("--arrow"); }
   box.classList.remove("pop"); void box.offsetWidth; box.classList.add("pop");
   clearTimeout(box._tm);
   box._tm = setTimeout(function(){ box.style.display = "none"; }, 4200);
@@ -4010,7 +4098,7 @@ function petPat_(unitEl){
     careFeed_(2);
     save();
   }
-  petSay_(line[0]);
+  petSay_(line[0], u, line[2]);
   if (navigator.vibrate) navigator.vibrate(12);
 }
 // ときどき キャラが勝手に動く(ひとりの動き)
