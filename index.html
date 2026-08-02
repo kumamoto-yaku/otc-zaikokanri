@@ -170,6 +170,7 @@ button.mate-chip { cursor: pointer; font-family: var(--sans); }
 .buddy-card i { font-style: normal; font-size: 10px; color: #7B8794; text-align: center; line-height: 1.35; }
 .buddy-card i.fx { color: #3E7C59; }
 .buddy-card i.pg { color: var(--ai); font-weight: 600; }
+.buddy-card i.pose { color: #8A97A0; font-size: 9.5px; }
 .buddy-card.on { border-color: var(--ai); background: #EEF3F1; }
 .buddy-card.yet { opacity: 0.65; cursor: default; }
 .buddy-card .onmark { background: var(--ai); color: #fff; border-radius: 999px; padding: 1px 7px; font-size: 9.5px; }
@@ -1086,7 +1087,7 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
   </section>
 
   <div class="toast" id="toast"></div>
-  <footer class="foot">OTCLinker — とみながグループ 店舗向けツール<br><span class="ver">版 2026-07-29 BA(カメラ起動の強化)</span></footer>
+  <footer class="foot">OTCLinker — とみながグループ 店舗向けツール<br><span class="ver">版 2026-07-29 BB(あいぼうの精細化・ポーズ)</span></footer>
 </div>
 
 <script>
@@ -2472,18 +2473,18 @@ const DOT_SPRITES = {
   g2_ocha: ["................................","................................","......KK....KK....KK............","......KKK...KKK...KKK...........",".......KKK...KKK...KKK..........","........KK....KK....KK..........","................................","................................",".....KKKKKKKKKKKKKKKKKKKK.......","....KKKKKKKKKKKKKKKKKKKKKK......","....KKKDDDDDDDDDDDDDDDdKKK......","....KKDDDDDDDDDDDDDDDDDdKK......","....KKWWWWWWWWWWWWWWWWWwKK......","....KKWWWwwWWWWWWWWwwWWwKK......","....KKWWwKKwWWWWWWwKKwWwKK......","....KKWwKKKKWWWWWwKKKKWwKK......","....KKWwKKKKWWWWWwKKKKWwKK......","....KKWWwKKWWWWWWWwKKWWwKK......","....KKWWWWWWWWWWWWWWWWWwKK......","....KKWWWWWWwwwwwwWWWWWwKK......","....KKwWWWWwKKKKKKWWWWWwKK......",".....KKWWWWwKKKKKKWWWWwKK.......",".....KKwwWWWWWWWWWWWWwwKK.......",".......KKWWWWWWWWWWWwKK.........",".......KKwwWWWWWWWWwwKK.........",".........KKwwwwwwwwKK...........","..........KKKKKKKKKK............","..........KKKKKKKKKK............","......KKKKKKKKKKKKKKKKKK........","......KKKKKKKKKKKKKKKKKK........","................................","................................"],
   g2_konnyaku: ["................................","................................","................................","................................",".....KKKKKKKKKKKKKKKKKKKKKK.....","...KKKKKKKKKKKKKKKKKKKKKKKKKK...","...KKDDDDDDDDDDDDDDDDDDDDDdKK...","..KKDDDddDDDDDDDDDDDDDDddDDdKK..","..KKDDdKKdDDDDDDDDDDDDdKKdDdKK..","..KKDdKKKKDDDDDDDDDDDdKKKKDdKK..","..KKDdKKKKDDDDDDDDDDDdKKKKDdKK..","..KKDDdKKDDDDDDDDDDDDDdKKDDdKK..","..KKDDDDDDDDDDDDDDDDDDDDDDDdKK..","..KKDDDDDDddddddddddddDDDDDdKK..","..KKDDDDDdKKKKKKKKKKKKDDDDDdKK..","..KKDDDDDdKKKKKKKKKKKKDDDDDdKK..","..KKDDDDDDDDDDDDDDDDDDDDDDDdKK..","..KKDDDDddDDDDDDDDDDDDddDDDdKK..","..KKDDDdKKDDDDDDDDDDDdKKDDDdKK..","..KKDDDdKKDDDDDDDDDDDdKKDDDdKK..","..KKDDDDDDDDDDDDDDDDDDDDDDDdKK..","..KKDDDDDDDDDDDDDDDDDDDDDDDdKK..","..KKdDDDDDDDDDDDDDDDDDDDDDDdKK..","...KKddddddddddddddddddddddKK...","...KKKKKKKKKKKKKKKKKKKKKKKKKK...","....KKKKKKKKKKKKKKKKKKKKKKKK....","....KKK..................KKK....","...KKK....................KKK...","..KKKK....................KKKK..","..KKK......................KKK..","................................","................................"],
   /* --- あいぼう(主人公のペット) --- */
-  p_wolf: ["................................","................................","....KK..................KK......","...KKKK................KKKK.....","...KSsK................KSsK.....","..KKSSsKK............KKSSsKK....","..KKSSsKKKKKKKKKKKKKKKKSSsKK....",".KKSSSSSsKKKKKKKKKKKKSSSSSsKK...",".KKSSSSSSSSSSSSSSSSSSSSSSSsKK...","KKSSssSSSSSSSSSSSSSSSSSSSSSSsKK.","KKSsKKSSSSSSSSSSSSSSSSSSSSSSSsK.","KKSsKKSSSSSSSSSSSSSSSSSSSSSsssKK","KKsSSSSSSSSSSSSSSSSSSSSSSSsKKKKK",".KKsSSSSSSSSSSSSSSSSSSSSSsKKKKK.","..KKSSSSSSSSSSSSSSSSSSSSSsKK....","..KKSSSSSSSSSSSSSSSSSSSSSSsK....",".KKSSSSSSSSSSSSSSSSSSSSSSSsKK...","KKSSSSSSSSSSSSSSSSSSSSSSSSSSsKK.","KKSSSSSSSSSSSSSSSSSSSSSSSSSSsKK.","KKSSSSSssSSSSSSSSSSSSssSSSSSSsKK","KKSSSSsKKssSSSSSSSSssKKsSSSSSsKK","KKSSSsKKKKKSSSSSSSsKKKKKSSSSsKsK","KKSSSsKK..KssSSSSssK..KKsSSsKKKs","KKSSsKK....KKSSSsKK....KKSSsKKSs","KKSSsKK....KKsSSsKK....KKsSsKKSs","KKSsKK......KKSsKK......KKSsKKs.","KKSsKK......KKSsKK......KKSsKK..","KKssKK......KKssKK......KKssKK..","KKKKKK......KKKKKK......KKKKKK..",".KKKK........KKKK........KKKK...","................................","................................"],
-  p_fox: ["................................","................................","....KK..................KK......","...KKKK................KKKK.....","...KOoK................KOoK.....","..KKOOoKK............KKOOoKK....","..KKOOoKKKKKKKKKKKKKKKKOOoKK....",".KKOOOOOoKKKKKKKKKKKKOOOOOoKK...",".KKOOOOOOOOOOOOOOOOOOOOOOOoKK...","KKOOooOOOOOOOOOOOOOOOOOOOOOOoKK.","KKOoKKOOOOOOOOOOOOOOOOOOOOOOOoK.","KKOoKKOOOOOOOOOOOOOOOOOOOOOoooKK","KKoOOOOOOOOOOOOOOOOOOOOOOOoKKKKK",".KKoOOOOOOOOOOOOOOOOOOOOOoKKKKK.","..KKWWWOOOOOOOOOOOOOOOOOOoKK....","..KWWWWWOOOOOOOOOOOOOOOOOOoK....",".KKWWWWWOOOOOOOOOOOOOOOOOOoKKKw.","KKWWWWWOOOOOOOOOOOOOOOOOOOOoKKWw","KKWWWWWOOOOOOOOOOOOOOOOOOOOoKKWw","KKWWWOOooOOOOOOOOOOOOooOOOOoKKWw","KKOOOOoKKooOOOOOOOOooKKoOOOoKKWw","KKOOOoKKKKKOOOOOOOoKKKKKOOOoKKWw","KKOOOoKK..KooOOOOooK..KKoOOoKKWw","KKOOoKK....KKOOOoKK....KKOOoKKWw","KKOOoKK....KKoOOoKK....KKoOoKKWw","KKOoKK......KKOoKK......KKOoKKw.","KKOoKK......KKOoKK......KKOoKK..","KKooKK......KKooKK......KKooKK..","KKKKKK......KKKKKK......KKKKKK..",".KKKK........KKKK........KKKK...","................................","................................"],
-  p_cat: ["................................","................................",".....KK................KK.....KK","...KKKKKK............KKKKKK..KKK","...KKWwKK............KKWwKKKKKKw","..KKWWWWwKK........KKWWWWwKKKKWw","..KKWWWWwKKKKKKKKKKKKWWWWwKKKKWw",".KKWWWWWWWwKKKKKKKKWWWWWWWwKKKWw",".KKWWWWWWWWWWWWWWWWWWWWWWWwKKKWw","KKWWwwWWWWWWWWWWWWWWWWWWWWWwKKWw","KKWwKKWWWWWWWWWWWWWWWWWWWWWwKKWw","KKWwKKWWWWWWWWWWWWWWWWWWWWwKKKWw","KKwWWWWWWWWWWWWWWWWWWWWWWWwKKKWw",".KKwWWWWWWWWWWWWWWWWWWWWWwKKKWw.","..KKWWWWWWWWWWWWWWWWWWWWWwKKWWw.","..KKWWWWWWWWWWWWWWWWWWWWWwKKWw..",".KKWWWWWWWWWWWWWWWWWWWWWWWwKwK..","KKWWWWWWWWWWWWWWWWWWWWWWWWWwKK..","KKWWWWWWWWWWWWWWWWWWWWWWWWWwKK..","KKWWWWWwwWWWWWWWWWWWWwwWWWWwKK..","KKWWWWwKKwwWWWWWWWWwwKKwWWWwKK..","KKWWWwKKKKKWWWWWWWwKKKKKWWWwKK..","KKWWWwKK..KwwWWWWwwK..KKwWWwKK..","KKWWwKK....KKWWWwKK....KKWWwKK..","KKWWwKK....KKwWWwKK....KKwWwKK..","KKWwKK......KKWwKK......KKWwKK..","KKWwKK......KKWwKK......KKWwKK..","KKwwKK......KKwwKK......KKwwKK..","KKKKKK......KKKKKK......KKKKKK..",".KKKK........KKKK........KKKK...","................................","................................"],
-  p_dog: ["................................","................................",".....KK................KK.......","...KKKKKK............KKKKKK.....","...KKNnKK............KKNnKK.....","..KKNNNNnKK........KKNNNNnKKK...","..KKNNNNnKKKKKKKKKKKKNNNNnKKK...",".KKNNNNNNNnKKKKKKKKNNNNNNNnKKKK.",".KKNNNNNNNNNNNNNNNNNNNNNNNNNNnK.","KKNNnnNNNNNNNNNNNNNNNNNNNNNNnnnK","KKNnKKNNNNNNNNNNNNNNNNNNNNNnKKKn","KKNnKKNNNNNNNNNNNNNNNNNNNNnKKKNn","KKnNNNNNNNNNNNNNNNNNNNNNNNnKKKNn",".KKnNNNNNNNNNNNNNNNNNNNNNnKKKNn.","..KKCCCNNNNNNNNNNNNNNNNNNnKKNNn.","..KCCCCCNNNNNNNNNNNNNNNNNnKKNn..",".KKCCCCCNNNNNNNNNNNNNNNNNNnKnK..","KKCCCCCNNNNNNNNNNNNNNNNNNNNnKK..","KKCCCCCNNNNNNNNNNNNNNNNNNNNnKK..","KKCCCNNnnNNNNNNNNNNNNnnNNNNnKK..","KKNNNNnKKnnNNNNNNNNnnKKnNNNnKK..","KKNNNnKKKKKNNNNNNNnKKKKKNNNnKK..","KKNNNnKK..KnnNNNNnnK..KKnNNnKK..","KKNNnKK....KKNNNnKK....KKNNnKK..","KKNNnKK....KKnNNnKK....KKnNnKK..","KKNnKK......KKNnKK......KKNnKK..","KKNnKK......KKNnKK......KKNnKK..","KKnnKK......KKnnKK......KKnnKK..","KKKKKK......KKKKKK......KKKKKK..",".KKKK........KKKK........KKKK...","................................","................................"],
-  p_rabbit: [".......KK.......................",".....KKKKKK.....................",".....KKWwKK......KK.............","....KKWWWwKK...KKKKKK...........","....KKWWWwKK...KKWwKK...........","....KKWWWwKK..KKWWWwKK..........","....KKWWWwKK..KKWWWwKK..........","....KKWWWwKK..KKWWWwKK..........","....KKWWWwKKKKKKWWWwKK..........","...KKWWWWWwKKKKWWWWWwKK.........","...KKWWWWWWWWWWWWWWWwKKKK.......",".KKWWWWWWWWWWWWWWWWWWWwKKKK.....",".KKWWWWWWWWWWWWWWWWWWWWWwKK.....","KKWWwwWWWWWWWWWWWWWWWWWWWwKKK...","KKWwKKWWWWWWWWWWWWWWWWWWWwKKKKw.","KKWwKKWWWWWWWWWWWWWWWWWWWwKKKWWw","KKWWWWWWWWWWWWWWWWWWWWWWWwKKKWWw","KKWWWWWWWWWWWWWWWWWWWWWWWwKKWWw.","KKPPWWWWWWWWWWWWWWWWWWWWWwKKWww.","KKPPWWWWWWWWWWWWWWWWWWWWWwKKw...","KKWWWWWWWWWWWWWWWWWWWWWWWwKK....","KKWWWWWwwWWWWWWWWWWWWwwWWwKK....","KKWWWwwKKwwWWWWWWWWwwKKwWwKK....","KKWWwKKKKKKWWWWWWWwKKKKKWwKK....","KKWWwKK..KKwWWWWWWwK..KKWwKK....","KKwwKK....KKWWWWWwKK..KKwwKK....","KKKKKK....KKwWWWWwKK..KKKKKK....",".KKKK.....KKKwwwwKKK...KKKK.....","..........KKKKKKKKKK............","...........KKKKKKKK.............","................................","................................"],
-  p_hamster: ["................................","................................","................................","................................",".....KK................KK.......","...KKKKKK............KKKKKK.....","...KKCcKKKKKKKKKKKKKKKKCcKK.....","..KKCCCCcKKKKKKKKKKKKCCCCcKK....","..KKcCCCCCCCCCCCCCCCCCCCCcKK....",".KKcKcCCCCCCCCCCCCCCCCCCCCcKK...",".KCcKKCCCCCCCCCCCCCCCCCCCCcKK...","KKCcKKCCCCCCCCCCCCCCCCCCCCCcKK..","KKCCCCCCCCCCCCCCCCCCCCCCCCCcKKc.","KKCCCCCCCCCCCCCCCCCCCCCCCCcKKKCc","KKCCCCCCCCCCCCCCCCCCCCCCCcKKKKCc","KKCCCCCCCCCCCCCCCCCCCCCCCcKKKKc.","KKCCCCCCCCCCCCCCCCCCCCCCCCcKKK..","KKCCCCCCCCCCCCCCCCCCCCCCCCCcKK..","KKcCCCCCCCCCCCCCCCCCCCCCCCCcKK..",".KKCCCCCCCCCCCCCCCCCCCCCCCcKK...",".KKcCCCCCCCCCCCCCCCCCCCCCCcKK...","..KKCCCccCCCCCCCCCCCCccCCcKK....","..KKCCcKKccCCCCCCCCccKKcCcKK....","...KccKKKKKCCCCCCCcKKKKKccK.....","...KKKKK..KccCCCCccK..KKKKK.....",".....KK...KKKccccKKK...KK.......","..........KKKKKKKKKK............","...........KKKKKKKK.............","................................","................................","................................","................................"],
-  p_chick: ["................................","................................","................................","................................","...........KKKKKK...............",".........KKKKKKKKKK.............",".......KKKKYYYYYyKKKK...........",".....KKKKYYYYYYYYYyKKKK.........",".....KKYYYYYYYYYYYYYyKK.........","....KKYYyyYYYYYYYYYYYyKK........","....KKYyKKYYYYYYYYYYYyKK........","...KKYYyKKYYYYYYYYYYYYyKK.......","...KKYYYYYYYYYYYYYYYYYyKK.......","..KKYYYYYYYYYYYYYYYYYYYyKK......","..KKYYYYYYYYYYYYYYYYYYYyKKo.....",".KKYYYYYYYYYYYYYYYYYYYYYyKKOo...",".KKYYYYYYYYYYYYYYYYYYYYYyKKoOo..","KKYYYYYYyyyyYYYYYYYYYYYYYyKKoo..","KKYYYYYyKKKKYYYYYYYYYYYYYyKK....","KKYYYYYyKKKKYYYYYYYYYYYYYyKK....","KKyYYYYYYYYYYYYYYYYYYYYYYyKK....",".KKYYYYYYYYYYYYYYYYYYYYYyKK.....",".KKyyYYYYYYYYYYYYYYYYYYyyKK.....","...KKYYYYYYYYYYYYYYYYYyKK.......","...KKyyYYYYYYYYYYYYYYyyKK.......",".....KKyyyyyyyyyyyyyyKK.........",".....KKKKKKKKKKKKKKKKKK.........",".......KKKKKKKKKKKKKK...........","........KKKo....oKKK............","........KOOo....OOoK............","......KKKOOo....oOoKKK..........","......KKooo......oooKK.........."],
-  p_penguin: ["................................","................................",".........KKKKKKKKKK.............",".......KKKKKKKKKKKKKK...........",".......KKKKKKKKKKKKKK...........",".....KKKKKKKKKKKKKKKKKK.........",".....KKKKKKWWWWWWwKKKKK.........","....KKKKKKWWwwWWwwwKKKKKK.......","....KKKKKKWwKKWwKKWwKKKKK.......","...KKKKKKKWwKKWwKKWwKKKKKKK.....","...KKKKKKKWWWWWWWWWwKKKKKKK.....",".KKKKKKKKKWWWWWWWWWwKKKKKKKKK...",".KKKKKKKKKWWWWOOWWWwKKKKKKKKK...","KKKKKKKKKKWWWWOOWWWwKKKKKKKKKK..","KKKKKKKKKKWWWWWWWWWwKKKKKKKKKK..","KKKKKKKKKKWWWWWWWWWwKKKKKKKKKK..","KKKKKKKKKKWWWWWWWWWwKKKKKKKKKK..","KKKKKKKKKKWWWWWWWWWwKKKKKKKKKK..","KKKKKKKKKKWWWWWWWWWwKKKKKKKKKK..",".KKKKKKKKKWWWWWWWWWwKKKKKKKKK...",".KKKKKKKKKWWWWWWWWWwKKKKKKKKK...","..KKKKKKKKWWWWWWWWWwKKKKKKKK....","..KKKKKKKKWWWWWWWWWwKKKKKKKK....","...KKKKKKKWWWWWWWWWwKKKKKKK.....","...KKKKKKKwWWWWWWWWwKKKKKKK.....","....KKKKKKKwwwwwwwwKKKKKKK......","....KKKKKKKKKKKKKKKKKKKKKK......",".....KKKKKKKKKKKKKKKKKKKK.......","......KKKOoKKK..KKKOoKKK........","......KOOOOoKK..KKOOOOoK........","....KKKOOOOoKK..KKOOOOoKKK......","....KKooooooK....KooooooKK......"],
-  p_owl: ["................................","................................",".....KK................KK.......","...KKKKKK............KKKKKK.....","...KKNnKKKKKKKKKKKKKKKKNnKK.....","..KKNNNNnKKKKKKKKKKKKNNNNnKK....","..KKnNNNNNNNNNNNNNNNNNNNNnKK....",".KKnKnNNNNnNNNNNNNNnNNNNnKnKK...",".KNNnKWWWwKnnNNNNnnKwWWwKnNnK...","KKNnKKWWwKwKKnNNnKKwKwWwKKNnKK..","KKNnKKWwKKWwKKNnKKWwKKWwKKNnKK..","KKNnKKWwKKWwKKNnKKwwKKWwKKNnKK..","KKNnKKWWwKwKKNNNnKKwKWWwKKNnKK..","KKNNnKWWWwKNNNNNNNnKWWWwKNNnKK..","KKNNNNNNNNNNNOONNNNNNNNNNNNnKK..","KKNNNNNNNNNNOOOONNNNNNNNNNNnKK..","KKNNCCNNNNNNOOOONNNNNNNNCCNnKK..","KKNNCCCNNNNNNOONNNNNNNNNCCCnKK..","KKNNCCCNNNNNNNNNNNNNNNNNCCCcKK..","KKNNCCCCCNNNNNNNNNNNNNNCCCCcKK..","KKnNCCCCCNNNNNNNNNNNNNNCCCCcKK..",".KKNNCCCCCNNNNNNNNNNNNCCCCcKK...",".KKnNCCCCCNNNNNNNNNNNNCCCCcKK...","..KKNNNCCCCNNNNNNNNNNCCCCcKK....","..KKnNNCCCCCNNNNNNNNCCCCCnKK....","...KKNNNNCCCNNNNNNNNCCCNnKK.....","...KKnnNNNNNNNNNNNNNNNNnnKK.....",".....KKnNNNNnnnnnnNNNNnKK.......","......KKOOOoKK..KKOOOoKK........","......KOOOOoKK..KKOOOOoK........","....KKKOOOOoKK..KKOOOOoKKK......","....KKooooooK....KooooooKK......"],
-  p_tanuki: ["................................","................................",".....KK................KK.......","...KKKKKK............KKKKKK.....","...KKNnKK............KKNnKK.....","..KKNNNNnKK........KKNNNNnKKK...","..KKNNNNnKKKKKKKKKKKKNNNNnKKK...",".KKNNNNNNNnKKKKKKKKNNNNNNNnKKK..",".KNNNNNNNNNNNNNNNNNNNNNNNNnKKKn.","KKnnnNNNNNNNNNNNNNNNNNNNNNNnKKNn","KKKKKnNNNNNNNNNNNNNNNNNNNNNnKKNn","KKKKKKNNNNNNNNNNNNNNNNNNNNnKKKNn","KKWwKKNNNNNNNNNNNNNNNNNNNNnKKKCc","KKwwKKNNNNNNNNNNNNNNNNNNNnKKKKc.","KKKKKKNNNNNNNNNNNNNNNNNNNnKKNn..","KKKKKKNNNNNNNNNNNNNNNNNNNnKKNn..","KKKNCCCCCNNNNNNNNNNNNNNNNNnKnK..","KKNNCCCCCCCNNNNNNNNNNNNNNNNnKK..","KKNNCCCCCCCCNNNNNNNNNNNNNNNnKK..","KKNNNCccccCCNNNNNNNNNnnNNNNnKK..","KKNNNnKKKKnNNNNNNNNnnKKnNNNnKK..","KKNNNnKKKKKNNNNNNNnKKKKKNNNnKK..","KKNNNnKK..KnnNNNNnnK..KKnNNnKK..","KKNNnKK....KKNNNnKK....KKNNnKK..","KKNNnKK....KKnNNnKK....KKnNnKK..","KKNnKK......KKNnKK......KKNnKK..","KKNnKK......KKNnKK......KKNnKK..","KKnnKK......KKnnKK......KKnnKK..","KKKKKK......KKKKKK......KKKKKK..",".KKKK........KKKK........KKKK...","................................","................................"],
-  p_bear: ["................................","................................","...KK....................KK.....",".KKKKKK................KKKKKK...",".KKNnKK................KKNnKK...","KKNNNNnKK............KKNNNNnKK..","KKNNNNnKKKKKKKKKKKKKKKKNNNNnKK..","KKNNNNNNnKKKKKKKKKKKKNNNNNNnKK..","KKNNNNNNNNNNNNNNNNNNNNNNNNNnKK..","KKNNnnNNNNNNNNNNNNNNNNNNNNNNnKK.","KKNnKKNNNNNNNNNNNNNNNNNNNNNNNnK.","KKNnKKNNNNNNNNNNNNNNNNNNNNNNNnKK","KKNNNNNNNNNNNNNNNNNNNNNNNNNNnKKK","KKNNNNNNNNNNNNNNNNNNNNNNNNNnKKK.","KKNNNNNNNNNNNNNNNNNNNNNNNNNnKKK.","KKNNNNNNNNNNNNNNNNNNNNNNNNNnKK..","KKNNNNNNNNNNNNNNNNNNNNNNNNNnKK..","KKNNNNNNNNNNNNNNNNNNNNNNNNNnKK..","KKNNNNNNNNNNNNNNNNNNNNNNNNNnKK..","KKNNNNNNNNNNNNNNNNNNNNNNNNNnKK..","KKNNNNNNNNNNNNNNNNNNNNNNNNNnKK..","KKNNNNNnnNNNNNNNNNNNNnnNNNNnKK..","KKNNNNnKKnnNNNNNNNNnnKKnNNNnKK..","KKNNNnKKKKKNNNNNNNnKKKKKNNNnKK..","KKNNNnKK..KnNNNNNNnK..KKNNNnKK..","KKNNNnKK..KKNNNNNnKK..KKNNNnKK..","KKnNNnKK..KKnNNNNnKK..KKnNNnKK..","KKKnnKKK..KKKnnnnKKK..KKKnnKKK..","KKKKKKKK..KKKKKKKKKK..KKKKKKKK..",".KKKKKK....KKKKKKKK....KKKKKK...","................................","................................"],
-  p_tiger: ["...KK....................KK.....",".KKKKKK................KKKKKK...",".KKOOoK................KOOoKK...","KKOOoooKK............KKOooOoKKK.","KKOoKKOoKKKKKKKKKKKKKKOoKKOoKKK.","KKOoKKOOoKKKKKKKKKKKKOOoKKOOoKKK","KKOOOOOOOOOOOOOOOOOOOOOOOOOOoKKK","KKOOooOOOOooOOOOooOOOOooOOOOOoKK","KKOoKKOOOoKKOOOoKKOOOoKKOOOOOoKK","KKOoKKOOOoKKOOOoKKOOOoKKOOOooKoK","KKOOOOOOOOOOOOOOOOOOOOOOOOoKKKKo","KKOOooOOOOooOOOOooOOOOooOoKKKKOo","KKOoKKOOOoKKOOOoKKOOOoKKOoKKKOOo","KKOoKKOOOoKKOOOoKKOOOoKKooKKOOo.","KKOOOOOOOOOOOOOOOOOOOOoKKKKOOOo.","KKOOOOooOOOOooOOOOooOOOoKKOOOo..","KKOOOoKKOOOoKKOOOoKKOOOOOOOOoK..","KKOOOoKKOOOoKKOOOoKKOOOOOOOoKK..","KKOOOOOOOOOOOOOOOOOOOOOOOOOoKK..","KKOOOOOooOOOOOOOOOOOOooOOOOoKK..","KKOOOOoKKooOOOOOOOOooKKoOOOoKK..","KKOOOoKKKKKOOOOOOOoKKKKKOOOoKK..","KKOOOoKK..KooOOOOooK..KKoOOoKK..","KKOOOoKK...KKOOOoKK....KKOOOoKK.","KKOOOoKK...KKoOOoKK....KKoOOoKK.","KKOOOoKK....KKOoKK......KKOOOoKK","KKoOOoKK....KKOoKK......KKoOOoKK","KKKooKKK....KKooKK......KKKooKKK","KKKKKKKK....KKKKKK......KKKKKKKK",".KKKKKK......KKKK........KKKKKK.","................................","................................"],
+  p_wolf: ["................................",".....KK.....................KK..","....KssK...................KssK.","....KsSK..................KsSSK.","...KsSSK.................KsSSSK.","...KsSSKKKKKKKKKKKKKKKKKKKsSSSK.","..KsSSSSSSSSSSSSSSSSSSSSSSSSSSK.",".KsSSSSSSSSSSSSSSSSSSSSSSSSSSSK.","KsSSSSSSSSSSSSSSSSSSSSSSSSSSSK..","KsSKKSSSSSSSSSSSSSSSSSSSSSSSK...","KsSKKSSSSSSSSSSSSSSSSSSSSSSSK...","KsSSSSSSSSSSSSSSSSSSSSSSSSSSK...","KKsSSSSSSSSSSSSSSSSSSSSSSSSSKKK.","KKKsSSSSSSSSSSSSSSSSSSSSSSSKsssK","KWWKsSSSSSSSSSSSSSSSSSSSSSKsSSSK","KWWKKsSSSSSSSSSSSSSSSSSSSKsSSSSK",".KKKKKsSSSSSSSSSSSSSSSSSKsSSSSK.","....KsSSSSSSSSSSSSSSSSSSSSSSSK..","...KsSSSSSSSSSSSSSSSSSSSSSSSK...","...KsSSSSSSSSSSSSSSSSSSSSSSK....","...KsSSSSSKKKKKKKKSSSSSSSSSK....","...KsSSSSK.......KsSSSSSSSK.....","...KsSSSK.........KsSSSSSK......","...KsSSK...........KsSSSSK......","...KsSSK...........KsSSSSK......","...KsSSK...........KsSSSSK......","...KsSSK...........KsSSSSK......","...KsSSK...........KsSSSSK......","...KsSSK...........KsSSSSK......","...KKKKK...........KKKKKKK......","................................","................................"],
+  p_fox: ["................................","....KK.......................KK.","...KooK.....................KooK","...KoOK....................KoOOK","..KoOOK...................KoOOOK","..KoOOKKKKKKKKKKKKKKKKKKKKoOOOK.",".KoOOOOOOOOOOOOOOOOOOOOOOOOOOOK.","KoOOOOOOOOOOOOOOOOOOOOOOOOOOOK..","KoOKKOOOOOOOOOOOOOOOOOOOOOOOK...","KoOKKOOOOOOOOOOOOOOOOOOOOOOK....","KoOOOOOOOOOOOOOOOOOOOOOOOOOK.KKK","KKoOOOOOOOOOOOOOOOOOOOOOOOKKwwwK","KWWKoOOOOOOOOOOOOOOOOOOOKKwWWWWK","KWWKKoOOOOOOOOOOOOOOOOOKwWWWWWWK",".KKKKKoOOOOOOOOOOOOOOOKwWWWWWWK.","...KWWKoOOOOOOOOOOOOOKwWWWWWWK..","...KWWKoOOOOOOOOOOOOOKwWWWWWK...","....KKKoOOOOOOOOOOOOOOKwWWWK....","......KoOOOOOOOOOOOOOOOKKKK.....","......KoOOOOOOOOOOOOOOOK........","......KoOOOKKKKKKKoOOOOK........","......KoOOK.......KoOOOK........","......KoOK.........KoOOK........","......KoOK.........KoOOK........","......KoOK.........KoOOK........","......KoOK.........KoOOK........","......KoOK.........KoOOK........","......KWWK.........KWWWK........","......KWWK.........KWWWK........","......KKKK.........KKKKK........","................................","................................"],
+  p_cat: ["...........................KK...","...KK.....................KwwK..","..KwwK....................KwWK..","..KwWK....................KwWK..","..KwWKKKKKKKKKKKKKKKKKK...KwWK..",".KwWWWWWWWWWWWWWWWWWWWWK..KwWK..","KwWWWWWWWWWWWWWWWWWWWWWWKKKwWK..","KwWKKWWWWWWWWWWWWWWWWWWWWWWWWK..","KwWKKWWWWWWWWWWWWWWWWWWWWWWWK...","KwWWWWWWWWWWWWWWWWWWWWWWWWWK....","KKwWWWMMWWWWWWWWWWWWWWWWWWK.....","KKKwWWWWWWWWWWWWWWWWWWWWWK......","KWWKwWWWWWWWWWWWWWWWWWWWK.......","KWWKKwWWWWWWWWWWWWWWWWWK........",".KKKKKwWWWWWWWWWWWWWWWWK........","...KWWKwWWWWWWWWWWWWWWWK........","...KWWKwWWWWWWWWWWWWWWWK........","....KKKwWWWWWWWWWWWWWWWK........",".......KwWWWWWWWWWWWWWWK........",".......KwWWWKKKKKKwWWWWK........",".......KwWWK......KwWWWK........",".......KwWK........KwWWK........",".......KwWK........KwWWK........",".......KwWK........KwWWK........",".......KwWK........KwWWK........",".......KwWK........KwWWK........",".......KKKK........KKKKK........","................................","................................","................................","................................","................................"],
+  p_dog: ["................................","...KKK......................KKK.","..KnnnK....................KnnnK","..KnNNK...................KnNNNK","..KnNNKKKKKKKKKKKKKKKKKKKKnNNNK.",".KnNNNNNNNNNNNNNNNNNNNNNNNNNNNK.","KnNNNNNNNNNNNNNNNNNNNNNNNNNNNK..","KnNKKNNNNNNNNNNNNNNNNNNNNNNNK...","KnNKKNNNNNNNNNNNNNNNNNNNNNNK....","KnNNNNNNNNNNNNNNNNNNNNNNNNK.KKK.","KKnNNNNNNNNNNNNNNNNNNNNNNKKnnnK.","KCCKnNNNNNNNNNNNNNNNNNNNKnNNNnK.","KCCKKnNNNNNNNNNNNNNNNNNKnNNKKnK.",".KKKKKnNNNNNNNNNNNNNNNKnNNKKnnK.","...KCCKnNNNNNNNNNNNNNNKnNNKnnK..","...KCCKnNNNNNNNNNNNNNNKnNNNNK...","....KKKnNNNNNNNNNNNNNNNKKKKK....","......KnNNNNNNNNNNNNNNNK........","......KnNNNNNNNNNNNNNNNK........","......KnNNNKKKKKKKnNNNNK........","......KnNNK.......KnNNNK........","......KnNK.........KnNNK........","......KnNK.........KnNNK........","......KnNK.........KnNNK........","......KnNK.........KnNNK........","......KnNK.........KnNNK........","......KCCK.........KCCCK........","......KCCK.........KCCCK........","......KKKK.........KKKKK........","................................","................................","................................"],
+  p_rabbit: ["....KK..........................","...KwwK.....KK..................","...KwWK....KwwK.................","...KwWK....KwWK.................","...KwWK....KwWK.................","...KwWK....KwWK.................","...KwWKKKKKKwWK.................","..KwWWWWWWWWWWKKKKKK............",".KwWWWWWWWWWWWWWWWWWKK..........","KwWKKWWWWWWWWWWWWWWWWWK.........","KwWKKWWWWWWWWWWWWWWWWWWK........","KwWWWWWWWWWWWWWWWWWWWWWWK.......","KwWWPWWWWWWWWWWWWWWWWWWWWK......","KKwWWWWWWWWWWWWWWWWWWWWWWWK..KKK","KWWKwWWWWWWWWWWWWWWWWWWWWWWKKwwK","KWWKKwWWWWWWWWWWWWWWWWWWWWWWWWWK",".KKKKKwWWWWWWWWWWWWWWWWWWWWWWWK.","...KWWKwWWWWWWWWWWWWWWWWWWWWWK..","...KWWKwWWWWWWWWWWWWWWWWWWWWK...","....KKKwWWWWWWWWWWWWWWWWWWWWK...","......KwWWWWWWWWWWWWWWWWWWWWK...","......KwWWWKKKKKKKKwWWWWWWWWK...","......KwWWK........KwWWWWWWWK...","......KwWK..........KwWWWWWWK...","......KwWK..........KwWWWWWWK...","......KwWK..........KwWWWWWWK...","......KWWK..........KWWWWWWWK...","......KKKK..........KKKKKKKKK...","................................","................................","................................","................................"],
+  p_hamster: ["................................","................................","................................","......KKK.............KKK.......",".....KcccK...........KcccK......",".....KcCCKKKKKKKKKKKKKcCCK......","....KcCCCCCCCCCCCCCCCCCCCCK.....","...KcCCCCCCCCCCCCCCCCCCCCCCK....","..KcCCCCCCCCCCCCCCCCCCCCCCCCK...",".KcCCKKCCCCCCCCCCCCCCCCCCCCCK...","KcCCKKCCCCCCCCCCCCCCCCCCCCCCK...","KcCCCCCCCCCCCCCCCCCCCCCCCCCCK.KK","KcCCCPPCCCCCCCCCCCCCCCCCCCCCKKcK","KcCCCCCCCCCCCCCCCCCCCCCCCCCCCKKK","KKcCCCCCCCCCCCCCCCCCCCCCCCCCCK..","KWWKcCCCCCCCCCCCCCCCCCCCCCCCK...","KWWKKcCCCCCCCCCCCCCCCCCCCCCK....",".KKKKKcCCCCCCCCCCCCCCCCCCCCK....","...KWWKcCCCCCCCCCCCCCCCCCCK.....","...KWWKcCCCCKKKKKKKcCCCCCCK.....","....KKKcCCCK......KcCCCCCK......","......KcCCK........KcCCCK.......","......KWWWK........KWWWWK.......","......KKKKK........KKKKKK.......","................................","................................","................................","................................","................................","................................","................................","................................"],
+  p_chick: ["................................","................................","................................","..........KKKKKK................",".......KKKyyyyyyKKK.............",".....KKyyyyyyyyyyyyKK...........","....KyyyyyyyyyyyyyyyyK..........","...KyyyyyyyyyyyyyyyyyyK.........","..KyyKKyyyyyyyyyyyKKyyyK........","..KyyKKyyyyyyyyyyyKKyyyK...KKK..",".KyYYYYYYYYYYYYYYYYYYYYYK.KOOOK.",".KyYYYYYYYYYYYYYYYYYYYYYYKOOOK..","KyYYYYYYYYYYYYYYYYYYYYYYYKOOK...","KyYYYYYYYYYYYYYYYYYYYYYYYYKK....","KyYYYKKKYYYYYYYYYYYYYYYYYYK.....","KyYYKYYKYYYYYYYYYYYYYYYYYYK.....","KyYYKYYKYYYYYYYYYYYYYYYYYYK.....","KyYYYKKYYYYYYYYYYYYYYYYYYYK.....",".KyYYYYYYYYYYYYYYYYYYYYYYK......","..KyYYYYYYYYYYYYYYYYYYYYK.......","...KKyYYYYYYYYYYYYYYYYKK........",".....KKKyYYYYYYYYYYKKK..........","........KKKKKKKKKKK.............","..........KOK.KOK...............","..........KOK.KOK...............",".........KOOK.KOOK..............","........KOOOK.KOOOK.............","........KKKKK.KKKKK.............","................................","................................","................................","................................"],
+  p_penguin: ["................................","..........KKKKKKK...............",".......KKKKKKKKKKKKK............",".....KKKKKKKKKKKKKKKKK..........","....KKKKKKKKKKKKKKKKKKK.........","....KKKKKWWWWWWWWKKKKKK.........","...KKKKKWWWWWWWWWWKKKKKK........","...KKKKWWKKWWWWKKWWKKKKK........","...KKKKWWKKWWWWKKWWKKKKK........","...KKKKWWWWWOOWWWWWKKKKK........","...KKKKWWWWWOOWWWWWKKKKK........","..KKKKKWWWWWWWWWWWWKKKKKK.......",".KKKKKKWWWWWWWWWWWWKKKKKKK......","KKKKKKKWWWWWWWWWWWWKKKKKKKK.....","KKKKKKKWWWWWWWWWWWWKKKKKKKK.....","KKKKKKKWWWWWWWWWWWWKKKKKKKK.....","KKKKKKKWWWWWWWWWWWWKKKKKKKK.....","KKKKKKKWWWWWWWWWWWWKKKKKKKK.....",".KKKKKKWWWWWWWWWWWWKKKKKKK......",".KKKKKKWWWWWWWWWWWWKKKKKKK......","..KKKKKWWWWWWWWWWWWKKKKKK.......","..KKKKKWWWWWWWWWWWWKKKKKK.......","...KKKKKWWWWWWWWWWKKKKKK........","....KKKKKWWWWWWWWKKKKKK.........",".....KKKKKKKKKKKKKKKKK..........",".......KKKKKKKKKKKKK............",".......KOOOOK.KOOOOK............","......KOOOOOK.KOOOOOK...........",".....KOOOOOOK.KOOOOOOK..........",".....KKKKKKKK.KKKKKKKK..........","................................","................................"],
+  p_owl: ["................................","...KK.....................KK....","..KnnK...................KnnK...","..KnNKKKKKKKKKKKKKKKKKKKKKnNK...",".KnNNNNNNNNNNNNNNNNNNNNNNNNNNK..",".KnNNNNNNNNNNNNNNNNNNNNNNNNNNK..","KnNNKKKKKNNNNNNNNNNKKKKKNNNNNK..","KnNKWWWWWKNNNNNNNNKWWWWWKNNNNK..","KnNKWWKWWKNNNNNNNNKWWKWWKNNNNK..","KnNKWWKWWKNNNNNNNNKWWKWWKNNNNK..","KnNKWWWWWKNNNNNNNNKWWWWWKNNNNK..","KnNNKKKKKNNNOONNNNKKKKKNNNNNNK..","KnNNNNNNNNNNOONNNNNNNNNNNNNNK...","KnNNNNNNNNNNNNNNNNNNNNNNNNNNK...","KnNCCNNNNNNNNNNNNNNNNNNNCCNNK...","KnNCCCNNNNNNNNNNNNNNNNNCCCNNK...","KnNCCCCNNNNNNNNNNNNNNNCCCCNNK...",".KnCCCCCNNNNNNNNNNNNNCCCCCNNK...",".KnNCCCCCNNNNNNNNNNNCCCCCNNK....","..KnNCCCCCNNNNNNNNNCCCCCNNK.....","..KnNNCCCCCNNNNNNNCCCCCNNNK.....","...KnNNCCCCCNNNNNCCCCCNNNK......","...KnNNNCCCCCNNNCCCCCNNNK.......","....KnNNNNNNNNNNNNNNNNNK........",".....KnNNNNNNNNNNNNNNNK.........","......KKKKKKKKKKKKKKKK..........",".......KOOOK...KOOOK............","......KOOOOOK.KOOOOOK...........",".....KOKOKOKK.KKOKOKOK..........",".....KKKKKKKK.KKKKKKKK..........","................................","................................"],
+  p_tanuki: ["................................","..KKK.......................KKK.",".KnnnK.....................KnnnK",".KnNNK....................KnNNNK",".KnNNKKKKKKKKKKKKKKKKKKKKKnNNNK.","KnNNNNNNNNNNNNNNNNNNNNNNNNNNNNK.","KnNNNNNNNNNNNNNNNNNNNNNNNNNNNK..","KKKKKNNNNNNNNNNNNNNNNNNNNNNNK...","KKWKKNNNNNNNNNNNNNNNNNNNNNNK.KKK","KKKKKNNNNNNNNNNNNNNNNNNNNNKKnnnK","KnNNNNNNNNNNNNNNNNNNNNNNNKnNKKnK","KKnNNNNNNNNNNNNNNNNNNNNNKnNKKnnK","KCCKnNNNNNNNNNNNNNNNNNNKnNKKnnK.","KCCKKnNNNNNNNNNNNNNNNNKnNKKnnK..",".KKKKKnCCCCCCCCCCCCCCKnNKKnnK...","...KCCKnCCCCCCCCCCCCCKnNNNNK....","...KCCKnCCCCCCCCCCCCCKKKKKK.....","....KKKnCCCCCCCCCCCCCK..........","......KnCCCCCCCCCCCCCK..........","......KnCCCCKKKKKnCCCK..........","......KnCCCK.....KnCCCK.........","......KnCCK.......KnCCK.........","......KnCCK.......KnCCK.........","......KnCCK.......KnCCK.........","......KnCCK.......KnCCK.........","......KKKKK.......KKKKK.........","................................","................................","................................","................................","................................","................................"],
+  p_bear: ["................................",".KKKK......................KKKK.","KnnnnK....................KnnnnK","KnNNNNK..................KnNNNNK","KnNNNNKKKKKKKKKKKKKKKKKKKKnNNNNK","KnNNNNNNNNNNNNNNNNNNNNNNNNNNNNNK","KnNNNNNNNNNNNNNNNNNNNNNNNNNNNNK.",".KnNKKNNNNNNNNNNNNNNNNNNNNNNNK..","KKnNKKNNNNNNNNNNNNNNNNNNNNNNK...","KnNNNNNNNNNNNNNNNNNNNNNNNNNNK...","KnNNNNNNNNNNNNNNNNNNNNNNNNNNKKK.","KKnNNNNNNNNNNNNNNNNNNNNNNNNKnnK.","KWWKnNNNNNNNNNNNNNNNNNNNNNNKnNK.","KWWKKnNNNNNNNNNNNNNNNNNNNNNNKKK.",".KKKKKnNNNNNNNNNNNNNNNNNNNNNK...","...KWWKnNNNNNNNNNNNNNNNNNNNNK...","...KWWKnNNNNNNNNNNNNNNNNNNNNK...","....KKKnNNNNNNNNNNNNNNNNNNNNK...","......KnNNNNNNNNNNNNNNNNNNNNK...","......KnNNNNNNNNNNNNNNNNNNNNK...","......KnNNNNKKKKKKKKnNNNNNNNK...","......KnNNNK........KnNNNNNNK...","......KnNNNK........KnNNNNNNK...","......KnNNNK........KnNNNNNNK...","......KnNNNK........KnNNNNNNK...","......KnNNNK........KnNNNNNNK...","......KWWWWK........KWWWWWWWK...","......KWWWWK........KWWWWWWWK...","......KKKKKK........KKKKKKKKK...","................................","................................","................................"],
+  p_tiger: ["................................","..KKK.......................KKK.",".KoooK.....................KoooK",".KoOOK....................KoOOOK",".KoOKOKKKKKKKKKKKKKKKKKKKKoOKOK.","KoOOKOOOOKOOOOKOOOOKOOOOKOOOKOK.","KoOOOOOOOOOOOOOOOOOOOOOOOOOOOK..","KoOKKOOOOOOOOOOOOOOOOOOOOOOOK...","KoOKKOOOOOOOOOOOOOOOOOOOOOOK.KKK","KoOOOOOOOOOOOOOOOOOOOOOOOOKKoooK","KKoOOOOKOOOOKOOOOKOOOOKOOKoOOOOK","KKKoOOOOOOOOOOOOOOOOOOOOKoOKKOOK","KWWKoOOOOOOOOOOOOOOOOOOKoOKKOOK.","KWWKKoOOOOKOOOOKOOOOKOOKoOKOOOK.",".KKKKKoOOOOOOOOOOOOOOOOKoOOOOK..","...KWWKoOOOOOOOOOOOOOOOKoOOOK...","...KWWKoOOOOKOOOOKOOOOOOKKKKK...","....KKKoOOOOOOOOOOOOOOOOK.......","......KoOOOOOOOOOOOOOOOOK.......","......KoOOOOKKKKKKKoOOOOK.......","......KoOOOK.......KoOOOK.......","......KoOOK.........KoOOK.......","......KoOOK.........KoOOK.......","......KoOOK.........KoOOK.......","......KoOOK.........KoOOK.......","......KoOOK.........KoOOK.......","......KoOOK.........KoOOK.......","......KWWWK.........KWWWK.......","......KWWWK.........KWWWK.......","......KKKKK.........KKKKK.......","................................","................................"],
   /* --- おひめさま(超ボスに勝つと なかまに なる) --- */
   m_hime: ["........KK..KK..KK..KK..........",".......KKK..KK..KK..KK..........",".......KKKKKKKKKKKKKKK..........","......KKKKKKKKKKKKKKKK..........","......KKGGGGGGGGGGGgKK..........",".....KKKggggggggggggKKK.........",".....KKKKKKKKKKKKKKKKKK.........","....KKKKKKKKKKKKKKKKKKKK........","....KKKNNNNNNNNNNNNNnKKK........","....KKNNNNNNNNNNNNNNNnKK........","....KKNNNFFFFFFFFFFNNnKK........","....KKNFffffFFFFffffFnKK........","....KKFfKKKKFFFfKKKKFfKK........","....KKFfKKKKFFFfKKKKFfKK........","....KKFFFFFFFFFFFFFFFfKK........","....KKFFFFFffffffFFFFfKK........","....KKfFFFfKKKKKKfFFFfKK........",".....KKfFfKKKKKKKKFFfKK.........","......KKMMMMMMMMMMMmKK..........","......KMMMMMMMMMMMMMmK..........",".....KKMMMMMMMMMMMMMmKK.........","...KKMMMMMMMMMMMMMMMMMmKK.......","...KKMMMMMMMMMMMMMMMMMmKK.......","..KKMMMMMMMMMMMMMMMMMMMmKK......","..KKMMMMMMPPPPPPPPMMMMMmKK......",".KKMMMMMMMPPPPPPPPMMMMMMmKK.....",".KKMMMMMMMMMMMMMMMMMMMMMmKK.....","KKMMMMMMMMMMMMMMMMMMMMMMMmKK....","KKmMMMMMMMMMMMMMMMMMMMMMMmKK....","KKKmmmmmmmmmmmmmmmmmmmmmmKKK....","KKKKKKKKKKKKKKKKKKKKKKKKKKKK....",".KKKKKKKKKKKKKKKKKKKKKKKKKK....."],
   /* --- てき(バトル用。なかま一覧には出ません) --- */
@@ -2792,7 +2793,9 @@ function dotStage(){
   return { key: key, name: name, n: n, next: next, mateN: mateN, mates: DOT_MATES.slice(0, mateN) };
 }
 function dotSvg(key, px, lv, deco, equip){
-  const rows = DOT_SPRITES[key] || DOT_SPRITES.baby;
+  let rows = DOT_SPRITES[key] || DOT_SPRITES.baby;
+  // あいぼうは いまの ポーズで描く
+  if (typeof isPet_ === "function" && isPet_(key)) rows = poseRows_(rows, petPose_(key));
   const n = rows.length;
   const cell = px / n;
   const rc = function(x, y, w, h, c){
@@ -2841,6 +2844,8 @@ function dotSvg(key, px, lv, deco, equip){
     }
   }
   for (const col in paths) r += '<path d="' + paths[col] + '" fill="' + col + '"/>';
+  // あいぼう(どうぶつ)は 服を着ない。かわりに ポーズで表現する。
+  if (deco && typeof isPet_ === "function" && isPet_(key)) deco = null;
   // 季節や日替わりの衣装(目の高さに合わせて描く)
   if (deco){
     const W = px;
@@ -3038,6 +3043,91 @@ function bonusGetEffect_(got){
   const head = got.kind === "rare" ? "★レア★ " : (got.kind === "senmon" ? "せんもんしょく! " : "ごとうち! ");
   toast(head + "「" + DOT_NAMES[got.key] + "」が なかまに なった!" + (got.note ? "(" + got.note + ")" : ""));
 }
+/* ===== あいぼうの ポーズ ===== */
+// 服のかわりに、その日その時の 姿勢で 表情を出す。
+// もとの絵を くずさずに、脚をたたむ・体を のばす といった 加工で作る。
+const PET_POSES = {
+  stand:  { name:"たっている" },
+  sit:    { name:"すわっている" },
+  lie:    { name:"ふせている" },
+  stretch:{ name:"のびをしている" },
+  alert:  { name:"みみを 立てている" },
+  crouch: { name:"身がまえている" }
+};
+const POSE_KEYS = Object.keys(PET_POSES);
+// スプライトを加工して ポーズを作る
+function poseRows_(rows, pose){
+  if (!pose || pose === "stand") return rows;
+  const n = rows.length, w = rows[0].length;
+  const blank = ".".repeat(w);
+  const out = rows.slice();
+  // 下から数えて 脚のある行(すきまが多い行)を探す
+  let legTop = n;
+  for (let y = n - 1; y >= Math.floor(n * 0.55); y--){
+    const gaps = (rows[y].match(/\./g) || []).length;
+    const solid = w - gaps;
+    if (solid > 0 && gaps > w * 0.45) legTop = y; else if (legTop < n) break;
+  }
+  const legN = n - legTop;
+  if (pose === "sit" && legN >= 4){
+    // 脚を半分にたたんで、そのぶん 体を下げる
+    const keep = Math.max(2, Math.floor(legN / 2));
+    const body = rows.slice(0, legTop);
+    const legs = rows.slice(legTop, legTop + keep);
+    const pad = new Array(n - body.length - legs.length).fill(blank);
+    return pad.concat(body, legs);
+  }
+  if (pose === "lie" && legN >= 3){
+    // 脚を たたんで 体を いちばん下まで さげる
+    const body = rows.slice(0, legTop);
+    const pad = new Array(n - body.length).fill(blank);
+    return pad.concat(body);
+  }
+  if (pose === "stretch"){
+    // 前の方を 低く、後ろを 高くして のびをした形に
+    const res = [];
+    for (let y = 0; y < n; y++){
+      const row = rows[y];
+      const half = Math.floor(w / 2);
+      res.push(row.slice(0, half) + row.slice(half));
+    }
+    // 前半分だけ 1段さげる
+    const shifted = res.map(function(r, y){
+      const half = Math.floor(w / 2);
+      const front = (y > 0 ? res[y-1] : blank).slice(0, half);
+      return front + r.slice(half);
+    });
+    return shifted;
+  }
+  if (pose === "alert"){
+    // 耳と頭を 1段あげる(上に すきまがあるときだけ)
+    if (rows[0].indexOf("K") < 0){
+      return rows.slice(1).concat([blank]).map(function(r, y){ return y < 2 ? rows[y] : r; });
+    }
+    return rows;
+  }
+  if (pose === "crouch" && legN >= 3){
+    // 脚を すこし たたんで 低くかまえる
+    const keep = Math.max(2, legN - 2);
+    const body = rows.slice(0, legTop);
+    const legs = rows.slice(legTop, legTop + keep);
+    const pad = new Array(n - body.length - legs.length).fill(blank);
+    return pad.concat(body, legs);
+  }
+  return rows;
+}
+// その日その時の ポーズ(なでるたびに 変わる)
+let __petPose = {};
+function petPose_(key){ return __petPose[key] || "stand"; }
+function setPetPose_(key, pose){ __petPose[key] = pose; }
+function rollPose_(key){
+  const cur = petPose_(key);
+  const rest = POSE_KEYS.filter(function(x){ return x !== cur; });
+  const p2 = rest[Math.floor(Math.random() * rest.length)];
+  setPetPose_(key, p2);
+  return PET_POSES[p2];
+}
+
 /* ===== あいぼうの しぐさ ===== */
 // どの あいぼうも する 共通のしぐさ。鳴き声と いっしょに 体で表現する。
 const PET_MOVES = [
@@ -3752,7 +3842,8 @@ function buddySection_(){
     const pr = petProgress_(x);
     if (has){
       h += '<button class="buddy-card' + (cur === x.key ? ' on' : '') + '" onclick="setBuddy(\'' + x.key + '\')">'
-        + '<span class="bd-icon">' + dotSvg(x.key, Math.min(46, Math.round(((x.size||28) / 28) * 34)), mateLv_(x.key), decoOf_(x.key)) + '</span>'
+        + '<span class="bd-icon">' + dotSvg(x.key, Math.min(46, Math.round(((x.size||28) / 28) * 34)), mateLv_(x.key)) + '</span>'
+        + '<i class="pose">' + esc((PET_POSES[petPose_(x.key)]||{}).name || '') + '</i>'
         + '<b>' + esc(x.name) + '</b>'
         + '<i>' + esc(PERSONA[x.key] ? PERSONA[x.key].p : "") + '</i>'
         + '<i class="fx">' + esc(x.fx) + '</i>'
@@ -3962,12 +4053,13 @@ function petLine_(key){
   if (isPet_(key)){
     const bi = petInfo_(key);
     // 3回に2回は しぐさ付きで こたえる
-    if (Math.random() < 0.66){
+    // なでるたびに ポーズが変わる
+    const po = rollPose_(key);
+    if (Math.random() < 0.55){
       const mv = petMove_(key);
-      // かっこが二重にならないよう、しぐさは 別の行に わけて出す
-      return [petCry_(key), mv.a, mv.s.replace(/^\(|\)$/g, "")];
+      return [petCry_(key), mv.a, mv.s.replace(/^\(|\)$/g, "") + " ／ " + po.name];
     }
-    return [petCry_(key), bi ? bi.act : "hop"];
+    return [petCry_(key), bi ? bi.act : "hop", po.name];
   }
   const per = personaOf_(key || st.key);
   const h = new Date().getHours();
@@ -4161,6 +4253,7 @@ function petPat_(unitEl){
   }
   petSay_(line[0], u, line[2]);
   if (navigator.vibrate) navigator.vibrate(12);
+  setTimeout(renderDotPet, 700);
 }
 // ときどき キャラが勝手に動く(ひとりの動き)
 const PET_ACTS = ["act-jump","act-wiggle","act-spin","act-squash","act-peek",
@@ -4185,7 +4278,8 @@ function petSolo_(){
   if (!units.length) return;
   const u = units[Math.floor(Math.random() * units.length)];
   const k = u.getAttribute("data-key");
-  // あいぼうは その子らしい しぐさをする
+  // あいぼうは その子らしい しぐさをする。たまに ポーズも変える。
+  if (isPet_(k) && Math.random() < 0.4){ rollPose_(k); setTimeout(renderDotPet, 900); }
   const a = isPet_(k) ? ("act-" + petMove_(k).a) : PET_ACTS[Math.floor(Math.random() * PET_ACTS.length)];
   clearActs_(u); void u.offsetWidth;
   u.classList.add(a);
