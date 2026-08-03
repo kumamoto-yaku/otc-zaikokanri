@@ -244,8 +244,8 @@ button.mate-chip { cursor: pointer; font-family: var(--sans); }
 .pt-tab { flex: 1 1 30%; min-width: 0; border: 1px solid var(--line); background: #fff; color: #5C6B78;
   border-radius: 8px; padding: 7px 4px; font-size: 12px; font-family: var(--sans); cursor: pointer; white-space: nowrap; }
 .pt-tab i { font-style: normal; font-size: 10px; color: #9AA7AF; margin-left: 3px; }
-.pt-tab.on { border-color: var(--ai); border-width: 2px; background: #fff; color: var(--ai-deep); font-weight: 700; box-shadow: inset 0 -3px 0 var(--ai); }
-.pt-tab.on i { color: var(--ai); }
+.pt-tab.on { border-color: var(--ai); background: var(--ai); color: #fff; font-weight: 600; }
+.pt-tab.on i { color: rgba(255,255,255,0.8); }
 .pt-top { margin: 8px 0 4px; }
 .pt-body { margin-top: 6px; }
 .stage-more { align-self: center; font-size: 11px; color: #5C6B78; }
@@ -288,10 +288,10 @@ button.mate-chip { cursor: pointer; font-family: var(--sans); }
 .tab:focus-visible, .btn:focus-visible, .link:focus-visible { outline: 2px solid var(--shu); outline-offset: 2px; }
 .panel { background: #fff; border: 1px solid var(--line); border-top: none; border-radius: 0 0 12px 12px; padding: 18px 16px 24px; display: none; flex-direction: column; gap: 16px; }
 .panel.active { display: flex; }
-.btn { font-family: var(--sans); font-size: 14.5px; padding: 10px 18px; border-radius: 8px; border: 1px solid var(--ai); cursor: pointer; letter-spacing: 0.04em; background: var(--ai); color: #fff; white-space: nowrap; }
+.btn { font-family: var(--sans); font-size: 14.5px; padding: 10px 18px; border-radius: 8px; border: 2px solid var(--ai); cursor: pointer; letter-spacing: 0.04em; background: #fff; color: var(--ai-deep); font-weight: 600; white-space: nowrap; }
 .btn:active { background: var(--ai-deep); }
 .btn.big { width: 100%; padding: 16px; font-size: 16px; }
-.btn.ghost { background: #fff; color: var(--ai); }
+.btn.ghost { background: #fff; color: var(--ai); border-width: 1px; font-weight: 400; }
 .btn.ghost.danger { border-color: var(--shu); color: var(--shu); }
 .btn:disabled { opacity: 0.4; cursor: default; }
 .link { background: none; border: none; color: var(--ai); text-decoration: underline; cursor: pointer; font-size: 13.5px; font-family: var(--sans); }
@@ -1124,7 +1124,7 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
   </section>
 
   <div class="toast" id="toast"></div>
-  <footer class="foot">OTCLinker — とみながグループ 店舗向けツール<br><span class="ver">版 2026-07-30 BE(割引値札・POP写真)</span></footer>
+  <footer class="foot">OTCLinker — とみながグループ 店舗向けツール<br><span class="ver">版 2026-07-31 BG(値札サイズの固定)</span></footer>
 </div>
 
 <script>
@@ -4878,8 +4878,8 @@ function resetTagStyle(){
 }
 function fitTags(){
   const t = tagStyle_();
-  // 高さを明示指定したときだけ、はみ出しを実測して文字を縮小する
-  if (!(t.size === "custom" && t.height)) return;
+  // どのサイズでも 高さが決まっているので、はみ出したら 文字を縮めて収める
+  if (t.size === "custom" && !t.height) return;
   document.querySelectorAll("#print-tags .price-tag").forEach(tag => {
     const box = tag.querySelector(".tag-inner");
     if (!box) return;
@@ -4921,9 +4921,8 @@ function renderTags(){
   const makerStyle = 'font-size:'+nMaker+'px';
   const f = t.fields || {};
   const isCustom = t.size === "custom";
-  const sheetStyle = isCustom
-    ? 'display:flex;flex-wrap:wrap;gap:4mm'
-    : 'display:grid;grid-template-columns:repeat(auto-fill,minmax('+sz.w+'px,1fr));gap:12px';
+  // 値札は 実寸で並べる(グリッドで伸び縮みさせない)
+  const sheetStyle = 'display:flex;flex-wrap:wrap;gap:4mm';
   area.innerHTML =
     '<div class="row gap" style="margin-bottom:12px"><button class="btn" onclick="window.print()">値札を印刷(' + arr.length + ' 枚)</button></div>'
     + '<div class="tag-sheet print-target size-' + t.size + '" style="'+sheetStyle+'">' + arr.map(it => {
@@ -4970,13 +4969,13 @@ function renderTags(){
       inner += '</div>';
       // カスタム時は幅・高さをmmで固定(印刷実寸を保証)
       const pad = (t.pad==null?2:t.pad);
+      // 幅と高さは かならず mm の実寸で固定する。
+      // (指定しないと 印刷のときに 文字数なりの幅になってしまう)
       let tagStyle = 'padding:0;';
-      if (isCustom){
-        tagStyle += 'width:'+t.width+'mm;';
-        if (t.height) tagStyle += 'height:'+t.height+'mm;';
-      } else {
-        tagStyle += 'min-height:'+(sz.w*0.62)+'px;';
-      }
+      const wmm = isCustom ? (t.width || 60) : (sz.mm || 60);
+      const hmm = isCustom ? (t.height || 0) : Math.round(wmm * 0.62);
+      tagStyle += 'width:' + wmm + 'mm;box-sizing:border-box;';
+      if (hmm) tagStyle += 'height:' + hmm + 'mm;';
       if (vert){
         const cls = 'price-tag tag-h' + (cp === "right" ? ' tag-h-rev' : '');
         return '<div class="'+cls+'"'+(tagStyle?(' style="'+tagStyle+'"'):'')+'>'+catBand+'<div class="tag-hbody">'+inner+'</div></div>';
