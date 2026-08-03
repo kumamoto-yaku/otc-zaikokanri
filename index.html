@@ -189,7 +189,10 @@ button.mate-chip { cursor: pointer; font-family: var(--sans); }
 /* ===== たたかいの画面(黒地に白抜き) ===== */
 .rpg-screen { position: fixed; inset: 0; z-index: 200; background: #000; color: #fff;
   display: flex; align-items: center; justify-content: center; padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom); }
-.rpg-inner { width: min(560px, 100%); height: 100%; display: flex; flex-direction: column; padding: 10px 12px 14px; }
+.rpg-inner { width: min(560px, 100%); height: 100%; display: flex; flex-direction: column; padding: 10px 12px 14px; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+.rpg-close { position: absolute; top: calc(env(safe-area-inset-top) + 8px); right: 10px; z-index: 5;
+  width: 40px; height: 40px; border-radius: 50%; border: 2px solid #fff; background: rgba(0,0,0,0.6);
+  color: #fff; font-size: 20px; line-height: 1; cursor: pointer; }
 .rpg-stage { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; min-height: 0; }
 .rpg-enemy { display: flex; justify-content: center; image-rendering: pixelated; }
 .rpg-enemy svg { image-rendering: pixelated; }
@@ -202,7 +205,8 @@ button.mate-chip { cursor: pointer; font-family: var(--sans); }
 .rpg-party svg { image-rendering: pixelated; }
 /* メッセージ窓(白い二重枠) */
 .rpg-win { border: 3px solid #fff; border-radius: 6px; background: #000; padding: 10px 12px; margin-top: 10px;
-  box-shadow: inset 0 0 0 2px #000, inset 0 0 0 4px #fff; min-height: 116px; }
+  box-shadow: inset 0 0 0 2px #000, inset 0 0 0 4px #fff; min-height: 116px;
+  max-height: 62vh; overflow-y: auto; -webkit-overflow-scrolling: touch; flex-shrink: 0; }
 .rpg-status { display: flex; justify-content: space-between; gap: 10px; font-family: var(--sans);
   font-size: 13px; letter-spacing: 0.06em; padding-bottom: 6px; border-bottom: 2px solid #fff; margin-bottom: 8px; }
 .rpg-hpbar { height: 7px; border: 2px solid #fff; background: #000; margin-bottom: 9px; }
@@ -657,6 +661,7 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
   </div>
 </div>
 <div id="rpg-screen" class="rpg-screen" style="display:none">
+  <button class="rpg-close" onclick="closeBattle()" aria-label="とじる">×</button>
   <div class="rpg-inner">
     <div class="rpg-stage" id="rpg-stage"></div>
     <div class="rpg-win" id="rpg-win"></div>
@@ -856,6 +861,25 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
               <option value="left">左</option><option value="right">右</option>
             </select></label>
           </div>
+          <div class="divider"><span>同じ値札を まとめて印刷</span></div>
+          <div class="grid2">
+            <label>1商品あたりの枚数
+              <select id="ts-copies" onchange="saveTagStyle();renderTags()">
+                <option value="1">1枚ずつ</option>
+                <option value="2">2枚ずつ</option>
+                <option value="3">3枚ずつ</option>
+                <option value="5">5枚ずつ</option>
+                <option value="10">10枚ずつ</option>
+                <option value="qty">在庫数と同じだけ</option>
+                <option value="custom">枚数を決める</option>
+              </select>
+            </label>
+            <label id="ts-copies-custom-wrap" style="display:none">枚数
+              <input type="number" id="ts-copies-custom" min="1" max="99" step="1" value="4" oninput="saveTagStyle();renderTags()">
+            </label>
+          </div>
+          <p class="hint">商品に直接はる場合は「在庫数と同じだけ」が便利です。値引きの値札を 1つずつ はって レジで対応できます。</p>
+
           <div class="divider"><span>お買い得値札(期限が近い商品などに)</span></div>
           <div class="grid2">
             <label>割引
@@ -1124,7 +1148,7 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
   </section>
 
   <div class="toast" id="toast"></div>
-  <footer class="foot">OTCLinker — とみながグループ 店舗向けツール<br><span class="ver">版 2026-07-31 BG(値札サイズの固定)</span></footer>
+  <footer class="foot">OTCLinker — とみながグループ 店舗向けツール<br><span class="ver">版 2026-07-31 BH(値札の枚数指定・並び順)</span></footer>
 </div>
 
 <script>
@@ -2953,30 +2977,97 @@ function dotSvg(key, px, lv, deco, equip){
     const W = px, ey = (DOT_EYE[key] || 0.4) * W;
     const e = function(sl){ return EQUIPS[equip[sl]]; };
     const body = e("body"), head = e("head"), hand = e("hand"), acc = e("acc");
+    const K = DOT_PAL.K, G = DOT_PAL.G, Wt = DOT_PAL.W, S2 = DOT_PAL.S, T = DOT_PAL.T, R = DOT_PAL.R, M = DOT_PAL.M, V = DOT_PAL.V;
+
+    // ---- からだ:よろい。段が上がるほど 肩あて・胸あて・こしあてが増える ----
     if (body){
-      const col = body.rank >= 4 ? DOT_PAL.G : (body.rank >= 3 ? DOT_PAL.T : DOT_PAL.W);
-      r += rc(W*0.20, ey + W*0.14, W*0.60, W*0.30, col)
-         + rc(W*0.20, ey + W*0.14, W*0.60, W*0.035, DOT_PAL.K);
-    }
-    if (head){
-      const col = head.rank >= 4 ? DOT_PAL.G : (head.rank >= 3 ? DOT_PAL.S : DOT_PAL.W);
-      r += rc(W*0.24, W*0.13, W*0.52, W*0.075, DOT_PAL.K)
-         + rc(W*0.26, W*0.055, W*0.48, W*0.09, col);
-      if (head.rank >= 4){
-        r += rc(W*0.30, W*0.0, W*0.07, W*0.06, DOT_PAL.G)
-           + rc(W*0.46, W*-0.02, W*0.07, W*0.08, DOT_PAL.G)
-           + rc(W*0.62, W*0.0, W*0.07, W*0.06, DOT_PAL.G);
+      const rk = body.rank;
+      const col = rk >= 4 ? G : (rk >= 3 ? S2 : (rk >= 2 ? T : Wt));
+      const dark = rk >= 4 ? "#8A6400" : (rk >= 3 ? "#7B8794" : (rk >= 2 ? "#3A4A7A" : "#C9CFD4"));
+      // 胸あて
+      r += rc(W*0.18, ey + W*0.13, W*0.64, W*0.34, K)
+         + rc(W*0.20, ey + W*0.15, W*0.60, W*0.30, col)
+         + rc(W*0.20, ey + W*0.15, W*0.60, W*0.05, dark);
+      if (rk >= 2){  // 肩あて
+        r += rc(W*0.10, ey + W*0.11, W*0.16, W*0.13, K) + rc(W*0.115, ey + W*0.125, W*0.13, W*0.10, col)
+           + rc(W*0.74, ey + W*0.11, W*0.16, W*0.13, K) + rc(W*0.755, ey + W*0.125, W*0.13, W*0.10, col);
+      }
+      if (rk >= 3){  // こしのベルト
+        r += rc(W*0.18, ey + W*0.42, W*0.64, W*0.07, K)
+           + rc(W*0.42, ey + W*0.415, W*0.16, W*0.10, G);
+      }
+      if (rk >= 4){  // 胸の紋章
+        r += rc(W*0.42, ey + W*0.22, W*0.16, W*0.14, K)
+           + rc(W*0.45, ey + W*0.245, W*0.10, W*0.09, Wt);
       }
     }
-    if (hand){
-      const col = hand.rank >= 4 ? DOT_PAL.G : (hand.rank >= 3 ? DOT_PAL.S : DOT_PAL.N);
-      r += rc(W*0.86, ey - W*0.10, W*0.06, W*0.46, DOT_PAL.K)
-         + rc(W*0.875, ey - W*0.085, W*0.035, W*0.42, col);
+
+    // ---- あたま:かぶと。段が上がるほど 面頬・角・羽根かざりが増える ----
+    if (head){
+      const rk = head.rank;
+      const col = rk >= 4 ? G : (rk >= 3 ? S2 : (rk >= 2 ? Wt : Wt));
+      r += rc(W*0.18, W*0.10, W*0.64, W*0.10, K)          // ふち
+         + rc(W*0.21, W*0.02, W*0.58, W*0.11, K)          // 本体の外
+         + rc(W*0.23, W*0.035, W*0.54, W*0.085, col);
+      if (rk >= 2){  // 面頬(ほほあて)
+        r += rc(W*0.17, W*0.155, W*0.10, W*0.16, K) + rc(W*0.185, W*0.17, W*0.07, W*0.13, col)
+           + rc(W*0.73, W*0.155, W*0.10, W*0.16, K) + rc(W*0.745, W*0.17, W*0.07, W*0.13, col);
+      }
+      if (rk >= 3){  // 角
+        r += rc(W*0.14, W*-0.04, W*0.07, W*0.12, K) + rc(W*0.155, W*-0.025, W*0.04, W*0.09, col)
+           + rc(W*0.79, W*-0.04, W*0.07, W*0.12, K) + rc(W*0.805, W*-0.025, W*0.04, W*0.09, col);
+      }
+      if (rk >= 4){  // 王冠のとがり + 羽根かざり
+        r += rc(W*0.26, W*-0.06, W*0.08, W*0.09, G)
+           + rc(W*0.46, W*-0.09, W*0.08, W*0.12, G)
+           + rc(W*0.66, W*-0.06, W*0.08, W*0.09, G)
+           + rc(W*0.84, W*-0.02, W*0.05, W*0.18, R);
+      }
     }
+
+    // ---- て:武器。段が上がるほど 長く 立派に ----
+    if (hand){
+      const rk = hand.rank;
+      const col = rk >= 4 ? G : (rk >= 3 ? S2 : (rk >= 2 ? S2 : DOT_PAL.N));
+      const len = 0.30 + rk * 0.13;
+      const top = ey - W*0.02 - W*(len - 0.30);
+      r += rc(W*0.845, top, W*0.075, W*len, K)
+         + rc(W*0.86, top + W*0.012, W*0.045, W*(len - 0.02), col);
+      if (rk >= 2){  // つば
+        r += rc(W*0.79, ey + W*0.155, W*0.19, W*0.05, K)
+           + rc(W*0.80, ey + W*0.165, W*0.17, W*0.03, rk >= 4 ? G : DOT_PAL.N);
+      }
+      if (rk >= 3){  // 柄がしら
+        r += rc(W*0.845, ey + W*0.26, W*0.075, W*0.07, K)
+           + rc(W*0.855, ey + W*0.27, W*0.055, W*0.05, DOT_PAL.N);
+      }
+      if (rk >= 4){  // 刃の輝き
+        r += rc(W*0.875, top + W*0.03, W*0.02, W*(len*0.55), Wt);
+      }
+    }
+
+    // ---- アクセ:マント・かた掛け ----
     if (acc){
-      const col = acc.rank >= 4 ? DOT_PAL.G : (acc.rank >= 3 ? DOT_PAL.B : DOT_PAL.M);
-      r += rc(W*0.06, ey + W*0.10, W*0.10, W*0.10, DOT_PAL.K)
-         + rc(W*0.075, ey + W*0.115, W*0.07, W*0.07, col);
+      const rk = acc.rank;
+      const col = rk >= 4 ? V : (rk >= 3 ? T : (rk >= 2 ? R : M));
+      // 首もとの留め具
+      r += rc(W*0.40, ey + W*0.08, W*0.20, W*0.07, K)
+         + rc(W*0.43, ey + W*0.09, W*0.14, W*0.05, G);
+      if (rk >= 2){  // 小さなマント(体の外側に少し出す)
+        r += rc(W*0.06, ey + W*0.12, W*0.10, W*0.34, K)
+           + rc(W*0.075, ey + W*0.135, W*0.07, W*0.30, col)
+           + rc(W*0.84, ey + W*0.12, W*0.10, W*0.34, K)
+           + rc(W*0.855, ey + W*0.135, W*0.07, W*0.30, col);
+      }
+      if (rk >= 3){  // 背中のマントを 大きく
+        r += rc(W*0.02, ey + W*0.14, W*0.08, W*0.44, K)
+           + rc(W*0.035, ey + W*0.155, W*0.05, W*0.40, col);
+      }
+      if (rk >= 4){  // 光の粒
+        r += rc(W*0.04, ey - W*0.06, W*0.05, W*0.05, G)
+           + rc(W*0.90, ey + W*0.02, W*0.05, W*0.05, G)
+           + rc(W*0.12, ey + W*0.52, W*0.04, W*0.04, G);
+      }
     }
   }
   // 3だんかい目のかんむりと きらめき(帽子系の衣装のときは重ならないよう省く)
@@ -3044,10 +3135,9 @@ function renderDotPet(){
     ? picks.map(function(k){ return line.filter(function(o){ return o.k === k; })[0]; }).filter(Boolean)
     : line.slice(0, buddy ? Math.max(1, PARTY_SHOW - 1) : PARTY_SHOW);
   const bi = petInfo_(buddy);
-  // あいぼうは 主人公の左。大きさは その動物なりに
-  let h = '';
+  // 並びは 主人公 → あいぼう → なかま
+  let h = '<span class="pet-unit" data-key="' + st.key + '">' + dotSvg(st.key, 34, 0, decoOf_(st.key), rpg_().equip) + '</span>';
   if (buddy) h += '<span class="pet-unit buddy" data-key="' + buddy + '">' + dotSvg(buddy, (bi && bi.size) || 28, mateLv_(buddy), decoOf_(buddy)) + '</span>';
-  h += '<span class="pet-unit" data-key="' + st.key + '">' + dotSvg(st.key, 34, 0, decoOf_(st.key), rpg_().equip) + '</span>';
   shown2.forEach(function(o){
     h += '<span class="pet-unit ' + o.c + '" data-key="' + o.k + '">' + dotSvg(o.k, 26, mateLv_(o.k), decoOf_(o.k)) + '</span>';
   });
@@ -3554,7 +3644,17 @@ function showBattleBox_(){
   const bm = document.getElementById("battle-modal");
   if (bm) bm.style.display = "none";
   const sc = document.getElementById("rpg-screen");
-  if (sc){ sc.style.display = "block"; document.body.style.overflow = "hidden"; }
+  if (sc){
+    sc.style.display = "block";
+    document.body.style.overflow = "hidden";
+    // 決着したあとは 背景を押しても とじられる
+    if (!sc.__tap){
+      sc.__tap = true;
+      sc.addEventListener("click", function(e){
+        if (e.target === sc && __battle && __battle.done) closeBattle();
+      });
+    }
+  }
 }
 function startBattle(practice){
   const r = rpg_();
@@ -4794,6 +4894,12 @@ function syncTagStyleInputs(){
   const t = tagStyle_();
   document.getElementById("ts-font").innerHTML = fontOptions(t.font);
   document.getElementById("ts-size").value = t.size;
+  const cpEl = document.getElementById("ts-copies");
+  if (cpEl){
+    cpEl.value = t.copies == null ? "1" : String(t.copies);
+    document.getElementById("ts-copies-custom").value = t.copiesCustom || 4;
+    document.getElementById("ts-copies-custom-wrap").style.display = (t.copies === "custom") ? "" : "none";
+  }
   const offEl = document.getElementById("ts-off");
   if (offEl){
     offEl.value = t.off == null ? "0" : String(t.off);
@@ -4833,6 +4939,14 @@ function offPrice_(price, off, round){
   else v = Math.floor(v);
   return Math.max(1, v);
 }
+// 1商品あたり 何枚 作るか
+function tagCopies_(it){
+  const t = tagStyle_();
+  const v = t.copies;
+  if (v === "qty") return Math.max(1, Math.min(99, Number(it && it.qty) || 1));
+  if (v === "custom") return Math.max(1, Math.min(99, Number(t.copiesCustom) || 1));
+  return Math.max(1, Math.min(99, Number(v) || 1));
+}
 // いま設定されている割引率(%)
 function tagOff_(){
   const t = tagStyle_();
@@ -4842,6 +4956,8 @@ function tagOff_(){
 function saveTagStyle(){
   const oe = document.getElementById("ts-off");
   if (oe) document.getElementById("ts-off-custom-wrap").style.display = (oe.value === "custom") ? "" : "none";
+  const ce = document.getElementById("ts-copies");
+  if (ce) document.getElementById("ts-copies-custom-wrap").style.display = (ce.value === "custom") ? "" : "none";
   const size = document.getElementById("ts-size").value;
   document.getElementById("ts-width-wrap").style.display = size === "custom" ? "flex" : "none";
   document.getElementById("ts-height-wrap").style.display = size === "custom" ? "grid" : "none";
@@ -4853,6 +4969,8 @@ function saveTagStyle(){
     bold: document.getElementById("ts-bold").value,
     nameSize: Math.min(60, Math.max(8, parseInt(document.getElementById("ts-name-size").value, 10) || 16)),
     priceSize: Math.min(120, Math.max(10, parseInt(document.getElementById("ts-price-size").value, 10) || 30)),
+    copies: document.getElementById("ts-copies") ? document.getElementById("ts-copies").value : "1",
+    copiesCustom: document.getElementById("ts-copies-custom") ? (parseInt(document.getElementById("ts-copies-custom").value, 10) || 4) : 4,
     off: document.getElementById("ts-off") ? document.getElementById("ts-off").value : "0",
     offCustom: document.getElementById("ts-off-custom") ? (parseInt(document.getElementById("ts-off-custom").value, 10) || 15) : 15,
     round: document.getElementById("ts-round") ? (parseInt(document.getElementById("ts-round").value, 10) || 10) : 10,
@@ -4922,9 +5040,12 @@ function renderTags(){
   const f = t.fields || {};
   const isCustom = t.size === "custom";
   // 値札は 実寸で並べる(グリッドで伸び縮みさせない)
+  const totalTags = arr.reduce(function(a, it){ return a + tagCopies_(it); }, 0);
   const sheetStyle = 'display:flex;flex-wrap:wrap;gap:4mm';
   area.innerHTML =
-    '<div class="row gap" style="margin-bottom:12px"><button class="btn" onclick="window.print()">値札を印刷(' + arr.length + ' 枚)</button></div>'
+    '<div class="row gap" style="margin-bottom:12px"><button class="btn" onclick="window.print()">値札を印刷(' + totalTags + ' 枚)</button>'
+    + (totalTags !== arr.length ? '<span class="hint">' + arr.length + ' 商品 × ' + (tagStyle_().copies === "qty" ? "在庫数" : (totalTags / arr.length) + "枚") + '</span>' : '')
+    + '</div>'
     + '<div class="tag-sheet print-target size-' + t.size + '" style="'+sheetStyle+'">' + arr.map(it => {
       const cp = t.catPos || "top";
       const vert = (cp === "left" || cp === "right");
@@ -4961,7 +5082,9 @@ function renderTags(){
       let bot = '';
       if (f.jan !== false){
         const tw = Math.max(30, (sz.mm || 60) - (t.pad == null ? 2 : t.pad) * 2 - 2);
-        bot += ean13Svg(it.jan, Math.max(10, Math.min(22.85, tw * 0.28)), f.jannum !== false, tw);
+        // 値札のバーコードは 幅の6割ほどにして 目立ちすぎないようにする
+        const bw = Math.max(32, Math.round(tw * 0.68));   // 規格の下限(1本0.264mm)を割らない大きさ
+        bot += ean13Svg(it.jan, Math.max(9, Math.min(13, bw * 0.24)), f.jannum !== false, bw);
       }
       else if (f.jannum !== false) bot += '<div class="barcode-num">'+esc(it.jan)+'</div>';
       inner += '<div class="tag-bot">'+bot+'</div>';
@@ -4973,14 +5096,24 @@ function renderTags(){
       // (指定しないと 印刷のときに 文字数なりの幅になってしまう)
       let tagStyle = 'padding:0;';
       const wmm = isCustom ? (t.width || 60) : (sz.mm || 60);
-      const hmm = isCustom ? (t.height || 0) : Math.round(wmm * 0.62);
       tagStyle += 'width:' + wmm + 'mm;box-sizing:border-box;';
-      if (hmm) tagStyle += 'height:' + hmm + 'mm;';
+      if (isCustom && t.height){
+        tagStyle += 'height:' + t.height + 'mm;';      // 高さを決めたときは そのとおりに
+      } else {
+        tagStyle += 'min-height:' + Math.round(wmm * 0.62) + 'mm;';  // ふだんは 最低の高さだけ決める
+      }
+      let one;
       if (vert){
         const cls = 'price-tag tag-h' + (cp === "right" ? ' tag-h-rev' : '');
-        return '<div class="'+cls+'"'+(tagStyle?(' style="'+tagStyle+'"'):'')+'>'+catBand+'<div class="tag-hbody">'+inner+'</div></div>';
+        one = '<div class="'+cls+'"'+(tagStyle?(' style="'+tagStyle+'"'):'')+'>'+catBand+'<div class="tag-hbody">'+inner+'</div></div>';
+      } else {
+        one = '<div class="price-tag"'+(tagStyle?(' style="'+tagStyle+'"'):'')+'>'+inner+'</div>';
       }
-      return '<div class="price-tag"'+(tagStyle?(' style="'+tagStyle+'"'):'')+'>'+inner+'</div>';
+      // 同じ値札を 設定した枚数だけ 並べる
+      const n = tagCopies_(it);
+      let outHtml = "";
+      for (let i = 0; i < n; i++) outHtml += one;
+      return outHtml;
     }).join("") + '</div>';
   requestAnimationFrame(() => requestAnimationFrame(() => {
     const padPx = ((t.pad==null?2:t.pad) * 2 + 2) * 3.78;
