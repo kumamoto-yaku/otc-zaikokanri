@@ -244,8 +244,8 @@ button.mate-chip { cursor: pointer; font-family: var(--sans); }
 .pt-tab { flex: 1 1 30%; min-width: 0; border: 1px solid var(--line); background: #fff; color: #5C6B78;
   border-radius: 8px; padding: 7px 4px; font-size: 12px; font-family: var(--sans); cursor: pointer; white-space: nowrap; }
 .pt-tab i { font-style: normal; font-size: 10px; color: #9AA7AF; margin-left: 3px; }
-.pt-tab.on { border-color: var(--ai); background: var(--ai); color: #fff; font-weight: 600; }
-.pt-tab.on i { color: rgba(255,255,255,0.8); }
+.pt-tab.on { border-color: var(--ai); border-width: 2px; background: #fff; color: var(--ai-deep); font-weight: 700; box-shadow: inset 0 -3px 0 var(--ai); }
+.pt-tab.on i { color: var(--ai); }
 .pt-top { margin: 8px 0 4px; }
 .pt-body { margin-top: 6px; }
 .stage-more { align-self: center; font-size: 11px; color: #5C6B78; }
@@ -435,6 +435,11 @@ input:focus, select:focus { outline: 2px solid var(--ai); outline-offset: -1px; 
 .tag-name { font-family: var(--serif); font-weight: 600; font-size: 16px; line-height: 1.3; overflow-wrap: anywhere; word-break: break-word; }
 .tag-maker { font-size: 11px; color: #5C6B78; }
 .tag-price { margin: 6px 0 4px; }
+.tag-off-band { background: #C0392B; color: #fff; font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-align: center; padding: 2px 0; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+.tag-price-off { display: flex; flex-direction: column; align-items: center; gap: 1px; }
+.tag-was { font-size: 12px; color: #7B8794; text-decoration: line-through; }
+.tag-offlabel { display: inline-block; background: #C0392B; color: #fff; font-size: 11px; font-weight: 700; border-radius: 999px; padding: 1px 9px; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+.tag-price-off .tag-yen { color: #C0392B !important; }
 .tag-yen { font-family: var(--serif); font-size: 30px; font-weight: 700; color: var(--shu); font-variant-numeric: tabular-nums; }
 .tag-tax { font-size: 11px; margin-left: 4px; color: var(--ink); }
 .barcode-num { font-family: monospace; font-size: 10px; letter-spacing: 2px; color: var(--ink); }
@@ -851,6 +856,36 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
               <option value="left">左</option><option value="right">右</option>
             </select></label>
           </div>
+          <div class="divider"><span>お買い得値札(期限が近い商品などに)</span></div>
+          <div class="grid2">
+            <label>割引
+              <select id="ts-off" onchange="saveTagStyle();renderTags()">
+                <option value="0">しない(通常の値札)</option>
+                <option value="5">5%引き</option>
+                <option value="10">1割引き</option>
+                <option value="20">2割引き</option>
+                <option value="30">3割引き</option>
+                <option value="40">4割引き</option>
+                <option value="50">半額</option>
+                <option value="custom">自分で決める</option>
+              </select>
+            </label>
+            <label id="ts-off-custom-wrap" style="display:none">割引率(%)
+              <input type="number" id="ts-off-custom" min="1" max="90" step="1" value="15" oninput="saveTagStyle();renderTags()">
+            </label>
+            <label>はしたの処理
+              <select id="ts-round" onchange="saveTagStyle();renderTags()">
+                <option value="10">10円未満は切り捨て</option>
+                <option value="1">1円まで計算する</option>
+                <option value="100">100円未満は切り捨て</option>
+                <option value="8">8円で終わる値段にする</option>
+              </select>
+            </label>
+            <label>ひとこと
+              <input type="text" id="ts-off-word" maxlength="12" placeholder="例:期限間近のため" oninput="saveTagStyle();renderTags()">
+            </label>
+          </div>
+          <p class="hint">割引を選ぶと、もとの値段に線を引いて 新しい値段を大きく出した値札になります。期限が近いものだけに付けたいときは、在庫リストで その商品だけ チェックしてください。</p>
           <div class="field-toggles">
             <span class="ft-label">表示する項目:</span>
             <label><input type="checkbox" id="tf-cat" onchange="saveTagStyle()"> 区分帯</label>
@@ -884,6 +919,8 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
             <div class="row gap wrap">
               <label class="btn" style="cursor:pointer">📷 カメラで撮影<input type="file" accept="image/*" capture="environment" style="display:none" onchange="popImageFile(event)"></label>
               <label class="btn ghost" style="cursor:pointer">写真を選ぶ<input type="file" accept="image/*" style="display:none" onchange="popImageFile(event)"></label>
+              <button class="btn ghost" onclick="fetchPopPhoto()">写真を自動取得</button>
+              <p class="hint" id="pop-msg" style="width:100%"></p>
               <button class="btn ghost" onclick="clearPopImage()">写真を削除</button>
             </div>
             <label>写真の大きさ(%) <input type="number" id="pop-img-size" min="10" max="100" inputmode="numeric" onchange="savePopFont()"></label>
@@ -1087,7 +1124,7 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
   </section>
 
   <div class="toast" id="toast"></div>
-  <footer class="foot">OTCLinker — とみながグループ 店舗向けツール<br><span class="ver">版 2026-07-30 BD(吹き出しの位置)</span></footer>
+  <footer class="foot">OTCLinker — とみながグループ 店舗向けツール<br><span class="ver">版 2026-07-30 BE(割引値札・POP写真)</span></footer>
 </div>
 
 <script>
@@ -4757,6 +4794,14 @@ function syncTagStyleInputs(){
   const t = tagStyle_();
   document.getElementById("ts-font").innerHTML = fontOptions(t.font);
   document.getElementById("ts-size").value = t.size;
+  const offEl = document.getElementById("ts-off");
+  if (offEl){
+    offEl.value = t.off == null ? "0" : String(t.off);
+    document.getElementById("ts-off-custom").value = t.offCustom || 15;
+    document.getElementById("ts-off-custom-wrap").style.display = (t.off === "custom") ? "" : "none";
+    document.getElementById("ts-round").value = String(t.round == null ? 10 : t.round);
+    document.getElementById("ts-off-word").value = t.offWord || "";
+  }
   document.getElementById("ts-width").value = t.width || 60;
   document.getElementById("ts-height").value = t.height || 0;
   document.getElementById("ts-width-wrap").style.display = t.size === "custom" ? "flex" : "none";
@@ -4777,7 +4822,26 @@ function syncTagStyleInputs(){
   document.getElementById("tf-jan").checked = f.jan !== false;
   document.getElementById("tf-jannum").checked = f.jannum !== false;
 }
+// 割引後の値段を計算する
+function offPrice_(price, off, round){
+  const p0 = Number(price);
+  if (!p0 || !off) return null;
+  let v = p0 * (100 - off) / 100;
+  if (round === 100) v = Math.floor(v / 100) * 100;
+  else if (round === 10) v = Math.floor(v / 10) * 10;
+  else if (round === 8) v = Math.max(8, Math.floor(v / 10) * 10 + 8);
+  else v = Math.floor(v);
+  return Math.max(1, v);
+}
+// いま設定されている割引率(%)
+function tagOff_(){
+  const t = tagStyle_();
+  if (t.off === "custom") return Math.max(1, Math.min(90, Number(t.offCustom) || 0));
+  return Number(t.off) || 0;
+}
 function saveTagStyle(){
+  const oe = document.getElementById("ts-off");
+  if (oe) document.getElementById("ts-off-custom-wrap").style.display = (oe.value === "custom") ? "" : "none";
   const size = document.getElementById("ts-size").value;
   document.getElementById("ts-width-wrap").style.display = size === "custom" ? "flex" : "none";
   document.getElementById("ts-height-wrap").style.display = size === "custom" ? "grid" : "none";
@@ -4789,6 +4853,10 @@ function saveTagStyle(){
     bold: document.getElementById("ts-bold").value,
     nameSize: Math.min(60, Math.max(8, parseInt(document.getElementById("ts-name-size").value, 10) || 16)),
     priceSize: Math.min(120, Math.max(10, parseInt(document.getElementById("ts-price-size").value, 10) || 30)),
+    off: document.getElementById("ts-off") ? document.getElementById("ts-off").value : "0",
+    offCustom: document.getElementById("ts-off-custom") ? (parseInt(document.getElementById("ts-off-custom").value, 10) || 15) : 15,
+    round: document.getElementById("ts-round") ? (parseInt(document.getElementById("ts-round").value, 10) || 10) : 10,
+    offWord: document.getElementById("ts-off-word") ? document.getElementById("ts-off-word").value.trim() : "",
     nameColor: document.getElementById("ts-name-color").value,
     priceColor: document.getElementById("ts-price-color").value,
     pad: Math.min(20, Math.max(0, parseFloat(document.getElementById("ts-pad").value) || 0)),
@@ -4867,14 +4935,28 @@ function renderTags(){
       let inner = '<div class="tag-inner">';
       let top = '';
       if (cp === "top") top += catBand;
-      if (it.smt) top += '<div class="tag-smt">セルフメディケーション税制対象</div>';
-      if (it.ranyo) top += '<div class="tag-ranyo">指定濫用防止医薬品</div>';
+      // 値札には 税制対象・濫用防止の表示は 入れない(売場が見づらくなるため)
       if (top) inner += '<div class="tag-top">'+top+'</div>';
       // 中段: 商品名・メーカー・価格(縦中央)
       inner += '<div class="tag-mid">';
       if (f.name !== false) inner += '<div class="tag-name" style="'+nameStyle+'">'+(it.name?esc(it.name):"(名称未設定)")+'</div>';
       if (f.maker !== false && it.maker) inner += '<div class="tag-maker" style="'+makerStyle+'">'+esc(it.maker)+'</div>';
-      if (f.price !== false) inner += '<div class="tag-price"><span class="tag-yen" style="'+yenStyle+'">'+(it.price===""?"—":"¥"+Number(it.price).toLocaleString("ja-JP"))+'</span><span class="tag-tax">税込</span></div>';
+      if (f.price !== false){
+        const off = tagOff_();
+        const np = off ? offPrice_(it.price, off, Number(t.round == null ? 10 : t.round)) : null;
+        if (np){
+          // もとの値段に線を引き、新しい値段を大きく出す
+          const label = off === 50 ? "半額" : ((off % 10 === 0) ? (off / 10) + "割引" : off + "%引");
+          inner += '<div class="tag-off-band">' + esc(t.offWord || "お買い得") + '</div>'
+            + '<div class="tag-price tag-price-off">'
+            +   '<span class="tag-was">¥' + Number(it.price).toLocaleString("ja-JP") + '</span>'
+            +   '<span class="tag-offlabel">' + label + '</span>'
+            +   '<div><span class="tag-yen" style="' + yenStyle + '">¥' + np.toLocaleString("ja-JP") + '</span><span class="tag-tax">税込</span></div>'
+            + '</div>';
+        } else {
+          inner += '<div class="tag-price"><span class="tag-yen" style="'+yenStyle+'">'+(it.price===""?"—":"¥"+Number(it.price).toLocaleString("ja-JP"))+'</span><span class="tag-tax">税込</span></div>';
+        }
+      }
       inner += '</div>';
       // 下段: バーコード
       let bot = '';
@@ -4970,6 +5052,61 @@ function savePopFont(){
     }
   };
   save(); syncPopFontInputs(); renderPop();
+}
+function popItem_(){
+  const el = document.getElementById("pop-item");
+  if (!el) return null;
+  return (S.items || []).find(function(x){ return x.id === el.value; }) || null;
+}
+// POPに使う写真を Webから 取ってくる(商品カードと同じ仕組み)
+async function fetchPopPhoto(){
+  doQuest("autoget");
+  const msg = document.getElementById("pop-msg") || document.getElementById("card-msg");
+  const it = popItem_();
+  const say = function(t, html){
+    if (!msg) { toast(t.replace(/<[^>]+>/g, "")); return; }
+    if (html) msg.innerHTML = t; else msg.textContent = t;
+  };
+  if (!it){ say("先に 在庫リストで 商品をチェックし、POPにする商品を えらんでください。"); return; }
+  if (!it.jan){ say("この商品には JANコードが ないため 自動取得できません。「写真を選ぶ」から 登録してください。"); return; }
+  if (!S.gasUrl || !S.apiKeys.yahoo){
+    say("自動取得には、「その他」タブで<strong>共有サーバーURL</strong>と<strong>Yahoo! Client ID</strong>の両方の設定が必要です。設定後にもう一度お試しください。なお写真は「写真を選ぶ」から手動でも登録できます。", true);
+    return;
+  }
+  say("「" + (it.name || it.jan) + "」の写真をさがしています…");
+  try {
+    const r = await lookupJanExternal(it.jan);
+    const url = r && (r.image || r.img);
+    if (!url){ say("写真が 見つかりませんでした。「写真を選ぶ」から 登録してください。"); return; }
+    const dataUrl = await urlToDataUrl_(url);
+    if (!dataUrl){ say("写真を 取り込めませんでした。「写真を選ぶ」から 登録してください。"); return; }
+    S.popFont = Object.assign(popFont_(), { img: dataUrl });
+    save(); renderPop(); doQuest("popimg");
+    say("写真を 取り込みました。");
+  } catch(e){
+    say("写真を 取得できませんでした。通信環境を ご確認ください。");
+  }
+}
+// 画像のURLを 端末内に取り込む(印刷や控えでも使えるように)
+function urlToDataUrl_(url){
+  return new Promise(function(resolve){
+    try {
+      const img = new Image();
+      img.crossOrigin = "anonymous";
+      img.onload = function(){
+        try {
+          const max = 900;
+          const sc = Math.min(1, max / Math.max(img.width, img.height));
+          const cv = document.createElement("canvas");
+          cv.width = Math.round(img.width * sc); cv.height = Math.round(img.height * sc);
+          cv.getContext("2d").drawImage(img, 0, 0, cv.width, cv.height);
+          resolve(cv.toDataURL("image/jpeg", 0.85));
+        } catch(e){ resolve(null); }
+      };
+      img.onerror = function(){ resolve(null); };
+      img.src = url;
+    } catch(e){ resolve(null); }
+  });
 }
 async function popImageFile(ev){
   const f = ev.target.files && ev.target.files[0];
