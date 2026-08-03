@@ -187,34 +187,75 @@ button.mate-chip { cursor: pointer; font-family: var(--sans); }
 .bt-log { margin-top: 8px; font-size: 12.5px; color: #43596B; background: #F4F8F6; border-radius: 8px; padding: 8px 10px; min-height: 56px; }
 
 /* ===== たたかいの画面(黒地に白抜き) ===== */
-.rpg-screen { position: fixed; inset: 0; z-index: 200; background: #000; color: #fff;
-  display: flex; align-items: center; justify-content: center; padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom); }
-.rpg-inner { width: min(560px, 100%); height: 100%; display: flex; flex-direction: column; padding: 10px 12px 14px; overflow-y: auto; -webkit-overflow-scrolling: touch; }
-.rpg-close { position: absolute; top: calc(env(safe-area-inset-top) + 8px); right: 10px; z-index: 5;
-  width: 40px; height: 40px; border-radius: 50%; border: 2px solid #fff; background: rgba(0,0,0,0.6);
-  color: #fff; font-size: 20px; line-height: 1; cursor: pointer; }
+
+/* ===== まほうの えんしゅつ ===== */
+.spell-fx { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center;
+  justify-content: center; gap: 4px; pointer-events: none; z-index: 4; animation: spellIn 1.6s ease forwards; }
+@keyframes spellIn { 0%{opacity:0;transform:scale(0.8)} 12%{opacity:1;transform:scale(1.05)} 78%{opacity:1} 100%{opacity:0} }
+.spell-caster { animation: castJump 0.7s ease 2; }
+@keyframes castJump { 0%,100%{transform:translateY(0)} 30%{transform:translateY(-8px) scale(1.1)} }
+.spell-name { font-family: var(--sans); font-size: 13px; letter-spacing: 0.08em; color: var(--sc, #fff);
+  text-shadow: 0 0 6px var(--sc, #fff), 0 0 2px #000; font-weight: 700; }
+.spell-parts { position: absolute; inset: 0; }
+.spell-parts i { position: absolute; left: 50%; top: 50%; width: 8px; height: 8px; background: var(--sc, #fff);
+  border-radius: 2px; box-shadow: 0 0 8px var(--sc, #fff); }
+/* わざの種類ごとに 粒の飛び方を変える */
+.fx-burst .spell-parts i { animation: pBurst 1.1s ease-out forwards; animation-delay: calc(var(--i) * 0.04s); }
+@keyframes pBurst { from{transform:translate(-50%,-50%) scale(0.4)} to{transform:translate(calc(-50% + (var(--i) - 4) * 26px), calc(-50% - 60px + var(--i) * 12px)) scale(0);opacity:0} }
+.fx-bomb .spell-parts i, .fx-local .spell-parts i { animation: pBomb 1.0s ease-out forwards; animation-delay: calc(var(--i) * 0.03s); border-radius: 50%; }
+@keyframes pBomb { from{transform:translate(-50%,-50%) scale(0.3)} to{transform:translate(calc(-50% + cos(var(--i) * 40deg) * 70px), calc(-50% + sin(var(--i) * 40deg) * 55px)) scale(0);opacity:0} }
+.fx-laser .spell-parts i, .fx-pierce .spell-parts i, .fx-stab .spell-parts i { width: 3px; height: 34px; animation: pLaser 0.9s ease-out forwards; animation-delay: calc(var(--i) * 0.05s); }
+@keyframes pLaser { from{transform:translate(calc(-50% + (var(--i) - 4) * 16px), 40px) scaleY(0.2)} to{transform:translate(calc(-50% + (var(--i) - 4) * 16px), -70px) scaleY(1.4);opacity:0} }
+.fx-heal .spell-parts i, .fx-drop .spell-parts i, .fx-mist .spell-parts i { animation: pHeal 1.3s ease-out forwards; animation-delay: calc(var(--i) * 0.07s); border-radius: 50%; }
+@keyframes pHeal { from{transform:translate(calc(-50% + (var(--i) - 4) * 18px), 46px) scale(0.5);opacity:0} 30%{opacity:1} to{transform:translate(calc(-50% + (var(--i) - 4) * 18px), -50px) scale(0.9);opacity:0} }
+.fx-ring .spell-parts i, .fx-pulse .spell-parts i, .fx-gold .spell-parts i { width: 60px; height: 60px; background: none;
+  border: 3px solid var(--sc, #fff); border-radius: 50%; box-shadow: 0 0 14px var(--sc, #fff);
+  animation: pRing 1.2s ease-out forwards; animation-delay: calc(var(--i) * 0.12s); }
+@keyframes pRing { from{transform:translate(-50%,-50%) scale(0.2);opacity:1} to{transform:translate(-50%,-50%) scale(2.4);opacity:0} }
+.fx-powder .spell-parts i, .fx-ice .spell-parts i, .fx-words .spell-parts i, .fx-riddle .spell-parts i {
+  animation: pFall 1.4s linear forwards; animation-delay: calc(var(--i) * 0.06s); }
+@keyframes pFall { from{transform:translate(calc(-50% + (var(--i) - 4) * 22px), -60px) rotate(0)} to{transform:translate(calc(-50% + (var(--i) - 4) * 26px), 60px) rotate(300deg);opacity:0} }
+.fx-flame .spell-parts i, .fx-grind .spell-parts i, .fx-scan .spell-parts i { animation: pRise 1.1s ease-out forwards; animation-delay: calc(var(--i) * 0.05s); }
+@keyframes pRise { from{transform:translate(calc(-50% + (var(--i) - 4) * 20px), 40px) scale(1.2)} to{transform:translate(calc(-50% + (var(--i) - 4) * 24px), -46px) scale(0.2);opacity:0} }
+.fx-wrap .spell-parts i, .fx-rainbow .spell-parts i { width: 46px; height: 5px; animation: pSpin 1.2s ease-out forwards; animation-delay: calc(var(--i) * 0.06s); }
+@keyframes pSpin { from{transform:translate(-50%,-50%) rotate(0) scale(0.4)} to{transform:translate(-50%,-50%) rotate(360deg) scale(1.8);opacity:0} }
+.rpg-screen.fx-flash { animation: scFlash 0.4s ease; }
+@keyframes scFlash { 0%,100%{background:#000} 30%{background:#4A4A3A} 60%{background:#000} }
+@media (prefers-reduced-motion: reduce){ .spell-fx, .spell-parts i, .rpg-screen.fx-flash { animation: none !important; } }
+.rpg-back { position: fixed; inset: 0; z-index: 199; background: rgba(0,0,0,0.35); }
+.rpg-screen { position: fixed; z-index: 200; background: #000; color: #fff;
+  left: 50%; transform: translateX(-50%);
+  top: calc(env(safe-area-inset-top) + 8px);
+  width: min(420px, calc(100vw - 16px));
+  height: min(52vh, 420px);
+  border-radius: 12px; border: 2px solid #fff; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  display: flex; align-items: stretch; justify-content: center; overflow: hidden; }
+.rpg-inner { width: 100%; height: 100%; display: flex; flex-direction: column; padding: 8px 10px 10px; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+.rpg-close { position: absolute; top: 6px; right: 6px; z-index: 5;
+  width: 32px; height: 32px; border-radius: 50%; border: 2px solid #fff; background: rgba(0,0,0,0.6);
+  color: #fff; font-size: 17px; line-height: 1; cursor: pointer; }
 .rpg-stage { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; min-height: 0; }
 .rpg-enemy { display: flex; justify-content: center; image-rendering: pixelated; }
 .rpg-enemy svg { image-rendering: pixelated; }
 .rpg-enemy.hit { animation: rpgHit 0.36s ease; }
 @keyframes rpgHit { 0%,100%{transform:translate(0,0);opacity:1} 20%{transform:translate(-7px,2px);opacity:0.35} 40%{transform:translate(6px,-2px);opacity:1} 60%{transform:translate(-4px,1px);opacity:0.55} }
-.rpg-ename { font-family: var(--sans); font-size: 15px; letter-spacing: 0.08em; color: #fff; }
+.rpg-ename { font-family: var(--sans); font-size: 12.5px; letter-spacing: 0.06em; color: #fff; }
 .rpg-ebar { width: min(280px, 70%); height: 8px; border: 2px solid #fff; background: #000; }
 .rpg-ebar i { display: block; height: 100%; background: #fff; transition: width 0.35s ease; }
 .rpg-party { display: flex; align-items: flex-end; justify-content: center; gap: 3px; margin-top: 10px; }
 .rpg-party svg { image-rendering: pixelated; }
 /* メッセージ窓(白い二重枠) */
-.rpg-win { border: 3px solid #fff; border-radius: 6px; background: #000; padding: 10px 12px; margin-top: 10px;
-  box-shadow: inset 0 0 0 2px #000, inset 0 0 0 4px #fff; min-height: 116px;
-  max-height: 62vh; overflow-y: auto; -webkit-overflow-scrolling: touch; flex-shrink: 0; }
-.rpg-status { display: flex; justify-content: space-between; gap: 10px; font-family: var(--sans);
-  font-size: 13px; letter-spacing: 0.06em; padding-bottom: 6px; border-bottom: 2px solid #fff; margin-bottom: 8px; }
+.rpg-win { border: 2px solid #fff; border-radius: 5px; background: #000; padding: 7px 9px; margin-top: 6px;
+  box-shadow: inset 0 0 0 1px #000, inset 0 0 0 3px #fff; min-height: 78px;
+  max-height: 46%; overflow-y: auto; -webkit-overflow-scrolling: touch; flex-shrink: 0; }
+.rpg-status { display: flex; justify-content: space-between; gap: 8px; font-family: var(--sans);
+  font-size: 11.5px; letter-spacing: 0.04em; padding-bottom: 4px; border-bottom: 1px solid #fff; margin-bottom: 5px; }
 .rpg-hpbar { height: 7px; border: 2px solid #fff; background: #000; margin-bottom: 9px; }
 .rpg-hpbar i { display: block; height: 100%; background: #fff; transition: width 0.35s ease; }
-.rpg-msg { font-family: var(--sans); font-size: 14px; line-height: 1.85; letter-spacing: 0.05em; }
+.rpg-msg { font-family: var(--sans); font-size: 12px; line-height: 1.7; letter-spacing: 0.03em; }
 .rpg-msg div { animation: rpgLine 0.25s ease; }
 @keyframes rpgLine { from{opacity:0} to{opacity:1} }
-.rpg-cmd { height: 22px; text-align: right; padding-right: 6px; }
+.rpg-cmd { height: 16px; text-align: right; padding-right: 4px; }
 .rpg-wait { display: inline-block; font-size: 14px; animation: rpgBlink 0.9s steps(2) infinite; }
 @keyframes rpgBlink { 0%,50%{opacity:1} 51%,100%{opacity:0} }
 /* 勝敗の表示 */
@@ -1148,7 +1189,7 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
   </section>
 
   <div class="toast" id="toast"></div>
-  <footer class="foot">OTCLinker — とみながグループ 店舗向けツール<br><span class="ver">版 2026-08-01 BJ(主人公の精細化・装備の整合)</span></footer>
+  <footer class="foot">OTCLinker — とみながグループ 店舗向けツール<br><span class="ver">版 2026-08-02 BK(まほう33種・そうび拡充)</span></footer>
 </div>
 
 <script>
@@ -3535,28 +3576,47 @@ const EQUIP_SLOTS = [
   { id:"hand", name:"て" },     { id:"acc",  name:"アクセ" }
 ];
 const EQUIPS = {
-  // あたま
-  q_cap:    { slot:"head", name:"しろいぼうし",   atk:0, def:2, rank:1, fx:null },
-  q_nurse:  { slot:"head", name:"ナースキャップ", atk:1, def:3, rank:2, fx:"genki" },
-  q_goggle: { slot:"head", name:"ゴーグル",       atk:3, def:2, rank:3, fx:"crit" },
-  q_crown:  { slot:"head", name:"きんのかんむり", atk:4, def:5, rank:4, fx:"drop" },
-  // からだ
-  q_coat:   { slot:"body", name:"はくい",         atk:0, def:4, rank:1, fx:null },
-  q_apron:  { slot:"body", name:"エプロン",       atk:1, def:5, rank:2, fx:"genki" },
-  q_guard:  { slot:"body", name:"ぼうごふく",     atk:2, def:8, rank:3, fx:null },
-  q_gold:   { slot:"body", name:"きんのよろい",   atk:4, def:11, rank:4, fx:"drop" },
-  // て
-  q_pin:    { slot:"hand", name:"ピンセット",     atk:3, def:0, rank:1, fx:null },
-  q_pestle: { slot:"hand", name:"にゅうぼう",     atk:5, def:1, rank:2, fx:null },
-  q_spoon:  { slot:"hand", name:"ちょうざいスプーン", atk:7, def:1, rank:3, fx:"crit" },
-  q_saji:   { slot:"hand", name:"でんせつのさじ", atk:11, def:2, rank:4, fx:"crit" },
-  // アクセ
-  q_steth:  { slot:"acc",  name:"ちょうしんき",   atk:1, def:1, rank:1, fx:"genki" },
-  q_glass:  { slot:"acc",  name:"めがね",         atk:2, def:1, rank:2, fx:"crit" },
-  q_badge:  { slot:"acc",  name:"バッジ",         atk:2, def:3, rank:3, fx:"drop" },
-  q_omamori:{ slot:"acc",  name:"おまもり",       atk:3, def:4, rank:4, fx:"genki" }
+  // ---- あたま(6段階) ----
+  q_cap:    { slot:"head", name:"しろいぼうし",     atk:0, def:2,  rank:1, fx:null },
+  q_mask:   { slot:"head", name:"サージカルマスク", atk:1, def:3,  rank:1, fx:"genki" },
+  q_nurse:  { slot:"head", name:"ナースキャップ",   atk:1, def:4,  rank:2, fx:"genki" },
+  q_loupe:  { slot:"head", name:"かくだいルーペ",   atk:3, def:2,  rank:2, fx:"crit" },
+  q_goggle: { slot:"head", name:"ぼうごゴーグル",   atk:3, def:5,  rank:3, fx:"crit" },
+  q_shield: { slot:"head", name:"フェイスシールド", atk:2, def:8,  rank:3, fx:"genki" },
+  q_helmet: { slot:"head", name:"ぼうしんヘルメット", atk:4, def:9, rank:3, fx:null },
+  q_crown:  { slot:"head", name:"やくおうのかんむり", atk:5, def:7, rank:4, fx:"drop" },
+  // ---- からだ(6段階) ----
+  q_coat:   { slot:"body", name:"はくい",           atk:0, def:4,  rank:1, fx:null },
+  q_apron:  { slot:"body", name:"ちょうざいエプロン", atk:1, def:6, rank:1, fx:"genki" },
+  q_scrub:  { slot:"body", name:"スクラブ",         atk:3, def:6,  rank:2, fx:null },
+  q_gown:   { slot:"body", name:"ガウン",           atk:1, def:9,  rank:2, fx:"genki" },
+  q_lead:   { slot:"body", name:"ぼうごエプロン",   atk:2, def:12, rank:3, fx:null },
+  q_guard:  { slot:"body", name:"クリーンスーツ",   atk:4, def:11, rank:3, fx:"crit" },
+  q_vest:   { slot:"body", name:"きゅうきゅうベスト", atk:3, def:10, rank:2, fx:"heal" },
+  q_gold:   { slot:"body", name:"きんのはくい",     atk:6, def:14, rank:4, fx:"drop" },
+  // ---- て(7段階) ----
+  q_pin:    { slot:"hand", name:"ピンセット",       atk:3,  def:0, rank:1, fx:null },
+  q_spatula:{ slot:"hand", name:"やくさじ",         atk:4,  def:1, rank:1, fx:null },
+  q_pestle: { slot:"hand", name:"にゅうぼう",       atk:6,  def:1, rank:2, fx:null },
+  q_syringe:{ slot:"hand", name:"ちゅうしゃき",     atk:8,  def:0, rank:2, fx:"crit" },
+  q_counter:{ slot:"hand", name:"じょうざいカウンター", atk:7, def:2, rank:3, fx:"drop" },
+  q_spoon:  { slot:"hand", name:"ちょうざいスプーン", atk:9, def:2, rank:3, fx:"crit" },
+  q_mortar: { slot:"hand", name:"にゅうばちハンマー", atk:11, def:3, rank:3, fx:null },
+  q_scale:  { slot:"hand", name:"てんびん",         atk:5,  def:4, rank:2, fx:"heal" },
+  q_autoclave:{slot:"hand",name:"オートクレーブ",   atk:12, def:5, rank:3, fx:"genki" },
+  q_saji:   { slot:"hand", name:"でんせつのさじ",   atk:14, def:3, rank:4, fx:"crit" },
+  // ---- アクセ(6段階) ----
+  q_steth:  { slot:"acc",  name:"ちょうしんき",     atk:1, def:1, rank:1, fx:"genki" },
+  q_gloves: { slot:"acc",  name:"てぶくろ",         atk:2, def:2, rank:1, fx:null },
+  q_glass:  { slot:"acc",  name:"めがね",           atk:3, def:1, rank:2, fx:"crit" },
+  q_thermo: { slot:"acc",  name:"たいおんけい",     atk:1, def:4, rank:2, fx:"genki" },
+  q_badge:  { slot:"acc",  name:"やくざいしバッジ", atk:3, def:4, rank:3, fx:"drop" },
+  q_pouch:  { slot:"acc",  name:"やくのうポーチ",   atk:2, def:5, rank:3, fx:"drop" },
+  q_bag:    { slot:"acc",  name:"おうしんカバン",   atk:2, def:6, rank:3, fx:"heal" },
+  q_book:   { slot:"acc",  name:"やっかいてん",     atk:5, def:3, rank:3, fx:"mp" },
+  q_omamori:{ slot:"acc",  name:"きんのちょうしんき", atk:4, def:6, rank:4, fx:"genki" }
 };
-const EQUIP_FX = { drop: "そうびが 手に入りやすい", genki: "げんきが へりにくい", crit: "たまに 会心の一撃" };
+const EQUIP_FX = { drop: "そうびが 手に入りやすい", genki: "げんきが へりにくい", crit: "たまに 会心の一撃", heal: "きずが 治りやすい", mp: "まほうを 使いやすい" };
 function rpg_(){
   S.rpg = S.rpg || { enemy: null, inv: [], equip: {}, wins: 0, loses: 0, day: "", count: 0 };
   if (!S.rpg.equip) S.rpg.equip = {};
@@ -3622,6 +3682,65 @@ function rpgOnOpen_(){
   }, 1600);
 }
 function enemyOf_(key){ return ENEMIES.filter(function(e){ return e.key === key; })[0] || null; }
+
+/* ===== なかまの まほう ===== */
+// なかまは 戦闘中に ときどき 自分の得意なわざを 出してくれる。
+// kind: dmg=追加のダメージ / heal=回復 / buff=つよくなる / debuff=てきを弱らせる
+const SPELLS = {
+  tablet:   { name:"じょうざいバースト", kind:"dmg",   pow:1.3, fx:"burst",  col:"#FFFFFF", say:"じょうざいが つぎつぎ とびだす!" },
+  capsule:  { name:"カプセルばくだん",   kind:"dmg",   pow:1.5, fx:"bomb",   col:"#D0342C", say:"カプセルが はじけた!" },
+  powder:   { name:"こなぐすりの あらし", kind:"debuff",pow:0.8, fx:"powder", col:"#FFF3D6", say:"こなが まいあがり めつぶしだ!" },
+  troche:   { name:"トローチシールド",   kind:"buff",  pow:1.0, fx:"ring",   col:"#FF8FB1", say:"のどが まもられた!" },
+  eyedrop:  { name:"めぐすりレーザー",   kind:"dmg",   pow:1.2, fx:"laser",  col:"#7FD4F5", say:"するどい しずくが つらぬく!" },
+  ointment: { name:"なんこうヒール",     kind:"heal",  pow:0.16, fx:"heal",  col:"#7DC383", say:"きずが ふさがっていく…" },
+  patch:    { name:"れいきゃくシップ",   kind:"debuff",pow:0.75, fx:"ice",   col:"#7FD4F5", say:"てきの うごきが にぶった!" },
+  tape:     { name:"ぐるぐるまき",       kind:"debuff",pow:0.7, fx:"wrap",   col:"#FFF3D6", say:"てきを しばりあげた!" },
+  syrup:    { name:"あまいシロップ",     kind:"heal",  pow:0.12, fx:"drop",  col:"#FF8FB1", say:"あまさで げんきが でた!" },
+  drink:    { name:"きあいのドリンク",   kind:"buff",  pow:1.35, fx:"flame", col:"#F08A3C", say:"ちからが みなぎってきた!" },
+  supp:     { name:"そくこうザヤク",     kind:"dmg",   pow:1.8, fx:"pierce", col:"#9B7EDE", say:"うしろから ふいうち!" },
+  inhaler:  { name:"きゅうにゅうミスト", kind:"heal",  pow:0.14, fx:"mist",  col:"#5FA8D3", say:"いきが ととのった!" },
+  inject:   { name:"いっぱつチューシャ", kind:"dmg",   pow:2.0, fx:"stab",   col:"#C0C8CF", say:"きゅうしょに ひとさし!" },
+  // せんもんしょく
+  s_hakase:  { name:"データかいせき",   kind:"buff",  pow:1.25, fx:"scan",  col:"#5FA8D3", say:"よわてんを 見ぬいた!" },
+  s_monshin: { name:"もんしんこうげき", kind:"debuff",pow:0.72, fx:"words", col:"#FFE24D", say:"しつもんぜめだ!" },
+  s_nyubachi:{ name:"すりつぶし",       kind:"dmg",   pow:1.6, fx:"grind",  col:"#C0C8CF", say:"ごりごり すりつぶす!" },
+  s_choshinki:{name:"こどうかんち",     kind:"buff",  pow:1.2, fx:"pulse",  col:"#F06A7E", say:"あいての こどうを よんだ!" },
+  // レア
+  r_gold:    { name:"おうごんのかがやき", kind:"buff", pow:1.5, fx:"gold",   col:"#FFD700", say:"まばゆい ひかりが つつむ!" },
+  r_rainbow: { name:"にじいろプリズム",   kind:"dmg",  pow:1.7, fx:"rainbow",col:"#F06A7E", say:"にじの ひかりが おそう!" },
+  r_phantom: { name:"まぼろしのなぞなぞ", kind:"debuff",pow:0.6, fx:"riddle",col:"#9B7EDE", say:"てきは こんらんした!" },
+  // あいぼう(どうぶつ)
+  p_wolf:   { name:"とおぼえ",           kind:"buff",  pow:1.35,fx:"pulse", col:"#C0C8CF", say:"とおぼえで みかたが ふるいたつ!" },
+  p_fox:    { name:"きつねび",           kind:"dmg",   pow:1.5, fx:"bomb",  col:"#5FA8D3", say:"あおい ほのおが つつむ!" },
+  p_dog:    { name:"かみつき",           kind:"dmg",   pow:1.4, fx:"stab",  col:"#8B6B45", say:"がぶりと かみついた!" },
+  p_cat:    { name:"ねこパンチ",         kind:"dmg",   pow:1.3, fx:"burst", col:"#FFFFFF", say:"すばやい ひっかき!" },
+  p_tiger:  { name:"ひゃくじゅうの ほえ", kind:"dmg",  pow:1.9, fx:"pulse", col:"#F08A3C", say:"ほえごえが 大地を ゆらす!" },
+  p_bear:   { name:"だいかいてん",       kind:"dmg",   pow:1.8, fx:"bomb",  col:"#8B6B45", say:"おおきな うでが うなる!" },
+  p_tanuki: { name:"ばけのかわ",         kind:"buff",  pow:1.25,fx:"gold",  col:"#C8A165", say:"すがたを 変えて みを まもる!" },
+  p_owl:    { name:"やみの まなざし",     kind:"debuff",pow:0.7, fx:"riddle",col:"#7B5EA7", say:"みつめられて 力が ぬけた!" },
+  p_rabbit: { name:"はやあし",           kind:"buff",  pow:1.2, fx:"pulse", col:"#F3C9D4", say:"すばやさが あがった!" },
+  p_penguin:{ name:"こおりの つぶて",     kind:"dmg",   pow:1.4, fx:"burst", col:"#8ECBD9", say:"こおりが つきささる!" },
+  p_hamster:{ name:"ためこみ",           kind:"heal",  pow:0.16,fx:"heal",  col:"#FFF3D6", say:"ためた ごはんで 元気に!" },
+  p_chick:  { name:"はげまし",           kind:"heal",  pow:0.14,fx:"heal",  col:"#FFD84D", say:"ぴよぴよと はげました!" },
+  m_hime:   { name:"せいなる いのり",     kind:"heal",  pow:0.32,fx:"gold",  col:"#FFD700", say:"いのりが みかたを つつむ!" }
+};
+// ごとうちのなかまは 共通の わざ(名物こうげき)
+function spellOf_(key){
+  if (SPELLS[key]) return SPELLS[key];
+  if (GOTOUCHI_MATES.indexOf(key) >= 0){
+    return { name: "めいぶつこうげき", kind:"dmg", pow:1.25,
+             fx:"local", col:"#F5D547", say:"ごとうちの ちからが さくれつ!" };
+  }
+  return null;
+}
+// この戦いで まほうを 使える面々(あいぼうも 参加する)
+function spellMates_(){
+  const list = [];
+  const bd = activePet_();
+  if (bd) list.push(bd);                                   // あいぼうは かならず参加
+  allMates_().slice(0, 4).forEach(function(o){ list.push(o.k); });
+  return list.filter(function(k){ return !!spellOf_(k); });
+}
 
 /* ===== 戦闘の進行(オート) ===== */
 let __battle = null;
@@ -3702,20 +3821,58 @@ function battleTurn_(){
   const b = __battle;
   if (!b || b.done) return;
   b.turn++;
-  // こちらの攻撃
+  const who = pet_().heroName || dotStage().name;
+
+  // なかまが まほうを 使うことがある(2ターンに1回くらい)
+  const mates = spellMates_();
+  let spellDmg = 0;
+  // 1ターン目から 出ることがある(短い戦いでも まほうが 見られるように)
+  if (mates.length && Math.random() < (b.turn === 1 ? 0.6 : 0.45)){
+    const k = mates[Math.floor(Math.random() * mates.length)];
+    const sp = spellOf_(k);
+    const nm2 = DOT_NAMES[k] || (petInfo_(k) ? petInfo_(k).name : "なかま");
+    b.log.push(nm2 + "の " + sp.name + "!");
+    b.log.push(sp.say);
+    playSpell_(sp, k);
+    if (sp.kind === "dmg"){
+      spellDmg = Math.max(1, Math.round(b.patk * sp.pow * (0.8 + Math.random() * 0.4)));
+      b.ehp = Math.max(0, b.ehp - spellDmg);
+      b.log.push(b.en.name + "に " + spellDmg + " のダメージ!");
+    } else if (sp.kind === "heal"){
+      const h = Math.round(b.pmax * sp.pow);
+      b.php = Math.min(b.pmax, b.php + h);
+      b.log.push(who + "は " + h + " かいふくした!");
+    } else if (sp.kind === "buff"){
+      b.patk = Math.round(b.patk * sp.pow);
+      b.log.push(who + "たちの こうげきが 上がった!");
+    } else if (sp.kind === "debuff"){
+      b.eatk = Math.max(1, Math.round(b.eatk * sp.pow));
+      b.log.push(b.en.name + "の こうげきが 下がった!");
+    }
+    if (b.ehp <= 0){ b.done = true; b.log.push(b.en.name + "を たおした!"); renderBattle_(); setTimeout(battleWin_, 1400); return; }
+    renderBattle_();
+    setTimeout(battleTurn2_, 1100);
+    return;
+  }
+  battleTurn2_();
+}
+// こちらの こうげき と てきの こうげき
+function battleTurn2_(){
+  const b = __battle;
+  if (!b || b.done) return;
+  const who = pet_().heroName || dotStage().name;
   const crit = Math.random() < 0.08 + equipFx_("crit") * 0.10;
   let dmg = Math.max(1, Math.round((b.patk * (0.85 + Math.random() * 0.3)) - (b.edef != null ? b.edef * 0.35 : b.en.atk * 0.15)));
   if (crit) dmg = Math.round(dmg * 1.8);
   b.ehp = Math.max(0, b.ehp - dmg);
-  const who = pet_().heroName || dotStage().name;
   b.log.push(who + "の こうげき!");
   b.log.push((crit ? "会心の一撃!　" : "") + b.en.name + "に " + dmg + " のダメージ!");
+  if (crit) flashFx_("crit");
   if (b.ehp <= 0){ b.done = true; b.log.push(b.en.name + "を たおした!"); renderBattle_(); setTimeout(battleWin_, 1400); return; }
-  // 敵の攻撃
   let edmg = Math.max(1, Math.round((b.eatk * (0.85 + Math.random() * 0.3)) - b.pdef * 0.35));
   b.php = Math.max(0, b.php - edmg);
   b.log.push(b.en.name + "の こうげき!");
-  b.log.push((pet_().heroName || dotStage().name) + "は " + edmg + " のダメージを うけた!");
+  b.log.push(who + "は " + edmg + " のダメージを うけた!");
   if (b.php <= 0){ b.done = true; b.log.push("ぜんめつしてしまった……"); renderBattle_(); setTimeout(battleLose_, 1400); return; }
   renderBattle_();
   setTimeout(battleTurn_, 1250);
@@ -3833,6 +3990,30 @@ function battleLose_(){
     + '<p class="hint">負けても なくすものは ありません。</p>'
     + '<button class="btn" onclick="closeBattle()">とじる</button></div>';
 }
+// まほうの 見た目の効果
+function playSpell_(sp, key){
+  const st = document.getElementById("rpg-stage");
+  if (!st) return;
+  const box = document.createElement("div");
+  box.className = "spell-fx fx-" + sp.fx;
+  box.style.setProperty("--sc", sp.col);
+  // わざを 出した なかまの すがたも 添える
+  box.innerHTML = '<span class="spell-caster">' + dotSvg(key, 34, mateLv_(key)) + '</span>'
+    + '<span class="spell-name">' + esc(sp.name) + '</span>'
+    + '<span class="spell-parts">' + Array.from({length: 9}).map(function(_, i){
+        return '<i style="--i:' + i + '"></i>';
+      }).join("") + '</span>';
+  st.appendChild(box);
+  if (navigator.vibrate) navigator.vibrate(sp.kind === "dmg" ? [20, 40, 20] : 25);
+  setTimeout(function(){ if (box.parentNode) box.parentNode.removeChild(box); }, 1600);
+}
+// 会心などの 一瞬の光
+function flashFx_(kind){
+  const sc = document.getElementById("rpg-screen");
+  if (!sc) return;
+  sc.classList.remove("fx-flash"); void sc.offsetWidth; sc.classList.add("fx-flash");
+  setTimeout(function(){ sc.classList.remove("fx-flash"); }, 400);
+}
 function renderBattle_(){
   const b = __battle;
   if (!b) return;
@@ -3844,13 +4025,13 @@ function renderBattle_(){
   if (stage){
     stage.innerHTML =
         '<div class="rpg-enemy' + (b.turn % 2 === 1 ? ' hit' : '') + '">'
-      +   dotSvg(b.en.key, Math.round((b.en.size || 56) * 1.7))
+      +   dotSvg(b.en.key, Math.round((b.en.size || 56) * 0.95))
       + '</div>'
       + '<div class="rpg-ename">' + esc(b.en.name) + (b.practice ? "(れんしゅう)" : "") + '</div>'
       + '<div class="rpg-ebar"><i style="width:' + ep + '%"></i></div>'
-      + '<div class="rpg-party">' + dotSvg(st.key, 44, 0, null, rpg_().equip)
-      +   (activePet_() ? dotSvg(activePet_(), 36) : "")
-      +   allMates_().slice(0, 3).map(function(o){ return dotSvg(o.k, 32, mateLv_(o.k), null); }).join("")
+      + '<div class="rpg-party">' + dotSvg(st.key, 34, 0, null, rpg_().equip)
+      +   (activePet_() ? dotSvg(activePet_(), 28) : "")
+      +   allMates_().slice(0, 3).map(function(o){ return dotSvg(o.k, 24, mateLv_(o.k), null); }).join("")
       + '</div>';
   }
   const win = battleBox_();
