@@ -488,7 +488,10 @@ input:focus, select:focus { outline: 2px solid var(--ai); outline-offset: -1px; 
 .tag-yen { font-family: var(--serif); font-size: 30px; font-weight: 700; color: var(--shu); font-variant-numeric: tabular-nums; }
 .tag-tax { font-size: 11px; margin-left: 4px; color: var(--ink); }
 .barcode-num { font-family: monospace; font-size: 10px; letter-spacing: 2px; color: var(--ink); }
-.pop-wrap { display: flex; justify-content: center; }
+.pop-wrap { display: flex; flex-direction: column; align-items: center; gap: 10px; overflow: hidden; }
+/* 画面では 実寸のままだと はみ出すので、幅に合わせて縮めて見せる(印刷は実寸) */
+.pop-scale { transform-origin: top center; }
+@media print { .pop-scale { transform: none !important; } .pop-wrap { display: block; overflow: visible; } }
 .pop-card { position: relative; width: min(100%, 420px); aspect-ratio: 1 / 1.18; border: 2px solid var(--ai); border-radius: 10px; background: #fff; padding: 26px 22px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; text-align: center; break-inside: avoid; }
 .pop-copy { font-family: var(--serif); font-size: 20px; color: var(--ai-deep); letter-spacing: 0.08em; border-bottom: 2px solid var(--shu); padding-bottom: 6px; }
 .pop-name { font-family: var(--serif); font-size: 30px; font-weight: 700; line-height: 1.3; }
@@ -1039,6 +1042,7 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
         <div id="saved-pops"></div>
       </div>
       <div class="pop-wrap print-target" id="pop-preview"></div>
+      <p class="hint" id="pop-scale-note" style="display:none"></p>
     </div>
     <div id="print-cards" style="display:none">
       <div class="steps"><span class="stp"><b>1</b>在庫リストで商品にチェック</span><span class="arw">→</span><span class="stp"><b>2</b>写真・特徴を自動取得か撮影</span><span class="arw">→</span><span class="stp"><b>3</b>印刷</span></div>
@@ -1189,7 +1193,7 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
   </section>
 
   <div class="toast" id="toast"></div>
-  <footer class="foot">OTCLinker — とみながグループ 店舗向けツール<br><span class="ver">版 2026-08-02 BK(まほう33種・そうび拡充)</span></footer>
+  <footer class="foot">OTCLinker — とみながグループ 店舗向けツール<br><span class="ver">版 2026-08-02 BL(POPの写真と表示)</span></footer>
 </div>
 
 <script>
@@ -5365,33 +5369,41 @@ function popItem_(){
   if (!el) return null;
   return (S.items || []).find(function(x){ return x.id === el.value; }) || null;
 }
-// POPに使う写真を Webから 取ってくる(商品カードと同じ仕組み)
+// POPに使う写真を Webから 取ってくる(商品カードと同じ方法で Yahoo!から探す)
 async function fetchPopPhoto(){
   doQuest("autoget");
-  const msg = document.getElementById("pop-msg") || document.getElementById("card-msg");
-  const it = popItem_();
+  const msg = document.getElementById("pop-msg");
   const say = function(t, html){
-    if (!msg) { toast(t.replace(/<[^>]+>/g, "")); return; }
+    if (!msg){ toast(String(t).replace(/<[^>]+>/g, "")); return; }
     if (html) msg.innerHTML = t; else msg.textContent = t;
   };
-  if (!it){ say("先に 在庫リストで 商品をチェックし、POPにする商品を えらんでください。"); return; }
+  const it = popItem_();
+  if (!it){ say("先に 上の一覧から POPにする商品を えらんでください。"); return; }
   if (!it.jan){ say("この商品には JANコードが ないため 自動取得できません。「写真を選ぶ」から 登録してください。"); return; }
   if (!S.gasUrl || !S.apiKeys.yahoo){
-    say("自動取得には、「その他」タブで<strong>共有サーバーURL</strong>と<strong>Yahoo! Client ID</strong>の両方の設定が必要です。設定後にもう一度お試しください。なお写真は「写真を選ぶ」から手動でも登録できます。", true);
+    say('自動取得には、「その他」タブで<strong>共有サーバーURL</strong>と<strong>Yahoo! Client ID</strong>の両方の設定が必要です。写真は「写真を選ぶ」から手動でも登録できます。', true);
     return;
   }
   say("「" + (it.name || it.jan) + "」の写真をさがしています…");
   try {
-    const r = await lookupJanExternal(it.jan);
-    const url = r && (r.image || r.img);
-    if (!url){ say("写真が 見つかりませんでした。「写真を選ぶ」から 登録してください。"); return; }
-    const dataUrl = await urlToDataUrl_(url);
-    if (!dataUrl){ say("写真を 取り込めませんでした。「写真を選ぶ」から 登録してください。"); return; }
-    S.popFont = Object.assign(popFont_(), { img: dataUrl });
+    const u = S.gasUrl + "?action=yahoo&appid=" + encodeURIComponent(S.apiKeys.yahoo) + "&jan=" + encodeURIComponent(it.jan);
+    const r = await fetch(u);
+    const d = await r.json();
+    const h0 = d && d.hits && d.hits[0];
+    const imgUrl = h0 && ((h0.exImage && h0.exImage.url) || (h0.image && (h0.image.medium || h0.image.small)) || "");
+    if (!imgUrl){ say("写真が 見つかりませんでした。「写真を選ぶ」から 登録してください。"); return; }
+    // 端末内に取り込む(印刷や控えでも使えるように)。時間がかかるときは URLのまま使う。
+    const dataUrl = await Promise.race([
+      urlToDataUrl_(imgUrl),
+      new Promise(function(res){ setTimeout(function(){ res(null); }, 4000); })
+    ]);
+    const f = popFont_();
+    f.img = dataUrl || imgUrl;
+    S.popFont = f;
     save(); renderPop(); doQuest("popimg");
     say("写真を 取り込みました。");
   } catch(e){
-    say("写真を 取得できませんでした。通信環境を ご確認ください。");
+    say("写真を 取得できませんでした。通信環境と 設定を ご確認ください。");
   }
 }
 // 画像のURLを 端末内に取り込む(印刷や控えでも使えるように)
@@ -5566,6 +5578,35 @@ function renderPop(){
     }
   }
   area.innerHTML = h || "";
+  fitPop_();
+}
+// POPは実寸(A5なら148mm)で作るので、そのままだと 画面から はみ出す。
+// 画面の幅に合わせて 縮めて見せる(印刷のときは 実寸に戻る)。
+function fitPop_(){
+  const area = document.getElementById("pop-preview");
+  const note = document.getElementById("pop-scale-note");
+  if (!area) return;
+  requestAnimationFrame(function(){
+    const cards = area.querySelectorAll(".pop-card");
+    if (!cards.length){ if (note) note.style.display = "none"; return; }
+    const avail = area.clientWidth || 320;
+    let minSc = 1;
+    cards.forEach(function(c){
+      c.style.transform = ""; c.classList.add("pop-scale");
+      const w = c.offsetWidth || avail;
+      const sc = Math.min(1, avail / w);
+      if (sc < minSc) minSc = sc;
+      c.style.transform = "scale(" + sc.toFixed(3) + ")";
+      // 縮めた分だけ 下に余白ができるので 高さを詰める
+      c.style.marginBottom = (-(c.offsetHeight * (1 - sc)) + 10) + "px";
+    });
+    if (note){
+      if (minSc < 0.995){
+        note.textContent = "画面では " + Math.round(minSc * 100) + "% に縮めて表示しています(印刷は実寸です)。";
+        note.style.display = "block";
+      } else { note.style.display = "none"; }
+    }
+  });
 }
 
 /* ============ 会員間共有(Google Apps Script サーバー) ============ */
