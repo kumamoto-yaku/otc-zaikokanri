@@ -1148,7 +1148,7 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
   </section>
 
   <div class="toast" id="toast"></div>
-  <footer class="foot">OTCLinker — とみながグループ 店舗向けツール<br><span class="ver">版 2026-07-31 BI(値札の崩れ・戦闘の戻り・装備)</span></footer>
+  <footer class="foot">OTCLinker — とみながグループ 店舗向けツール<br><span class="ver">版 2026-08-01 BJ(主人公の精細化・装備の整合)</span></footer>
 </div>
 
 <script>
@@ -2488,11 +2488,11 @@ const DOT_PAL = { K:"#2B2B2B", W:"#FFFFFF", C:"#FFF3D6", Y:"#FFD84D", O:"#F08A3C
   /* 下辺・右辺に落とす影(小文字) */ w:"#B2B2B2", c:"#B2AA95", y:"#B29735", o:"#A8602A", r:"#91241E", p:"#AA7481", b:"#427593", n:"#603E1E", g:"#B29600", e:"#57885B", v:"#6C589B", s:"#868C90", d:"#2B6C37", m:"#B2647B", a:"#5894AB", l:"#759C45", t:"#3F4D9D", f:"#B29075", h:"#892F28" };
 const DOT_SPRITES = {
   /* --- 主人公の成長 --- */
-  baby: ["................................","................................","............KKKK................","...........KKKKKK...............","..........KK....KK..............",".........KKK....KKK.............",".......KKKKKKKKKKKKKK...........",".....KKKKKKKKKKKKKKKKKK.........",".....KKFFFFFFFFFFFFFfKK.........","...KKFFFFFFFFFFFFFFFFFfKK.......","...KKFFFFFFFFFFFFFFFFFfKK.......","..KKFFFffFFFFFFFFFFffFFfKK......","..KKFFfKKfFFFFFFFFfKKfFfKK......","..KKFfKKKKFFFFFFFfKKKKFfKK......","..KKFfKKKKFFFFFFFfKKKKFfKK......","..KKFFfKKFFFFFFFFFfKKFFfKK......","..KKFFFFFFFFFFFFFFFFFFFfKK......","..KKFFFFFFffffffffFFFFFfKK......","..KKfFPPFfKKKKKKKKFFPPFfKK......","...KKFPPFfKKKKKKKKFFPPfKK.......","...KKffFFFFFFFFFFFFFFffKK.......",".....KKffffffffffffffKK.........","......KKKKKKKKKKKKKKKKK.........","......KKKKKKKKKKKKKKKK..........",".....KKAAAAAAAAAAAAAAAAaK.......","...KKAAAAAAAAAAAAAAAAAAAaKK.....","...KKAAAAAAAAAAAAAAAAAAAaKK.....","..KKAAAAAAAAAAAAAAAAAAAAAaKK....","..KKaAAAAAAAAAAAAAAAAAAAAaKK....","...KKaaaaaaaaaaaaaaaaaaaaKK.....","...KKKKKKKKKKKKKKKKKKKKKKKK.....",".....KKKKKKKKKKKKKKKKKKKK......."],
-  child: ["................................","................................",".........KKKKKKKKKK.............",".......KKKKKKKKKKKKKK...........",".......KKNNNNNNNNNnKK...........",".....KKNNNNNNNNNNNNNnKK.........",".....KKNNNNNNNNNNNNNnKK.........","....KKNNNNNNNNNNNNNNNnKK........","....KKNNNFFFFFFFFFFNNnKK........","....KKNFffffFFFFffffFnKK........","....KKFfKKKKFFFfKKKKFfKK........","....KKFfKKKKFFFfKKKKFfKK........","....KKFFFFFFFFFFFFFFFfKK........","....KKFFFFffffffffFFFfKK........","....KKfFFfKKKKKKKKFFFfKK........",".....KKFFfKKKKKKKKFFfKK.........","......KfFFFFFFFFFFFFfK..........","......KKFFFFFFFFFFFfKK..........",".....KKKEEEEEEEEEEEeKKK.........","...KKKKKEEEEEEEEEEEeKKKKK.......","...KFfKKEEEEEEEEEEEeKKFfK.......","..KKFfKKEEEEEEEEEEEeKKFfKK......","..KKFfKKEEEEEEEEEEEeKKFfKK......","..KKffKKEEEEEEEEEEEeKKffKK......","..KKKKKKEEEEEEEEEEEeKKKKKK......","...KKKKKEEEEEEEEEEEeKKKKK.......",".....KKKEEEEEEEEEEEeKKK.........","......KKEEEEeeeeEEEeKK..........","......KKnNNnKKKKnNNnKK..........",".....KKKKnnKKKKKKnnKKKK.........","....KKKKKKKKK..KKKKKKKKK........","....KKKKKKK......KKKKKKK........"],
-  apprentice: ["........................KK......",".......................KKKK.....",".........KKKKKKKKKK....KNnK.....",".......KKKKKKKKKKKKK..KKNnKK....",".......KKNNNNNNNNNnKKKKKNnKK....",".....KKKNNNNNNNNNNNnKKKKNnKK....",".....KKRRRRRRRRRRRRRrKKKNnKK....","....KKRRRRRRRRRRRRRRRrKKNnKK....","....KKNNFFFFFFFFFFFFNnKKNnKK....","....KKNFffffFFFFffffFnKKNnKK....","....KKFfKKKKFFFfKKKKFfKKNnKK....","....KKFfKKKKFFFfKKKKFfKKNnKK....","....KKFFFFFFFFFFFFFFFfKKNnKK....","....KKFFFFFffffffFFFFfKKNnKK....","....KKfFFFfKKKKKKfFFFfKKNnKK....",".....KKfFfKKKKKKKKFFfKKNNnK.....","......KKWWWWWWWWWWWwKKNNnKK.....","......KKWWWWWWWWWWWwKKnnK.......",".....KKKWWWWWWWWWWWwKKKK........","...KKKKKWWWWWWWWWWWwKKKK........","...KWwKKWWWWWEEWWWWwKKWwK.......","..KKWwKKWWWWEEEEWWWwKKWwKK......","..KKWwKKWWWWEEEEWWWwKKWwKK......","..KKwwKKWWWWEEEEWWWwKKwwKK......","..KKKKKKWWWWEEEEWWWwKKKKKK......","...KKKKKWWWWWEEWWWWwKKKKK.......",".....KKKWWWWWWWWWWWwKKK.........","......KKWWWWwwwwWWWwKK..........","......KKnNNnKKKKnNNnKK..........",".....KKKKnnKKKKKKnnKKKK.........","....KKKKKKKKK..KKKKKKKKK........","....KKKKKKK......KKKKKKK........"],
-  warrior: ["................................","................................",".........KKKKKKKKKK.............",".......KKKKKKKKKKKKKK...........",".......KKNNNNNNNNNnKK...........",".....KKNNNNNNNNNNNNNnKK.........",".....KKNNNNNNNNNNNNNnKK.........","....KKNNNNNNNNNNNNNNNnKK........","....KKnNNFFFFFFFFFFNNnKK........","....KKKnFFFFffffFFFFnKKK........","....KKKKWWWwKKKKWWWwKKKK........","....KKKKWWWwKKKKWWWwKKKK........","....KKKFFFFFFFFFFFFFfKKK........","....KKFFFFFffffffFFFFfKK........","....KKfFFFfKKKKKKfFFFfKK........",".....KKfFfKKKKKKKKFFfKK.........","......KKWWWWWWWWWWWwKK..........","......KKWWWWWWWWWWWwKK..........",".....KKKWWWWWWWWWWWwKKK.........","...KKKKKWWWWWWWWWWWwKKKKK.......","...KWwKKWWWWWTTWWWWwKKWwK.......","..KKWwKKWWWWTTTTWWWwKKWwKK......","..KKWwKKWWWWTTTTWWWwKKWwKK......","..KKwwKKWWWWWTTWWWWwKKwwKK......","..KKKKKKWWWWWWWWWWWwKKKKKK......","...KKKKKWWWWWWWWWWWwKKKKK.......",".....KKKWWWWWWWWWWWwKKK.........","......KKWWWWwwwwWWWwKK..........","......KKnNNnKKKKnNNnKK..........",".....KKKKnnKKKKKKnnKKKK.........","....KKKKKKKKK..KKKKKKKKK........","....KKKKKKK......KKKKKKK........"],
-  hero: ["......Gg....Gg....Gg....KK......","......GGg..GGGg..GGGg..KKK......",".....KGGGGGGGGGGGGGGGgKKKKGgK...","....KKGGGGGGGGGGGGGGGgKKKKGgKK..","....KKNNNNNNNNNNNNNNNnKKKKGgKK..","....KKNNNNNNNNNNNNNNNnKKKKGgKK..","....KKNNNFFFFFFFFFFNNnKKKKGgKK..","....KKNFffffFFFFffffFnKKKKGgKK..","....KKFfKKKKFFFfKKKKFfKKKKGgKK..","....KKFfKKKKFFFfKKKKFfKKKKGgKK..","....KKFFFFFFFFFFFFFFFfKKKKGgKK..","....KKFFFFFffffffFFFFfKKKKGgKK..","....KKfFFFfKKKKKKfFFFfKKKKNnKK..","....KKKfFfKKKKKKKKFFfKKKKNNnK...","...hKKKKWWWWWWWWWWWwKKKKNNnKK...",".HHhKKKWWWWWWWWWWWWWwKKKnnK.....",".HHhKKKWWWWWWWWWWWWWwKKKKKK.....","HHHhKKWWWWWWWWWWWWWWWwKKK.......","HHHhKKWWWWWGGGGGGWWWWwKKK.......","HHHhKKWWWWGGGGGGGGWWWwKK........","hHHhKKWWWWGGGGGGGGWWWwKK........",".HHhKKWWWWWGGGGGGWWWWwKK........",".hHhKKwWWWWWWWWWWWWWWwKK........","..HhKKKWWWWWWWWWWWWWwKKK........","..hhKKKwWWWWWWWWWWWWwKKK........","...hKKKKWWWWWWWWWWWwKKKK........","....KKKKWWWWWWWWWWWwKKKK........",".....KKKWWWWwwwwWWWwKKK.........","......KKnNNnKKKKnNNnKK..........","......KKKnnKKKKKKnnKKK..........","....KKKKKKKKK..KKKKKKKKK........","....KKKKKKK......KKKKKKK........"],
+  baby: ["................................","..............KK................",".............K..K...............","..........KKKKKKKKKK............",".........KFFFFFFFFFFK...........","........KFFFFFFFFFFFFK..........",".......KFFFFFFFFFFFFFFK.........",".......KFFKKFFFFFFKKFFK.........",".......KFFKKFFFFFFKKFFK.........",".......KFFFFFFFFFFFFFFK.........",".......KFFFFFFFFFFFFFFK.........",".......KFPFFFFFFFFFFPFK.........","........KFFFFKKKKFFFFK..........",".........KFFFFFFFFFFK...........","..........KKKKKKKKKK............",".......KKKKKKKKKKKKKKKK.........","......KAAAAAAAAAAAAAAAAK........",".....KAAAAAAAAAAAAAAAAAAK.......",".....KAAAAAAAAAAAAAAAAAAK.......",".....KAAAAAAAAAAAAAAAAAAK.......",".....KAAAAAAAAAAAAAAAAAAK.......",".....KAAAAAAAAAAAAAAAAAAK.......",".....KAAAAAAAAAAAAAAAAAAK.......","......KAAAAAAAAAAAAAAAAK........",".......KAAAAAAAAAAAAAAK.........","........KKKKKKKKKKKKKK..........","................................","................................","................................","................................","................................","................................"],
+  child: ["................................","................................","..........KKKKKKKKKK............",".........KNNNNNNNNNNK...........","........KNNNNNNNNNNNNK..........",".......KNNNNNNNNNNNNNNK.........",".......KNNFFFFFFFFFFNNK.........",".......KFFKKFFFFFFKKFFK.........",".......KFFKKFFFFFFKKFFK.........",".......KFFFFFFFFFFFFFFK.........",".......KFFFFFFFFFFFFFFK.........",".......KFFFFFFFFFFFFFFK.........","........KFFFKKKKFFFFK...........",".........KFFFFFFFFFK............","..........KKKKKKKKK.............","......KKKKKEEEEEEEEKKKK.........",".....KFFFKEEEEEEEEEEKFFFK.......",".....KFFFKEEEEEEEEEEKFFFK.......",".....KFFFKEEEEEEEEEEKFFFK.......",".....KKKKKEEEEEEEEEEKKKKK.......",".........KEEEEEEEEEEK...........",".........KEEEEEEEEEEK...........",".........KEEEEEEEEEEK...........",".........KEEEEKKEEEEK...........",".........KNNNNKKNNNNK...........",".........KNNNNKKNNNNK...........",".........KNNNNKKNNNNK...........","........KKNNNKKKKNNNKK..........","........KKKKKK..KKKKKK..........","................................","................................","................................"],
+  apprentice: ["................................","................................","..........KKKKKKKKKK............",".........KNNNNNNNNNNK...........","........KRRRRRRRRRRRRK..........",".......KRRRRRRRRRRRRRRK.........",".......KNNFFFFFFFFFFNNK.........",".......KFFKKFFFFFFKKFFK.........",".......KFFKKFFFFFFKKFFK.........",".......KFFFFFFFFFFFFFFK.........",".......KFFFFFFFFFFFFFFK.........",".......KFFFFFFFFFFFFFFK.........","........KFFFKKKKFFFFK...........",".........KFFFFFFFFFK............","..........KKKKKKKKK.............","......KKKKKWWWWWWWWKKKK.........",".....KFFFKWWWWWWWWWWKFFFK.......",".....KFFFKWWWWWWWWWWKFFFK.......",".....KFFFKWWWWWWWWWWKFFFK.......",".....KKKKKWWWWWWWWWWKKKKK.......",".........KWWWWEEWWWWK...........",".........KWWWWEEWWWWK...........",".........KWWWWWWWWWWK...........",".........KWWWWKKWWWWK...........",".........KNNNNKKNNNNK...........",".........KNNNNKKNNNNK...........",".........KNNNNKKNNNNK...........","........KKNNNKKKKNNNKK..........","........KKKKKK..KKKKKK..........","................................","................................","................................"],
+  warrior: ["................................","................................","..........KKKKKKKKKK............",".........KNNNNNNNNNNK...........","........KNNNNNNNNNNNNK..........",".......KNNNNNNNNNNNNNNK.........",".......KNNFFFFFFFFFFNNK.........",".......KKKKKFFFFKKKKKKK.........",".......KWWKKFFFFKKWWKKK.........",".......KFFFFFFFFFFFFFFK.........",".......KFFFFFFFFFFFFFFK.........",".......KFFFFFFFFFFFFFFK.........","........KFFFKKKKFFFFK...........",".........KFFFFFFFFFK............","..........KKKKKKKKK.............","......KKKKKWWWWWWWWKKKK.........",".....KWWWKWWWWWWWWWWKWWWK.......",".....KWWWKWWWWWWWWWWKWWWK.......",".....KWWWKWWWWWWWWWWKWWWK.......",".....KKKKKWWWWWWWWWWKKKKK.......",".........KWWWWWWWWWWK...........",".........KWWWWWWWWWWK...........",".........KWWWWWWWWWWK...........",".........KWWWWKKWWWWK...........",".........KNNNNKKNNNNK...........",".........KNNNNKKNNNNK...........",".........KNNNNKKNNNNK...........","........KKNNNKKKKNNNKK..........","........KKKKKK..KKKKKK..........","................................","................................","................................"],
+  hero: ["................................","................................","..........KKKKKKKKKK............",".........KNNNNNNNNNNK...........","........KNNNNNNNNNNNNK..........",".......KNNNNNNNNNNNNNNK.........",".......KNNFFFFFFFFFFNNK.........",".......KFFKKFFFFFFKKFFK.........",".......KFFKKFFFFFFKKFFK.........",".......KFFFFFFFFFFFFFFK.........",".......KFFFFFFFFFFFFFFK.........",".......KFFFFFFFFFFFFFFK.........","........KFFFKKKKFFFFK...........",".........KFFFFFFFFFK............","..........KKKKKKKKK.............","......KKKKKWWWWWWWWKKKK.........",".....KWWWKWWWGGGGWWWKWWWK.......",".....KWWWKWWWGGGGWWWKWWWK.......",".....KWWWKWWWWWWWWWWKWWWK.......",".....KKKKKWWWWWWWWWWKKKKK.......",".........KWWWWWWWWWWK...........",".........KGWWWWWWWWGK...........",".........KGWWWWWWWWGK...........",".........KWWWWKKWWWWK...........",".........KNNNNKKNNNNK...........",".........KNNNNKKNNNNK...........",".........KNNNNKKNNNNK...........","........KKNNNKKKKNNNKK..........","........KKKKKK..KKKKKK..........","................................","................................","................................"],
   /* --- なかま(お薬の剤形) --- */
   tablet: ["................................","................................","..............KK................","..............KK................","..............KK................",".............KKKK...............",".........KKKKKKKKKKKK...........",".......KKKKKKKKKKKKKKKK.........",".......KKWWWWWWWWWWWwKK.........",".....KKWWWWWWWWWWWWWWWwKK.......",".....KKWWWWWWWWWWWWWWWwKK.......","....KKWWWwwwWWWWWWwwwWWwKK......","....KKWWwKKKWWWWWwKKKwWwKK......","....KKWwKKKKWWWWWwKKKKWwKK......","KK..KKWwKKKWWWWWWWwKKKWwKK..KK..","KK..KKWwKKWWWWWWWWWwKKWwKK..KK..","KKKKKKWWWWWWWWWWWWWWWWWwKKKKKK..",".KKKKKWWWWWWwwwwwwWWWWWWwKKKK...",".KKKKKWWWWWwKKKKKKWWWWWWWwKKK...","...KKKWWWWWwKKKKKKWWWWWWWwK.....","...KKKWWWWWWWWWWWWWWWWWWwKK.....","....KKWWWWWWWWWWWWWWWWWwKK......","....KKwWWWWWWWWWWWWWWWWwKK......",".....KKWWWWWWWWWWWWWWWwKK.......",".....KKwwWWWWWWWWWWWWwwKK.......",".......KKwwwwwwwwwwwwKK.........",".......KKKKKKKKKKKKKKKK.........","........KKKKKKKKKKKKKK..........","........KKK........KKK..........",".......KKK..........KKK.........","......KKKK..........KKKK........","......KKK............KKK........"],
   capsule: ["................................","................................",".........KKKKKKKKKKKKKK.........",".......KKKKKKKKKKKKKKKKKK.......",".......KKRRRRRRRRRRRRRrKK.......",".....KKRRRRRRRRRRRRRRRRRrKK.....",".....KKRRRRRRRRRRRRRRRRRrKK.....","....KKRRRRrrRRRRRRRRrrRRRrKK....","....KKRRRrKKRRRRRRRrKKRRRrKK....","....KKRRRrKKRRRRRRRrKKRRRrKK....","....KKRRRrKKRRRRRRRrKKRRRrKK....","....KKRRRrKKRRRRRRRrKKRRRrKK....","....KKrRRRRRRRRRRRRRRRRRRrKK....","....KKKrrrrrrrrrrrrrrrrrrKKK....","....KKKKKKKKKKKKKKKKKKKKKKKK....","....KKKKKKKKKKKKKKKKKKKKKKKK....","KK..KKKCCCCCCCCCCCCCCCCCcKKK..KK","KK..KKCCCCccccccccccccCCCcKK..KK","KKKKKKCCCcKKKKKKKKKKKKcCCcKKKKKK",".KKKKKCCcKKKKKKKKKKKKKKcCcKKKKK.",".KKKKKCcKKCCCCCCCCCCCcKKCcKKKKK.","...KKKCcKKccccccccccccKKCcKKK...","...KKKCCcKKKKKKKKKKKKKKCCcKKK...","....KKCCCcKKKKKKKKKKKKCCCcKK....","....KKcCCCCCCCCCCCCCCCCCCcKK....",".....KKCCCCCCCCCCCCCCCCCcKK.....",".....KKccCCCCCCCCCCCCCCccKK.....",".......KKccccccccccccccKK.......",".......KKKKKKKKKKKKKKKKKK.......","........KKKKKKKKKKKKKKKK........","........KKK..........KKK........","........KK............KK........"],
@@ -2974,100 +2974,94 @@ function dotSvg(key, px, lv, deco, equip){
   }
   // そうび(装備しているものをキャラに重ねる)
   if (equip){
-    const W = px, ey = (DOT_EYE[key] || 0.4) * W;
+    // 装備は キャラと同じ 升目(32×32)に そろえて描く。
+    // 升目からずれると 絵が崩れて見えるため、すべて 升目の単位で指定する。
+    const N = rows.length, u = px / N;
+    const g = function(gx, gy, gw, gh, col){
+      if (!col) return;
+      // キャラ本体と同じ升目(u)を使うので、どの大きさでも ぴったり重なる
+      r += rc(Math.round(gx) * u, Math.round(gy) * u,
+              Math.max(1, Math.round(gw)) * u + 0.3, Math.max(1, Math.round(gh)) * u + 0.3, col);
+    };
     const e = function(sl){ return EQUIPS[equip[sl]]; };
     const body = e("body"), head = e("head"), hand = e("hand"), acc = e("acc");
-    const K = DOT_PAL.K, G = DOT_PAL.G, Wt = DOT_PAL.W, S2 = DOT_PAL.S, T = DOT_PAL.T, R = DOT_PAL.R, M = DOT_PAL.M, V = DOT_PAL.V;
+    const K = DOT_PAL.K, G = DOT_PAL.G, Wt = DOT_PAL.W, Sv = DOT_PAL.S, T = DOT_PAL.T, R = DOT_PAL.R, V = DOT_PAL.V, M = DOT_PAL.M;
+    const sc = N / 32;   // 32升を基準に、ほかの大きさでも合うようにする
+    const q = function(v){ return v * sc; };
 
-    // ---- からだ:よろい。段が上がるほど 肩あて・胸あて・こしあてが増える ----
-    if (body){
-      const rk = body.rank;
-      const col = rk >= 4 ? G : (rk >= 3 ? S2 : (rk >= 2 ? T : Wt));
-      const dark = rk >= 4 ? "#8A6400" : (rk >= 3 ? "#7B8794" : (rk >= 2 ? "#3A4A7A" : "#C9CFD4"));
-      // 胸あて
-      r += rc(W*0.18, ey + W*0.13, W*0.64, W*0.34, K)
-         + rc(W*0.20, ey + W*0.15, W*0.60, W*0.30, col)
-         + rc(W*0.20, ey + W*0.15, W*0.60, W*0.05, dark);
-      if (rk >= 2){  // 肩あて
-        r += rc(W*0.10, ey + W*0.11, W*0.16, W*0.13, K) + rc(W*0.115, ey + W*0.125, W*0.13, W*0.10, col)
-           + rc(W*0.74, ey + W*0.11, W*0.16, W*0.13, K) + rc(W*0.755, ey + W*0.125, W*0.13, W*0.10, col);
-      }
-      if (rk >= 3){  // こしのベルト
-        r += rc(W*0.18, ey + W*0.42, W*0.64, W*0.07, K)
-           + rc(W*0.42, ey + W*0.415, W*0.16, W*0.10, G);
-      }
-      if (rk >= 4){  // 胸の紋章
-        r += rc(W*0.42, ey + W*0.22, W*0.16, W*0.14, K)
-           + rc(W*0.45, ey + W*0.245, W*0.10, W*0.09, Wt);
-      }
-    }
-
-    // ---- あたま:かぶと。段が上がるほど 面頬・角・羽根かざりが増える ----
-    if (head){
-      const rk = head.rank;
-      const col = rk >= 4 ? G : (rk >= 3 ? S2 : (rk >= 2 ? Wt : Wt));
-      r += rc(W*0.18, W*0.10, W*0.64, W*0.10, K)          // ふち
-         + rc(W*0.21, W*0.02, W*0.58, W*0.11, K)          // 本体の外
-         + rc(W*0.23, W*0.035, W*0.54, W*0.085, col);
-      if (rk >= 2){  // 面頬(ほほあて)
-        r += rc(W*0.17, W*0.155, W*0.10, W*0.16, K) + rc(W*0.185, W*0.17, W*0.07, W*0.13, col)
-           + rc(W*0.73, W*0.155, W*0.10, W*0.16, K) + rc(W*0.745, W*0.17, W*0.07, W*0.13, col);
-      }
-      if (rk >= 3){  // 角
-        r += rc(W*0.14, W*-0.04, W*0.07, W*0.12, K) + rc(W*0.155, W*-0.025, W*0.04, W*0.09, col)
-           + rc(W*0.79, W*-0.04, W*0.07, W*0.12, K) + rc(W*0.805, W*-0.025, W*0.04, W*0.09, col);
-      }
-      if (rk >= 4){  // 王冠のとがり + 羽根かざり
-        r += rc(W*0.26, W*-0.06, W*0.08, W*0.09, G)
-           + rc(W*0.46, W*-0.09, W*0.08, W*0.12, G)
-           + rc(W*0.66, W*-0.06, W*0.08, W*0.09, G)
-           + rc(W*0.84, W*-0.02, W*0.05, W*0.18, R);
-      }
-    }
-
-    // ---- て:武器。段が上がるほど 長く 立派に ----
-    if (hand){
-      const rk = hand.rank;
-      const col = rk >= 4 ? G : (rk >= 3 ? S2 : (rk >= 2 ? S2 : DOT_PAL.N));
-      const len = 0.30 + rk * 0.13;
-      const top = ey - W*0.02 - W*(len - 0.30);
-      r += rc(W*0.845, top, W*0.075, W*len, K)
-         + rc(W*0.86, top + W*0.012, W*0.045, W*(len - 0.02), col);
-      if (rk >= 2){  // つば
-        r += rc(W*0.79, ey + W*0.155, W*0.19, W*0.05, K)
-           + rc(W*0.80, ey + W*0.165, W*0.17, W*0.03, rk >= 4 ? G : DOT_PAL.N);
-      }
-      if (rk >= 3){  // 柄がしら
-        r += rc(W*0.845, ey + W*0.26, W*0.075, W*0.07, K)
-           + rc(W*0.855, ey + W*0.27, W*0.055, W*0.05, DOT_PAL.N);
-      }
-      if (rk >= 4){  // 刃の輝き
-        r += rc(W*0.875, top + W*0.03, W*0.02, W*(len*0.55), Wt);
-      }
-    }
-
-    // ---- アクセ:マント・かた掛け ----
+    // ---- アクセ:マント(体の後ろ側なので 先に描く) ----
     if (acc){
       const rk = acc.rank;
       const col = rk >= 4 ? V : (rk >= 3 ? T : (rk >= 2 ? R : M));
-      // 首もとの留め具
-      r += rc(W*0.40, ey + W*0.08, W*0.20, W*0.07, K)
-         + rc(W*0.43, ey + W*0.09, W*0.14, W*0.05, G);
-      if (rk >= 2){  // 小さなマント(体の外側に少し出す)
-        r += rc(W*0.06, ey + W*0.12, W*0.10, W*0.34, K)
-           + rc(W*0.075, ey + W*0.135, W*0.07, W*0.30, col)
-           + rc(W*0.84, ey + W*0.12, W*0.10, W*0.34, K)
-           + rc(W*0.855, ey + W*0.135, W*0.07, W*0.30, col);
+      g(q(9), q(15), q(2), q(2), K); g(q(21), q(15), q(2), q(2), K);   // 肩の留め具
+      g(q(9), q(15), q(2), q(1), G); g(q(21), q(15), q(2), q(1), G);
+      if (rk >= 2){                                                    // 左右に垂れるマント
+        g(q(4), q(16), q(2), q(8), K); g(q(5), q(16), q(1), q(7), col);
+        g(q(26), q(16), q(2), q(8), K); g(q(27), q(16), q(1), q(7), col);
       }
-      if (rk >= 3){  // 背中のマントを 大きく
-        r += rc(W*0.02, ey + W*0.14, W*0.08, W*0.44, K)
-           + rc(W*0.035, ey + W*0.155, W*0.05, W*0.40, col);
+      if (rk >= 3){                                                    // さらに長く
+        g(q(3), q(17), q(2), q(9), K); g(q(4), q(18), q(1), q(8), col);
+        g(q(27), q(17), q(2), q(9), K); g(q(28), q(18), q(1), q(8), col);
       }
-      if (rk >= 4){  // 光の粒
-        r += rc(W*0.04, ey - W*0.06, W*0.05, W*0.05, G)
-           + rc(W*0.90, ey + W*0.02, W*0.05, W*0.05, G)
-           + rc(W*0.12, ey + W*0.52, W*0.04, W*0.04, G);
+      if (rk >= 4){                                                    // 光の粒
+        g(q(2), q(14), q(1), q(1), G); g(q(29), q(20), q(1), q(1), G); g(q(6), q(27), q(1), q(1), G);
       }
+    }
+
+    // ---- からだ:よろい(胴は 行15〜23、列9〜22) ----
+    if (body){
+      const rk = body.rank;
+      const col = rk >= 4 ? G : (rk >= 3 ? Sv : (rk >= 2 ? T : Wt));
+      g(q(9), q(15), q(14), q(1), K);          // 胸あての上ぶち
+      g(q(9), q(16), q(14), q(6), col);        // 胸あて
+      g(q(9), q(22), q(14), q(1), K);          // 下ぶち
+      if (rk >= 2){                            // 肩あて
+        g(q(6), q(15), q(4), q(3), K); g(q(7), q(16), q(2), q(1), col);
+        g(q(22), q(15), q(4), q(3), K); g(q(23), q(16), q(2), q(1), col);
+      }
+      if (rk >= 3){                            // 腰のベルト
+        g(q(9), q(20), q(14), q(1), K);
+        g(q(14), q(19), q(4), q(3), G);
+      }
+      if (rk >= 4){                            // 胸の紋章
+        g(q(14), q(17), q(4), q(3), K); g(q(15), q(18), q(2), q(1), Wt);
+      }
+    }
+
+    // ---- あたま:かぶと(頭は 行2〜13) ----
+    if (head){
+      const rk = head.rank;
+      const col = rk >= 4 ? G : (rk >= 3 ? Sv : Wt);
+      g(q(9), q(1), q(14), q(1), K);
+      g(q(9), q(2), q(14), q(3), col);         // かぶと本体
+      g(q(8), q(5), q(16), q(1), K);           // ふち
+      if (rk >= 2){                            // ほほあて
+        g(q(7), q(6), q(2), q(4), K); g(q(8), q(6), q(1), q(3), col);
+        g(q(23), q(6), q(2), q(4), K); g(q(24), q(6), q(1), q(3), col);
+      }
+      if (rk >= 3){                            // 角
+        g(q(6), q(-1), q(2), q(4), K); g(q(7), q(0), q(1), q(3), col);
+        g(q(24), q(-1), q(2), q(4), K); g(q(25), q(0), q(1), q(3), col);
+      }
+      if (rk >= 4){                            // 王冠のとがり + 羽根
+        g(q(10), q(-1), q(2), q(2), G);
+        g(q(15), q(-2), q(2), q(3), G);
+        g(q(20), q(-1), q(2), q(2), G);
+        g(q(25), q(2), q(1), q(5), R);
+      }
+    }
+
+    // ---- て:武器(右手の外側 列24〜) ----
+    if (hand){
+      const rk = hand.rank;
+      const col = rk >= 4 ? G : (rk >= 3 ? Sv : (rk >= 2 ? Sv : DOT_PAL.N));
+      const len = 6 + rk * 3;                  // 段が上がるほど長い
+      const top = 18 - (len - 6);
+      g(q(24), q(top), q(2), q(len), K);
+      g(q(24.5), q(top + 1), q(1), q(len - 2), col);
+      if (rk >= 2) { g(q(22), q(18), q(6), q(1), K); g(q(23), q(18), q(4), q(1), rk >= 4 ? G : DOT_PAL.N); }
+      if (rk >= 3) { g(q(24), q(21), q(2), q(2), K); g(q(24.5), q(21.5), q(1), q(1), DOT_PAL.N); }
+      if (rk >= 4) { g(q(25), q(top + 2), q(1), q(len - 5), Wt); }
     }
   }
   // 3だんかい目のかんむりと きらめき(帽子系の衣装のときは重ならないよう省く)
