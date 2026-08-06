@@ -333,6 +333,8 @@ button.mate-chip { cursor: pointer; font-family: var(--sans); }
 .tab:focus-visible, .btn:focus-visible, .link:focus-visible { outline: 2px solid var(--shu); outline-offset: 2px; }
 .panel { background: #fff; border: 1px solid var(--line); border-top: none; border-radius: 0 0 12px 12px; padding: 18px 16px 24px; display: none; flex-direction: column; gap: 16px; }
 .panel.active { display: flex; }
+.btn:active { transform: translateY(1px); opacity: 0.85; }
+.stock-item:active, .ph-row:active, .mate-chip:active { opacity: 0.7; }
 .btn { font-family: var(--sans); font-size: 14.5px; padding: 10px 18px; border-radius: 8px; border: 2px solid var(--ai); cursor: pointer; letter-spacing: 0.04em; background: #fff; color: var(--ai-deep); font-weight: 600; white-space: nowrap; }
 .btn:active { background: var(--ai-deep); }
 .btn.big { width: 100%; padding: 16px; font-size: 16px; }
@@ -388,7 +390,7 @@ input:focus, select:focus { outline: 2px solid var(--ai); outline-offset: -1px; 
 .select-bar { font-size: 13.5px; background: #EDF2F0; border-radius: 8px; padding: 8px 12px; display: none; }
 .list-more { text-align: center; margin: 12px 0 4px; }
 .stock-list { list-style: none; padding: 0; display: flex; flex-direction: column; gap: 8px; }
-.stock-item { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; background: #fff; }
+.stock-item { cursor: pointer; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; background: #fff; }
 .stock-main { flex: 1 1 220px; min-width: 0; cursor: pointer; }
 .stock-top { display: flex; align-items: center; gap: 8px; min-width: 0; }
 .stock-name { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -669,6 +671,9 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
      対応しておらず要素が上下で切れてしまう。印刷時だけ
      「ブロック + インラインブロック」に切り替えると、
      収まらない要素は丸ごと次のページへ送られる。 */
+  /* 切るのが楽なように、印刷では すきまなく 並べる */
+  #print-tags, #print-cards, #print-pop { font-size: 0 !important; letter-spacing: 0 !important; word-spacing: 0 !important; }
+  .price-tag *, .pcard *, .pop-card * { font-size: revert; letter-spacing: revert; word-spacing: revert; }
   .tag-sheet, .card-sheet, .pop-wrap {
     display: block !important;
     gap: 0 !important;
@@ -681,7 +686,11 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
     break-inside: avoid !important;
     page-break-inside: avoid !important;
     -webkit-column-break-inside: avoid !important;
-    margin: 0 2mm 3mm 0 !important;
+    margin: 0 !important;
+    /* となりと 線を 共有して 二重線に ならないようにする */
+    border-width: 1px 1px 1px 1px !important;
+    margin-right: -1px !important;
+    margin-bottom: -1px !important;
   }
   /* 用紙より高いPOP(A4指定など)は高さを内容なりにして切れを防ぐ */
   .pop-card { min-height: 0 !important; max-width: 190mm !important; }
@@ -1121,7 +1130,7 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
     </details>
 
     <details class="set-card" open>
-      <summary class="set-h">データの控え(バックアップ・引き継ぎ)</summary>
+      <summary class="set-h">データの控え(バックアップ・機種変更のときの引き継ぎ)</summary>
       <div id="storage-warn" class="storage-warn" style="display:none"></div>
       <p class="hint" id="storage-info"></p>
       <p class="hint">在庫・商品マスタ・各種設定をファイル1つに保存できます。機種変更やアドレス変更の際は、変更前に「控えを保存」し、変更後の画面で「控えから復元」してください。</p>
@@ -1136,7 +1145,7 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
     <details class="set-card">
       <summary class="set-h">店舗間の備蓄情報共有</summary>
       <div class="share-note">とみながグループ 店舗間の備蓄情報共有です。アップロードすると、共有サーバーに接続している<strong>すべての店舗</strong>が薬局名・品目・在庫数を閲覧できます。</div>
-      <label>共有サーバーURL(管理者から配布されたもの)
+      <label>共有サーバーURL(みんなの備蓄をあずける場所。管理者から配布されたもの)
         <input id="gas-url" placeholder="https://script.google.com/macros/s/……/exec" onchange="savePharmacy()">
       </label>
       <div class="row gap wrap">
@@ -1193,7 +1202,7 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
   </section>
 
   <div class="toast" id="toast"></div>
-  <footer class="foot">OTCLinker — とみながグループ 店舗向けツール<br><span class="ver">版 2026-08-02 BL(POPの写真と表示)</span></footer>
+  <footer class="foot">OTCLinker — とみながグループ 店舗向けツール<br><span class="ver">版 2026-08-03 BM(印刷のすきまゼロ・見やすさ)</span></footer>
 </div>
 
 <script>
@@ -2372,7 +2381,7 @@ function renderList(){
       + '<button class="link" onclick="showTab(\'print\');setPrintKind(\'pop\')">POP</button>'
       + '<button class="link" onclick="showTab(\'print\');setPrintKind(\'cards\')">商品カード</button>'
       + '<span style="color:#C9CFD4">｜</span>'
-      + '<button class="link" style="color:var(--shu)" onclick="removeSelected()">削除</button>'
+      + '<button class="link" style="color:var(--shu)" onclick="removeSelected()">この商品を削除</button>'
       + '<button class="link" onclick="selected.clear();renderList();renderTags()">解除</button>';
   } else bar.style.display = "none";
 
@@ -4842,7 +4851,7 @@ function renderCardEdit_(){
       +   (m.img ? '<img class="card-edit-thumb" src="' + esc(m.img) + '">' : '<span style="color:#9AA7AF">写真なし</span>')
       +   '<label class="link" style="cursor:pointer">📷 撮影<input type="file" accept="image/*" capture="environment" style="display:none" onchange="cardImageFile(event,\'' + it.jan + '\')"></label>'
       +   '<label class="link" style="cursor:pointer">写真を選ぶ<input type="file" accept="image/*" style="display:none" onchange="cardImageFile(event,\'' + it.jan + '\')"></label>'
-      +   (m.img ? '<button class="link" onclick="setCardMeta(\'' + it.jan + '\',\'img\',\'\')">削除</button>' : '')
+      +   (m.img ? '<button class="link" onclick="setCardMeta(\'' + it.jan + '\',\'img\',\'\')">この商品を削除</button>' : '')
       + '</div></div>';
   }).join("") + '</div>';
 }
