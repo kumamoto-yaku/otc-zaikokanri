@@ -1120,12 +1120,12 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
     <details class="set-card" open>
       <summary class="set-h">使用マニュアル</summary>
       <div class="form">
-        <p class="hint">使い方をまとめた冊子です(A4・8ページ・図入り)。印刷して店頭に置いておくこともできます。</p>
+        <p class="hint">使い方をまとめた冊子です(A4・9ページ・図入り)。印刷して店頭に置いておくこともできます。</p>
         <div class="row gap wrap">
-          <a class="btn" href="OTCLinker_使用マニュアル.pdf" target="_blank" rel="noopener">マニュアルを開く(PDF)</a>
-          <a class="btn ghost" href="OTCLinker_使用マニュアル.pdf" download>PDFを保存</a>
+          <a class="btn" id="manual-open" href="OTCLinker_使用マニュアル.pdf" target="_blank" rel="noopener">マニュアルを開く(PDF)</a>
+          <a class="btn ghost" id="manual-save" href="OTCLinker_使用マニュアル.pdf" download>PDFを保存</a>
         </div>
-        <p class="hint">作成日 2026年7月27日 / 対応版 2026-07-27 AM 以降</p>
+        <p class="hint">作成日 2026年8月3日 / 対応版 2026-08-03 BM 以降(A4・9ページ)</p>
       </div>
     </details>
 
@@ -1202,7 +1202,7 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
   </section>
 
   <div class="toast" id="toast"></div>
-  <footer class="foot">OTCLinker — とみながグループ 店舗向けツール<br><span class="ver">版 2026-08-03 BM(印刷のすきまゼロ・見やすさ)</span></footer>
+  <footer class="foot">OTCLinker — とみながグループ 店舗向けツール<br><span class="ver">版 2026-08-03 BN(マニュアルの案内を更新)</span></footer>
 </div>
 
 <script>
@@ -5923,6 +5923,13 @@ function fillLookOptions_(){
   }).join("");
 }
 function bootUi_(){
+  // マニュアルは 古いものが 端末に残ることがあるので、開くたびに 新しく読み込ませる
+  try {
+    const stamp = "?v=" + today().replace(/-/g, "");
+    const a1 = document.getElementById("manual-open"), a2 = document.getElementById("manual-save");
+    if (a1) a1.href = "OTCLinker_使用マニュアル.pdf" + stamp;
+    if (a2) a2.href = "OTCLinker_使用マニュアル.pdf" + stamp;
+  } catch(e){}
   careTick_();
   onCategoryChange();
   setupPetTaps_();
