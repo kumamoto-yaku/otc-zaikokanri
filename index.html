@@ -683,8 +683,14 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
     grid-template-columns: none !important;
     text-align: left !important;
   }
+  /* 中身のそろえ方は 画面のまま保つ(外側の並べ方の指定に引きずられないように) */
+  .pop-card { align-items: center !important; justify-content: center !important; text-align: center !important; }
+  .price-tag { text-align: center !important; }
   .price-tag, .pcard, .pop-card {
-    display: inline-block !important;
+    /* 画面と同じ「縦に積む」並べ方を保つ。
+       inline-block にすると中身の配置が変わってしまうため inline-flex を使う。 */
+    display: inline-flex !important;
+    flex-direction: column !important;
     vertical-align: top !important;
     break-inside: avoid !important;
     page-break-inside: avoid !important;
@@ -1205,7 +1211,7 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
   </section>
 
   <div class="toast" id="toast"></div>
-  <footer class="foot">OTCLinker — とみながグループ 店舗向けツール<br><span class="ver">版 2026-08-04 BO(印刷サイズの実寸化)</span></footer>
+  <footer class="foot">OTCLinker — とみながグループ 店舗向けツール<br><span class="ver">版 2026-08-04 BP(印刷レイアウトの一致)</span></footer>
 </div>
 
 <script>
