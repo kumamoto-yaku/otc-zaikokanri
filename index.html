@@ -702,10 +702,25 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
     page-break-inside: avoid !important;
     -webkit-column-break-inside: avoid !important;
     margin: 0 !important;
-    /* となりと 線を 共有して 二重線に ならないようにする */
+    /* となりと 線を 共有する。ただし 下方向に 負の余白を付けると
+       最後の行が 親の高さの外に出て 最終ページが 作られないため、
+       共有するのは 横方向だけにする。 */
     border-width: 1px 1px 1px 1px !important;
     margin-right: -1px !important;
-    margin-bottom: -1px !important;
+  }
+  /* 最後のページが 確実に 作られるよう、いちばん下に 見えない受け皿を置く */
+  .tag-sheet::after, .card-sheet::after, .pop-wrap::after {
+    content: "";
+    display: block;
+    clear: both;
+    width: 100%;
+    height: 1px;
+  }
+  /* 最後の要素のうしろで 改ページを 止めない(止めると 最終ページが 落ちることがある) */
+  .price-tag:last-child, .pcard:last-child, .pop-card:last-child,
+  .tag-sheet, .card-sheet, .pop-wrap, #print-tags, #print-cards, #print-pop {
+    break-after: auto !important;
+    page-break-after: auto !important;
   }
   /* 用紙より高いPOP(A4指定など)は高さを内容なりにして切れを防ぐ */
   .pop-card { min-height: 0 !important; max-width: 194mm !important; max-height: 281mm !important; }
@@ -1217,7 +1232,7 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
   </section>
 
   <div class="toast" id="toast"></div>
-  <footer class="foot">OTCLinker — とみながグループ 店舗向けツール<br><span class="ver">版 2026-08-04 BQ(印刷の抜け防止)</span></footer>
+  <footer class="foot">OTCLinker — とみながグループ 店舗向けツール<br><span class="ver">版 2026-08-05 BR(最終ページの欠落を修正)</span></footer>
 </div>
 
 <script>
