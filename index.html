@@ -491,6 +491,19 @@ input:focus, select:focus { outline: 2px solid var(--ai); outline-offset: -1px; 
 .tag-yen { font-family: var(--serif); font-size: 30px; font-weight: 700; color: var(--shu); font-variant-numeric: tabular-nums; }
 .tag-tax { font-size: 11px; margin-left: 4px; color: var(--ink); }
 .barcode-num { font-family: monospace; font-size: 10px; letter-spacing: 2px; color: var(--ink); }
+/* 印刷を確実にページ分けするための「行」。画面では 中身がそのまま並ぶ */
+.print-row { display: contents; }
+@media print {
+  .print-row {
+    display: block !important;
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+    break-after: auto !important;
+    page-break-after: auto !important;
+    font-size: 0 !important;
+  }
+  .print-row > * { font-size: 1rem; }
+}
 .pop-wrap { display: flex; flex-direction: column; align-items: center; gap: 10px; overflow: hidden; }
 /* 画面では 実寸のままだと はみ出すので、幅に合わせて縮めて見せる(印刷は実寸) */
 .pop-scale { transform-origin: top center; }
@@ -708,17 +721,11 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
     border-width: 1px 1px 1px 1px !important;
     margin-right: -1px !important;
   }
-  /* 最後のページが 確実に 作られるよう、いちばん下に 見えない受け皿を置く */
-  .tag-sheet::after, .card-sheet::after, .pop-wrap::after {
-    content: "";
-    display: block;
-    clear: both;
-    width: 100%;
-    height: 1px;
-  }
-  /* 最後の要素のうしろで 改ページを 止めない(止めると 最終ページが 落ちることがある) */
-  .price-tag:last-child, .pcard:last-child, .pop-card:last-child,
+  /* 1行ずつのかたまり(.print-row)で ページが分かれるので、
+     シート自体には 改ページの制限を つけない */
   .tag-sheet, .card-sheet, .pop-wrap, #print-tags, #print-cards, #print-pop {
+    break-inside: auto !important;
+    page-break-inside: auto !important;
     break-after: auto !important;
     page-break-after: auto !important;
   }
@@ -1232,7 +1239,7 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
   </section>
 
   <div class="toast" id="toast"></div>
-  <footer class="foot">OTCLinker — とみながグループ 店舗向けツール<br><span class="ver">版 2026-08-05 BR(最終ページの欠落を修正)</span></footer>
+  <footer class="foot">OTCLinker — とみながグループ 店舗向けツール<br><span class="ver">版 2026-08-05 BS(印刷を行単位に)</span></footer>
 </div>
 
 <script>
@@ -4830,6 +4837,20 @@ function cardMeta_(jan){
   S.cardMeta[jan] = S.cardMeta[jan] || {};
   return S.cardMeta[jan];
 }
+// 印刷は「1行ずつのかたまり」に分けると、どのブラウザでも 確実に ページが分かれる。
+// (ばらばらに並べる方式だと、ページの境目で 抜け落ちることがある)
+const PRINT_W_MM = 194;          // A4縦・余白8mmのときに使える横幅
+function rowsOf_(list, itemWmm){
+  const per = Math.max(1, Math.floor(PRINT_W_MM / Math.max(1, itemWmm)));
+  const out = [];
+  for (let i = 0; i < list.length; i += per) out.push(list.slice(i, i + per));
+  return out;
+}
+function wrapRows_(htmlList, itemWmm){
+  return rowsOf_(htmlList, itemWmm).map(function(row){
+    return '<div class="print-row">' + row.join("") + '</div>';
+  }).join("");
+}
 function cardItems_(){
   return S.items.filter(function(it){ return selected.has(it.id); });
 }
@@ -4918,7 +4939,7 @@ function renderCardSheet_(){
     cm.innerHTML = ""; cm.style.display = "none";
   }
   if (items.length) doQuest("card");
-  sheet.innerHTML = items.map(function(it){
+  const cardHtmls = items.map(function(it){
     const m = (S.cardMeta || {})[it.jan] || {};
     const label = m.label || "";
     const feature = m.feature || "";
@@ -4936,7 +4957,8 @@ function renderCardSheet_(){
       +   (x.price !== false ? '<div class="pcard-priceline"><span class="pcard-price" style="font-size:' + fs(15) + '">' + (it.price !== "" && it.price != null ? Number(it.price).toLocaleString("ja-JP") : "") + '円<small>(税込)</small></span></div>' : '')
       +   (x.jan !== false && it.jan ? '<div class="pcard-barcode">' + ean13Svg(it.jan, bcH, x.jannum !== false, bcW) + '</div>' : '')
       + '</div></div>';
-  }).join("");
+  });
+  sheet.innerHTML = wrapRows_(cardHtmls, dim.w);
   fitBoxes_("#card-sheet .pcard");
 }
 // 枠に収まらない文字を、収まるまで少しずつ縮める(値札・カード・POP 共通)
@@ -5305,7 +5327,7 @@ function renderTags(){
     '<div class="row gap" style="margin-bottom:12px"><button class="btn" onclick="window.print()">値札を印刷(' + totalTags + ' 枚)</button>'
     + (totalTags !== arr.length ? '<span class="hint">' + arr.length + ' 商品 × ' + (tagStyle_().copies === "qty" ? "在庫数" : (totalTags / arr.length) + "枚") + '</span>' : '')
     + '</div>'
-    + '<div class="tag-sheet print-target size-' + t.size + '" style="'+sheetStyle+'">' + arr.map(it => {
+    + '<div class="tag-sheet print-target size-' + t.size + '" style="'+sheetStyle+'">' + wrapRows_([].concat.apply([], arr.map(it => {
       const cp = t.catPos || "top";
       const vert = (cp === "left" || cp === "right");
       const catLabel = vert ? (CAT_TINY[it.category] || it.category) : it.category;
@@ -5371,9 +5393,10 @@ function renderTags(){
       // 同じ値札を 設定した枚数だけ 並べる
       const n = tagCopies_(it);
       let outHtml = "";
-      for (let i = 0; i < n; i++) outHtml += one;
-      return outHtml;
-    }).join("") + '</div>';
+      const list = [];
+      for (let i = 0; i < n; i++) list.push(one);
+      return list;
+    })), (t.size === "custom" ? (t.width || 60) : (tagSize_(t).mm || 60))) + '</div>';
   requestAnimationFrame(() => requestAnimationFrame(() => {
     const padPx = ((t.pad==null?2:t.pad) * 2 + 2) * 3.78;
     document.querySelectorAll("#print-tags .price-tag").forEach(el => { el.__padPx = padPx; });
@@ -5658,7 +5681,7 @@ function renderPop(){
       h += '<div class="pop-extras-head">保存済みで一緒に印刷されるPOP(' + extras.length + '枚) — 外すには下の一覧でチェックを外してください</div>' + cards;
     }
   }
-  area.innerHTML = h || "";
+  area.innerHTML = h ? wrapRows_([h], PRINT_W_MM) : "";
   fitBoxes_("#pop-preview .pop-card");
   fitPop_();
 }
