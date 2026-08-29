@@ -495,6 +495,13 @@ input:focus, select:focus { outline: 2px solid var(--ai); outline-offset: -1px; 
 .sign-main { font-weight: 900; letter-spacing: -0.02em; line-height: 1; text-align: center;
   -webkit-text-stroke: 0.6mm currentColor; paint-order: stroke fill; }
 .sign-sub { font-weight: 900; letter-spacing: 0.08em; line-height: 1; text-align: center; }
+.sign-price { display: flex; align-items: baseline; justify-content: center; gap: 1.5mm; margin-top: 1mm;
+  background: rgba(255,255,255,0.92); border-radius: 1.5mm; padding: 1mm 3mm; color: #C0392B;
+  -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+.sign-was { text-decoration: line-through; text-decoration-thickness: 0.5mm; color: #7B8794; font-weight: 700; }
+.sign-arrow { color: #7B8794; font-weight: 700; }
+.sign-now { font-weight: 900; letter-spacing: -0.01em; }
+.sign-card.has-price .sign-main { margin-top: -1mm; }
 .sign-hole { position: absolute; top: 3mm; left: 50%; transform: translateX(-50%);
   width: 3mm; height: 3mm; border: 0.5mm solid; border-radius: 50%; opacity: 0.7; }
 @media print { .sign-sheet { display: block; } }
@@ -1132,6 +1139,35 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
       <div class="divider"><span>札を えらぶ</span></div>
       <div class="preset-list" id="sign-presets"></div>
 
+      <div class="divider"><span>金額を入れる(任意)</span></div>
+      <div class="grid2">
+        <label>もとの値段(円)
+          <input type="number" id="sg-price" min="0" step="1" placeholder="例:1280" inputmode="numeric" oninput="saveSignStyle();renderSigns()">
+        </label>
+        <label>割引
+          <select id="sg-off" onchange="saveSignStyle();renderSigns()">
+            <option value="0">値引きなし(値段だけ)</option>
+            <option value="10">1割引き</option>
+            <option value="20">2割引き</option>
+            <option value="30">3割引き</option>
+            <option value="40">4割引き</option>
+            <option value="50">半額</option>
+            <option value="70">70%引き</option>
+            <option value="80">80%引き</option>
+          </select>
+        </label>
+        <label>はしたの処理
+          <select id="sg-round" onchange="saveSignStyle();renderSigns()">
+            <option value="10">10円未満は切り捨て</option>
+            <option value="1">1円まで計算する</option>
+            <option value="100">100円未満は切り捨て</option>
+            <option value="8">8円で終わる値段にする</option>
+          </select>
+        </label>
+      </div>
+      <p class="hint">もとの値段を入れると、札の下に「¥1,280 → <b>¥640</b>」のように 入ります。空欄なら 文字だけの札になります。
+        「札を えらぶ」で 50%OFF などを選ぶと、割引率も 合わせて 変わります。</p>
+
       <div class="divider"><span>文字を 自分で決める</span></div>
       <div class="grid2">
         <label>大きい文字 <input type="text" id="sg-main" maxlength="8" placeholder="例:50%" oninput="saveSignStyle();renderSigns()"></label>
@@ -1332,7 +1368,7 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
   </section>
 
   <div class="toast" id="toast"></div>
-  <footer class="foot">OTCLinker — とみながグループ 店舗向けツール<br><span class="ver">版 2026-08-07 BV(うりば札タブ)</span></footer>
+  <footer class="foot">OTCLinker — とみながグループ 店舗向けツール<br><span class="ver">版 2026-08-07 BW(うりば札に金額)</span></footer>
 </div>
 
 <script>
@@ -5324,28 +5360,29 @@ function syncTagStyleInputs(){
 /* ===== うりば札(商品と関係なく使える札) ===== */
 const SIGN_SIZES = { s:{w:60,h:40}, m:{w:90,h:60}, l:{w:120,h:80}, ll:{w:180,h:120} };
 const SIGN_PRESETS = [
-  { id:"off80", main:"80%", sub:"OFF", col:"#C0392B", label:"80% OFF" },
-  { id:"off70", main:"70%", sub:"OFF", col:"#C0392B", label:"70% OFF" },
-  { id:"off50", main:"50%", sub:"OFF", col:"#C0392B", label:"50% OFF" },
-  { id:"off30", main:"30%", sub:"OFF", col:"#C0392B", label:"30% OFF" },
-  { id:"off20", main:"20%", sub:"OFF", col:"#C0392B", label:"20% OFF" },
-  { id:"han",   main:"半額", sub:"",   col:"#C0392B", label:"半額" },
-  { id:"waribiki3", main:"3割", sub:"引き", col:"#C0392B", label:"3割引き" },
-  { id:"waribiki2", main:"2割", sub:"引き", col:"#C0392B", label:"2割引き" },
+  { id:"off80", main:"80%", sub:"OFF", col:"#C0392B", label:"80% OFF", off:80 },
+  { id:"off70", main:"70%", sub:"OFF", col:"#C0392B", label:"70% OFF", off:70 },
+  { id:"off50", main:"50%", sub:"OFF", col:"#C0392B", label:"50% OFF", off:50 },
+  { id:"off30", main:"30%", sub:"OFF", col:"#C0392B", label:"30% OFF", off:30 },
+  { id:"off20", main:"20%", sub:"OFF", col:"#C0392B", label:"20% OFF", off:20 },
+  { id:"han",   main:"半額", sub:"",   col:"#C0392B", label:"半額", off:50 },
+  { id:"waribiki3", main:"3割", sub:"引き", col:"#C0392B", label:"3割引き", off:30 },
+  { id:"waribiki2", main:"2割", sub:"引き", col:"#C0392B", label:"2割引き", off:20 },
   { id:"osusume", main:"オススメ", sub:"", col:"#E3A21A", label:"オススメ" },
   { id:"ninki",   main:"人気", sub:"NO.1", col:"#D9534F", label:"人気No.1" },
   { id:"gentei",  main:"数量", sub:"限定", col:"#7B5EA7", label:"数量限定" },
   { id:"new",     main:"NEW", sub:"新発売", col:"#2E7D6B", label:"新発売" },
   { id:"yaku",    main:"薬剤師", sub:"おすすめ", col:"#1E3A55", label:"薬剤師おすすめ" },
   { id:"season",  main:"季節の", sub:"おすすめ", col:"#3E7C59", label:"季節のおすすめ" },
-  { id:"tokka",   main:"特価", sub:"", col:"#C0392B", label:"特価" },
+  { id:"tokka",   main:"特価", sub:"", col:"#C0392B", label:"特価", off:20 },
   { id:"sale",    main:"SALE", sub:"", col:"#C0392B", label:"SALE" },
   { id:"tesuto",  main:"お試し", sub:"価格", col:"#E3A21A", label:"お試し価格" },
   { id:"zaiko",   main:"在庫", sub:"かぎり", col:"#5C6B78", label:"在庫かぎり" }
 ];
 function signStyle_(){
   return Object.assign({ preset:"off50", main:"50%", sub:"OFF", col:"#C0392B",
-                         size:"m", w:90, h:60, copies:4, shape:"rect", hole:false }, S.signStyle || {});
+                         size:"m", w:90, h:60, copies:4, shape:"rect", hole:false,
+                         price:"", off:50, round:10, showPrice:false }, S.signStyle || {});
 }
 function saveSignStyle(){
   const g = function(id){ const e = document.getElementById(id); return e ? e.value : ""; };
@@ -5359,7 +5396,10 @@ function saveSignStyle(){
     h: parseInt(g("sg-h"), 10) || 60,
     copies: Math.max(1, Math.min(60, parseInt(g("sg-copies"), 10) || 4)),
     shape: g("sg-shape") || "rect",
-    hole: !!(document.getElementById("sg-hole") || {}).checked
+    hole: !!(document.getElementById("sg-hole") || {}).checked,
+    price: g("sg-price"),
+    off: parseInt(g("sg-off"), 10) || 0,
+    round: parseInt(g("sg-round"), 10) || 10
   };
   S.signStyle = st;
   const cus = st.size === "custom";
@@ -5373,6 +5413,7 @@ function applySignPreset(id){
   if (!ps) return;
   const st = signStyle_();
   st.preset = id; st.main = ps.main; st.sub = ps.sub; st.col = ps.col;
+  if (ps.off != null) st.off = ps.off;      // 「50% OFF」などは 割引率も そろえる
   S.signStyle = st; save();
   syncSignInputs(); renderSigns();
   toast("「" + ps.label + "」の札にしました");
@@ -5383,6 +5424,7 @@ function syncSignInputs(){
   set("sg-main", st.main); set("sg-sub", st.sub); set("sg-color", st.col);
   set("sg-size", st.size); set("sg-w", st.w); set("sg-h", st.h);
   set("sg-copies", st.copies); set("sg-shape", st.shape);
+  set("sg-price", st.price); set("sg-off", st.off); set("sg-round", st.round);
   const hl = document.getElementById("sg-hole"); if (hl) hl.checked = !!st.hole;
   const cus = st.size === "custom";
   const ww = document.getElementById("sg-w-wrap"), hw = document.getElementById("sg-h-wrap");
@@ -5415,11 +5457,31 @@ function renderSigns(){
     widthUnits += (c < 128) ? 0.62 : 1.0;
   }
   widthUnits = Math.max(0.62, widthUnits);
-  const mainMm = Math.min(dim.h * 0.52, (dim.w * 0.86) / widthUnits);
+  const hasPrice = (parseInt(String(st.price).replace(/[^\d]/g, ""), 10) || 0) > 0;
+  const mainMm = Math.min(dim.h * (hasPrice ? 0.38 : 0.52), (dim.w * 0.86) / widthUnits);
   const subMm = Math.max(3, Math.min(dim.h * 0.17, dim.w * 0.13));
   const radius = st.shape === "round" ? "4mm" : "0";
   const clip = st.shape === "tag" ? "polygon(0 0,100% 0,100% 78%,50% 100%,0 78%)" : "none";
-  const one = '<div class="sign-card" style="width:' + dim.w + 'mm;height:' + dim.h + 'mm;'
+  // 金額(入っていれば 札の下に 出す)
+  const p0 = parseInt(String(st.price).replace(/[^\d]/g, ""), 10);
+  let priceHtml = "";
+  if (p0 > 0){
+    const np = st.off ? offPrice_(p0, st.off, Number(st.round) || 10) : null;
+    const pSize = Math.max(3.5, Math.min(dim.h * 0.20, dim.w * 0.14));
+    const wSize = pSize * 0.55;
+    if (np){
+      priceHtml = '<div class="sign-price">'
+        + '<span class="sign-was" style="font-size:' + wSize.toFixed(1) + 'mm">¥' + p0.toLocaleString("ja-JP") + '</span>'
+        + '<span class="sign-arrow" style="font-size:' + wSize.toFixed(1) + 'mm">→</span>'
+        + '<span class="sign-now" style="font-size:' + pSize.toFixed(1) + 'mm">¥' + np.toLocaleString("ja-JP") + '</span>'
+        + '</div>';
+    } else {
+      priceHtml = '<div class="sign-price">'
+        + '<span class="sign-now" style="font-size:' + pSize.toFixed(1) + 'mm">¥' + p0.toLocaleString("ja-JP") + '</span>'
+        + '</div>';
+    }
+  }
+  const one = '<div class="sign-card' + (priceHtml ? ' has-price' : '') + '" style="width:' + dim.w + 'mm;height:' + dim.h + 'mm;'
     + 'background:' + bg + ';color:' + fg + ';border-radius:' + radius + ';'
     + (white ? 'border:2mm solid #C0392B;' : '')
     + (clip !== "none" ? 'clip-path:' + clip + ';-webkit-clip-path:' + clip + ';' : '')
@@ -5427,6 +5489,7 @@ function renderSigns(){
     + (st.hole ? '<i class="sign-hole" style="border-color:' + fg + '"></i>' : '')
     + '<div class="sign-main" style="font-size:' + mainMm.toFixed(1) + 'mm">' + esc(st.main || "") + '</div>'
     + (st.sub ? '<div class="sign-sub" style="font-size:' + subMm.toFixed(1) + 'mm">' + esc(st.sub) + '</div>' : '')
+    + priceHtml
     + '</div>';
   const list = [];
   for (let i = 0; i < st.copies; i++) list.push(one);
