@@ -488,6 +488,16 @@ input:focus, select:focus { outline: 2px solid var(--ai); outline-offset: -1px; 
 .sub-fold > summary::before { content: "▸ "; }
 .sub-fold[open] > summary::before { content: "▾ "; }
 .sub-fold[open] { padding-bottom: 10px; }
+.sign-sheet { display: flex; flex-wrap: wrap; gap: 4mm; }
+.sign-card { box-sizing: border-box; position: relative; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 1mm; overflow: hidden; font-family: var(--sans);
+  -webkit-print-color-adjust: exact; print-color-adjust: exact; break-inside: avoid; page-break-inside: avoid; }
+.sign-main { font-weight: 900; letter-spacing: -0.02em; line-height: 1; text-align: center;
+  -webkit-text-stroke: 0.6mm currentColor; paint-order: stroke fill; }
+.sign-sub { font-weight: 900; letter-spacing: 0.08em; line-height: 1; text-align: center; }
+.sign-hole { position: absolute; top: 3mm; left: 50%; transform: translateX(-50%);
+  width: 3mm; height: 3mm; border: 0.5mm solid; border-radius: 50%; opacity: 0.7; }
+@media print { .sign-sheet { display: block; } }
 .preset-list { display: flex; flex-wrap: wrap; gap: 7px; }
 .preset-chip { display: flex; flex-direction: column; align-items: stretch; gap: 3px; min-width: 92px; flex: 1 1 92px;
   border: 1px solid var(--line); border-radius: 9px; background: #fff; padding: 0 0 7px; cursor: pointer; font-family: var(--sans); overflow: hidden; }
@@ -690,18 +700,19 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
   /* 印刷対象以外を完全に消す(場所も詰める) */
   body > .chrome > *:not(.panel),
   .panel:not(.active),
-  .panel.active > *:not(#print-tags-wrap):not(#print-pop):not(#print-cards),
+  .panel.active > *:not(#print-tags-wrap):not(#print-pop):not(#print-cards):not(#print-signs),
   #print-tags-wrap > *:not(#print-tags),
   #print-pop > *:not(#pop-preview),
   #print-cards > *:not(#card-sheet),
+  #print-signs > *:not(#sign-sheet),
   #print-tags > .row,
   .tabs, .header, .foot, #login-gate, .toast {
     display: none !important;
   }
   body, .chrome, .panel { display: block !important; padding: 0 !important; margin: 0 !important; max-width: none !important; border: none !important; background: #fff !important; }
   /* 高さの制限や はみ出し隠しが 残っていると 2ページ目以降が 出ない */
-  html, body, .chrome, .panel, #print-cards, #print-tags-wrap, #print-pop,
-  .card-sheet, .tag-sheet, .pop-wrap {
+  html, body, .chrome, .panel, #print-cards, #print-tags-wrap, #print-pop, #print-signs,
+  .card-sheet, .tag-sheet, .pop-wrap, .sign-sheet {
     height: auto !important;
     max-height: none !important;
     overflow: visible !important;
@@ -715,7 +726,7 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
   /* 切るのが楽なように、印刷では すきまなく 並べる */
   /* 印刷は block+inline-block でないと 複数ページに 分かれない。
      すきまは 要素どうしの 改行が原因なので、HTML側で 改行を入れずに出力している。 */
-  .tag-sheet, .card-sheet, .pop-wrap {
+  .tag-sheet, .card-sheet, .pop-wrap, .sign-sheet {
     display: block !important;
     gap: 0 !important;
     grid-template-columns: none !important;
@@ -724,7 +735,7 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
   /* 中身のそろえ方は 画面のまま保つ(外側の並べ方の指定に引きずられないように) */
   .pop-card { align-items: center !important; justify-content: center !important; text-align: center !important; }
   .price-tag { text-align: center !important; }
-  .price-tag, .pcard, .pop-card {
+  .price-tag, .pcard, .pop-card, .sign-card {
     /* 横に並べつつ、中身は 画面と同じく 縦に積む */
     display: inline-flex !important;
     flex-direction: column !important;
@@ -741,7 +752,7 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
   }
   /* 1行ずつのかたまり(.print-row)で ページが分かれるので、
      シート自体には 改ページの制限を つけない */
-  .tag-sheet, .card-sheet, .pop-wrap, #print-tags, #print-cards, #print-pop {
+  .tag-sheet, .card-sheet, .pop-wrap, .sign-sheet, #print-tags, #print-cards, #print-pop, #print-signs {
     break-inside: auto !important;
     page-break-inside: auto !important;
     break-after: auto !important;
@@ -935,6 +946,7 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
       <button id="seg-tags" class="on" onclick="setPrintKind('tags')">値札シート</button>
       <button id="seg-pop" onclick="setPrintKind('pop')">販促POP</button>
       <button id="seg-cards" onclick="setPrintKind('cards')">商品カード</button>
+      <button id="seg-signs" onclick="setPrintKind('signs')">うりば札</button>
     </div>
     <div id="print-tags-wrap">
       <div class="steps"><span class="stp"><b>1</b>在庫リストで商品にチェック</span><span class="arw">→</span><span class="stp"><b>2</b>デザインを調整</span><span class="arw">→</span><span class="stp"><b>3</b>印刷</span></div>
@@ -1114,6 +1126,63 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
       <div class="pop-wrap print-target" id="pop-preview"></div>
       <p class="hint" id="pop-scale-note" style="display:none"></p>
     </div>
+    <div id="print-signs" style="display:none">
+      <p class="hint">商品とは関係なく使える、売場に貼る札です。文字を選んで 枚数を決め、印刷してください。</p>
+
+      <div class="divider"><span>札を えらぶ</span></div>
+      <div class="preset-list" id="sign-presets"></div>
+
+      <div class="divider"><span>文字を 自分で決める</span></div>
+      <div class="grid2">
+        <label>大きい文字 <input type="text" id="sg-main" maxlength="8" placeholder="例:50%" oninput="saveSignStyle();renderSigns()"></label>
+        <label>小さい文字 <input type="text" id="sg-sub" maxlength="10" placeholder="例:OFF" oninput="saveSignStyle();renderSigns()"></label>
+      </div>
+
+      <details class="sub-fold">
+        <summary>こまかい設定(色・大きさ・枚数・穴)</summary>
+        <div class="grid2">
+          <label>色
+            <select id="sg-color" onchange="saveSignStyle();renderSigns()">
+              <option value="#C0392B">赤</option>
+              <option value="#E3A21A">黄</option>
+              <option value="#2E7D6B">緑</option>
+              <option value="#1E3A55">紺</option>
+              <option value="#7B5EA7">紫</option>
+              <option value="#D9534F">朱</option>
+              <option value="#333333">黒</option>
+              <option value="#FFFFFF">白(枠のみ)</option>
+            </select>
+          </label>
+          <label>大きさ
+            <select id="sg-size" onchange="saveSignStyle();renderSigns()">
+              <option value="s">小(60×40mm)</option>
+              <option value="m">中(90×60mm)</option>
+              <option value="l">大(120×80mm)</option>
+              <option value="ll">特大(180×120mm)</option>
+              <option value="custom">自分で決める</option>
+            </select>
+          </label>
+          <label id="sg-w-wrap" style="display:none">幅(mm) <input type="number" id="sg-w" min="20" max="200" value="90" oninput="saveSignStyle();renderSigns()"></label>
+          <label id="sg-h-wrap" style="display:none">高さ(mm) <input type="number" id="sg-h" min="15" max="280" value="60" oninput="saveSignStyle();renderSigns()"></label>
+          <label>枚数 <input type="number" id="sg-copies" min="1" max="60" value="4" oninput="saveSignStyle();renderSigns()"></label>
+          <label>形
+            <select id="sg-shape" onchange="saveSignStyle();renderSigns()">
+              <option value="rect">四角</option>
+              <option value="round">角丸</option>
+              <option value="tag">下がとがった札</option>
+            </select>
+          </label>
+        </div>
+        <label class="chk-row"><input type="checkbox" id="sg-hole" onchange="saveSignStyle();renderSigns()"> ひもを通す穴の印をつける</label>
+      </details>
+
+      <div class="row gap" style="margin:12px 0">
+        <button class="btn" onclick="window.print()">うりば札を印刷</button>
+        <span class="hint" id="sign-count"></span>
+      </div>
+      <div class="sign-sheet print-target" id="sign-sheet"></div>
+    </div>
+
     <div id="print-cards" style="display:none">
       <div class="steps"><span class="stp"><b>1</b>在庫リストで商品にチェック</span><span class="arw">→</span><span class="stp"><b>2</b>写真・特徴を自動取得か撮影</span><span class="arw">→</span><span class="stp"><b>3</b>印刷</span></div>
       <div class="form">
@@ -1263,7 +1332,7 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
   </section>
 
   <div class="toast" id="toast"></div>
-  <footer class="foot">OTCLinker — とみながグループ 店舗向けツール<br><span class="ver">版 2026-08-06 BU(割引を目立たせ・縮小の修正)</span></footer>
+  <footer class="foot">OTCLinker — とみながグループ 店舗向けツール<br><span class="ver">版 2026-08-07 BV(うりば札タブ)</span></footer>
 </div>
 
 <script>
@@ -2441,6 +2510,7 @@ function renderList(){
       + '<button class="link" onclick="showTab(\'print\');setPrintKind(\'tags\')">値札</button>'
       + '<button class="link" onclick="showTab(\'print\');setPrintKind(\'pop\')">POP</button>'
       + '<button class="link" onclick="showTab(\'print\');setPrintKind(\'cards\')">商品カード</button>'
+      + '<button class="link" onclick="showTab(\'print\');setPrintKind(\'signs\')">うりば札</button>'
       + '<span style="color:#C9CFD4">｜</span>'
       + '<button class="link" style="color:var(--shu)" onclick="removeSelected()">この商品を削除</button>'
       + '<button class="link" onclick="selected.clear();renderList();renderTags()">解除</button>';
@@ -2575,12 +2645,15 @@ function setPrintKind(k){
   document.getElementById("seg-tags").className = k==="tags" ? "on" : "";
   document.getElementById("seg-pop").className = k==="pop" ? "on" : "";
   document.getElementById("seg-cards").className = k==="cards" ? "on" : "";
+  document.getElementById("seg-signs").className = k==="signs" ? "on" : "";
   document.getElementById("print-tags-wrap").style.display = k==="tags" ? "block" : "none";
   document.getElementById("print-pop").style.display = k==="pop" ? "block" : "none";
   document.getElementById("print-cards").style.display = k==="cards" ? "block" : "none";
+  document.getElementById("print-signs").style.display = k==="signs" ? "block" : "none";
   updatePrintSelbar_();
   if (k==="tags") renderTags();
   else if (k==="pop"){ fillPopSelect(); renderPop(); }
+  else if (k==="signs") renderSigns();
   else renderCards();
 }
 function updatePrintSelbar_(){
@@ -5247,6 +5320,125 @@ function syncTagStyleInputs(){
   document.getElementById("tf-price").checked = f.price !== false;
   document.getElementById("tf-jan").checked = f.jan !== false;
   document.getElementById("tf-jannum").checked = f.jannum !== false;
+}
+/* ===== うりば札(商品と関係なく使える札) ===== */
+const SIGN_SIZES = { s:{w:60,h:40}, m:{w:90,h:60}, l:{w:120,h:80}, ll:{w:180,h:120} };
+const SIGN_PRESETS = [
+  { id:"off80", main:"80%", sub:"OFF", col:"#C0392B", label:"80% OFF" },
+  { id:"off70", main:"70%", sub:"OFF", col:"#C0392B", label:"70% OFF" },
+  { id:"off50", main:"50%", sub:"OFF", col:"#C0392B", label:"50% OFF" },
+  { id:"off30", main:"30%", sub:"OFF", col:"#C0392B", label:"30% OFF" },
+  { id:"off20", main:"20%", sub:"OFF", col:"#C0392B", label:"20% OFF" },
+  { id:"han",   main:"半額", sub:"",   col:"#C0392B", label:"半額" },
+  { id:"waribiki3", main:"3割", sub:"引き", col:"#C0392B", label:"3割引き" },
+  { id:"waribiki2", main:"2割", sub:"引き", col:"#C0392B", label:"2割引き" },
+  { id:"osusume", main:"オススメ", sub:"", col:"#E3A21A", label:"オススメ" },
+  { id:"ninki",   main:"人気", sub:"NO.1", col:"#D9534F", label:"人気No.1" },
+  { id:"gentei",  main:"数量", sub:"限定", col:"#7B5EA7", label:"数量限定" },
+  { id:"new",     main:"NEW", sub:"新発売", col:"#2E7D6B", label:"新発売" },
+  { id:"yaku",    main:"薬剤師", sub:"おすすめ", col:"#1E3A55", label:"薬剤師おすすめ" },
+  { id:"season",  main:"季節の", sub:"おすすめ", col:"#3E7C59", label:"季節のおすすめ" },
+  { id:"tokka",   main:"特価", sub:"", col:"#C0392B", label:"特価" },
+  { id:"sale",    main:"SALE", sub:"", col:"#C0392B", label:"SALE" },
+  { id:"tesuto",  main:"お試し", sub:"価格", col:"#E3A21A", label:"お試し価格" },
+  { id:"zaiko",   main:"在庫", sub:"かぎり", col:"#5C6B78", label:"在庫かぎり" }
+];
+function signStyle_(){
+  return Object.assign({ preset:"off50", main:"50%", sub:"OFF", col:"#C0392B",
+                         size:"m", w:90, h:60, copies:4, shape:"rect", hole:false }, S.signStyle || {});
+}
+function saveSignStyle(){
+  const g = function(id){ const e = document.getElementById(id); return e ? e.value : ""; };
+  const cur = signStyle_();
+  const st = {
+    preset: cur.preset,
+    main: g("sg-main"), sub: g("sg-sub"),
+    col: g("sg-color") || cur.col,
+    size: g("sg-size") || "m",
+    w: parseInt(g("sg-w"), 10) || 90,
+    h: parseInt(g("sg-h"), 10) || 60,
+    copies: Math.max(1, Math.min(60, parseInt(g("sg-copies"), 10) || 4)),
+    shape: g("sg-shape") || "rect",
+    hole: !!(document.getElementById("sg-hole") || {}).checked
+  };
+  S.signStyle = st;
+  const cus = st.size === "custom";
+  const ww = document.getElementById("sg-w-wrap"), hw = document.getElementById("sg-h-wrap");
+  if (ww) ww.style.display = cus ? "" : "none";
+  if (hw) hw.style.display = cus ? "" : "none";
+  save();
+}
+function applySignPreset(id){
+  const ps = SIGN_PRESETS.filter(function(x){ return x.id === id; })[0];
+  if (!ps) return;
+  const st = signStyle_();
+  st.preset = id; st.main = ps.main; st.sub = ps.sub; st.col = ps.col;
+  S.signStyle = st; save();
+  syncSignInputs(); renderSigns();
+  toast("「" + ps.label + "」の札にしました");
+}
+function syncSignInputs(){
+  const st = signStyle_();
+  const set = function(id, v){ const e = document.getElementById(id); if (e) e.value = v; };
+  set("sg-main", st.main); set("sg-sub", st.sub); set("sg-color", st.col);
+  set("sg-size", st.size); set("sg-w", st.w); set("sg-h", st.h);
+  set("sg-copies", st.copies); set("sg-shape", st.shape);
+  const hl = document.getElementById("sg-hole"); if (hl) hl.checked = !!st.hole;
+  const cus = st.size === "custom";
+  const ww = document.getElementById("sg-w-wrap"), hw = document.getElementById("sg-h-wrap");
+  if (ww) ww.style.display = cus ? "" : "none";
+  if (hw) hw.style.display = cus ? "" : "none";
+  const box = document.getElementById("sign-presets");
+  if (box){
+    box.innerHTML = SIGN_PRESETS.map(function(ps){
+      return '<button class="preset-chip' + (st.preset === ps.id ? ' on' : '') + '" onclick="applySignPreset(\'' + ps.id + '\')">'
+        + '<i class="preset-band" style="background:' + ps.col + '"></i>'
+        + '<b>' + esc(ps.label) + '</b></button>';
+    }).join("");
+  }
+}
+function renderSigns(){
+  syncSignInputs();
+  const st = signStyle_();
+  const sheet = document.getElementById("sign-sheet");
+  if (!sheet) return;
+  const dim = st.size === "custom" ? { w: st.w, h: st.h } : (SIGN_SIZES[st.size] || SIGN_SIZES.m);
+  const white = String(st.col).toUpperCase() === "#FFFFFF";
+  const fg = white ? "#C0392B" : "#fff";
+  const bg = white ? "#fff" : st.col;
+  // 大きい文字は 札の幅と 文字の横幅から決める。
+  // 全角は およそ1文字ぶん、半角(英数)は 0.62文字ぶんの幅になる。
+  const mainTxt = String(st.main || "");
+  let widthUnits = 0;
+  for (let i = 0; i < mainTxt.length; i++){
+    const c = mainTxt.charCodeAt(i);
+    widthUnits += (c < 128) ? 0.62 : 1.0;
+  }
+  widthUnits = Math.max(0.62, widthUnits);
+  const mainMm = Math.min(dim.h * 0.52, (dim.w * 0.86) / widthUnits);
+  const subMm = Math.max(3, Math.min(dim.h * 0.17, dim.w * 0.13));
+  const radius = st.shape === "round" ? "4mm" : "0";
+  const clip = st.shape === "tag" ? "polygon(0 0,100% 0,100% 78%,50% 100%,0 78%)" : "none";
+  const one = '<div class="sign-card" style="width:' + dim.w + 'mm;height:' + dim.h + 'mm;'
+    + 'background:' + bg + ';color:' + fg + ';border-radius:' + radius + ';'
+    + (white ? 'border:2mm solid #C0392B;' : '')
+    + (clip !== "none" ? 'clip-path:' + clip + ';-webkit-clip-path:' + clip + ';' : '')
+    + '">'
+    + (st.hole ? '<i class="sign-hole" style="border-color:' + fg + '"></i>' : '')
+    + '<div class="sign-main" style="font-size:' + mainMm.toFixed(1) + 'mm">' + esc(st.main || "") + '</div>'
+    + (st.sub ? '<div class="sign-sub" style="font-size:' + subMm.toFixed(1) + 'mm">' + esc(st.sub) + '</div>' : '')
+    + '</div>';
+  const list = [];
+  for (let i = 0; i < st.copies; i++) list.push(one);
+  sheet.innerHTML = wrapRows_(list, dim.w);
+  const cnt = document.getElementById("sign-count");
+  if (cnt){
+    const per = Math.max(1, Math.floor(PRINT_W_MM / dim.w));
+    const rows = Math.ceil(st.copies / per);
+    const rowsPerPage = Math.max(1, Math.floor(281 / dim.h));
+    cnt.textContent = st.copies + "枚(" + dim.w + "×" + dim.h + "mm / 横" + per + "枚 / "
+      + Math.ceil(rows / rowsPerPage) + "ページ)";
+  }
 }
 // よく使う札を ひと押しで 作れるようにする
 // off=割引率(0なら値引きなし) / word=帯の文字 / col=帯の色
