@@ -483,6 +483,19 @@ input:focus, select:focus { outline: 2px solid var(--ai); outline-offset: -1px; 
 .tag-name { font-family: var(--serif); font-weight: 600; font-size: 16px; line-height: 1.3; overflow-wrap: anywhere; word-break: break-word; }
 .tag-maker { font-size: 11px; color: #5C6B78; }
 .tag-price { margin: 6px 0 4px; }
+.sub-fold { border: 1px solid var(--line); border-radius: 9px; padding: 0 12px; margin: 8px 0; background: #FAFBFB; }
+.sub-fold > summary { cursor: pointer; padding: 10px 0; font-size: 13px; color: var(--ai-deep); list-style: none; }
+.sub-fold > summary::before { content: "▸ "; }
+.sub-fold[open] > summary::before { content: "▾ "; }
+.sub-fold[open] { padding-bottom: 10px; }
+.preset-list { display: flex; flex-wrap: wrap; gap: 7px; }
+.preset-chip { display: flex; flex-direction: column; align-items: stretch; gap: 3px; min-width: 92px; flex: 1 1 92px;
+  border: 1px solid var(--line); border-radius: 9px; background: #fff; padding: 0 0 7px; cursor: pointer; font-family: var(--sans); overflow: hidden; }
+.preset-chip .preset-band { display: block; height: 8px; }
+.preset-chip .preset-band.none { background: repeating-linear-gradient(45deg,#E8ECEA,#E8ECEA 4px,#F4F6F5 4px,#F4F6F5 8px); }
+.preset-chip b { font-size: 12.5px; color: var(--ai-deep); padding: 5px 6px 0; }
+.preset-chip span { font-size: 10.5px; color: #8A97A0; padding: 0 6px; }
+.preset-chip.on { border-color: var(--ai); border-width: 2px; background: #EEF3F1; }
 .tag-off-band { background: #C0392B; color: #fff; font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-align: center; padding: 2px 0; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 .tag-price-off { display: flex; flex-direction: column; align-items: center; gap: 1px; }
 .tag-was { font-size: 12px; color: #7B8794; text-decoration: line-through; }
@@ -970,7 +983,12 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
           </div>
           <p class="hint">商品に直接はる場合は「在庫数と同じだけ」が便利です。値引きの値札を 1つずつ はって レジで対応できます。</p>
 
-          <div class="divider"><span>お買い得値札(期限が近い商品などに)</span></div>
+          <div class="divider"><span>札のデザインを えらぶ</span></div>
+          <p class="hint">押すだけで 帯の文字と 値引きが 決まります。細かい調整は 下の欄でできます。</p>
+          <div class="preset-list" id="tag-presets"></div>
+
+          <details class="sub-fold">
+            <summary>こまかい設定(割引率・はしたの処理・帯の文字)</summary>
           <div class="grid2">
             <label>割引
               <select id="ts-off" onchange="saveTagStyle();renderTags()">
@@ -999,7 +1017,8 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
               <input type="text" id="ts-off-word" maxlength="12" placeholder="例:期限間近のため" oninput="saveTagStyle();renderTags()">
             </label>
           </div>
-          <p class="hint">割引を選ぶと、もとの値段に線を引いて 新しい値段を大きく出した値札になります。期限が近いものだけに付けたいときは、在庫リストで その商品だけ チェックしてください。</p>
+          <p class="hint">割引を選ぶと、もとの値段に線を引いて 新しい値段を大きく出した値札になります。</p>
+          </details>
           <div class="field-toggles">
             <span class="ft-label">表示する項目:</span>
             <label><input type="checkbox" id="tf-cat" onchange="saveTagStyle()"> 区分帯</label>
@@ -1239,7 +1258,7 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
   </section>
 
   <div class="toast" id="toast"></div>
-  <footer class="foot">OTCLinker — とみながグループ 店舗向けツール<br><span class="ver">版 2026-08-05 BS(印刷を行単位に)</span></footer>
+  <footer class="foot">OTCLinker — とみながグループ 店舗向けツール<br><span class="ver">版 2026-08-06 BT(販促札のひと押し作成)</span></footer>
 </div>
 
 <script>
@@ -5171,7 +5190,22 @@ const TAG_SIZES = { s: { w: 170, bar: 28, mm: 45 }, m: { w: 220, bar: 34, mm: 60
 function tagSize_(t){ if (t.size === "custom") { const px = Math.round((t.width || 60) * 3.78); return { w: px, bar: Math.max(20, Math.round(px * 0.16)), mm: (t.width || 60) }; } return TAG_SIZES[t.size] || TAG_SIZES.m; }
 function defaultTagStyle(){ return { size: "m", width: 60, height: 0, pad: 2, catPos: "top", fields: { cat:true, name:true, maker:true, price:true, jan:true, jannum:true }, font: "serif", bold: "bold", nameSize: 16, priceSize: 30, nameColor: "#1F2933", priceColor: "#B7402B" }; }
 function tagStyle_(){ return Object.assign(defaultTagStyle(), S.tagStyle || {}); }
+// 札のデザインの ボタンを 並べる
+function renderTagPresets(){
+  const box = document.getElementById("tag-presets");
+  if (!box) return;
+  const cur = tagStyle_().preset || "";
+  box.innerHTML = TAG_PRESETS.map(function(ps){
+    const on = cur === ps.id;
+    return '<button class="preset-chip' + (on ? ' on' : '') + '" onclick="applyTagPreset(\'' + ps.id + '\')">'
+      + (ps.col ? '<i class="preset-band" style="background:' + ps.col + '"></i>' : '<i class="preset-band none"></i>')
+      + '<b>' + esc(ps.label) + '</b>'
+      + (ps.off ? '<span>' + ps.off + '%引き</span>' : '<span>値引きなし</span>')
+      + '</button>';
+  }).join("");
+}
 function syncTagStyleInputs(){
+  renderTagPresets();
   const t = tagStyle_();
   document.getElementById("ts-font").innerHTML = fontOptions(t.font);
   document.getElementById("ts-size").value = t.size;
@@ -5208,6 +5242,35 @@ function syncTagStyleInputs(){
   document.getElementById("tf-price").checked = f.price !== false;
   document.getElementById("tf-jan").checked = f.jan !== false;
   document.getElementById("tf-jannum").checked = f.jannum !== false;
+}
+// よく使う札を ひと押しで 作れるようにする
+// off=割引率(0なら値引きなし) / word=帯の文字 / col=帯の色
+const TAG_PRESETS = [
+  { id:"off50",  label:"半額",       off:50, word:"半額",           col:"#C0392B" },
+  { id:"off30",  label:"3割引",      off:30, word:"3割引",          col:"#C0392B" },
+  { id:"off20",  label:"2割引",      off:20, word:"2割引",          col:"#C0392B" },
+  { id:"off10",  label:"1割引",      off:10, word:"1割引",          col:"#C0392B" },
+  { id:"kigen",  label:"期限間近",    off:30, word:"期限間近のため", col:"#B7402B" },
+  { id:"osusume",label:"オススメ",    off:0,  word:"★ オススメ",     col:"#E3A21A" },
+  { id:"gentei", label:"数量限定",    off:0,  word:"数量限定",       col:"#7B5EA7" },
+  { id:"shinhatsu",label:"新発売",   off:0,  word:"NEW 新発売",     col:"#2E7D6B" },
+  { id:"ninki",  label:"人気商品",    off:0,  word:"人気商品",       col:"#D9534F" },
+  { id:"yakuzaishi",label:"薬剤師おすすめ", off:0, word:"薬剤師おすすめ", col:"#1E3A55" },
+  { id:"season", label:"季節のおすすめ", off:0, word:"季節のおすすめ", col:"#3E7C59" },
+  { id:"tokka",  label:"特価",       off:20, word:"特価",           col:"#C0392B" },
+  { id:"none",   label:"ふつうの値札", off:0, word:"",              col:"" }
+];
+function applyTagPreset(id){
+  const ps = TAG_PRESETS.filter(function(x){ return x.id === id; })[0];
+  if (!ps) return;
+  const t = tagStyle_();
+  t.off = String(ps.off || 0);
+  t.offWord = ps.word || "";
+  t.bandColor = ps.col || "";
+  t.preset = id;
+  S.tagStyle = t;
+  save(); syncTagStyleInputs(); renderTags();
+  toast(ps.label + "の札にしました");
 }
 // 割引後の値段を計算する
 function offPrice_(price, off, round){
@@ -5256,6 +5319,8 @@ function saveTagStyle(){
     offCustom: document.getElementById("ts-off-custom") ? (parseInt(document.getElementById("ts-off-custom").value, 10) || 15) : 15,
     round: document.getElementById("ts-round") ? (parseInt(document.getElementById("ts-round").value, 10) || 10) : 10,
     offWord: document.getElementById("ts-off-word") ? document.getElementById("ts-off-word").value.trim() : "",
+    bandColor: (S.tagStyle || {}).bandColor || "",
+    preset: (S.tagStyle || {}).preset || "",
     nameColor: document.getElementById("ts-name-color").value,
     priceColor: document.getElementById("ts-price-color").value,
     pad: Math.min(20, Math.max(0, parseFloat(document.getElementById("ts-pad").value) || 0)),
@@ -5345,10 +5410,14 @@ function renderTags(){
       if (f.price !== false){
         const off = tagOff_();
         const np = off ? offPrice_(it.price, off, Number(t.round == null ? 10 : t.round)) : null;
+        // 値引きはしないが 帯だけ出す(オススメ・限定など)
+        if (!np && t.offWord){
+          inner += '<div class="tag-off-band"' + (t.bandColor ? ' style="background:' + t.bandColor + '"' : '') + '>' + esc(t.offWord) + '</div>';
+        }
         if (np){
           // もとの値段に線を引き、新しい値段を大きく出す
           const label = off === 50 ? "半額" : ((off % 10 === 0) ? (off / 10) + "割引" : off + "%引");
-          inner += '<div class="tag-off-band">' + esc(t.offWord || "お買い得") + '</div>'
+          inner += '<div class="tag-off-band"' + (t.bandColor ? ' style="background:' + t.bandColor + '"' : '') + '>' + esc(t.offWord || "お買い得") + '</div>'
             + '<div class="tag-price tag-price-off">'
             +   '<span class="tag-was">¥' + Number(it.price).toLocaleString("ja-JP") + '</span>'
             +   '<span class="tag-offlabel">' + label + '</span>'
