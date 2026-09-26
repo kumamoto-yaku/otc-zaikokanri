@@ -605,6 +605,8 @@ table.inv td { border-top: 1px solid var(--line); padding: 6px 8px; white-space:
 .expiry-alert { border: 1px solid #E8C4B8; border-radius: 10px; background: #FDF3EF; padding: 10px 12px; margin: 8px 0 4px; font-size: 13px; color: #6B3A2C; display: flex; flex-direction: column; gap: 6px; }
 .ea-row { line-height: 1.5; }
 .ea-expired strong { color: #C0392B; }
+.ea-bad { color: #8C2F1B; background: #FDF3EF; border-radius: 6px; padding: 4px 8px; }
+.ea-bad strong { color: #8C2F1B; }
 .ea-soon strong { color: #B8860B; }
 .ea-soon6 strong { color: #7A8B33; }
 .ea-actions { display: flex; gap: 12px; padding-top: 2px; }
@@ -1368,7 +1370,7 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
   </section>
 
   <div class="toast" id="toast"></div>
-  <footer class="foot">OTCLinker — とみながグループ 店舗向けツール<br><span class="ver">版 2026-08-07 BW(うりば札に金額)</span></footer>
+  <footer class="foot">OTCLinker — とみながグループ 店舗向けツール<br><span class="ver">版 2026-08-08 BX(期限アラートの修正)</span></footer>
 </div>
 
 <script>
@@ -2369,17 +2371,25 @@ function removeSelected(){
   selected.clear();
   save(); renderList(); checkAll_(); toast("削除しました");
 }
-function expiryLevel(e){
+// 使用期限の書き方は ゆれるので、幅広く 読み取れるようにする
+// (2026-10 / 2026-10-15 / 2026/10 / 2026.10 / 2026年10月 / 前後の空白 など)
+function parseExpiry_(e){
   if (!e) return null;
-  // YYYY-MM(月単位)ならその月の末日を期限とみなす。YYYY-MM-DDにも対応。
-  let d;
-  if (/^\d{4}-\d{2}$/.test(e)){
-    const y = +e.slice(0,4), m = +e.slice(5,7);
-    d = new Date(y, m, 0, 23, 59, 59); // m月の0日=前月末→実質m月末
-  } else {
-    d = new Date(e + "T23:59:59");
-  }
-  if (isNaN(d)) return null;
+  let t = String(e).trim()
+    .replace(/[０-９]/g, function(c){ return String.fromCharCode(c.charCodeAt(0) - 0xFEE0); })
+    .replace(/年|\//g, "-").replace(/月/g, "-").replace(/日/g, "").replace(/\./g, "-")
+    .replace(/-+$/,"").replace(/\s+/g, "");
+  const m = t.match(/^(\d{4})-(\d{1,2})(?:-(\d{1,2}))?$/);
+  if (!m) return null;
+  const y = +m[1], mo = +m[2], da = m[3] ? +m[3] : 0;
+  if (mo < 1 || mo > 12) return null;
+  // 日の指定がなければ その月の末日を 期限とみなす
+  const d = da ? new Date(y, mo - 1, da, 23, 59, 59) : new Date(y, mo, 0, 23, 59, 59);
+  return isNaN(d) ? null : d;
+}
+function expiryLevel(e){
+  const d = parseExpiry_(e);
+  if (!d) return null;
   const now = new Date();
   if (d < now) return "expired";
   const m3 = new Date(); m3.setMonth(m3.getMonth() + 3);
@@ -2393,12 +2403,17 @@ function showExpiryAlert(){
   if (!box) return;
   const expired = [], soon = [], soon6 = [];
   S.items.forEach(it => {
+    if (Number(it.qty) <= 0) return;          // 在庫0は 売場にないので 知らせない
     const lv = expiryLevel(it.expiry);
     if (lv === "expired") expired.push(it);
     else if (lv === "m3") soon.push(it);
     else if (lv === "m6") soon6.push(it);
   });
-  if (!expired.length && !soon.length && !soon6.length){ box.style.display = "none"; return; }
+  // 期限を入れたのに 読み取れない書き方の商品(直してもらうため)
+  const badFmt = S.items.filter(function(it){
+    return it.expiry && String(it.expiry).trim() && !parseExpiry_(it.expiry) && Number(it.qty) > 0;
+  });
+  if (!expired.length && !soon.length && !soon6.length && !badFmt.length){ box.style.display = "none"; return; }
   let h = '';
   if (expired.length){
     h += '<div class="ea-row ea-expired"><strong>期限切れ '+expired.length+'件</strong>: '
@@ -2414,6 +2429,12 @@ function showExpiryAlert(){
     h += '<div class="ea-row ea-soon6"><strong>6ヶ月以内 '+soon6.length+'件</strong>: '
       + soon6.slice(0,6).map(it => esc(it.name)+(it.expiry?'('+fmtExpiry(it.expiry)+')':'')).join(' / ')
       + (soon6.length>6?' ほか':'') + '</div>';
+  }
+  if (badFmt.length){
+    h += '<div class="ea-row ea-bad"><strong>期限の書き方が読み取れません '+badFmt.length+'件</strong>: '
+      + badFmt.slice(0,6).map(function(it){ return esc(it.name)+'('+esc(it.expiry)+')'; }).join(' / ')
+      + (badFmt.length>6?' ほか':'')
+      + '<br><span class="hint">商品名を押して、使用期限を入れ直してください(例:2027-03)</span></div>';
   }
   h += '<div class="ea-actions"><button class="link" onclick="showTab(\'list\');document.getElementById(\'sort-by\').value=\'expiry\';renderList()">期限順で一覧を見る</button> <button class="link" onclick="dismissExpiryAlert()">閉じる</button></div>';
   box.innerHTML = h;
