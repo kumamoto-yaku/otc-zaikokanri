@@ -1623,7 +1623,7 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
   </section>
 
   <div class="toast" id="toast"></div>
-  <footer class="foot">OTCLinker — とみながグループ 店舗向けツール<br><span class="ver">版 2026-10-10 CH(発注先の一覧を修正)</span></footer>
+  <footer class="foot">OTCLinker — とみながグループ 店舗向けツール<br><span class="ver">版 2026-10-10 CI(発注案内の表示を修正)</span></footer>
 </div>
 
 <script>
@@ -6917,9 +6917,10 @@ function showMakerNotice_(items){
   body.innerHTML = '<p class="mk-msg">メーカー指定された注文方法(FAX、専用Webページ等)で発注してください。</p>'
     + '<ul class="mk-list">' + items.map(function(it){
         return '<li><b>' + esc(it.name || "(名称未設定)") + '</b><span>発注先: ' + esc(it.supplier || "") + '</span>'
-          + (it.memo ? '<span>メモ: ' + esc(it.memo) + '</span>' : '') + '</li>';
+          + (String(it.memo || "").trim() ? '<span>メモ: ' + esc(it.memo).replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" target="_blank" rel="noopener">$1</a>') + '</span>' : '') + '</li>';
       }).join("") + '</ul>'
-    + '<p class="hint">FAX番号や発注ページは、商品の「メモ」に書いておくと ここに表示されます。</p>';
+    + (items.some(function(it){ return !String(it.memo || "").trim(); })
+        ? '<p class="hint">FAX番号や発注ページは、商品の「メモ」に書いておくと ここに表示されます。</p>' : '');
   m.style.display = "flex";
 }
 function closeMakerNotice(){ const m = document.getElementById("mk-modal"); if (m) m.style.display = "none"; }
