@@ -559,6 +559,22 @@ input:focus, select:focus { outline: 2px solid var(--ai); outline-offset: -1px; 
 .del { border: none; background: none; color: #9AA7AF; font-size: 18px; cursor: pointer; padding: 4px; }
 .edit { border: none; background: none; color: var(--ai); font-size: 16px; cursor: pointer; padding: 4px; }
 .info-btn { border: none; background: none; font-size: 16px; cursor: pointer; padding: 4px; }
+.ord-btn { border: 1px solid var(--line); background: #fff; border-radius: 8px; font-size: 15px; cursor: pointer; padding: 3px 7px; line-height: 1.2; }
+.ord-btn:active { background: #EEF3F1; }
+/* 注文の手助け(画面の下から出る) */
+.ord-sheet { position: fixed; left: 0; right: 0; bottom: 0; z-index: 96; background: #fff; border-top: 1px solid var(--line); box-shadow: 0 -8px 30px rgba(0,0,0,0.18); border-radius: 16px 16px 0 0; padding: 12px 14px calc(14px + env(safe-area-inset-bottom)); max-height: 70vh; overflow-y: auto; }
+.ord-sheet[hidden] { display: none; }
+.ord-sheet .os-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 8px; }
+.ord-sheet .os-title { font-weight: 800; font-size: 15px; color: var(--ai-deep); }
+.ord-sheet .os-x { border: 1px solid var(--line); background: #fff; border-radius: 999px; padding: 4px 12px; font-size: 13px; cursor: pointer; }
+.ord-sheet .os-login { display: flex; gap: 6px; flex-wrap: wrap; margin: 4px 0 10px; }
+.ord-sheet .os-item { display: flex; align-items: center; gap: 8px; padding: 7px 0; border-top: 1px dashed var(--line); font-size: 13px; }
+.ord-sheet .os-item .nm { flex: 1; min-width: 0; }
+.ord-sheet .os-item .nm small { display: block; color: #7B8794; font-family: monospace; }
+.ord-sheet .os-item .q { color: #5C6B78; font-size: 12px; white-space: nowrap; }
+.os-btn { border: 1px solid var(--ai); color: var(--ai); background: #fff; border-radius: 8px; padding: 6px 10px; font-size: 12.5px; cursor: pointer; font-family: var(--sans); white-space: nowrap; }
+.os-btn.fill { background: var(--ai); color: #fff; }
+@media print { .ord-sheet { display: none !important; } }
 .ph-list { display: flex; flex-direction: column; gap: 6px; }
 .ph-row { display: flex; align-items: center; gap: 10px; border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; background: #fff; cursor: pointer; }
 .ph-row-main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
@@ -987,6 +1003,7 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
     <div id="battle-body"></div>
   </div>
 </div>
+<div id="ord-sheet" class="ord-sheet" hidden></div>
 <div id="party-modal" class="order-modal" style="display:none" onclick="if(event.target===this)closePartyModal()">
   <div class="order-card">
     <div class="order-head">
@@ -1551,6 +1568,20 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
     </details>
 
     <details class="set-card">
+      <summary class="set-h">注文サイト(e健康ショップ・order-epi)</summary>
+      <p class="hint">在庫リストの 🛒 を押すと、発注先が「e健康ショップ」の商品は e健康ショップの管理ページを、それ以外の商品は order-epi を別のウィンドウで開きます。</p>
+      <div class="grid2">
+        <label>e健康ショップ ID <input id="ol-ek-id" autocomplete="off" onchange="saveOrderLogin()"></label>
+        <label>e健康ショップ パスワード <input id="ol-ek-pw" type="password" autocomplete="new-password" onchange="saveOrderLogin()"></label>
+        <label>order-epi ID <input id="ol-ep-id" autocomplete="off" onchange="saveOrderLogin()"></label>
+        <label>order-epi パスワード <input id="ol-ep-pw" type="password" autocomplete="new-password" onchange="saveOrderLogin()"></label>
+      </div>
+      <p class="hint">IDとパスワードは この端末の中だけに保存されます(データの控え・備蓄共有には含まれません)。他の人も使う端末では入れないでください。</p>
+      <p class="hint">別のサイトの入力欄に このアプリから文字を書き込むことは、ブラウザの安全のしくみで禁止されています。そのため、開いたあとに出る「IDをコピー」「パスワードをコピー」で貼り付けてください。毎回の入力を省くには、ブラウザ(Chrome・Safari)の「パスワードを保存」を使うのが確実です。一度保存すれば、次からは自動で入力されます。</p>
+      <div class="row gap"><button class="btn ghost" onclick="clearOrderLogin()">保存したIDとパスワードを消す</button></div>
+    </details>
+
+    <details class="set-card">
       <summary class="set-h">商品名の自動取得(外部データベース)</summary>
       <p class="hint">楽天ウェブサービス(Rakuten Developers)の <strong>Application ID</strong> と <strong>Access Key</strong> を設定すると、スキャンしたJANコードから商品名を自動取得します。</p>
       <label>Yahoo! Client ID(メーカー名・分類まで取得できます)
@@ -1571,7 +1602,7 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
   </section>
 
   <div class="toast" id="toast"></div>
-  <footer class="foot">OTCLinker — とみながグループ 店舗向けツール<br><span class="ver">版 2026-10-10 CD(主人公を白衣に・向きの統一)</span></footer>
+  <footer class="foot">OTCLinker — とみながグループ 店舗向けツール<br><span class="ver">版 2026-10-10 CE(注文サイトとの連携)</span></footer>
 </div>
 
 <script>
@@ -2933,6 +2964,8 @@ function renderList(){
       + '<button class="link" onclick="showTab(\'print\');setPrintKind(\'cards\')">商品カード</button>'
       + '<button class="link" onclick="showTab(\'print\');setPrintKind(\'signs\')">うりば札</button>'
       + '<span style="color:#C9CFD4">｜</span>'
+      + '<button class="link" onclick="openOrderSelected()">🛒 注文</button>'
+      + '<span style="color:#C9CFD4">｜</span>'
       + '<button class="link" style="color:var(--shu)" onclick="removeSelected()">この商品を削除</button>'
       + '<button class="link" onclick="selected.clear();renderList();renderTags()">解除</button>';
   } else bar.style.display = "none";
@@ -2962,6 +2995,7 @@ function renderList(){
         + '<td style="font-family:monospace">'+it.jan+'</td>'
         + '<td>'+esc(it.memo||"")+'</td><td>'+(it.updatedAt||"")+'</td>'
         + '<td><div class="row-actions">'
+        +   '<button class="ord-btn" onclick="openOrder(\''+it.id+'\')" title="' + esc(orderSiteOf_(it).name) + 'を開く">🛒</button>'
         +   '<button class="info-btn" onclick="openDrugInfo(\''+it.id+'\',event)" title="患者説明資料">📄</button>'
         +   '<button class="del" onclick="removeItem(\''+it.id+'\')" title="削除" aria-label="この商品を削除">×</button>'
         + '</div></td></tr>'
@@ -2977,6 +3011,7 @@ function renderList(){
     +   '<div class="stock-sub">' + (it.smt?'<span class="smt-flag">税制対象</span>':'') + (it.ranyo?'<span class="ranyo-flag">濫用防止</span>':'') + (it.maker?'<span>'+esc(it.maker)+'</span>':'') + '<span>'+yen(it.price)+'</span>' + (it.cost?'<span class="sub-cost">納入 '+yen(it.cost)+'</span>':'') + (it.supplier?'<span class="sub-sup">'+esc(it.supplier)+'</span>':'') + (it.staffPrice?'<span class="sub-staff">職員 '+yen(it.staffPrice)+'</span>':'') + expiryChip(it.expiry) + (it.memo?'<span class="sub-memo">'+esc(it.memo)+'</span>':'') + '</div>'
     + '</div>'
     + '<div class="qty-ctrl"><button onclick="changeQty(\''+it.id+'\',-1)" aria-label="1減らす">−</button><span class="qty">'+it.qty+'</span><button onclick="changeQty(\''+it.id+'\',1)" aria-label="1増やす">＋</button></div>'
+    + '<button class="ord-btn" onclick="event.stopPropagation();openOrder(\''+it.id+'\')" aria-label="注文サイトを開く" title="' + esc(orderSiteOf_(it).name) + 'を開く">🛒</button>'
     + '<button class="info-btn" onclick="event.stopPropagation();openDrugInfo(\''+it.id+'\',event)" aria-label="患者説明資料" title="患者説明資料を開く">📄</button>'
     + '<button class="del" onclick="removeItem(\''+it.id+'\')" aria-label="削除">×</button></li>'
   ).join("") + '</ul>' + moreBtn;
@@ -6823,6 +6858,105 @@ function fitPop_(){
   });
 }
 
+
+/* ============ 注文サイトとの連携(e健康ショップ・order-epi) ============ */
+const ORDER_SITES = {
+  ek: { key: "ek", name: "e健康ショップ", url: "https://www.ekenkoshop.jp/pharmacy/login", win: "otc_ekenko" },
+  ep: { key: "ep", name: "order-epi",    url: "https://www.order-epi.com/order/",          win: "otc_orderepi" }
+};
+// 発注先が e健康ショップ なら e健康ショップ、それ以外(空欄も含む)は order-epi
+function orderSiteOf_(it){ return (it && String(it.supplier || "").trim() === "e健康ショップ") ? ORDER_SITES.ek : ORDER_SITES.ep; }
+// IDとパスワードは 控えや共有に入らないよう、S とは別に この端末だけに置く
+const ORDER_LOGIN_KEY = "otc_order_login_v1";
+function orderLogin_(){ try { return JSON.parse(localStorage.getItem(ORDER_LOGIN_KEY) || "{}") || {}; } catch(e){ return {}; } }
+function saveOrderLogin(){
+  const v = function(id){ const el = document.getElementById(id); return el ? el.value.trim() : ""; };
+  const d = { ek: { id: v("ol-ek-id"), pw: v("ol-ek-pw") }, ep: { id: v("ol-ep-id"), pw: v("ol-ep-pw") } };
+  try { localStorage.setItem(ORDER_LOGIN_KEY, JSON.stringify(d)); toast("注文サイトのログイン情報を保存しました"); } catch(e){ toast("保存できませんでした"); }
+}
+function loadOrderLogin_(){
+  const d = orderLogin_();
+  const set = function(id, val){ const el = document.getElementById(id); if (el) el.value = val || ""; };
+  set("ol-ek-id", d.ek && d.ek.id); set("ol-ek-pw", d.ek && d.ek.pw);
+  set("ol-ep-id", d.ep && d.ep.id); set("ol-ep-pw", d.ep && d.ep.pw);
+}
+function clearOrderLogin(){
+  if (!confirm("保存した e健康ショップ と order-epi の IDとパスワードを消します。よろしいですか?")) return;
+  try { localStorage.removeItem(ORDER_LOGIN_KEY); } catch(e){}
+  loadOrderLogin_();
+  toast("消しました");
+}
+// 押したらすぐ開く(あとから開くと ブラウザに止められるため)
+function openOrderWin_(site){
+  const w = window.open(site.url, site.win);
+  if (!w) toast("ポップアップが止められました。ブラウザの設定で このサイトのポップアップを許可してください");
+  else { try { w.focus(); } catch(e){} }
+  return w;
+}
+function openOrder(id){
+  const it = S.items.find(function(x){ return x.id === id; });
+  if (!it) return;
+  const site = orderSiteOf_(it);
+  openOrderWin_(site);
+  showOrderSheet_(site, [it]);
+}
+function openOrderSelected(){
+  const items = S.items.filter(function(it){ return selected.has(it.id); });
+  if (!items.length) return;
+  const ek = items.filter(function(it){ return orderSiteOf_(it) === ORDER_SITES.ek; });
+  const ep = items.filter(function(it){ return orderSiteOf_(it) === ORDER_SITES.ep; });
+  // 1回のタップで開けるのは1つだけなので、多い方を開き、もう一方は シートのボタンで開く
+  const first = ek.length >= ep.length ? ORDER_SITES.ek : ORDER_SITES.ep;
+  openOrderWin_(first);
+  showOrderSheet_(first, first === ORDER_SITES.ek ? ek : ep, first === ORDER_SITES.ek ? { site: ORDER_SITES.ep, items: ep } : { site: ORDER_SITES.ek, items: ek });
+}
+function copyText_(t, label){
+  if (!t){ toast(label + "が 未設定です(その他 → 注文サイト で設定できます)"); return; }
+  const done = function(){ toast(label + "をコピーしました。注文サイトで貼り付けてください"); };
+  if (navigator.clipboard && window.isSecureContext){
+    navigator.clipboard.writeText(t).then(done, function(){ fallbackCopy_(t); done(); });
+  } else { fallbackCopy_(t); done(); }
+}
+function fallbackCopy_(t){
+  const ta = document.createElement("textarea");
+  ta.value = t; ta.setAttribute("readonly", ""); ta.style.position = "fixed"; ta.style.opacity = "0";
+  document.body.appendChild(ta); ta.select();
+  try { document.execCommand("copy"); } catch(e){}
+  document.body.removeChild(ta);
+}
+let __ordSheetItems = [];
+function showOrderSheet_(site, items, other){
+  const box = document.getElementById("ord-sheet");
+  if (!box) return;
+  __ordSheetItems = items.slice();
+  const lg = orderLogin_()[site.key] || {};
+  let h = '<div class="os-head"><span class="os-title">🛒 ' + esc(site.name) + ' を開きました</span>'
+    + '<button class="os-x" onclick="closeOrderSheet()">とじる</button></div>'
+    + '<div class="os-login">'
+    +   '<button class="os-btn" onclick="copyOrderLogin_(\'' + site.key + '\',\'id\')">IDをコピー</button>'
+    +   '<button class="os-btn" onclick="copyOrderLogin_(\'' + site.key + '\',\'pw\')">パスワードをコピー</button>'
+    +   '<button class="os-btn" onclick="openOrderWin_(ORDER_SITES.' + site.key + ')">もう一度ひらく</button>'
+    + '</div>';
+  if (!lg.id && !lg.pw) h += '<p class="hint">ID・パスワードは「その他 → 注文サイト」で設定できます。</p>';
+  h += items.map(function(it, i){
+    return '<div class="os-item"><span class="nm">' + esc(it.name || "(名称未設定)") + '<small>' + esc(it.jan || "JANなし") + '</small></span>'
+      + '<span class="q">在庫 ' + it.qty + '</span>'
+      + (it.jan ? '<button class="os-btn" onclick="copyText_(__ordSheetItems[' + i + '].jan,\'JAN\')">JAN</button>' : '')
+      + '<button class="os-btn" onclick="copyText_(__ordSheetItems[' + i + '].name,\'商品名\')">商品名</button></div>';
+  }).join("");
+  if (other && other.items.length){
+    h += '<div class="os-item"><span class="nm">' + esc(other.site.name) + 'の商品も ' + other.items.length + '品目あります</span>'
+      + '<button class="os-btn fill" onclick="openOrderWin_(ORDER_SITES.' + other.site.key + ');showOrderSheet_(ORDER_SITES.' + other.site.key + ',S.items.filter(function(it){return selected.has(it.id)&&orderSiteOf_(it)===ORDER_SITES.' + other.site.key + '}))">' + esc(other.site.name) + 'をひらく</button></div>';
+  }
+  box.innerHTML = h;
+  box.hidden = false;
+}
+function copyOrderLogin_(k, what){
+  const lg = orderLogin_()[k] || {};
+  copyText_(what === "id" ? lg.id : lg.pw, what === "id" ? "ID" : "パスワード");
+}
+function closeOrderSheet(){ const b = document.getElementById("ord-sheet"); if (b) b.hidden = true; }
+
 /* ============ 会員間共有(Google Apps Script サーバー) ============ */
 function updateBrand(){
   const p = S.pharmacy;
@@ -7143,6 +7277,7 @@ function bootUi_(){
   fillLookOptions_();
   updateBrand();
   try { initKeyboard_(); } catch(e){}
+  try { loadOrderLogin_(); } catch(e){}
   renderList();
   showExpiryAlert();
   showBackupAlert();
