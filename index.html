@@ -1623,7 +1623,7 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
   </section>
 
   <div class="toast" id="toast"></div>
-  <footer class="foot">OTCLinker — とみながグループ 店舗向けツール<br><span class="ver">版 2026-10-10 CI(発注案内の表示を修正)</span></footer>
+  <footer class="foot">OTCLinker — とみながグループ 店舗向けツール<br><span class="ver">版 2026-10-10 CJ(e健康ショップの開き方を変更)</span></footer>
 </div>
 
 <script>
@@ -6947,10 +6947,18 @@ function clearOrderLogin(){
 }
 // 押したらすぐ開く(あとから開くと ブラウザに止められるため)
 function openOrderWin_(site){
-  const w = window.open(siteUrl_(site), site.win);
-  if (!w) toast("ポップアップが止められました。ブラウザの設定で このサイトのポップアップを許可してください");
-  else { try { w.focus(); } catch(e){} }
-  return w;
+  // 参照元(このアプリのURL)と 開いた元への つながりを 渡さずに開く。
+  // サイトによっては「よそのページから開かれた」ことを嫌って ログイン画面が うまく動かないため。
+  const a = document.createElement("a");
+  a.href = siteUrl_(site);
+  a.target = "_blank";
+  a.rel = "noopener noreferrer";
+  a.referrerPolicy = "no-referrer";
+  a.style.display = "none";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  return true;
 }
 function openOrder(id){
   const it = S.items.find(function(x){ return x.id === id; });
@@ -7031,7 +7039,7 @@ function showOrderSheet_(site, items, other, makerItems){
     +   '<button class="os-btn" onclick="copyOrderLogin_(\'' + site.key + '\',\'id\')">IDをコピー</button>'
     +   '<button class="os-btn" onclick="copyOrderLogin_(\'' + site.key + '\',\'pw\')">パスワードをコピー</button>'
     + '</div>'
-    + '<p class="os-alt">開かないときは <a href="' + esc(siteUrl_(site)) + '" target="' + site.win + '" rel="noopener">ここを押して ' + esc(site.name) + ' を開く</a></p>'
+    + '<p class="os-alt">開かないときは <a href="' + esc(siteUrl_(site)) + '" target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer">ここを押して ' + esc(site.name) + ' を開く</a></p>'
     + '<div class="os-copybox" id="os-copybox" hidden></div>';
   if (!lg.id && !lg.pw) h += '<p class="hint">ID・パスワードは「その他 → 注文サイト」で設定できます。</p>';
   h += items.map(function(it, i){
