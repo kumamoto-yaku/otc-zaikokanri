@@ -381,6 +381,29 @@ input:focus, select:focus { outline: 2px solid var(--ai); outline-offset: -1px; 
 .stat.warn .stat-num { color: var(--shu); }
 .stat-label { font-size: 11.5px; color: #5C6B78; letter-spacing: 0.1em; }
 .search { flex: 1; min-width: 180px; }
+.skb { margin: 8px 0 10px; border: 1px solid #d6dbe3; border-radius: 12px; background: #f6f8fb; padding: 8px; user-select: none; -webkit-user-select: none; }
+.skb-bar { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-bottom: 8px; }
+.skb-bar button { border: 1px solid #c3cad6; background: #fff; color: #334; border-radius: 8px; padding: 7px 10px; font-size: 13px; font-weight: 700; cursor: pointer; }
+.skb-bar button.on { background: #1f6feb; border-color: #1f6feb; color: #fff; }
+.skb-bar .skb-sp { flex: 1; }
+.skb-body { display: flex; gap: 8px; align-items: flex-start; }
+.skb-kana { flex: 1; display: grid; grid-template-columns: repeat(11, minmax(0, 1fr)); gap: 4px; }
+.skb-alpha { flex: 1; display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; }
+.skb-num { display: grid; grid-template-columns: repeat(3, 46px); gap: 4px; }
+.skb-k { border: 1px solid #c9d0db; background: #fff; color: #1a2233; border-radius: 7px; height: 40px; font-size: 17px; font-weight: 700; padding: 0; cursor: pointer; touch-action: manipulation; }
+.skb-k:active { background: #dbe7ff; }
+.skb-k.fn { background: #eef1f6; color: #445; font-size: 15px; }
+.skb-k.del { background: #fde8e8; color: #b42318; }
+.skb-k.blank { visibility: hidden; }
+.skb-num .skb-k { background: #fffbe8; }
+.skb-hide { display: none; }
+@media (max-width: 560px) {
+  .skb-body { flex-direction: column; }
+  .skb-kana, .skb-alpha { width: 100%; }
+  .skb-num { width: 100%; grid-template-columns: repeat(6, minmax(0, 1fr)); }
+  .skb-k { height: 36px; font-size: 15px; }
+  .skb-kana { gap: 3px; }
+}
 .field-toggles { display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: center; padding: 8px 0; border-top: 1px dashed var(--line); }
 .field-toggles .ft-label { font-size: 12px; color: #5C6B78; width: 100%; }
 .field-toggles label { flex-direction: row; align-items: center; gap: 5px; font-size: 13px; color: var(--ink); }
@@ -938,10 +961,24 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
   <section class="panel active" id="tab-list">
     <div class="cat-chips" id="cat-chips"></div>
     <div class="row gap wrap">
-      <input class="search" id="q" placeholder="商品名・JAN・メーカーで検索" oninput="searchInput()">
+      <input class="search" id="q" placeholder="商品名・ふりがな・JAN・メーカーで検索" oninput="searchInput()">
       <select id="cat-filter" onchange="renderList()" style="display:none"></select>
       <select id="sort-by" onchange="renderList();if(this.value!=='new')doQuest('sort')"><option value="new">新規登録順</option><option value="aiueo">50音順</option><option value="expiry">有効期限順</option><option value="price-a">価格が安い順</option><option value="price-d">価格が高い順</option><option value="qty-a">在庫が少ない順</option></select>
       <button class="btn ghost" id="view-toggle" onclick="toggleView()">表形式</button>
+    </div>
+    <div class="skb" id="skb">
+      <div class="skb-bar">
+        <button type="button" id="skb-m-prefix" onclick="setSearchMode('prefix')">前方検索</button>
+        <button type="button" id="skb-m-middle" onclick="setSearchMode('middle')">中間検索</button>
+        <button type="button" id="skb-tg-alpha" onclick="kbToggleAlpha()">英字</button>
+        <button type="button" onclick="kbClear()">入力クリア</button>
+        <span class="skb-sp"></span>
+        <button type="button" id="skb-tg" onclick="kbToggle()">⌨ キーボードを閉じる</button>
+      </div>
+      <div class="skb-body" id="skb-body">
+        <div class="skb-kana" id="skb-kana"></div>
+        <div class="skb-num" id="skb-num"></div>
+      </div>
     </div>
     <label class="selall-row"><input type="checkbox" id="sel-all" onchange="toggleSelectAll()"> 条件に合うものをすべて選択</label>
     <div class="select-bar" id="select-bar"></div>
@@ -1370,7 +1407,7 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
   </section>
 
   <div class="toast" id="toast"></div>
-  <footer class="foot">OTCLinker — とみながグループ 店舗向けツール<br><span class="ver">版 2026-08-08 BX(期限アラートの修正)</span></footer>
+  <footer class="foot">OTCLinker — とみながグループ 店舗向けツール<br><span class="ver">版 2026-10-10 BY(在庫検索キーボード)</span></footer>
 </div>
 
 <script>
@@ -2472,7 +2509,7 @@ function currentFiltered(){
   const arr = S.items.filter(it => {
     if (cf !== "すべて" && it.category !== cf) return false;
     if (!q) return true;
-    return it.name.toLowerCase().includes(q) || it.jan.includes(q) || (it.maker||"").toLowerCase().includes(q);
+    return itemMatch_(it, q);
   });
   return arr;
 }
@@ -2514,6 +2551,144 @@ function sortItems(arr){
   else if (by === "qty-a") arr.sort((a,b) => a.qty - b.qty);
   // "new" は登録順(items先頭が新しい)なのでそのまま
 }
+// ===== 在庫検索:ひらがな・カタカナ・全角半角・小さい文字の違いを吸収して比べる =====
+const SMALL_KANA_ = { "ぁ":"あ","ぃ":"い","ぅ":"う","ぇ":"え","ぉ":"お","っ":"つ","ゃ":"や","ゅ":"ゆ","ょ":"よ","ゎ":"わ" };
+function searchNorm_(v){
+  let t = String(v == null ? "" : v).normalize("NFKC");
+  t = t.replace(/[\u30A1-\u30F6]/g, function(ch){ return String.fromCharCode(ch.charCodeAt(0) - 0x60); });
+  t = t.replace(/[ぁぃぅぇぉっゃゅょゎ]/g, function(ch){ return SMALL_KANA_[ch] || ch; });
+  return t.replace(/[\s\u3000]/g, "").toLowerCase();
+}
+const __searchNormCache = {};
+function itemSearchKeys_(it){
+  const src = (it.name||"") + "\u0001" + (it.kana||"") + "\u0001" + (it.maker||"") + "\u0001" + (it.jan||"");
+  const c = __searchNormCache[it.id];
+  if (c && c.src === src) return c.keys;
+  const keys = [searchNorm_(it.name), searchNorm_(it.kana), searchNorm_(it.maker), String(it.jan||"")];
+  __searchNormCache[it.id] = { src: src, keys: keys };
+  return keys;
+}
+function searchMode_(){ return (S && S.searchMode === "prefix") ? "prefix" : "middle"; }
+function itemMatch_(it, q){
+  const nq = searchNorm_(q);
+  if (!nq) return true;
+  const keys = itemSearchKeys_(it);
+  if (searchMode_() === "prefix"){
+    for (let i = 0; i < keys.length; i++){ if (keys[i] && keys[i].indexOf(nq) === 0) return true; }
+    return false;
+  }
+  for (let i = 0; i < keys.length; i++){ if (keys[i] && keys[i].indexOf(nq) >= 0) return true; }
+  return false;
+}
+// ===== 画面キーボード(在庫リストの検索欄の下) =====
+const KB_KANA_ROWS_ = [
+  ["ア","カ","サ","タ","ナ","ハ","マ","ヤ","ラ","ワ","゛"],
+  ["イ","キ","シ","チ","ニ","ヒ","ミ","小","リ","",  "゜"],
+  ["ウ","ク","ス","ツ","ヌ","フ","ム","ユ","ル","ヲ","ー"],
+  ["エ","ケ","セ","テ","ネ","ヘ","メ","",  "レ","",  "空白"],
+  ["オ","コ","ソ","ト","ノ","ホ","モ","ヨ","ロ","ン","←"]
+];
+const KB_ALPHA_ = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("").concat(["-","・","空白","←"]);
+const KB_NUM_ = ["1","2","3","4","5","6","7","8","9","0","00","←"];
+const KB_DAKU_ = { "カ":"ガ","キ":"ギ","ク":"グ","ケ":"ゲ","コ":"ゴ","サ":"ザ","シ":"ジ","ス":"ズ","セ":"ゼ","ソ":"ゾ","タ":"ダ","チ":"ヂ","ツ":"ヅ","テ":"デ","ト":"ド","ハ":"バ","ヒ":"ビ","フ":"ブ","ヘ":"ベ","ホ":"ボ","ウ":"ヴ" };
+const KB_HANDAKU_ = { "ハ":"パ","ヒ":"ピ","フ":"プ","ヘ":"ペ","ホ":"ポ" };
+const KB_SMALL_ = { "ア":"ァ","イ":"ィ","ウ":"ゥ","エ":"ェ","オ":"ォ","ツ":"ッ","ヤ":"ャ","ユ":"ュ","ヨ":"ョ","ワ":"ヮ" };
+let __kbAlpha = false;
+function kbKeyHtml_(k){
+  if (!k) return '<button type="button" class="skb-k blank" tabindex="-1" aria-hidden="true"></button>';
+  const cls = k === "←" ? "skb-k del" : ((k === "゛" || k === "゜" || k === "小" || k === "ー" || k === "空白") ? "skb-k fn" : "skb-k");
+  const label = k === "←" ? "⌫" : k;
+  return '<button type="button" class="' + cls + '" data-k="' + k + '">' + label + '</button>';
+}
+function renderKeyboard_(){
+  const kana = document.getElementById("skb-kana");
+  const num = document.getElementById("skb-num");
+  if (!kana || !num) return;
+  let keys;
+  if (__kbAlpha){ kana.className = "skb-alpha"; keys = KB_ALPHA_; }
+  else { kana.className = "skb-kana"; keys = []; KB_KANA_ROWS_.forEach(function(r){ keys = keys.concat(r); }); }
+  kana.innerHTML = keys.map(kbKeyHtml_).join("");
+  num.innerHTML = KB_NUM_.map(kbKeyHtml_).join("");
+  const ta = document.getElementById("skb-tg-alpha"); if (ta){ ta.textContent = __kbAlpha ? "カナ" : "英字"; ta.classList.toggle("on", __kbAlpha); }
+  const mp = document.getElementById("skb-m-prefix"), mm = document.getElementById("skb-m-middle");
+  if (mp) mp.classList.toggle("on", searchMode_() === "prefix");
+  if (mm) mm.classList.toggle("on", searchMode_() === "middle");
+  let hidden = false; try { hidden = localStorage.getItem("otc_kb_hidden") === "1"; } catch(e){}
+  const body = document.getElementById("skb-body"), tg = document.getElementById("skb-tg");
+  if (body) body.classList.toggle("skb-hide", hidden);
+  if (tg) tg.textContent = hidden ? "⌨ キーボードを開く" : "⌨ キーボードを閉じる";
+}
+function kbToggle(){
+  let hidden = false; try { hidden = localStorage.getItem("otc_kb_hidden") === "1"; } catch(e){}
+  try { localStorage.setItem("otc_kb_hidden", hidden ? "0" : "1"); } catch(e){}
+  renderKeyboard_();
+}
+function kbToggleAlpha(){ __kbAlpha = !__kbAlpha; renderKeyboard_(); }
+function setSearchMode(m){
+  S.searchMode = (m === "prefix") ? "prefix" : "middle";
+  save(); renderKeyboard_(); renderList();
+}
+function kbSearchNow_(){
+  clearTimeout(__searchTimer);
+  renderList();
+  clearTimeout(__kbQuestTimer);
+  __kbQuestTimer = setTimeout(function(){
+    const el = document.getElementById("q");
+    if (el && el.value.trim().length >= 2) doQuest("find");
+  }, 800);
+}
+let __kbQuestTimer = null;
+function kbInput(k){
+  const el = document.getElementById("q");
+  if (!el) return;
+  let v = el.value;
+  if (k === "←"){ v = Array.from(v).slice(0, -1).join(""); }
+  else if (k === "゛" || k === "゜" || k === "小"){
+    const arr = Array.from(v);
+    if (!arr.length) return;
+    let last = arr[arr.length - 1], nx = null;
+    if (k === "゛"){
+      nx = KB_DAKU_[last];
+      if (!nx){ for (const b in KB_DAKU_){ if (KB_DAKU_[b] === last){ nx = b; break; } } }
+      if (!nx){ for (const b in KB_HANDAKU_){ if (KB_HANDAKU_[b] === last){ nx = KB_DAKU_[b]; break; } } }
+    } else if (k === "゜"){
+      nx = KB_HANDAKU_[last];
+      if (!nx){ for (const b in KB_HANDAKU_){ if (KB_HANDAKU_[b] === last){ nx = b; break; } } }
+      if (!nx){ for (const b in KB_DAKU_){ if (KB_DAKU_[b] === last && KB_HANDAKU_[b]){ nx = KB_HANDAKU_[b]; break; } } }
+    } else {
+      nx = KB_SMALL_[last];
+      if (!nx){ for (const b in KB_SMALL_){ if (KB_SMALL_[b] === last){ nx = b; break; } } }
+    }
+    if (!nx) return;
+    arr[arr.length - 1] = nx; v = arr.join("");
+  }
+  else if (k === "空白"){ v += " "; }
+  else { v += k; }
+  el.value = v;
+  kbSearchNow_();
+}
+function kbClear(){
+  const el = document.getElementById("q");
+  if (el) el.value = "";
+  kbSearchNow_();
+}
+function initKeyboard_(){
+  const box = document.getElementById("skb");
+  if (!box || box.__kbInit) return;
+  box.__kbInit = true;
+  // 押した瞬間に反応させ、検索欄にフォーカスが移ってスマホの文字キーボードが出ないようにする
+  box.addEventListener("pointerdown", function(ev){
+    const b = ev.target.closest ? ev.target.closest(".skb-k") : null;
+    if (!b || !b.dataset.k) return;
+    ev.preventDefault();
+    kbInput(b.dataset.k);
+  });
+  box.addEventListener("click", function(ev){
+    const b = ev.target.closest ? ev.target.closest(".skb-k") : null;
+    if (b && b.dataset.k && ev.detail === 0) kbInput(b.dataset.k); // キーボード操作(Enter)の場合
+  });
+  renderKeyboard_();
+}
 // 入力のたびに描き直すと品目が多いとき重いので、少し待ってからまとめて実行する
 let __searchTimer = null;
 function searchInput(){
@@ -2521,7 +2696,7 @@ function searchInput(){
   __searchTimer = setTimeout(function(){
     renderList();
     if (document.getElementById("q").value.trim().length >= 2) doQuest("find");
-  }, 180);
+  }, 120);
 }
 function showMoreList(){
   __listLimit += 120;
@@ -2548,7 +2723,7 @@ function renderList(){
   const arr = S.items.filter(it => {
     if (cf !== "すべて" && it.category !== cf) return false;
     if (!q) return true;
-    return it.name.toLowerCase().includes(q) || it.jan.includes(q) || (it.maker||"").toLowerCase().includes(q);
+    return itemMatch_(it, q);
   });
   sortItems(arr);
 
@@ -6402,6 +6577,7 @@ function bootUi_(){
   applyTheme();
   fillLookOptions_();
   updateBrand();
+  try { initKeyboard_(); } catch(e){}
   renderList();
   showExpiryAlert();
   showBackupAlert();
