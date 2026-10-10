@@ -616,14 +616,18 @@ input:focus, select:focus { outline: 2px solid var(--ai); outline-offset: -1px; 
 .info-pop-btn.close { color: #7B8794; border-top: 1px solid var(--line); }
 
 .empty { text-align: center; padding: 30px 10px; color: #5C6B78; display: flex; flex-direction: column; gap: 14px; align-items: center; }
-.print-selbar { font-size: 12.5px; color: #5C6B78; background: #F4F8F6; border: 1px solid #DCE7E1; border-radius: 8px; padding: 8px 12px; margin-bottom: 10px; }
+.print-selbar { font-size: 12.5px; color: #5C6B78; background: #F4F8F6; border: 1px solid #DCE7E1; border-radius: 8px; padding: 8px 12px; margin: 10px 0; }
 .print-selbar .link { font-size: 12.5px; }
-.steps { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; margin: 2px 0 12px; font-size: 12px; color: #5C6B78; }
-.steps .stp { display: inline-flex; align-items: center; gap: 5px; background: #EEF3F1; border-radius: 999px; padding: 4px 11px 4px 5px; }
+.steps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; margin: 2px 0 12px; font-size: 11.5px; color: #5C6B78; }
+.steps .arw { display: none; }
+.steps::-webkit-scrollbar { display: none; }
+.steps .stp { display: flex; align-items: center; gap: 5px; background: #EEF3F1; border-radius: 10px; padding: 5px 7px; line-height: 1.3; min-width: 0; }
+.steps .stp b { flex: 0 0 auto; }
 .steps .stp b { width: 17px; height: 17px; border-radius: 50%; background: var(--ai); color: #fff; font-size: 10.5px; display: inline-flex; align-items: center; justify-content: center; font-weight: 600; }
 .steps .arw { color: #B7C2C8; }
-.seg { display: flex; border: 1px solid var(--ai); border-radius: 8px; overflow: hidden; width: fit-content; max-width: 100%; }
-.seg button { min-height: 42px; border: none; background: #fff; color: var(--ai); padding: 8px 18px; font-size: 14px; cursor: pointer; font-family: var(--sans); white-space: nowrap; }
+.seg { display: flex; border: 1px solid var(--ai); border-radius: 10px; overflow: hidden; width: 100%; }
+.seg button { flex: 1 1 0; min-width: 0; min-height: 42px; border: none; background: #fff; color: var(--ai); padding: 8px 4px; font-size: 13.5px; cursor: pointer; font-family: var(--sans); white-space: nowrap; }
+.seg button + button { border-left: 1px solid #DCE4EA; }
 .seg button.on { background: var(--ai); color: #fff; }
 .tag-sheet { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; }
 .price-tag, .price-tag *, .pcard *, .pop-card * { box-sizing: border-box; }
@@ -646,6 +650,12 @@ input:focus, select:focus { outline: 2px solid var(--ai); outline-offset: -1px; 
 .sub-fold[open] > summary::before { content: "▾ "; }
 .sub-fold[open] { padding-bottom: 10px; }
 .sign-sheet { display: flex; flex-wrap: wrap; gap: 4mm; }
+/* 画面では 見本を1枚だけ見せる(同じ札が並ぶだけなので)。印刷では 全部出る */
+@media screen {
+  .sign-sheet .print-row:nth-child(n+2), .sign-sheet .print-row > .sign-card:nth-child(n+2) { display: none; }
+  .sign-sheet { justify-content: center; max-width: 100%; overflow: hidden; }
+  .sign-sheet .sign-card { max-width: 100%; }
+}
 .sign-card { box-sizing: border-box; position: relative; display: flex; flex-direction: column;
   align-items: center; justify-content: center; gap: 1mm; overflow: hidden; font-family: var(--sans);
   -webkit-print-color-adjust: exact; print-color-adjust: exact; break-inside: avoid; page-break-inside: avoid; }
@@ -696,7 +706,7 @@ input:focus, select:focus { outline: 2px solid var(--ai); outline-offset: -1px; 
   }
   .print-row > * { font-size: 1rem; }
 }
-.pop-wrap { display: flex; flex-direction: column; align-items: center; gap: 10px; overflow: hidden; }
+.pop-wrap { display: flex; flex-direction: column; align-items: center; gap: 10px; overflow: hidden; width: 100%; max-width: 100%; }
 /* 画面では 実寸のままだと はみ出すので、幅に合わせて縮めて見せる(印刷は実寸) */
 .pop-scale { transform-origin: top center; }
 @media print { .pop-scale { transform: none !important; margin-bottom: 0 !important; } .pop-wrap { display: block; overflow: visible; } }
@@ -731,11 +741,17 @@ input:focus, select:focus { outline: 2px solid var(--ai); outline-offset: -1px; 
 .hit-ph { font-size: 12.5px; color: #5C6B78; }
 .flag-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 .flag-label { font-size: 12.5px; color: #5C6B78; }
-.flag-chip { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--line); border-radius: 999px; padding: 7px 14px 7px 10px; background: #fff; font-size: 13px; cursor: pointer; }
+.flag-chip { display: inline-flex; flex-direction: row; align-items: center; gap: 6px; border: 1px solid var(--line); border-radius: 999px; padding: 7px 14px 7px 10px; background: #fff; font-size: 13px; cursor: pointer; }
 .flag-chip input { width: 17px; height: 17px; }
 .flag-chip:has(input:checked) { border-color: var(--ai); background: #EEF3F1; font-weight: 600; }
 .chk-row { flex-direction: row; align-items: center; gap: 8px; font-size: 13px; color: var(--ink); }
 .chk-row input { width: auto; }
+.act-row { margin-top: 6px; flex-wrap: nowrap; }
+.act-row > .btn:first-child { flex: 1 1 auto; }
+.btn-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 8px; }
+.btn-grid .btn { width: 100%; }
+#card-edit-q { flex: 1 1 100%; min-width: 0; }
+.chk-row label { display: inline-flex; flex-direction: row; align-items: center; gap: 8px; font-size: 13px; color: var(--ink); }
 .sub-cost { color: #8A6D3B; }
 .sub-staff { color: #6A3FA0; }
 .sub-memo { color: #5C6B78; font-style: italic; }
@@ -759,14 +775,26 @@ table.inv td { border-top: 1px solid var(--line); padding: 6px 8px; white-space:
 .row-actions .del { color: #9AA7AF; font-size: 17px; }
 .storage-warn { border: 1px solid #E0B4AC; background: #FDF3EF; color: #8C2F1B; border-radius: 10px; padding: 10px 12px; margin-bottom: 8px; font-size: 13px; }
 .backup-alert { border: 1px solid #C8D6C0; border-radius: 10px; background: #F2F7EF; padding: 10px 12px; margin: 8px 0 4px; font-size: 13px; color: #35502C; display: flex; flex-direction: column; gap: 6px; }
-.expiry-alert { border: 1px solid #E8C4B8; border-radius: 10px; background: #FDF3EF; padding: 10px 12px; margin: 8px 0 4px; font-size: 13px; color: #6B3A2C; display: flex; flex-direction: column; gap: 6px; }
+.expiry-alert { position: relative; border: 1px solid #EBD3C9; border-radius: 12px; background: #FFF8F4; padding: 9px 12px; margin: 8px 0 4px; font-size: 13px; color: #6B3A2C; display: flex; flex-direction: column; gap: 6px; }
+body:not([data-tab="list"]) .expiry-alert { display: none !important; }
+.ea-sum { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; padding-right: 26px; }
+.ea-title { font-weight: 700; font-size: 12.5px; color: #8C4A33; margin-right: 2px; }
+.ea-pill { font-size: 12px; border-radius: 999px; padding: 2px 9px; background: #fff; border: 1px solid #E6CFC4; white-space: nowrap; }
+.ea-pill b { font-weight: 800; }
+.ea-pill.p-exp { background: #C0392B; border-color: #C0392B; color: #fff; }
+.ea-pill.p-m3 { background: #FDEBC8; border-color: #E9C77C; color: #7A5410; }
+.ea-pill.p-m6 { background: #EEF3DD; border-color: #C9D59A; color: #55621F; }
+.ea-pill.p-bad { background: #FBE3DD; border-color: #E9B4A6; color: #8C2F1B; }
+.ea-x { position: absolute; top: 6px; right: 8px; border: none; background: none; font-size: 18px; line-height: 1; color: #A0806F; cursor: pointer; padding: 2px 4px; }
+.ea-detail { border-top: 1px dashed #EBD3C9; padding-top: 6px; display: flex; flex-direction: column; gap: 4px; }
+.ea-detail[hidden] { display: none; }
 .ea-row { line-height: 1.5; }
 .ea-expired strong { color: #C0392B; }
 .ea-bad { color: #8C2F1B; background: #FDF3EF; border-radius: 6px; padding: 4px 8px; }
 .ea-bad strong { color: #8C2F1B; }
 .ea-soon strong { color: #B8860B; }
 .ea-soon6 strong { color: #7A8B33; }
-.ea-actions { display: flex; gap: 12px; padding-top: 2px; }
+.ea-actions { display: flex; gap: 16px; }
 .cat-chips { display: flex; gap: 8px; flex-wrap: wrap; }
 .cat-chip { border: 1px solid var(--ai); color: var(--ai); background: #fff; border-radius: 999px; padding: 6px 12px; font-size: 13px; cursor: pointer; font-family: var(--sans); }
 .cat-chip.on { background: var(--ai); color: #fff; }
@@ -933,7 +961,7 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
 }
 </style>
 </head>
-<body>
+<body data-tab="list">
 <div id="login-gate">
   <div class="login-card">
     <div style="text-align:center"><span class="brand-mark" style="display:inline-flex"><svg viewBox="0 0 48 48" width="26" height="26" aria-hidden="true"><g transform="rotate(-45 24 24)"><rect x="6" y="17" width="36" height="14" rx="7" fill="#ffffff"/><path d="M13 17h11v14H13a7 7 0 0 1-7-7 7 7 0 0 1 7-7z" fill="#B7402B"/><rect x="23" y="17" width="1.6" height="14" fill="#14283C" opacity="0.35"/><rect x="6.8" y="17.8" width="34.4" height="12.4" rx="6.2" fill="none" stroke="#14283C" stroke-opacity="0.28" stroke-width="1.2"/></g></svg></span></div>
@@ -1004,7 +1032,7 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
   <!-- ============ スキャン登録 ============ -->
   <section class="panel" id="tab-scan">
     <div id="flash" class="flash" style="display:none"></div>
-    <div class="steps"><span class="stp"><b>1</b>バーコードをスキャン</span><span class="arw">→</span><span class="stp"><b>2</b>内容を確認・修正</span><span class="arw">→</span><span class="stp"><b>3</b>在庫に登録</span></div>
+    <div class="steps"><span class="stp"><b>1</b>読み取り</span><span class="arw">→</span><span class="stp"><b>2</b>内容を確認</span><span class="arw">→</span><span class="stp"><b>3</b>登録</span></div>
     <div class="scan-box">
       <div class="scan-btns">
         <button class="btn scan-main" id="scan-toggle" onclick="toggleScan()"><span class="scan-ico">▚</span> カメラでスキャン</button>
@@ -1083,8 +1111,8 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
         <label class="flag-chip"><input type="checkbox" id="f-smt"><span>セルフメディケーション税制</span></label>
         <label class="flag-chip"><input type="checkbox" id="f-ranyo"><span>濫用防止</span></label>
       </div>
-      <div class="row gap">
-        <button class="btn" id="save-btn" onclick="saveItem()">在庫に登録</button>
+      <div class="row gap act-row">
+        <button class="btn big" id="save-btn" onclick="saveItem()">在庫に登録</button>
         <button class="btn ghost" onclick="clearForm()">クリア</button>
       </div>
       <p class="hint">スキャンすると商品データベースから商品名・区分を自動取得します。一度登録した商品は自局マスタから瞬時に補完されます。</p>
@@ -1123,15 +1151,15 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
 
   <!-- ============ 値札・POP ============ -->
   <section class="panel" id="tab-print">
-    <div id="print-selbar" class="print-selbar"></div>
     <div class="seg">
       <button id="seg-tags" class="on" onclick="setPrintKind('tags')">値札シート</button>
       <button id="seg-pop" onclick="setPrintKind('pop')">販促POP</button>
       <button id="seg-cards" onclick="setPrintKind('cards')">商品カード</button>
       <button id="seg-signs" onclick="setPrintKind('signs')">うりば札</button>
     </div>
+    <div id="print-selbar" class="print-selbar"></div>
     <div id="print-tags-wrap">
-      <div class="steps"><span class="stp"><b>1</b>在庫リストで商品にチェック</span><span class="arw">→</span><span class="stp"><b>2</b>デザインを調整</span><span class="arw">→</span><span class="stp"><b>3</b>印刷</span></div>
+      <div class="steps"><span class="stp"><b>1</b>商品を選ぶ</span><span class="arw">→</span><span class="stp"><b>2</b>デザイン</span><span class="arw">→</span><span class="stp"><b>3</b>印刷</span></div>
       <details class="settings" id="tag-style-settings">
         <summary>値札のデザイン設定(サイズ・フォント・色)</summary>
         <div class="form" style="padding-top:10px">
@@ -1233,7 +1261,7 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
       <div id="print-tags"></div>
     </div>
     <div id="print-pop" style="display:none">
-      <div class="steps"><span class="stp"><b>1</b>商品とデザインを選ぶ</span><span class="arw">→</span><span class="stp"><b>2</b>写真・文字を調整</span><span class="arw">→</span><span class="stp"><b>3</b>保存して印刷</span></div>
+      <div class="steps"><span class="stp"><b>1</b>商品とデザイン</span><span class="arw">→</span><span class="stp"><b>2</b>写真・文字</span><span class="arw">→</span><span class="stp"><b>3</b>保存して印刷</span></div>
       <div class="form">
         <div class="grid2">
           <label>対象商品 <select id="pop-item" onchange="renderPop()"></select>
@@ -1395,7 +1423,7 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
     </div>
 
     <div id="print-cards" style="display:none">
-      <div class="steps"><span class="stp"><b>1</b>在庫リストで商品にチェック</span><span class="arw">→</span><span class="stp"><b>2</b>写真・特徴を自動取得か撮影</span><span class="arw">→</span><span class="stp"><b>3</b>印刷</span></div>
+      <div class="steps"><span class="stp"><b>1</b>商品を選ぶ</span><span class="arw">→</span><span class="stp"><b>2</b>写真・特徴</span><span class="arw">→</span><span class="stp"><b>3</b>印刷</span></div>
       <div class="form">
         <p class="hint">商品の代わりに売場へ置き、お客さまにレジへ持参してもらうカードです。</p>
         <details class="settings">
@@ -1475,7 +1503,7 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
       <div id="storage-warn" class="storage-warn" style="display:none"></div>
       <p class="hint" id="storage-info"></p>
       <p class="hint">在庫・商品マスタ・各種設定をファイル1つに保存できます。機種変更やアドレス変更の際は、変更前に「控えを保存」し、変更後の画面で「控えから復元」してください。</p>
-      <div class="row gap">
+      <div class="btn-grid">
         <button class="btn ghost" onclick="backupData()">控えを保存</button>
         <button class="btn ghost" onclick="exportCsv()">在庫をCSV出力</button>
         <button class="btn ghost" onclick="document.getElementById('restore-input').click()">控えから復元</button>
@@ -1543,7 +1571,7 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
   </section>
 
   <div class="toast" id="toast"></div>
-  <footer class="foot">OTCLinker — とみながグループ 店舗向けツール<br><span class="ver">版 2026-10-10 CB(キャラの高精細化)</span></footer>
+  <footer class="foot">OTCLinker — とみながグループ 店舗向けツール<br><span class="ver">版 2026-10-10 CC(主人公の見た目・全体の整理)</span></footer>
 </div>
 
 <script>
@@ -2587,29 +2615,26 @@ function showExpiryAlert(){
     return it.expiry && String(it.expiry).trim() && !parseExpiry_(it.expiry) && Number(it.qty) > 0;
   });
   if (!expired.length && !soon.length && !soon6.length && !badFmt.length){ box.style.display = "none"; return; }
-  let h = '';
-  if (expired.length){
-    h += '<div class="ea-row ea-expired"><strong>期限切れ '+expired.length+'件</strong>: '
-      + expired.slice(0,6).map(it => esc(it.name)+(it.expiry?'('+fmtExpiry(it.expiry)+')':'')).join(' / ')
-      + (expired.length>6?' ほか':'') + '</div>';
-  }
-  if (soon.length){
-    h += '<div class="ea-row ea-soon"><strong>期限間近(3ヶ月以内) '+soon.length+'件</strong>: '
-      + soon.slice(0,6).map(it => esc(it.name)+(it.expiry?'('+fmtExpiry(it.expiry)+')':'')).join(' / ')
-      + (soon.length>6?' ほか':'') + '</div>';
-  }
-  if (soon6.length){
-    h += '<div class="ea-row ea-soon6"><strong>6ヶ月以内 '+soon6.length+'件</strong>: '
-      + soon6.slice(0,6).map(it => esc(it.name)+(it.expiry?'('+fmtExpiry(it.expiry)+')':'')).join(' / ')
-      + (soon6.length>6?' ほか':'') + '</div>';
-  }
-  if (badFmt.length){
-    h += '<div class="ea-row ea-bad"><strong>期限の書き方が読み取れません '+badFmt.length+'件</strong>: '
-      + badFmt.slice(0,6).map(function(it){ return esc(it.name)+'('+esc(it.expiry)+')'; }).join(' / ')
-      + (badFmt.length>6?' ほか':'')
-      + '<br><span class="hint">商品名を押して、使用期限を入れ直してください(例:2027-03)</span></div>';
-  }
-  h += '<div class="ea-actions"><button class="link" onclick="showTab(\'list\');document.getElementById(\'sort-by\').value=\'expiry\';renderList()">期限順で一覧を見る</button> <button class="link" onclick="dismissExpiryAlert()">閉じる</button></div>';
+  // 1行の まとめ + 「くわしく」で 中身を開く(画面を ふさがないように)
+  const pill = function(cls, label, n){ return n ? '<span class="ea-pill ' + cls + '">' + label + ' <b>' + n + '</b></span>' : ''; };
+  const list = function(arr, withExp){
+    return arr.slice(0, 8).map(function(it){ return esc(it.name) + (it.expiry ? '(' + (withExp ? fmtExpiry(it.expiry) : esc(it.expiry)) + ')' : ''); }).join(' / ') + (arr.length > 8 ? ' ほか' : '');
+  };
+  let d = '';
+  if (expired.length) d += '<div class="ea-row ea-expired"><strong>期限切れ</strong> ' + list(expired, true) + '</div>';
+  if (soon.length)    d += '<div class="ea-row ea-soon"><strong>3か月以内</strong> ' + list(soon, true) + '</div>';
+  if (soon6.length)   d += '<div class="ea-row ea-soon6"><strong>6か月以内</strong> ' + list(soon6, true) + '</div>';
+  if (badFmt.length)  d += '<div class="ea-row ea-bad"><strong>期限の書き方が読み取れません</strong> ' + list(badFmt, false)
+                         + '<br><span class="hint">商品名を押して、使用期限を入れ直してください(例:2027-03)</span></div>';
+  let h = '<div class="ea-sum"><span class="ea-title">使用期限</span>'
+    + pill("p-exp", "期限切れ", expired.length) + pill("p-m3", "3か月以内", soon.length)
+    + pill("p-m6", "6か月以内", soon6.length) + pill("p-bad", "書き方の確認", badFmt.length) + '</div>'
+    + '<div class="ea-actions">'
+    +   '<button class="link" onclick="showTab(\'list\');document.getElementById(\'sort-by\').value=\'expiry\';renderList()">期限順に並べる</button>'
+    +   '<button class="link" onclick="var d=this.parentNode.nextElementSibling;d.hidden=!d.hidden;this.textContent=d.hidden?\'くわしく\':\'とじる\'">くわしく</button>'
+    +   '<button class="ea-x" onclick="dismissExpiryAlert()" aria-label="閉じる">×</button>'
+    + '</div>'
+    + '<div class="ea-detail" hidden>' + d + '</div>';
   box.innerHTML = h;
   box.style.display = "block";
 }
@@ -3057,6 +3082,7 @@ function updatePrintSelbar_(){
   if (!bar) return;
   const n = selected.size;
   const goList = '<button class="link" onclick="showTab(\'list\')">在庫リストで選ぶ</button>';
+  bar.style.display = printKind === "signs" ? "none" : "";
   if (printKind === "pop"){
     bar.innerHTML = n
       ? '値札・カードと同じチェック中の商品(' + n + '品目)が「対象商品」の先頭に並んでいます'
@@ -3510,19 +3536,20 @@ function hrFinish_(g, N){
     if (below === null) out[i] = hrShade_(col, -0.26);
     else if (below !== col && hrLuma_(below) >= 70 && hrLuma_(below) < hrLuma_(col) + 40) out[i] = hrShade_(col, -0.16);
     else if (right === null) out[i] = hrShade_(col, -0.14);
-    else if (above === null) out[i] = hrShade_(col, 0.35);
+    else if (above === null) out[i] = hrShade_(col, 0.12);
   }
   return out;
 }
 
 // ---- 主人公の部品 ----
 const HR_SKIN = "#FFD3B0";
+// ドラゴンクエストの主人公のような 見た目(青い服・マント・ブーツ・つんつん頭)
 const HERO_LOOK = {
-  baby:       { hair: "#E8C07A", top: "#7FD4F5", pants: null,      coat: null,      tuft: true },
-  child:      { hair: "#8A5A2B", top: "#7DC383", pants: "#5B6EE1", coat: null },
-  apprentice: { hair: "#8A5A2B", top: "#7DC383", pants: "#4B5563", coat: "#FFFFFF", band: "#D0342C", short: true },
-  warrior:    { hair: "#5A3A1C", top: "#5FA8D3", pants: "#3F4D9D", coat: "#FFFFFF", glasses: true, tie: "#3F4D9D" },
-  hero:       { hair: "#5A3A1C", top: "#5FA8D3", pants: "#3F4D9D", coat: "#FFFFFF", trim: "#E3B21A", emblem: true }
+  baby:       { hair: "#3A2A1E", top: "#5B8FD8", baby: true },
+  child:      { hair: "#3A2A1E", top: "#4E9A55", pants: "#6B4A2B", boots: "#7A4E26" },
+  apprentice: { hair: "#3A2A1E", top: "#2F5FB3", pants: "#5A4632", boots: "#7A4E26", band: "#C8452C", belt: true },
+  warrior:    { hair: "#2A2A2A", top: "#2F5FB3", pants: "#4A3A2A", boots: "#7A4E26", belt: true, cape: "#B8402A", pad: true, sheath: true },
+  hero:       { hair: "#2A2A2A", top: "#2F5FB3", pants: "#4A3A2A", boots: "#7A4E26", belt: true, cape: "#C8452C", pad: true, sheath: true, circlet: true }
 };
 function heroGrid_(key, equip, frame){
   const L = HERO_LOOK[key] || HERO_LOOK.hero;
@@ -3531,45 +3558,48 @@ function heroGrid_(key, equip, frame){
   const eb = E("body"), eh = E("head"), ew = E("hand"), ea = E("acc");
   const step = frame ? 1 : 0;      // 歩きの2コマ目は 左足を上げる
   const hoodOn = eb === "q_guard";
-  // 体の色(からだの そうびで 変わる)
-  let top = L.top, coat = L.coat, sleeve = L.coat || L.top, pants = L.pants, skirt = L.coat ? (L.short ? 4 : 6) : 0;
-  let coatTrim = L.trim || null;
-  if (eb === "q_coat"){ coat = "#FFFFFF"; sleeve = coat; skirt = 8; }
-  if (eb === "q_scrub"){ coat = null; top = "#2FA4A9"; sleeve = "#2FA4A9"; skirt = 0; pants = "#2A8C90"; }
-  if (eb === "q_gown"){ coat = "#F7D46B"; sleeve = coat; skirt = 10; }
-  if (eb === "q_guard"){ coat = "#EAF4FB"; top = "#EAF4FB"; sleeve = coat; pants = "#EAF4FB"; skirt = 0; }
-  if (eb === "q_gold"){ coat = "#F2C230"; sleeve = coat; skirt = 10; coatTrim = "#FFF3B8"; }
-  if (eb === "q_lead" || eb === "q_apron" || eb === "q_vest"){ if (!coat){ sleeve = top; } }
-  if (eb && eb !== "q_gold" && eb !== "q_coat") coatTrim = null;
+  let top = L.top, sleeve = L.top, pants = L.pants || "#4A3A2A", coat = null, skirt = 0, cape = L.cape || null;
+  if (eb === "q_coat"){ coat = "#FFFFFF"; skirt = 8; }
+  if (eb === "q_scrub"){ top = "#2FA4A9"; sleeve = top; pants = "#2A8C90"; }
+  if (eb === "q_gown"){ coat = "#F7D46B"; skirt = 10; }
+  if (eb === "q_guard"){ top = "#EAF4FB"; sleeve = top; pants = "#EAF4FB"; cape = null; }
+  if (eb === "q_gold"){ coat = "#E9B824"; skirt = 10; }
+  if (coat) sleeve = coat;
 
-  // あし(赤ちゃんは まるい体)
-  if (key === "baby"){
+  if (L.baby){
     c.ell(32, 46, 12, 10, top);
+    c.rect(22, 44, 20, 2, "#FFFFFF");
     c.rect(24, 54, 6, 3, HR_SKIN); c.rect(34, 54, 6, 3, HR_SKIN);
     c.ell(19, 42, 3, 3.5, HR_SKIN); c.ell(45, 42, 3, 3.5, HR_SKIN);
   } else {
-    const pc = pants || "#3F4D9D";
-    c.rect(24, 47 - step * 2, 7, 9, pc); c.rect(33, 47, 7, 9, pc);
-    c.rect(23, 55 - step * 2, 9, 4, "#4A3020"); c.rect(32, 55, 9, 4, "#4A3020");
-    // うで と 手
+    // マント(体のうしろ)
+    if (cape){ c.rect(16, 33, 32, 3, cape); c.rect(15, 36, 34, 18, cape); c.rect(16, 54, 32, 1, hrShade_(cape, -0.25)); }
+    // 剣のさや(左の腰)
+    if (L.sheath && ea !== "q_bag" && ea !== "q_book"){ c.rect(13, 40, 3, 14, "#6B4A2B"); c.rect(12, 38, 5, 2, "#B8962E"); c.rect(14, 35, 1, 3, "#8A8F96"); }
+    // あし と ブーツ
+    c.rect(24, 47 - step * 2, 7, 8, pants); c.rect(33, 47, 7, 8, pants);
+    const boots = L.boots || "#4A3020";
+    c.rect(23, 53 - step * 2, 9, 6, boots); c.rect(32, 53, 9, 6, boots);
+    c.rect(23, 53 - step * 2, 9, 1, hrShade_(boots, 0.25)); c.rect(32, 53, 9, 1, hrShade_(boots, 0.25));
+    // うで
     c.rect(17, 34, 5, 10, sleeve); c.rect(42, 34, 5, 10, sleeve);
     if (eb === "q_scrub"){ c.rect(17, 39, 5, 5, HR_SKIN); c.rect(42, 39, 5, 5, HR_SKIN); }
-    // 胴
-    c.rect(22, 33, 20, 14, top);
+    // 胴(チュニック)
+    c.rect(22, 33, 20, 16, top);
+    c.rect(29, 33, 6, 2, hrShade_(top, -0.2));                  // えり
+    if (L.belt && !coat && eb !== "q_guard"){ c.rect(22, 44, 20, 2, "#6B4A2B"); c.rect(30, 44, 4, 2, "#C9A632"); }
+    // 肩あて
+    if (L.pad && !coat && eb !== "q_guard"){ c.ell(19.5, 35, 4, 3, "#A7AFB8"); c.ell(44.5, 35, 4, 3, "#A7AFB8"); }
     if (coat){
       c.rect(22, 33, 20, 14 + skirt, coat);
-      c.rect(29, 33, 6, 6, top);                         // 白衣の えりもと
-      c.rect(31, 39, 2, 8 + skirt, hrShade_(coat, -0.12)); // 前の あわせ
-      c.set(28, 33, hrShade_(coat, -0.2)); c.set(35, 33, hrShade_(coat, -0.2));
-      if (skirt){ c.rect(31, 47, 2, skirt, pants ? hrShade_(pants, -0.1) : top); }
-      if (L.tie && !eb) c.rect(31, 34, 2, 6, L.tie);
-      if (coatTrim){ c.rect(22, 46 + skirt - 1, 20, 1, coatTrim); c.rect(29, 33, 1, 7, coatTrim); c.rect(34, 33, 1, 7, coatTrim); }
-      if (L.emblem && !eb){ c.rect(25, 37, 3, 3, "#E3B21A"); c.set(26, 38, "#FFF3B8"); }
+      c.rect(29, 33, 6, 6, top);
+      c.rect(31, 39, 2, 8 + skirt, hrShade_(coat, -0.12));
+      c.rect(31, 47, 2, skirt, hrShade_(pants, -0.1));
       if (eb === "q_coat"){ c.rect(35, 40, 4, 3, "#E1E6EA"); c.rect(36, 38, 1, 3, "#5FA8D3"); }
       if (eb === "q_gown"){ c.rect(22, 46, 20, 1, "#E8B93A"); c.rect(17, 42, 5, 2, "#E8B93A"); c.rect(42, 42, 5, 2, "#E8B93A"); }
+      if (eb === "q_gold"){ c.rect(22, 46 + skirt - 1, 20, 1, "#B8902A"); c.rect(29, 33, 1, 7, "#B8902A"); c.rect(34, 33, 1, 7, "#B8902A"); }
     }
     if (eb === "q_scrub"){ c.rect(29, 33, 6, 1, HR_SKIN); c.rect(30, 34, 4, 1, HR_SKIN); c.rect(31, 35, 2, 1, HR_SKIN); c.rect(36, 37, 4, 3, "#2A8C90"); }
-    // 手
     const glove = ea === "q_gloves" ? "#5B9BD5" : HR_SKIN;
     c.rect(17, 44, 5, 4, glove); c.rect(42, 44, 5, 4, glove);
   }
@@ -3595,27 +3625,27 @@ function heroGrid_(key, equip, frame){
     c.rect(26, 9, 12, 2, "#CFE3F2");
   } else {
     c.ell(32, 19.5, 12.5, 11.5, HR_SKIN);
-    // かみ
-    if (L.tuft){
+    if (L.baby){
       c.rect(31, 5, 2, 4, L.hair); c.rect(29, 6, 2, 2, L.hair); c.rect(33, 6, 2, 2, L.hair);
       c.ell(32, 12, 9, 4, L.hair, 0, 12);
     } else {
-      c.ell(32, 15, 14, 9, L.hair, 0, 15);
+      // つんつん頭(上に とがった毛束)
+      c.ell(32, 14, 14, 8.5, L.hair, 0, 15);
+      [[19, 9, 4], [23, 4, 5], [28, 1, 5], [34, 2, 5], [39, 5, 5], [43, 9, 4]].forEach(function(t){
+        const x0 = t[0], y0 = t[1], w = t[2];
+        for (let k = 0; k < 8; k++){ const ww = Math.max(1, Math.round(w * (k + 1) / 8)); c.rect(x0 + Math.floor((w - ww) / 2), y0 + k, ww, 1, L.hair); }
+      });
       c.rect(19, 14, 3, 9, L.hair); c.rect(42, 14, 3, 8, L.hair);
-      for (let x = 21; x < 43; x++) if (x % 5 < 3) c.set(x, 16, L.hair);
-      for (let x = 22; x < 42; x++) if (x % 5 === 1) c.set(x, 17, L.hair);
+      for (let x = 21; x < 43; x++) if (x % 4 < 2) c.set(x, 16, L.hair);
     }
     if (L.band) c.rect(19, 12, 26, 2, L.band);
+    if (L.circlet && ["q_cap","q_nurse","q_helmet","q_crown","q_shield"].indexOf(eh) < 0){ c.rect(19, 12, 26, 2, "#D4AF37"); c.rect(30, 10, 4, 4, "#D4AF37"); c.rect(31, 11, 2, 2, "#3F7FD0"); }
   }
-  // かお
+  // かお(ドット絵らしく 目は 黒い たて長、まゆを入れて 凛々しく)
   c.rect(26, 21, 3, 4, "#2B2B2B"); c.rect(36, 21, 3, 4, "#2B2B2B");
-  c.set(26, 21, "#FFFFFF"); c.set(36, 21, "#FFFFFF");
-  c.rect(22, 25, 3, 2, "#F4A7B9"); c.rect(40, 25, 3, 2, "#F4A7B9");
+  if (!L.baby){ c.rect(25, 19, 4, 1, hrShade_(L.hair, 0.1)); c.rect(36, 19, 4, 1, hrShade_(L.hair, 0.1)); }
+  else { c.rect(22, 25, 3, 2, "#F4A7B9"); c.rect(40, 25, 3, 2, "#F4A7B9"); }
   c.rect(30, 27, 4, 1, "#9A4A3A");
-  if (L.glasses && ea !== "q_glass" && eh !== "q_goggle" && eh !== "q_loupe"){
-    c.layer(function(){ hrFrame_(c, 24, 20, 7, 6, "#3A3F47"); hrFrame_(c, 34, 20, 7, 6, "#3A3F47"); c.rect(31, 22, 3, 1, "#3A3F47"); }, 0);
-  }
-
   // あたまの そうび
   if (eh) c.layer(function(){
     if (eh === "q_cap"){ c.ell(32, 12, 13.5, 7, "#F4F6F8", 0, 12); c.rect(19, 11, 26, 3, "#D9DFE4"); }
@@ -3648,7 +3678,6 @@ function heroGrid_(key, equip, frame){
       c.rect(21, 7, 22, 5, "#F2C230");
       c.rect(21, 3, 3, 4, "#F2C230"); c.rect(30, 1, 4, 6, "#F2C230"); c.rect(40, 3, 3, 4, "#F2C230");
       c.rect(31, 3, 2, 2, "#D0342C"); c.rect(25, 8, 2, 2, "#5FA8D3"); c.rect(37, 8, 2, 2, "#3E9B4F");
-      c.spark.push([19, 2], [45, 6]);
     }
   });
 
@@ -3658,7 +3687,6 @@ function heroGrid_(key, equip, frame){
       const tc = ea === "q_omamori" ? "#E3B21A" : "#3A3F47", hc = ea === "q_omamori" ? "#FFE27A" : "#C9D1D8";
       c.rect(26, 33, 2, 8, tc); c.rect(36, 33, 2, 5, tc); c.rect(27, 40, 7, 2, tc); c.rect(36, 37, 1, 4, tc);
       c.ell(35.5, 42.5, 2.6, 2.6, hc);
-      if (ea === "q_omamori") c.spark.push([40, 36], [22, 44]);
     }
     else if (ea === "q_glass"){ hrFrame_(c, 24, 20, 7, 6, "#2B2B2B"); hrFrame_(c, 34, 20, 7, 6, "#2B2B2B"); c.rect(31, 22, 3, 1, "#2B2B2B"); }
     else if (ea === "q_thermo"){ c.rect(37, 35, 2, 7, "#FFFFFF"); c.rect(37, 42, 2, 2, "#D0342C"); c.rect(35, 39, 6, 4, "#D9E1E7"); }
@@ -3700,11 +3728,9 @@ function heroGrid_(key, equip, frame){
     }
     else if (ew === "q_saji"){
       c.rect(45, 22, 3, 25, "#E3B21A"); c.ell(46.5, 16, 5.5, 6.5, "#FFE27A"); c.ell(45.5, 14.5, 2, 2.5, "#FFF6C9");
-      c.spark.push([53, 10], [39, 13], [54, 22]);
     }
     if (ew !== "q_counter") c.rect(42, 44, 5, 4, ea === "q_gloves" ? "#5B9BD5" : HR_SKIN);   // 持つ手を前に
   });
-  if (eb === "q_gold") c.spark.push([18, 30], [46, 50]);
   const g = hrFinish_(c.g, HR_N);
   return { g: g, N: HR_N, over: c.over, spark: c.spark };
 }
@@ -3772,8 +3798,8 @@ function hiresRows_(rows){
     let col = DOT_PAL[ch];
     if (ch !== "K" && ch === ch.toUpperCase()){
       const up = y > 0 ? T2[y - 1][x] : ".", lf = x > 0 ? T2[y][x - 1] : ".";
-      if ((up === "K" || up === ".") && hrLuma_(col) < 235) col = hrShade_(col, 0.38);
-      else if ((lf === "K" || lf === ".") && hrLuma_(col) < 235) col = hrShade_(col, 0.18);
+      if ((up === "K" || up === ".") && hrLuma_(col) < 235) col = hrShade_(col, 0.22);
+      else if ((lf === "K" || lf === ".") && hrLuma_(col) < 235) col = hrShade_(col, 0.1);
     }
     g[y * N + x] = col;
   }
@@ -6259,7 +6285,7 @@ function renderSigns(){
     const per = Math.max(1, Math.floor(PRINT_W_MM / dim.w));
     const rows = Math.ceil(st.copies / per);
     const rowsPerPage = Math.max(1, Math.floor(281 / dim.h));
-    cnt.textContent = st.copies + "枚(" + dim.w + "×" + dim.h + "mm / 横" + per + "枚 / "
+    cnt.textContent = "見本は1枚だけ表示 — 印刷すると " + st.copies + "枚(" + dim.w + "×" + dim.h + "mm / 横" + per + "枚 / "
       + Math.ceil(rows / rowsPerPage) + "ページ)";
   }
 }
@@ -6803,7 +6829,8 @@ function fitPop_(){
   requestAnimationFrame(function(){
     const cards = area.querySelectorAll(".pop-card");
     if (!cards.length){ if (note) note.style.display = "none"; return; }
-    const avail = area.clientWidth || 320;
+    const panel = document.getElementById("tab-print");
+    const avail = Math.max(200, Math.min(area.clientWidth || 9999, (panel ? panel.clientWidth - 28 : 320)));
     let minSc = 1;
     cards.forEach(function(c){
       c.style.transform = ""; c.classList.add("pop-scale");
@@ -7095,6 +7122,7 @@ function renderShared(){
 
 /* ============ タブ ============ */
 function showTab(k){
+  document.body.dataset.tab = k;
   document.querySelectorAll(".tab").forEach(b => b.classList.toggle("active", b.dataset.tab===k));
   document.querySelectorAll(".panel").forEach(p => p.classList.toggle("active", p.id==="tab-"+k));
   if (k!=="scan") stopScan();
