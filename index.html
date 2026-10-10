@@ -35,6 +35,32 @@ body { min-height: 100vh; background: var(--hakuji); color: var(--ink); font-fam
 .header { position: relative; display: flex; align-items: center; justify-content: space-between; padding: 18px 2px 12px; gap: 10px; }
 .dot-pet { min-height: 50px; overflow: visible; background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.25); border-radius: 10px; padding: 3px 7px 2px; cursor: pointer; display: flex; align-items: flex-end; gap: 1px; flex-shrink: 0; touch-action: manipulation; -webkit-user-select: none; user-select: none; -webkit-tap-highlight-color: transparent; }
 .dot-pet svg { image-rendering: pixelated; display: block; }
+/* ===== キャラの動き:呼吸(ゆっくり伸び縮み)と 主人公の足ぶみ(2コマ) ===== */
+.pet-unit > svg, .pet-unit > .walk2, .gm-slot > svg, .gm-slot > .walk2, .rpg-party > svg, .rpg-party > .walk2, .eq-preview > .walk2 {
+  animation: idleBreath 1.9s ease-in-out infinite; transform-origin: 50% 100%; will-change: transform; backface-visibility: hidden; }
+.pet-unit:nth-child(2) > *, .gm-slot:nth-child(2) > svg { animation-delay: -0.5s; }
+.pet-unit:nth-child(3) > *, .gm-slot:nth-child(3) > svg { animation-delay: -1.0s; }
+.pet-unit:nth-child(4) > *, .gm-slot:nth-child(4) > svg { animation-delay: -1.4s; }
+.pet-unit:nth-child(5) > *, .gm-slot:nth-child(5) > svg { animation-delay: -0.25s; }
+.pet-unit.buddy > svg { animation-name: idleTrot; animation-duration: 0.9s; }
+@keyframes idleBreath { 0%,100% { transform: scale(1, 1); } 50% { transform: scale(0.975, 1.035); } }
+@keyframes idleTrot { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-1.5px); } }
+.walk2 { display: inline-grid; line-height: 0; }
+.walk2 > svg { grid-area: 1 / 1; display: block; }
+.walk2 > svg:nth-child(1) { animation: walkA 0.95s steps(1, end) infinite; }
+.walk2 > svg:nth-child(2) { animation: walkB 0.95s steps(1, end) infinite; }
+@keyframes walkA { 0% { visibility: visible; } 50% { visibility: hidden; } }
+@keyframes walkB { 0% { visibility: hidden; } 50% { visibility: visible; } }
+.dot-pet.sleepy svg, .dot-pet.sleepy .walk2 > svg { animation-duration: 4s; }
+.dot-pet.sleepy .walk2 > svg:nth-child(2) { animation: none; visibility: hidden; }
+.dot-pet.sleepy .walk2 > svg:nth-child(1) { animation: none; visibility: visible; }
+.hr-spark { animation: sparkTw 1.6s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+@keyframes sparkTw { 0%,100% { opacity: 0; transform: scale(0.4); } 45% { opacity: 1; transform: scale(1); } }
+.gm-card:hover svg { animation: idleBreath 1s ease-in-out infinite; transform-origin: 50% 100%; }
+@media (prefers-reduced-motion: reduce) {
+  .pet-unit > svg, .pet-unit > .walk2, .gm-slot > svg, .gm-slot > .walk2, .hr-spark, .walk2 > svg { animation: none !important; }
+  .walk2 > svg:nth-child(2) { visibility: hidden; }
+}
 .dot-pet .mate-more { color: #fff; font-size: 11px; opacity: 0.85; padding: 0 2px 3px; letter-spacing: 0; }
 .dot-pet.bounce { animation: petBounce 0.5s ease; }
 .pet-wrap { position: relative; margin-left: auto; flex-shrink: 0; }
@@ -281,6 +307,13 @@ button.mate-chip { cursor: pointer; font-family: var(--sans); }
 .eq-item { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; border: 1px solid var(--line); border-radius: 8px; background: #fff; padding: 6px 10px; font-size: 12.5px; font-family: var(--sans); cursor: pointer; color: var(--ink); }
 .eq-item i { font-style: normal; font-size: 10.5px; color: #7B8794; }
 .eq-item.on { border-color: var(--ai); background: #EEF3F1; font-weight: 600; }
+.eq-item:has(.eq-ic) { flex-direction: row; align-items: center; gap: 8px; padding: 4px 10px 4px 4px; }
+.eq-ic { flex: 0 0 auto; width: 38px; height: 38px; border-radius: 6px; background: #EEF3F6; display: flex; align-items: flex-end; justify-content: center; overflow: hidden; }
+.eq-ic svg { display: block; image-rendering: pixelated; }
+.eq-ic-head { align-items: flex-start; } .eq-ic-head svg { margin-top: -2px; flex: 0 0 auto; }
+.eq-ic-hand { align-items: center; justify-content: flex-end; } .eq-ic-hand svg { margin-right: -14px; flex: 0 0 auto; }
+.eq-ic-body svg, .eq-ic-acc svg { margin-bottom: -6px; flex: 0 0 auto; }
+.eq-tx { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; text-align: left; }
 .lv-row { display: flex; align-items: center; gap: 8px; font-size: 12.5px; color: #43596B; margin: 6px 0; }
 .lv-row b { color: var(--ai-deep); font-size: 14px; }
 .lv-bar { flex: 1; height: 8px; background: #E4EAE7; border-radius: 999px; overflow: hidden; }
@@ -1510,7 +1543,7 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
   </section>
 
   <div class="toast" id="toast"></div>
-  <footer class="foot">OTCLinker — とみながグループ 店舗向けツール<br><span class="ver">版 2026-10-10 CA(なかま画面の整理)</span></footer>
+  <footer class="foot">OTCLinker — とみながグループ 店舗向けツール<br><span class="ver">版 2026-10-10 CB(キャラの高精細化)</span></footer>
 </div>
 
 <script>
@@ -3404,7 +3437,386 @@ function dotStage(){
   else if (mateN < DOT_MATES.length) next = (Math.floor(n / 5) + 1) * 5;
   return { key: key, name: name, n: n, next: next, mateN: mateN, mates: DOT_MATES.slice(0, mateN) };
 }
-function dotSvg(key, px, lv, deco, equip){
+/* ============ 高精細ドット(64×64)の描画エンジン ============ */
+// 主人公は 部品(頭・髪・体・手足・そうび)を 64升の上に組み立てて描き、
+// 輪郭線と影・光を 自動で付ける。そうびは 品物ごとに 形と色が ちがう。
+// なかま・あいぼう・敵は 元の32升の絵を Scale2x で 2倍に細かくし、輪郭を細くして 光を足す。
+const HR_N = 64;
+const HR_OUT = "#2B2B2B";
+const HERO_KEYS = ["baby","child","apprentice","warrior","hero"];
+const __hrShadeCache = {};
+function hrShade_(hex, amt){
+  const k = hex + "|" + amt;
+  if (__hrShadeCache[k]) return __hrShadeCache[k];
+  const n = parseInt(hex.slice(1), 16);
+  let r = (n >> 16) & 255, g = (n >> 8) & 255, b = n & 255;
+  if (amt >= 0){ r += (255 - r) * amt; g += (255 - g) * amt; b += (255 - b) * amt; }
+  else { r *= (1 + amt); g *= (1 + amt); b *= (1 + amt); }
+  const out = "#" + [r, g, b].map(function(v){ v = Math.max(0, Math.min(255, Math.round(v))); return (v < 16 ? "0" : "") + v.toString(16); }).join("");
+  __hrShadeCache[k] = out;
+  return out;
+}
+function hrLuma_(hex){
+  const n = parseInt(hex.slice(1), 16);
+  return ((n >> 16) & 255) * 0.299 + ((n >> 8) & 255) * 0.587 + (n & 255) * 0.114;
+}
+// 1枚の升目(色の配列)。layer を使うと、その部品の ふちだけ少し暗くして 体と見分けやすくする
+function hrCanvas_(){
+  const N = HR_N, g = new Array(N * N).fill(null);
+  const c = { g: g, N: N, over: [], spark: [] };
+  c.set = function(x, y, col){ x = Math.round(x); y = Math.round(y); if (x >= 0 && y >= 0 && x < N && y < N) g[y * N + x] = col; };
+  c.rect = function(x, y, w, h, col){ for (let yy = 0; yy < h; yy++) for (let xx = 0; xx < w; xx++) c.set(x + xx, y + yy, col); };
+  c.ell = function(cx, cy, rx, ry, col, y0, y1){
+    for (let y = Math.floor(cy - ry); y <= Math.ceil(cy + ry); y++){
+      if (y0 !== undefined && y < y0) continue;
+      if (y1 !== undefined && y > y1) continue;
+      for (let x = Math.floor(cx - rx); x <= Math.ceil(cx + rx); x++){
+        const dx = (x + 0.5 - cx) / rx, dy = (y + 0.5 - cy) / ry;
+        if (dx * dx + dy * dy <= 1) c.set(x, y, col);
+      }
+    }
+  };
+  // ふちを付けた部品:描いた升目のうち、外側に接する升を少し暗くする
+  c.layer = function(fn, edge){
+    const before = g.slice();
+    fn();
+    const mark = [];
+    for (let i = 0; i < N * N; i++) if (g[i] !== before[i]) mark.push(i);
+    const set = {}; mark.forEach(function(i){ set[i] = 1; });
+    mark.forEach(function(i){
+      const x = i % N, y = (i / N) | 0;
+      const nb = [[x - 1, y], [x + 1, y], [x, y - 1], [x, y + 1]];
+      for (let k = 0; k < 4; k++){
+        const nx = nb[k][0], ny = nb[k][1];
+        if (nx < 0 || ny < 0 || nx >= N || ny >= N) continue;
+        const j = ny * N + nx;
+        if (!set[j] && before[j] !== null && g[j] !== null){ g[i] = hrShade_(g[i], edge === undefined ? -0.32 : edge); break; }
+      }
+    });
+  };
+  return c;
+}
+// 仕上げ:外側に輪郭線、下と右に影、上に光
+function hrFinish_(g, N){
+  const out = g.slice();
+  for (let i = 0; i < N * N; i++){
+    const x = i % N, y = (i / N) | 0, col = g[i];
+    if (col === null){
+      if ((x > 0 && g[i - 1] !== null) || (x < N - 1 && g[i + 1] !== null) || (y > 0 && g[i - N] !== null) || (y < N - 1 && g[i + N] !== null)) out[i] = HR_OUT;
+      continue;
+    }
+    if (col === HR_OUT || hrLuma_(col) < 70) continue;
+    const below = y < N - 1 ? g[i + N] : null, above = y > 0 ? g[i - N] : null, right = x < N - 1 ? g[i + 1] : null;
+    if (below === null) out[i] = hrShade_(col, -0.26);
+    else if (below !== col && hrLuma_(below) >= 70 && hrLuma_(below) < hrLuma_(col) + 40) out[i] = hrShade_(col, -0.16);
+    else if (right === null) out[i] = hrShade_(col, -0.14);
+    else if (above === null) out[i] = hrShade_(col, 0.35);
+  }
+  return out;
+}
+
+// ---- 主人公の部品 ----
+const HR_SKIN = "#FFD3B0";
+const HERO_LOOK = {
+  baby:       { hair: "#E8C07A", top: "#7FD4F5", pants: null,      coat: null,      tuft: true },
+  child:      { hair: "#8A5A2B", top: "#7DC383", pants: "#5B6EE1", coat: null },
+  apprentice: { hair: "#8A5A2B", top: "#7DC383", pants: "#4B5563", coat: "#FFFFFF", band: "#D0342C", short: true },
+  warrior:    { hair: "#5A3A1C", top: "#5FA8D3", pants: "#3F4D9D", coat: "#FFFFFF", glasses: true, tie: "#3F4D9D" },
+  hero:       { hair: "#5A3A1C", top: "#5FA8D3", pants: "#3F4D9D", coat: "#FFFFFF", trim: "#E3B21A", emblem: true }
+};
+function heroGrid_(key, equip, frame){
+  const L = HERO_LOOK[key] || HERO_LOOK.hero;
+  const c = hrCanvas_();
+  const E = function(sl){ return equip && equip[sl] ? equip[sl] : null; };
+  const eb = E("body"), eh = E("head"), ew = E("hand"), ea = E("acc");
+  const step = frame ? 1 : 0;      // 歩きの2コマ目は 左足を上げる
+  const hoodOn = eb === "q_guard";
+  // 体の色(からだの そうびで 変わる)
+  let top = L.top, coat = L.coat, sleeve = L.coat || L.top, pants = L.pants, skirt = L.coat ? (L.short ? 4 : 6) : 0;
+  let coatTrim = L.trim || null;
+  if (eb === "q_coat"){ coat = "#FFFFFF"; sleeve = coat; skirt = 8; }
+  if (eb === "q_scrub"){ coat = null; top = "#2FA4A9"; sleeve = "#2FA4A9"; skirt = 0; pants = "#2A8C90"; }
+  if (eb === "q_gown"){ coat = "#F7D46B"; sleeve = coat; skirt = 10; }
+  if (eb === "q_guard"){ coat = "#EAF4FB"; top = "#EAF4FB"; sleeve = coat; pants = "#EAF4FB"; skirt = 0; }
+  if (eb === "q_gold"){ coat = "#F2C230"; sleeve = coat; skirt = 10; coatTrim = "#FFF3B8"; }
+  if (eb === "q_lead" || eb === "q_apron" || eb === "q_vest"){ if (!coat){ sleeve = top; } }
+  if (eb && eb !== "q_gold" && eb !== "q_coat") coatTrim = null;
+
+  // あし(赤ちゃんは まるい体)
+  if (key === "baby"){
+    c.ell(32, 46, 12, 10, top);
+    c.rect(24, 54, 6, 3, HR_SKIN); c.rect(34, 54, 6, 3, HR_SKIN);
+    c.ell(19, 42, 3, 3.5, HR_SKIN); c.ell(45, 42, 3, 3.5, HR_SKIN);
+  } else {
+    const pc = pants || "#3F4D9D";
+    c.rect(24, 47 - step * 2, 7, 9, pc); c.rect(33, 47, 7, 9, pc);
+    c.rect(23, 55 - step * 2, 9, 4, "#4A3020"); c.rect(32, 55, 9, 4, "#4A3020");
+    // うで と 手
+    c.rect(17, 34, 5, 10, sleeve); c.rect(42, 34, 5, 10, sleeve);
+    if (eb === "q_scrub"){ c.rect(17, 39, 5, 5, HR_SKIN); c.rect(42, 39, 5, 5, HR_SKIN); }
+    // 胴
+    c.rect(22, 33, 20, 14, top);
+    if (coat){
+      c.rect(22, 33, 20, 14 + skirt, coat);
+      c.rect(29, 33, 6, 6, top);                         // 白衣の えりもと
+      c.rect(31, 39, 2, 8 + skirt, hrShade_(coat, -0.12)); // 前の あわせ
+      c.set(28, 33, hrShade_(coat, -0.2)); c.set(35, 33, hrShade_(coat, -0.2));
+      if (skirt){ c.rect(31, 47, 2, skirt, pants ? hrShade_(pants, -0.1) : top); }
+      if (L.tie && !eb) c.rect(31, 34, 2, 6, L.tie);
+      if (coatTrim){ c.rect(22, 46 + skirt - 1, 20, 1, coatTrim); c.rect(29, 33, 1, 7, coatTrim); c.rect(34, 33, 1, 7, coatTrim); }
+      if (L.emblem && !eb){ c.rect(25, 37, 3, 3, "#E3B21A"); c.set(26, 38, "#FFF3B8"); }
+      if (eb === "q_coat"){ c.rect(35, 40, 4, 3, "#E1E6EA"); c.rect(36, 38, 1, 3, "#5FA8D3"); }
+      if (eb === "q_gown"){ c.rect(22, 46, 20, 1, "#E8B93A"); c.rect(17, 42, 5, 2, "#E8B93A"); c.rect(42, 42, 5, 2, "#E8B93A"); }
+    }
+    if (eb === "q_scrub"){ c.rect(29, 33, 6, 1, HR_SKIN); c.rect(30, 34, 4, 1, HR_SKIN); c.rect(31, 35, 2, 1, HR_SKIN); c.rect(36, 37, 4, 3, "#2A8C90"); }
+    // 手
+    const glove = ea === "q_gloves" ? "#5B9BD5" : HR_SKIN;
+    c.rect(17, 44, 5, 4, glove); c.rect(42, 44, 5, 4, glove);
+  }
+  // からだの そうび(上に重ねるもの)
+  if (eb === "q_apron") c.layer(function(){
+    c.rect(24, 35, 16, 18, "#9ED9A6"); c.rect(25, 31, 2, 4, "#9ED9A6"); c.rect(37, 31, 2, 4, "#9ED9A6");
+    c.rect(28, 44, 8, 4, "#7FC48A"); c.rect(22, 41, 2, 1, "#9ED9A6"); c.rect(40, 41, 2, 1, "#9ED9A6");
+  });
+  if (eb === "q_lead") c.layer(function(){
+    c.rect(22, 34, 20, 19, "#4B5A73"); c.rect(24, 30, 16, 4, "#5B6B86");
+    c.rect(22, 52, 20, 1, "#2E384A"); c.rect(26, 38, 12, 1, "#6A7C99");
+  });
+  if (eb === "q_vest") c.layer(function(){
+    c.rect(22, 33, 9, 13, "#F28C28"); c.rect(33, 33, 9, 13, "#F28C28");
+    c.rect(22, 38, 9, 2, "#E6EEF2"); c.rect(33, 38, 9, 2, "#E6EEF2");
+    c.rect(22, 43, 9, 2, "#E6EEF2"); c.rect(33, 43, 9, 2, "#E6EEF2");
+  });
+
+  // あたま
+  if (hoodOn){
+    c.ell(32, 19, 15, 14, "#EAF4FB");
+    c.ell(32, 21, 10, 9.5, HR_SKIN);
+    c.rect(26, 9, 12, 2, "#CFE3F2");
+  } else {
+    c.ell(32, 19.5, 12.5, 11.5, HR_SKIN);
+    // かみ
+    if (L.tuft){
+      c.rect(31, 5, 2, 4, L.hair); c.rect(29, 6, 2, 2, L.hair); c.rect(33, 6, 2, 2, L.hair);
+      c.ell(32, 12, 9, 4, L.hair, 0, 12);
+    } else {
+      c.ell(32, 15, 14, 9, L.hair, 0, 15);
+      c.rect(19, 14, 3, 9, L.hair); c.rect(42, 14, 3, 8, L.hair);
+      for (let x = 21; x < 43; x++) if (x % 5 < 3) c.set(x, 16, L.hair);
+      for (let x = 22; x < 42; x++) if (x % 5 === 1) c.set(x, 17, L.hair);
+    }
+    if (L.band) c.rect(19, 12, 26, 2, L.band);
+  }
+  // かお
+  c.rect(26, 21, 3, 4, "#2B2B2B"); c.rect(36, 21, 3, 4, "#2B2B2B");
+  c.set(26, 21, "#FFFFFF"); c.set(36, 21, "#FFFFFF");
+  c.rect(22, 25, 3, 2, "#F4A7B9"); c.rect(40, 25, 3, 2, "#F4A7B9");
+  c.rect(30, 27, 4, 1, "#9A4A3A");
+  if (L.glasses && ea !== "q_glass" && eh !== "q_goggle" && eh !== "q_loupe"){
+    c.layer(function(){ hrFrame_(c, 24, 20, 7, 6, "#3A3F47"); hrFrame_(c, 34, 20, 7, 6, "#3A3F47"); c.rect(31, 22, 3, 1, "#3A3F47"); }, 0);
+  }
+
+  // あたまの そうび
+  if (eh) c.layer(function(){
+    if (eh === "q_cap"){ c.ell(32, 12, 13.5, 7, "#F4F6F8", 0, 12); c.rect(19, 11, 26, 3, "#D9DFE4"); }
+    else if (eh === "q_mask"){
+      c.rect(22, 24, 20, 7, "#BFE3F5"); c.rect(23, 26, 18, 1, "#8FC3DD"); c.rect(23, 28, 18, 1, "#8FC3DD");
+      c.rect(19, 22, 3, 1, "#F4F6F8"); c.rect(42, 22, 3, 1, "#F4F6F8");
+    }
+    else if (eh === "q_nurse"){ c.rect(24, 4, 16, 6, "#FFFFFF"); c.rect(21, 9, 22, 3, "#F1F3F5"); c.rect(31, 5, 2, 4, "#D0342C"); c.rect(30, 6, 4, 2, "#D0342C"); }
+    else if (eh === "q_loupe"){
+      c.rect(19, 14, 26, 2, "#3A3F47");
+      c.ell(27.5, 22.5, 4.2, 4.2, "#AEB6BD"); c.ell(27.5, 22.5, 2.6, 2.6, "#9EE0F5");
+      c.ell(37.5, 22.5, 4.2, 4.2, "#AEB6BD"); c.ell(37.5, 22.5, 2.6, 2.6, "#9EE0F5");
+      c.set(26, 21, "#FFFFFF"); c.set(36, 21, "#FFFFFF");
+    }
+    else if (eh === "q_goggle"){
+      c.rect(18, 19, 28, 2, "#2E7D6B");
+      c.rect(21, 18, 22, 8, "#58B89F"); c.rect(23, 20, 8, 4, "#D6F3FF"); c.rect(33, 20, 8, 4, "#D6F3FF");
+      c.set(24, 20, "#FFFFFF"); c.set(34, 20, "#FFFFFF");
+    }
+    else if (eh === "q_shield"){
+      c.rect(19, 10, 26, 3, "#4A7FC1"); c.rect(17, 13, 30, 1, "#9CC9E6");
+      c.over.push({ x: 17, y: 14, w: 30, h: 19, col: "#CFEFFF", op: 0.42 });
+      c.over.push({ x: 20, y: 15, w: 2, h: 14, col: "#FFFFFF", op: 0.7 });
+    }
+    else if (eh === "q_helmet"){
+      c.ell(32, 13, 15, 9.5, "#E8C547", 0, 14); c.rect(16, 13, 32, 3, "#C9A632");
+      c.rect(31, 4, 2, 9, "#F6DE7E"); c.rect(23, 7, 2, 5, "#F6DE7E");
+    }
+    else if (eh === "q_crown"){
+      c.rect(21, 7, 22, 5, "#F2C230");
+      c.rect(21, 3, 3, 4, "#F2C230"); c.rect(30, 1, 4, 6, "#F2C230"); c.rect(40, 3, 3, 4, "#F2C230");
+      c.rect(31, 3, 2, 2, "#D0342C"); c.rect(25, 8, 2, 2, "#5FA8D3"); c.rect(37, 8, 2, 2, "#3E9B4F");
+      c.spark.push([19, 2], [45, 6]);
+    }
+  });
+
+  // アクセ
+  if (ea && ea !== "q_gloves") c.layer(function(){
+    if (ea === "q_steth" || ea === "q_omamori"){
+      const tc = ea === "q_omamori" ? "#E3B21A" : "#3A3F47", hc = ea === "q_omamori" ? "#FFE27A" : "#C9D1D8";
+      c.rect(26, 33, 2, 8, tc); c.rect(36, 33, 2, 5, tc); c.rect(27, 40, 7, 2, tc); c.rect(36, 37, 1, 4, tc);
+      c.ell(35.5, 42.5, 2.6, 2.6, hc);
+      if (ea === "q_omamori") c.spark.push([40, 36], [22, 44]);
+    }
+    else if (ea === "q_glass"){ hrFrame_(c, 24, 20, 7, 6, "#2B2B2B"); hrFrame_(c, 34, 20, 7, 6, "#2B2B2B"); c.rect(31, 22, 3, 1, "#2B2B2B"); }
+    else if (ea === "q_thermo"){ c.rect(37, 35, 2, 7, "#FFFFFF"); c.rect(37, 42, 2, 2, "#D0342C"); c.rect(35, 39, 6, 4, "#D9E1E7"); }
+    else if (ea === "q_badge"){ c.ell(27, 38, 2.8, 2.8, "#F2C230"); c.set(27, 38, "#FFF3B8"); c.rect(25, 41, 2, 3, "#D0342C"); c.rect(28, 41, 2, 3, "#D0342C"); }
+    else if (ea === "q_pouch"){ c.rect(22, 45, 20, 2, "#6B4A2B"); c.rect(36, 45, 7, 6, "#A0703C"); c.rect(36, 45, 7, 2, "#7A5230"); c.set(39, 47, "#F2C230"); }
+    else if (ea === "q_bag"){
+      c.rect(7, 45, 13, 9, "#3A2E2A"); c.rect(9, 41, 1, 4, "#3A2E2A"); c.rect(16, 41, 1, 4, "#3A2E2A"); c.rect(9, 41, 8, 1, "#3A2E2A");
+      c.rect(12, 47, 3, 2, "#F2C230"); c.rect(7, 50, 13, 1, "#5A4A44");
+    }
+    else if (ea === "q_book"){ c.rect(9, 38, 10, 13, "#2F7D4F"); c.rect(18, 39, 1, 11, "#F4F1E6"); c.rect(11, 41, 6, 2, "#F2C230"); c.rect(11, 45, 6, 1, "#5FB37F"); }
+    // 左手に持つものは 手を前に描きなおす
+    if (ea === "q_bag" || ea === "q_book") c.rect(17, 44, 5, 4, HR_SKIN);
+  });
+
+  // ての そうび(右手に持つ)
+  if (ew) c.layer(function(){
+    const S1 = "#C9D1D8", S2 = "#E3E8EC";
+    if (ew === "q_pin"){ c.rect(44, 28, 1, 17, S1); c.rect(47, 28, 1, 17, S1); c.rect(45, 42, 2, 3, S1); c.set(44, 28, S2); c.set(47, 28, S2); }
+    else if (ew === "q_spatula"){ c.rect(45, 30, 2, 16, S1); c.rect(44, 25, 4, 6, S2); }
+    else if (ew === "q_pestle"){ c.rect(44, 34, 3, 12, "#EDE8DC"); c.ell(45.5, 30.5, 3.4, 4.5, "#FAF8F2"); }
+    else if (ew === "q_syringe"){
+      c.rect(45, 23, 1, 6, "#AEB6BD"); c.rect(43, 29, 6, 14, "#E4F6FC"); c.rect(44, 33, 4, 9, "#7FD4F5");
+      c.rect(41, 42, 10, 1, S1); c.rect(45, 43, 2, 5, S1); c.rect(43, 48, 6, 1, S1);
+    }
+    else if (ew === "q_counter"){
+      c.rect(40, 40, 18, 6, "#BFE3F5"); c.rect(40, 40, 18, 1, "#8FC3DD");
+      c.rect(42, 42, 2, 2, "#FFFFFF"); c.rect(46, 41, 2, 2, "#FFFFFF"); c.rect(50, 43, 2, 2, "#FFFFFF"); c.rect(54, 42, 2, 2, "#FFF3B8");
+    }
+    else if (ew === "q_spoon"){ c.rect(45, 26, 2, 22, S1); c.ell(46, 23, 3, 4, S2); c.ell(46, 49, 2, 2.5, S2); }
+    else if (ew === "q_mortar"){ c.rect(45, 26, 2, 21, "#8A5A2B"); c.ell(46, 22, 7, 5, "#F4F2EC", 22); c.rect(39, 20, 15, 2, "#DCD7CB"); }
+    else if (ew === "q_scale"){
+      c.rect(45, 24, 2, 22, "#D4AF37"); c.rect(37, 25, 18, 2, "#D4AF37");
+      c.rect(38, 27, 1, 5, "#B8962E"); c.rect(53, 27, 1, 5, "#B8962E");
+      c.ell(38.5, 33, 4, 1.6, "#E9C964"); c.ell(53.5, 33, 4, 1.6, "#E9C964"); c.ell(46, 23, 1.8, 1.8, "#FFF3B8");
+    }
+    else if (ew === "q_autoclave"){
+      c.rect(44, 30, 15, 17, "#B9C2CA"); c.ell(51.5, 39, 4.5, 4.5, "#8F9AA3"); c.ell(51.5, 39, 2.4, 2.4, "#D6DDE3");
+      c.rect(55, 32, 2, 2, "#D0342C"); c.rect(46, 32, 2, 2, "#7DC383");
+    }
+    else if (ew === "q_saji"){
+      c.rect(45, 22, 3, 25, "#E3B21A"); c.ell(46.5, 16, 5.5, 6.5, "#FFE27A"); c.ell(45.5, 14.5, 2, 2.5, "#FFF6C9");
+      c.spark.push([53, 10], [39, 13], [54, 22]);
+    }
+    if (ew !== "q_counter") c.rect(42, 44, 5, 4, ea === "q_gloves" ? "#5B9BD5" : HR_SKIN);   // 持つ手を前に
+  });
+  if (eb === "q_gold") c.spark.push([18, 30], [46, 50]);
+  const g = hrFinish_(c.g, HR_N);
+  return { g: g, N: HR_N, over: c.over, spark: c.spark };
+}
+function hrFrame_(c, x, y, w, h, col){ c.rect(x, y, w, 1, col); c.rect(x, y + h - 1, w, 1, col); c.rect(x, y, 1, h, col); c.rect(x + w - 1, y, 1, h, col); }
+
+// ---- なかま・あいぼう・敵:Scale2x で 2倍に細かくする ----
+const __hrCache = {};
+function hiresRows_(rows){
+  const id = rows.join("|");
+  if (__hrCache[id]) return __hrCache[id];
+  const n = rows.length, N = n * 2;
+  const at = function(x, y){ return (x < 0 || y < 0 || x >= n || y >= n) ? "." : (rows[y][x] || "."); };
+  const S2 = [];
+  for (let y = 0; y < N; y++) S2.push(new Array(N));
+  for (let y = 0; y < n; y++) for (let x = 0; x < n; x++){
+    const E = at(x, y), B = at(x, y - 1), D = at(x - 1, y), F = at(x + 1, y), H = at(x, y + 1);
+    let e0 = E, e1 = E, e2 = E, e3 = E;
+    if (B !== H && D !== F){
+      e0 = D === B ? D : E; e1 = B === F ? F : E; e2 = D === H ? D : E; e3 = H === F ? F : E;
+    }
+    S2[y * 2][x * 2] = e0; S2[y * 2][x * 2 + 1] = e1; S2[y * 2 + 1][x * 2] = e2; S2[y * 2 + 1][x * 2 + 1] = e3;
+  }
+  // 外側の輪郭を 1升ぶん細くする(2升の太さだと ぼってり見えるため)
+  const A = function(x, y){ return (x < 0 || y < 0 || x >= N || y >= N) ? "." : S2[y][x]; };
+  const T = S2.map(function(r){ return r.slice(); });
+  const dirs = [[1, 0], [-1, 0], [0, 1], [0, -1]];
+  for (let y = 0; y < N; y++) for (let x = 0; x < N; x++){
+    if (S2[y][x] !== "K") continue;
+    for (let k = 0; k < 4; k++){
+      const dx = dirs[k][0], dy = dirs[k][1];
+      if (A(x + dx, y + dy) !== ".") continue;
+      const ix = x - dx, iy = y - dy, bx = x - 2 * dx, by = y - 2 * dy;
+      const inner = A(ix, iy), beyond = A(bx, by);
+      if (inner === "K" && beyond !== "." && beyond !== "K"){ T[y][x] = "."; break; }
+    }
+  }
+  // 取り残された 角の点を消す
+  const A2 = function(x, y){ return (x < 0 || y < 0 || x >= N || y >= N) ? "." : T[y][x]; };
+  const T2 = T.map(function(r){ return r.slice(); });
+  for (let y = 0; y < N; y++) for (let x = 0; x < N; x++){
+    if (T[y][x] !== "K") continue;
+    let open = 0, kn = 0;
+    for (let k = 0; k < 4; k++){ const v = A2(x + dirs[k][0], y + dirs[k][1]); if (v === ".") open++; else if (v === "K") kn++; }
+    if (open >= 2 && kn === 2 && A2(x - 1, y) !== A2(x + 1, y) && A2(x, y - 1) !== A2(x, y + 1)){
+      // 角:2方向が外、2方向が輪郭 → 内側の対角が 色なら消す
+      const ox = A2(x - 1, y) === "." ? 1 : -1, oy = A2(x, y - 1) === "." ? 1 : -1;
+      const d = A2(x + ox, y + oy);
+      if (d !== "." && d !== "K") T2[y][x] = ".";
+    }
+  }
+  // 目の光:顔の中の 縦2升以上の黒い点(=目)の 左上に 白い光を入れる
+  for (let y = 1; y < n - 1; y++) for (let x = 1; x < n - 1; x++){
+    if (at(x, y) !== "K") continue;
+    const up = at(x, y - 1), lf = at(x - 1, y), dn = at(x, y + 1), rt = at(x + 1, y);
+    if (up === "." || lf === "." || dn === "." || rt === ".") continue;
+    if (up === "K" || lf === "K" || dn !== "K") continue;
+    if (at(x, y + 2) === "K" && at(x, y + 3) === "K") continue;   // 長い線(輪郭や模様)は除く
+    T2[y * 2][x * 2] = "W";
+  }
+  // 色に変換し、上のふちに 光を入れる
+  const g = new Array(N * N).fill(null);
+  for (let y = 0; y < N; y++) for (let x = 0; x < N; x++){
+    const ch = T2[y][x];
+    if (ch === "." || !DOT_PAL[ch]) continue;
+    let col = DOT_PAL[ch];
+    if (ch !== "K" && ch === ch.toUpperCase()){
+      const up = y > 0 ? T2[y - 1][x] : ".", lf = x > 0 ? T2[y][x - 1] : ".";
+      if ((up === "K" || up === ".") && hrLuma_(col) < 235) col = hrShade_(col, 0.38);
+      else if ((lf === "K" || lf === ".") && hrLuma_(col) < 235) col = hrShade_(col, 0.18);
+    }
+    g[y * N + x] = col;
+  }
+  const res = { g: g, N: N, over: [], spark: [] };
+  __hrCache[id] = res;
+  return res;
+}
+// 升目(色の配列)を SVG の図形にする(同じ色は ひとつにまとめる)
+function hrPaths_(grid, px){
+  const N = grid.N, cell = px / N, paths = {};
+  const q = function(v){ return Math.round(v * 100) / 100; };
+  for (let y = 0; y < N; y++){
+    let x = 0;
+    while (x < N){
+      const col = grid.g[y * N + x];
+      if (col === null){ x++; continue; }
+      let w = 1;
+      while (x + w < N && grid.g[y * N + x + w] === col) w++;
+      const px0 = q(x * cell), py0 = q(y * cell), pw = q(w * cell + 0.2), ph = q(cell + 0.2);
+      paths[col] = (paths[col] || "") + "M" + px0 + " " + py0 + "h" + pw + "v" + ph + "h" + (-pw) + "z";
+      x += w;
+    }
+  }
+  let r = "";
+  for (const col in paths) r += '<path d="' + paths[col] + '" fill="' + col + '"/>';
+  grid.over.forEach(function(o){
+    r += '<rect x="' + q(o.x * cell) + '" y="' + q(o.y * cell) + '" width="' + q(o.w * cell) + '" height="' + q(o.h * cell) + '" fill="' + o.col + '" opacity="' + o.op + '"/>';
+  });
+  grid.spark.forEach(function(s, i){
+    const cx = s[0] * cell, cy = s[1] * cell, a = cell * 3, b = cell;
+    r += '<g class="hr-spark" style="animation-delay:' + (i * 0.45) + 's"><rect x="' + q(cx - a / 2) + '" y="' + q(cy - b / 2) + '" width="' + q(a) + '" height="' + q(b) + '" fill="#FFF8D0"/><rect x="' + q(cx - b / 2) + '" y="' + q(cy - a / 2) + '" width="' + q(b) + '" height="' + q(a) + '" fill="#FFF8D0"/></g>';
+  });
+  return r;
+}
+HERO_KEYS.forEach(function(k){ DOT_EYE[k] = 0.36; });
+
+const __heroGridCache = {};
+function eqOne_(slot, k){ const o = {}; o[slot] = k; return o; }
+// 主人公を 2コマ(足ぶみ)で描く。CSSで 交互に 見せる
+function heroWalkSvg_(key, px, deco, equip){
+  return '<span class="walk2">' + dotSvg(key, px, 0, deco, equip, 0) + dotSvg(key, px, 0, deco, equip, 1) + '</span>';
+}
+function dotSvg(key, px, lv, deco, equip, frame){
   let rows = DOT_SPRITES[key] || DOT_SPRITES.baby;
   // あいぼうは いまの ポーズで描く
   if (typeof isPet_ === "function" && isPet_(key)) rows = poseRows_(rows, petPose_(key));
@@ -3435,27 +3847,14 @@ function dotSvg(key, px, lv, deco, equip){
          + rc(x(W*0.06), W*0.465, W*0.13, W*0.055, ws);
     });
   }
-  // 同じ色をひとつの図形にまとめて描く(端末への負担を抑えるため)
-  const paths = {};
-  const q = function(v){ return Math.round(v * 100) / 100; };
-  for (let y = 0; y < n; y++){
-    const row = rows[y];
-    let x = 0;
-    while (x < row.length){
-      const ch = row[x];
-      if (ch === "."){ x++; continue; }
-      let w = 1;
-      while (x + w < row.length && row[x + w] === ch) w++;
-      const col = DOT_PAL[ch];
-      if (col){
-        const px0 = q(x*cell), py0 = q(y*cell);
-        const pw = q(w*cell + 0.25), ph = q(cell + 0.25);
-        paths[col] = (paths[col] || "") + "M" + px0 + " " + py0 + "h" + pw + "v" + ph + "h" + (-pw) + "z";
-      }
-      x += w;
-    }
-  }
-  for (const col in paths) r += '<path d="' + paths[col] + '" fill="' + col + '"/>';
+  // 64升の 細かい絵で描く(主人公は 部品から組み立て、ほかは 2倍に細かくする)
+  const isHero = HERO_KEYS.indexOf(key) >= 0;
+  let grid;
+  if (isHero){
+    const ck = key + "|" + (frame ? 1 : 0) + "|" + (equip ? [equip.head, equip.body, equip.hand, equip.acc].join(",") : "");
+    grid = __heroGridCache[ck] || (__heroGridCache[ck] = heroGrid_(key, equip, frame));
+  } else grid = hiresRows_(rows);
+  r += hrPaths_(grid, px);
   // あいぼう(どうぶつ)は 服を着ない。かわりに ポーズで表現する。
   if (deco && typeof isPet_ === "function" && isPet_(key)) deco = null;
   // 季節や日替わりの衣装(目の高さに合わせて描く)
@@ -3524,7 +3923,7 @@ function dotSvg(key, px, lv, deco, equip){
        + rc(W*0.46, cy - W*0.03, W*0.09, W*0.06, DOT_PAL.G);
   }
   // そうび(装備しているものをキャラに重ねる)
-  if (equip){
+  if (equip && !isHero){
     // 装備は キャラと同じ 升目(32×32)に そろえて描く。
     // 升目からずれると 絵が崩れて見えるため、すべて 升目の単位で指定する。
     const N = rows.length, u = px / N;
@@ -3681,10 +4080,10 @@ function renderDotPet(){
     : line.slice(0, buddy ? Math.max(1, PARTY_SHOW - 1) : PARTY_SHOW);
   const bi = petInfo_(buddy);
   // 並びは 主人公 → あいぼう → なかま
-  let h = '<span class="pet-unit" data-key="' + st.key + '">' + dotSvg(st.key, 34, 0, decoOf_(st.key), rpg_().equip) + '</span>';
-  if (buddy) h += '<span class="pet-unit buddy" data-key="' + buddy + '">' + dotSvg(buddy, (bi && bi.size) || 28, mateLv_(buddy), decoOf_(buddy)) + '</span>';
+  let h = '<span class="pet-unit" data-key="' + st.key + '">' + heroWalkSvg_(st.key, 40, decoOf_(st.key), rpg_().equip) + '</span>';
+  if (buddy) h += '<span class="pet-unit buddy" data-key="' + buddy + '">' + dotSvg(buddy, Math.round(((bi && bi.size) || 28) * 1.12), mateLv_(buddy), decoOf_(buddy)) + '</span>';
   shown2.forEach(function(o){
-    h += '<span class="pet-unit ' + o.c + '" data-key="' + o.k + '">' + dotSvg(o.k, 26, mateLv_(o.k), decoOf_(o.k)) + '</span>';
+    h += '<span class="pet-unit ' + o.c + '" data-key="' + o.k + '">' + dotSvg(o.k, 30, mateLv_(o.k), decoOf_(o.k)) + '</span>';
   });
   const rest = picks.length ? 0 : (line.length - shown2.length);
   if (rest > 0) h += '<span class="mate-more">+' + rest + '</span>';
@@ -4539,7 +4938,7 @@ function renderBattle_(){
       + '</div>'
       + '<div class="rpg-ename">' + esc(b.en.name) + (b.practice ? "(れんしゅう)" : "") + '</div>'
       + '<div class="rpg-ebar"><i style="width:' + ep + '%"></i></div>'
-      + '<div class="rpg-party">' + dotSvg(st.key, 34, 0, null, rpg_().equip)
+      + '<div class="rpg-party">' + heroWalkSvg_(st.key, 40, null, rpg_().equip)
       +   (activePet_() ? dotSvg(activePet_(), 28) : "")
       +   allMates_().slice(0, 3).map(function(o){ return dotSvg(o.k, 24, mateLv_(o.k), null); }).join("")
       + '</div>';
@@ -4594,7 +4993,7 @@ function bossList_(){
 // そうび(着せかえ)
 function equipSection_(){
   const r = rpg_(), inv = r.inv || [];
-  let h = '<div class="eq-preview">' + dotSvg(dotStage().key, 64, 0, null, r.equip) + '</div>';
+  let h = '<div class="eq-preview">' + heroWalkSvg_(dotStage().key, 104, null, r.equip) + '</div>';
   EQUIP_SLOTS.forEach(function(sl){
     const have = inv.filter(function(k){ return EQUIPS[k].slot === sl.id; });
     h += '<div class="eq-slot"><div class="eq-slot-name">' + sl.name + '</div><div class="eq-list">';
@@ -4602,7 +5001,8 @@ function equipSection_(){
     have.forEach(function(k){
       const e = EQUIPS[k];
       h += '<button class="eq-item' + (r.equip[sl.id] === k ? ' on' : '') + '" onclick="setEquipIn(\'' + sl.id + '\',\'' + k + '\')">'
-         + esc(e.name) + '<i>攻+' + e.atk + ' 守+' + e.def + (e.fx ? ' / ' + EQUIP_FX[e.fx] : '') + '</i></button>';
+         + '<span class="eq-ic eq-ic-' + sl.id + '">' + dotSvg(dotStage().key, sl.id === "head" ? 72 : (sl.id === "hand" ? 56 : 46), 0, null, eqOne_(sl.id, k)) + '</span>'
+         + '<span class="eq-tx">' + esc(e.name) + '<i>攻+' + e.atk + ' 守+' + e.def + (e.fx ? ' / ' + EQUIP_FX[e.fx] : '') + '</i></span></button>';
     });
     if (!have.length) h += '<span class="hint">まだ 持っていません</span>';
     h += '</div></div>';
@@ -4709,7 +5109,7 @@ function openEquip(){
   const box = document.getElementById("battle-body");
   const inv = r.inv || [];
   let h = '<div class="eq-wrap"><div class="bt-name">そうび</div>'
-    + '<div class="eq-preview">' + dotSvg(dotStage().key, 64, 0, null, r.equip) + '</div>';
+    + '<div class="eq-preview">' + heroWalkSvg_(dotStage().key, 104, null, r.equip) + '</div>';
   EQUIP_SLOTS.forEach(function(sl){
     const have = inv.filter(function(k){ return EQUIPS[k].slot === sl.id; });
     h += '<div class="eq-slot"><div class="eq-slot-name">' + sl.name + '</div><div class="eq-list">';
@@ -4717,7 +5117,8 @@ function openEquip(){
     have.forEach(function(k){
       const e = EQUIPS[k];
       h += '<button class="eq-item' + (r.equip[sl.id] === k ? ' on' : '') + '" onclick="setEquip(\'' + sl.id + '\',\'' + k + '\')">'
-         + esc(e.name) + '<i>攻+' + e.atk + ' 守+' + e.def + (e.fx ? ' / ' + EQUIP_FX[e.fx] : '') + '</i></button>';
+         + '<span class="eq-ic eq-ic-' + sl.id + '">' + dotSvg(dotStage().key, sl.id === "head" ? 72 : (sl.id === "hand" ? 56 : 46), 0, null, eqOne_(sl.id, k)) + '</span>'
+         + '<span class="eq-tx">' + esc(e.name) + '<i>攻+' + e.atk + ' 守+' + e.def + (e.fx ? ' / ' + EQUIP_FX[e.fx] : '') + '</i></span></button>';
     });
     if (!have.length) h += '<span class="hint">まだ 持っていません</span>';
     h += '</div></div>';
@@ -5148,11 +5549,11 @@ function partyPanel_(){
     + '<div class="gm-party-head"><span>パーティ</span><b>Lv ' + li.lv + '</b></div>'
     + '<div class="gm-slots">'
     + '<div class="gm-slot hero" onclick="setPartyTab(\'equip\')" title="タップで そうび">'
-    +   dotSvg(st.key, 46, 0, decoOf_(st.key), rpg_().equip)
+    +   heroWalkSvg_(st.key, 54, decoOf_(st.key), rpg_().equip)
     +   '<span class="nm">' + esc(st.name) + '</span><span class="role">主人公</span></div>';
   if (bk){
     h += '<div class="gm-slot buddy" onclick="setPartyTab(\'buddy\')" title="タップで あいぼうを えらぶ">'
-      + dotSvg(bk, 40, mateLv_(bk))
+      + dotSvg(bk, 46, mateLv_(bk))
       + '<span class="nm">' + esc(bi ? bi.name : "") + '</span><span class="role">あいぼう</span></div>';
   } else {
     h += '<div class="gm-slot buddy empty" onclick="setPartyTab(\'buddy\')"><span class="plus">＋</span><span class="nm">' + (petsOwned_().length ? "お休み中" : "まだいない") + '</span><span class="role">あいぼう</span></div>';
@@ -5161,7 +5562,7 @@ function partyPanel_(){
     const k = picks[n];
     if (k){
       h += '<div class="gm-slot mate" onclick="togglePetPick(\'' + k + '\')" title="タップで はずす">'
-        + dotSvg(k, 34, mateLv_(k), decoOf_(k))
+        + dotSvg(k, 38, mateLv_(k), decoOf_(k))
         + '<span class="nm">' + esc(DOT_NAMES[k]) + '</span><span class="role">なかま' + (n + 1) + '</span></div>';
     } else {
       h += '<div class="gm-slot mate empty" onclick="setPartyTab(\'mates\')"><span class="plus">＋</span><span class="nm">' + (picks.length ? "あき" : "おまかせ") + '</span><span class="role">なかま' + (n + 1) + '</span></div>';
@@ -5200,7 +5601,7 @@ function matesSection_(){
     const lv = mateLv_(k), dk = decoOf_(k), nx = mateNext_(k), pi = picks.indexOf(k);
     return '<button class="gm-card ' + cur.cls + (pi >= 0 ? ' on' : '') + '" onclick="togglePetPick(\'' + k + '\')" title="' + (PERSONA[k] ? esc(PERSONA[k].p) + " / " : "") + mateLvLabel_(lv) + (dk ? " / " + DECOS[dk] : "") + '">'
       + no + (pi >= 0 ? '<span class="badge">なかま' + (pi + 1) + '</span>' : '')
-      + dotSvg(k, 40, lv, dk)
+      + dotSvg(k, 46, lv, dk)
       + '<span class="nm">' + esc(DOT_NAMES[k]) + '</span>'
       + '<span class="st">' + mateStars_(lv) + '</span>'
       + '<span class="sub">' + (nx !== null ? 'しんか あと' + nx + '日' : (PERSONA[k] ? esc(PERSONA[k].p) : "")) + '</span>'
