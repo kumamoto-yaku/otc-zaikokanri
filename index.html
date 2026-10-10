@@ -574,6 +574,17 @@ input:focus, select:focus { outline: 2px solid var(--ai); outline-offset: -1px; 
 .ord-sheet .os-item .q { color: #5C6B78; font-size: 12px; white-space: nowrap; }
 .os-btn { border: 1px solid var(--ai); color: var(--ai); background: #fff; border-radius: 8px; padding: 6px 10px; font-size: 12.5px; cursor: pointer; font-family: var(--sans); white-space: nowrap; }
 .os-btn.fill { background: var(--ai); color: #fff; }
+.os-alt { font-size: 12px; color: #5C6B78; margin: -4px 0 10px; }
+.os-alt a { color: var(--ai); font-weight: 700; }
+#mk-modal { z-index: 97; align-items: center; }
+.mk-msg { font-size: 15px; font-weight: 700; color: #8C2F1B; background: #FDF3EF; border: 1px solid #EBD3C9; border-radius: 10px; padding: 12px; line-height: 1.6; }
+.mk-list { list-style: none; padding: 0; margin: 10px 0; }
+.mk-list li { display: flex; flex-direction: column; gap: 2px; padding: 8px 0; border-top: 1px dashed var(--line); font-size: 13px; }
+.mk-list li span { color: #5C6B78; font-size: 12px; }
+.os-copybox { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; background: #F4F8F6; border: 1px solid #DCE7E1; border-radius: 10px; padding: 8px 10px; margin: 0 0 10px; }
+.os-copybox[hidden] { display: none; }
+.os-cb-head { width: 100%; font-size: 11.5px; color: #5C6B78; }
+.os-cb-val { flex: 1; min-width: 0; font-size: 16px; font-family: monospace; padding: 6px 8px; border: 1px solid var(--line); border-radius: 6px; background: #fff; -webkit-user-select: text; user-select: text; }
 @media print { .ord-sheet { display: none !important; } }
 .ph-list { display: flex; flex-direction: column; gap: 6px; }
 .ph-row { display: flex; align-items: center; gap: 10px; border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; background: #fff; cursor: pointer; }
@@ -1004,6 +1015,13 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
   </div>
 </div>
 <div id="ord-sheet" class="ord-sheet" hidden></div>
+<div id="mk-modal" class="order-modal" style="display:none" onclick="if(event.target===this)closeMakerNotice()">
+  <div class="order-card" style="max-width:420px">
+    <div class="order-head"><span class="order-title">発注のご案内</span><button class="link" onclick="closeMakerNotice()">閉じる</button></div>
+    <div id="mk-body"></div>
+    <div class="row gap" style="margin-top:8px"><button class="btn" onclick="closeMakerNotice()">わかりました</button></div>
+  </div>
+</div>
 <div id="party-modal" class="order-modal" style="display:none" onclick="if(event.target===this)closePartyModal()">
   <div class="order-card">
     <div class="order-head">
@@ -1110,7 +1128,6 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
               <option>翔薬</option>
               <option>新生堂</option>
               <option>富田薬品</option>
-              <option>リッツメディカル</option>
               <option value="__other">その他(自由記載)</option>
             </select></label>
             <label id="f-supplier-other-wrap" style="display:none">発注先(その他) <input id="f-supplier-other" placeholder="発注先名を入力"></label>
@@ -1569,12 +1586,16 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
 
     <details class="set-card">
       <summary class="set-h">注文サイト(e健康ショップ・order-epi)</summary>
-      <p class="hint">在庫リストの 🛒 を押すと、発注先が「e健康ショップ」の商品は e健康ショップの管理ページを、それ以外の商品は order-epi を別のウィンドウで開きます。</p>
+      <p class="hint">在庫リストの 🛒 を押すと、発注先が「e健康ショップ」の商品は e健康ショップの管理ページを、一覧にある卸(アステム・アルフレッサ等)や発注先が空欄の商品は order-epi を別のウィンドウで開きます。発注先を「その他」で自由に書いた商品は、メーカー指定の方法で発注するよう お知らせを出します。</p>
       <div class="grid2">
-        <label>e健康ショップ ID <input id="ol-ek-id" autocomplete="off" onchange="saveOrderLogin()"></label>
-        <label>e健康ショップ パスワード <input id="ol-ek-pw" type="password" autocomplete="new-password" onchange="saveOrderLogin()"></label>
-        <label>order-epi ID <input id="ol-ep-id" autocomplete="off" onchange="saveOrderLogin()"></label>
-        <label>order-epi パスワード <input id="ol-ep-pw" type="password" autocomplete="new-password" onchange="saveOrderLogin()"></label>
+        <label>e健康ショップのURL(空欄なら標準) <input id="ou-ek" inputmode="url" placeholder="https://www.ekenkoshop.jp/pharmacy/login" onchange="saveOrderUrls()"></label>
+        <label>order-epiのURL(空欄なら標準) <input id="ou-ep" inputmode="url" placeholder="https://www.order-epi.com/order/" onchange="saveOrderUrls()"></label>
+      </div>
+      <div class="grid2">
+        <label>e健康ショップ ID <input id="ol-ek-id" autocomplete="off" oninput="saveOrderLogin_(true)" onchange="saveOrderLogin()"></label>
+        <label>e健康ショップ パスワード <input id="ol-ek-pw" type="password" autocomplete="new-password" oninput="saveOrderLogin_(true)" onchange="saveOrderLogin()"></label>
+        <label>order-epi ID <input id="ol-ep-id" autocomplete="off" oninput="saveOrderLogin_(true)" onchange="saveOrderLogin()"></label>
+        <label>order-epi パスワード <input id="ol-ep-pw" type="password" autocomplete="new-password" oninput="saveOrderLogin_(true)" onchange="saveOrderLogin()"></label>
       </div>
       <p class="hint">IDとパスワードは この端末の中だけに保存されます(データの控え・備蓄共有には含まれません)。他の人も使う端末では入れないでください。</p>
       <p class="hint">別のサイトの入力欄に このアプリから文字を書き込むことは、ブラウザの安全のしくみで禁止されています。そのため、開いたあとに出る「IDをコピー」「パスワードをコピー」で貼り付けてください。毎回の入力を省くには、ブラウザ(Chrome・Safari)の「パスワードを保存」を使うのが確実です。一度保存すれば、次からは自動で入力されます。</p>
@@ -1602,7 +1623,7 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
   </section>
 
   <div class="toast" id="toast"></div>
-  <footer class="foot">OTCLinker — とみながグループ 店舗向けツール<br><span class="ver">版 2026-10-10 CE(注文サイトとの連携)</span></footer>
+  <footer class="foot">OTCLinker — とみながグループ 店舗向けツール<br><span class="ver">版 2026-10-10 CH(発注先の一覧を修正)</span></footer>
 </div>
 
 <script>
@@ -2351,7 +2372,7 @@ function readForm(){
     staffPrice: document.getElementById("f-staff-price").value.replace(/\D/g,"")
   };
 }
-const SUPPLIERS = ["e健康ショップ","アステム","アトル","アルフレッサ","九州東邦","翔薬","新生堂","富田薬品","リッツメディカル"];
+const SUPPLIERS = ["e健康ショップ","アステム","アトル","アルフレッサ","九州東邦","翔薬","新生堂","富田薬品"];
 function fillForm(o){
   document.getElementById("f-jan").value = o.jan || "";
   document.getElementById("f-name").value = o.name || "";
@@ -2995,7 +3016,7 @@ function renderList(){
         + '<td style="font-family:monospace">'+it.jan+'</td>'
         + '<td>'+esc(it.memo||"")+'</td><td>'+(it.updatedAt||"")+'</td>'
         + '<td><div class="row-actions">'
-        +   '<button class="ord-btn" onclick="openOrder(\''+it.id+'\')" title="' + esc(orderSiteOf_(it).name) + 'を開く">🛒</button>'
+        +   '<button class="ord-btn" onclick="openOrder(\''+it.id+'\')" title="' + esc(orderSiteOf_(it).maker ? 'メーカー指定の方法で発注' : orderSiteOf_(it).name + 'を開く') + '">🛒</button>'
         +   '<button class="info-btn" onclick="openDrugInfo(\''+it.id+'\',event)" title="患者説明資料">📄</button>'
         +   '<button class="del" onclick="removeItem(\''+it.id+'\')" title="削除" aria-label="この商品を削除">×</button>'
         + '</div></td></tr>'
@@ -3011,7 +3032,7 @@ function renderList(){
     +   '<div class="stock-sub">' + (it.smt?'<span class="smt-flag">税制対象</span>':'') + (it.ranyo?'<span class="ranyo-flag">濫用防止</span>':'') + (it.maker?'<span>'+esc(it.maker)+'</span>':'') + '<span>'+yen(it.price)+'</span>' + (it.cost?'<span class="sub-cost">納入 '+yen(it.cost)+'</span>':'') + (it.supplier?'<span class="sub-sup">'+esc(it.supplier)+'</span>':'') + (it.staffPrice?'<span class="sub-staff">職員 '+yen(it.staffPrice)+'</span>':'') + expiryChip(it.expiry) + (it.memo?'<span class="sub-memo">'+esc(it.memo)+'</span>':'') + '</div>'
     + '</div>'
     + '<div class="qty-ctrl"><button onclick="changeQty(\''+it.id+'\',-1)" aria-label="1減らす">−</button><span class="qty">'+it.qty+'</span><button onclick="changeQty(\''+it.id+'\',1)" aria-label="1増やす">＋</button></div>'
-    + '<button class="ord-btn" onclick="event.stopPropagation();openOrder(\''+it.id+'\')" aria-label="注文サイトを開く" title="' + esc(orderSiteOf_(it).name) + 'を開く">🛒</button>'
+    + '<button class="ord-btn" onclick="event.stopPropagation();openOrder(\''+it.id+'\')" aria-label="注文サイトを開く" title="' + esc(orderSiteOf_(it).maker ? 'メーカー指定の方法で発注' : orderSiteOf_(it).name + 'を開く') + '">🛒</button>'
     + '<button class="info-btn" onclick="event.stopPropagation();openDrugInfo(\''+it.id+'\',event)" aria-label="患者説明資料" title="患者説明資料を開く">📄</button>'
     + '<button class="del" onclick="removeItem(\''+it.id+'\')" aria-label="削除">×</button></li>'
   ).join("") + '</ul>' + moreBtn;
@@ -6864,15 +6885,52 @@ const ORDER_SITES = {
   ek: { key: "ek", name: "e健康ショップ", url: "https://www.ekenkoshop.jp/pharmacy/login", win: "otc_ekenko" },
   ep: { key: "ep", name: "order-epi",    url: "https://www.order-epi.com/order/",          win: "otc_orderepi" }
 };
-// 発注先が e健康ショップ なら e健康ショップ、それ以外(空欄も含む)は order-epi
-function orderSiteOf_(it){ return (it && String(it.supplier || "").trim() === "e健康ショップ") ? ORDER_SITES.ek : ORDER_SITES.ep; }
+// 発注先の書き方の ゆれ(全角・半角・空白)を そろえて比べる
+function normSup_(v){ return String(v == null ? "" : v).normalize("NFKC").replace(/[\s　]/g, "").toLowerCase(); }
+// 発注先が e健康ショップ → e健康ショップ / 一覧の卸・空欄 → order-epi /
+// 「その他」で自由に書いた発注先 → メーカー指定の方法で発注(サイトは開かない)
+function orderSiteOf_(it){
+  const n = normSup_(it && it.supplier);
+  if (n.indexOf("健康ショップ") >= 0 || n.indexOf("ekenko") >= 0) return ORDER_SITES.ek;
+  if (!n || SUPPLIERS.some(function(x){ return normSup_(x) === n; })) return ORDER_SITES.ep;
+  return { key: "mk", name: String(it.supplier).trim(), maker: true };
+}
+// サイトのURLは 変わることがあるので「その他 → 注文サイト」で直せるようにする
+function siteUrl_(site){
+  const u = (S.orderUrls || {})[site.key];
+  return (u && /^https?:\/\//i.test(u)) ? u : site.url;
+}
+function saveOrderUrls(){
+  const v = function(id){ const el = document.getElementById(id); return el ? el.value.trim() : ""; };
+  S.orderUrls = { ek: v("ou-ek"), ep: v("ou-ep") };
+  save(); toast("注文サイトのURLを保存しました");
+}
+function loadOrderUrls_(){
+  const u = S.orderUrls || {};
+  const a = document.getElementById("ou-ek"), b = document.getElementById("ou-ep");
+  if (a) a.value = u.ek || ""; if (b) b.value = u.ep || "";
+}
+// メーカー指定の発注方法の お知らせ
+function showMakerNotice_(items){
+  const m = document.getElementById("mk-modal"), body = document.getElementById("mk-body");
+  if (!m || !body) return;
+  body.innerHTML = '<p class="mk-msg">メーカー指定された注文方法(FAX、専用Webページ等)で発注してください。</p>'
+    + '<ul class="mk-list">' + items.map(function(it){
+        return '<li><b>' + esc(it.name || "(名称未設定)") + '</b><span>発注先: ' + esc(it.supplier || "") + '</span>'
+          + (it.memo ? '<span>メモ: ' + esc(it.memo) + '</span>' : '') + '</li>';
+      }).join("") + '</ul>'
+    + '<p class="hint">FAX番号や発注ページは、商品の「メモ」に書いておくと ここに表示されます。</p>';
+  m.style.display = "flex";
+}
+function closeMakerNotice(){ const m = document.getElementById("mk-modal"); if (m) m.style.display = "none"; }
 // IDとパスワードは 控えや共有に入らないよう、S とは別に この端末だけに置く
 const ORDER_LOGIN_KEY = "otc_order_login_v1";
 function orderLogin_(){ try { return JSON.parse(localStorage.getItem(ORDER_LOGIN_KEY) || "{}") || {}; } catch(e){ return {}; } }
-function saveOrderLogin(){
+function saveOrderLogin_(quiet){ saveOrderLogin(quiet); }
+function saveOrderLogin(quiet){
   const v = function(id){ const el = document.getElementById(id); return el ? el.value.trim() : ""; };
   const d = { ek: { id: v("ol-ek-id"), pw: v("ol-ek-pw") }, ep: { id: v("ol-ep-id"), pw: v("ol-ep-pw") } };
-  try { localStorage.setItem(ORDER_LOGIN_KEY, JSON.stringify(d)); toast("注文サイトのログイン情報を保存しました"); } catch(e){ toast("保存できませんでした"); }
+  try { localStorage.setItem(ORDER_LOGIN_KEY, JSON.stringify(d)); if (!quiet) toast("注文サイトのログイン情報を保存しました"); } catch(e){ if (!quiet) toast("保存できませんでした"); }
 }
 function loadOrderLogin_(){
   const d = orderLogin_();
@@ -6888,7 +6946,7 @@ function clearOrderLogin(){
 }
 // 押したらすぐ開く(あとから開くと ブラウザに止められるため)
 function openOrderWin_(site){
-  const w = window.open(site.url, site.win);
+  const w = window.open(siteUrl_(site), site.win);
   if (!w) toast("ポップアップが止められました。ブラウザの設定で このサイトのポップアップを許可してください");
   else { try { w.focus(); } catch(e){} }
   return w;
@@ -6897,6 +6955,7 @@ function openOrder(id){
   const it = S.items.find(function(x){ return x.id === id; });
   if (!it) return;
   const site = orderSiteOf_(it);
+  if (site.maker){ closeOrderSheet(); showMakerNotice_([it]); return; }
   openOrderWin_(site);
   showOrderSheet_(site, [it]);
 }
@@ -6905,27 +6964,62 @@ function openOrderSelected(){
   if (!items.length) return;
   const ek = items.filter(function(it){ return orderSiteOf_(it) === ORDER_SITES.ek; });
   const ep = items.filter(function(it){ return orderSiteOf_(it) === ORDER_SITES.ep; });
+  const mk = items.filter(function(it){ return orderSiteOf_(it).maker; });
+  if (!ek.length && !ep.length){ closeOrderSheet(); showMakerNotice_(mk); return; }
   // 1回のタップで開けるのは1つだけなので、多い方を開き、もう一方は シートのボタンで開く
   const first = ek.length >= ep.length ? ORDER_SITES.ek : ORDER_SITES.ep;
   openOrderWin_(first);
-  showOrderSheet_(first, first === ORDER_SITES.ek ? ek : ep, first === ORDER_SITES.ek ? { site: ORDER_SITES.ep, items: ep } : { site: ORDER_SITES.ek, items: ek });
+  showOrderSheet_(first, first === ORDER_SITES.ek ? ek : ep, first === ORDER_SITES.ek ? { site: ORDER_SITES.ep, items: ep } : { site: ORDER_SITES.ek, items: ek }, mk);
 }
+// コピー:①新しい方式(navigator.clipboard) → ②古い方式(execCommand) の順に試し、
+// それでも だめなときは 画面に文字を出して 長押しでコピーできるようにする(失敗を成功と言わない)
 function copyText_(t, label){
   if (!t){ toast(label + "が 未設定です(その他 → 注文サイト で設定できます)"); return; }
-  const done = function(){ toast(label + "をコピーしました。注文サイトで貼り付けてください"); };
-  if (navigator.clipboard && window.isSecureContext){
-    navigator.clipboard.writeText(t).then(done, function(){ fallbackCopy_(t); done(); });
-  } else { fallbackCopy_(t); done(); }
+  const ok = function(){ toast(label + "をコピーしました。注文サイトの入力欄を長押しして「貼り付け」してください"); showCopyBox_(t, label, true); };
+  const ng = function(){ if (legacyCopy_(t)) ok(); else { toast("この端末では自動でコピーできませんでした。下の欄を長押ししてコピーしてください"); showCopyBox_(t, label, false); } };
+  try {
+    if (navigator.clipboard && navigator.clipboard.writeText && window.isSecureContext){
+      navigator.clipboard.writeText(t).then(ok, ng);
+      return;
+    }
+  } catch(e){}
+  ng();
 }
-function fallbackCopy_(t){
+function legacyCopy_(t){
   const ta = document.createElement("textarea");
-  ta.value = t; ta.setAttribute("readonly", ""); ta.style.position = "fixed"; ta.style.opacity = "0";
-  document.body.appendChild(ta); ta.select();
-  try { document.execCommand("copy"); } catch(e){}
+  ta.value = t;
+  ta.style.cssText = "position:fixed;top:0;left:0;width:2em;height:2em;padding:0;border:none;outline:none;box-shadow:none;background:transparent;font-size:16px;opacity:0.01";
+  ta.contentEditable = "true";
+  document.body.appendChild(ta);
+  let done = false;
+  try {
+    ta.focus(); ta.select(); ta.setSelectionRange(0, t.length);
+    done = document.execCommand("copy");
+  } catch(e){ done = false; }
   document.body.removeChild(ta);
+  return !!done;
+}
+// コピーした内容を シートの中に 文字で出す(貼り付けできないサイトでも 見ながら入力できる)
+function showCopyBox_(t, label, copied){
+  const box = document.getElementById("os-copybox");
+  if (!box) return;
+  const secret = label === "パスワード";
+  box.innerHTML = '<div class="os-cb-head">' + esc(label) + (copied ? '(コピー済み)' : '(長押しでコピー)') + '</div>'
+    + '<input class="os-cb-val" id="os-cb-val" readonly value="' + esc(t) + '"' + (secret ? ' data-secret="1" style="-webkit-text-security:disc"' : '') + '>'
+    + (secret ? '<button class="os-btn" onclick="toggleCopyReveal_(this)">表示</button>' : '');
+  box.hidden = false;
+  const inp = document.getElementById("os-cb-val");
+  if (inp && !copied){ try { inp.focus(); inp.select(); inp.setSelectionRange(0, t.length); } catch(e){} }
+}
+function toggleCopyReveal_(btn){
+  const inp = document.getElementById("os-cb-val");
+  if (!inp) return;
+  const hide = inp.style.webkitTextSecurity === "disc" || inp.style.getPropertyValue("-webkit-text-security") === "disc";
+  inp.style.setProperty("-webkit-text-security", hide ? "none" : "disc");
+  btn.textContent = hide ? "かくす" : "表示";
 }
 let __ordSheetItems = [];
-function showOrderSheet_(site, items, other){
+function showOrderSheet_(site, items, other, makerItems){
   const box = document.getElementById("ord-sheet");
   if (!box) return;
   __ordSheetItems = items.slice();
@@ -6935,8 +7029,9 @@ function showOrderSheet_(site, items, other){
     + '<div class="os-login">'
     +   '<button class="os-btn" onclick="copyOrderLogin_(\'' + site.key + '\',\'id\')">IDをコピー</button>'
     +   '<button class="os-btn" onclick="copyOrderLogin_(\'' + site.key + '\',\'pw\')">パスワードをコピー</button>'
-    +   '<button class="os-btn" onclick="openOrderWin_(ORDER_SITES.' + site.key + ')">もう一度ひらく</button>'
-    + '</div>';
+    + '</div>'
+    + '<p class="os-alt">開かないときは <a href="' + esc(siteUrl_(site)) + '" target="' + site.win + '" rel="noopener">ここを押して ' + esc(site.name) + ' を開く</a></p>'
+    + '<div class="os-copybox" id="os-copybox" hidden></div>';
   if (!lg.id && !lg.pw) h += '<p class="hint">ID・パスワードは「その他 → 注文サイト」で設定できます。</p>';
   h += items.map(function(it, i){
     return '<div class="os-item"><span class="nm">' + esc(it.name || "(名称未設定)") + '<small>' + esc(it.jan || "JANなし") + '</small></span>'
@@ -6947,6 +7042,10 @@ function showOrderSheet_(site, items, other){
   if (other && other.items.length){
     h += '<div class="os-item"><span class="nm">' + esc(other.site.name) + 'の商品も ' + other.items.length + '品目あります</span>'
       + '<button class="os-btn fill" onclick="openOrderWin_(ORDER_SITES.' + other.site.key + ');showOrderSheet_(ORDER_SITES.' + other.site.key + ',S.items.filter(function(it){return selected.has(it.id)&&orderSiteOf_(it)===ORDER_SITES.' + other.site.key + '}))">' + esc(other.site.name) + 'をひらく</button></div>';
+  }
+  if (makerItems && makerItems.length){
+    h += '<div class="os-item"><span class="nm">メーカー指定の方法で発注する商品が ' + makerItems.length + '品目あります</span>'
+      + '<button class="os-btn" onclick="showMakerNotice_(S.items.filter(function(it){return selected.has(it.id)&&orderSiteOf_(it).maker}))">確認する</button></div>';
   }
   box.innerHTML = h;
   box.hidden = false;
@@ -7277,7 +7376,7 @@ function bootUi_(){
   fillLookOptions_();
   updateBrand();
   try { initKeyboard_(); } catch(e){}
-  try { loadOrderLogin_(); } catch(e){}
+  try { loadOrderLogin_(); loadOrderUrls_(); } catch(e){}
   renderList();
   showExpiryAlert();
   showBackupAlert();
