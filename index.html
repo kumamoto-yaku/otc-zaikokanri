@@ -294,6 +294,97 @@ button.mate-chip { cursor: pointer; font-family: var(--sans); }
 .pt-top { margin: 8px 0 4px; }
 .pt-body { margin-top: 6px; }
 .stage-more { align-self: center; font-size: 11px; color: #5C6B78; }
+/* ===== なかま画面(ゲーム風) ===== */
+.gm-tabs { display: grid; grid-template-columns: repeat(6, minmax(0,1fr)); gap: 4px; margin-bottom: 10px; }
+.gm-tab { position: relative; display: flex; flex-direction: column; align-items: center; gap: 1px; padding: 7px 2px 6px; border: 1px solid var(--line); background: #fff; color: #5C6B78; border-radius: 10px; font-size: 11px; font-family: var(--sans); cursor: pointer; min-width: 0; }
+.gm-tab .ic { font-size: 18px; line-height: 1.1; }
+.gm-tab .lb { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+.gm-tab .bd { position: absolute; top: -5px; right: -3px; min-width: 18px; height: 18px; padding: 0 4px; border-radius: 999px; background: #E3A21A; color: #fff; font-size: 10px; font-weight: 700; line-height: 18px; text-align: center; }
+.gm-tab.on { border-color: var(--ai); background: var(--ai); color: #fff; font-weight: 700; }
+@media (max-width: 420px) { .gm-tabs { grid-template-columns: repeat(3, minmax(0,1fr)); } }
+.gm-party { border-radius: 14px; background: linear-gradient(180deg,#22344A 0%,#2E4A63 100%); color: #fff; padding: 10px 10px 8px; margin-bottom: 12px; }
+.gm-party.sleepy { filter: grayscale(0.7); }
+.gm-party-head { display: flex; justify-content: space-between; align-items: baseline; font-size: 12px; letter-spacing: 0.1em; opacity: 0.9; margin-bottom: 6px; }
+.gm-party-head b { font-size: 15px; letter-spacing: 0.04em; }
+.gm-slots { display: grid; grid-template-columns: 1.2fr 1.1fr 1fr 1fr 1fr; gap: 6px; }
+.gm-slot { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 2px; min-height: 92px; padding: 6px 2px 5px; border-radius: 10px; background: rgba(255,255,255,0.10); border: 1px solid rgba(255,255,255,0.18); color: #fff; font-family: var(--sans); cursor: pointer; min-width: 0; }
+.gm-slot svg { image-rendering: pixelated; display: block; }
+.gm-slot .role { font-size: 9.5px; padding: 0 6px; border-radius: 999px; background: rgba(255,255,255,0.2); white-space: nowrap; }
+.gm-slot .nm { font-size: 11px; font-weight: 700; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.gm-slot.hero { background: rgba(255,214,102,0.18); border-color: rgba(255,214,102,0.55); }
+.gm-slot.hero .role { background: #E3A21A; }
+.gm-slot.buddy .role { background: #3E9C6A; }
+.gm-slot.mate .role { background: #4A7FC1; }
+.gm-slot.empty { border-style: dashed; color: rgba(255,255,255,0.65); }
+.gm-slot.empty .plus { font-size: 22px; line-height: 1; margin-bottom: 6px; }
+.gm-bars { display: grid; grid-template-columns: auto 1fr auto; gap: 4px 8px; align-items: center; margin-top: 8px; font-size: 11px; }
+.gm-bars .bar { height: 8px; border-radius: 999px; background: rgba(255,255,255,0.18); overflow: hidden; }
+.gm-bars .bar i { display: block; height: 100%; border-radius: 999px; background: #F2C14E; }
+.gm-help { font-size: 12px; color: #5C6B78; margin: 0 0 8px; line-height: 1.6; }
+.gm-groups { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 6px; }
+.gm-group { flex: 0 0 auto; border: 1px solid var(--line); background: #fff; color: #44525E; border-radius: 999px; padding: 6px 12px; font-size: 12.5px; font-family: var(--sans); cursor: pointer; white-space: nowrap; }
+.gm-group small { font-size: 10.5px; color: #8A97A0; margin-left: 4px; }
+.gm-group.on { background: #22344A; border-color: #22344A; color: #fff; font-weight: 700; }
+.gm-group.on small { color: rgba(255,255,255,0.75); }
+.gm-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(78px, 1fr)); gap: 6px; }
+.gm-card { position: relative; display: flex; flex-direction: column; align-items: center; gap: 1px; padding: 8px 3px 6px; border: 2px solid #E1E7EC; border-radius: 12px; background: #fff; font-family: var(--sans); cursor: pointer; min-width: 0; }
+.gm-card svg { image-rendering: pixelated; display: block; margin-bottom: 2px; }
+.gm-card .nm { font-size: 11.5px; font-weight: 700; color: var(--ai-deep); max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.gm-card .st { font-size: 10px; color: #E3A21A; letter-spacing: -1px; }
+.gm-card .sub { font-size: 9.5px; color: #8A97A0; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.gm-card.rare { background: #FFFBEC; border-color: #EBD58A; }
+.gm-card.senmon { background: #F1F8FC; border-color: #A9D0E8; }
+.gm-card.gotouchi { background: #F3FAF4; border-color: #B5DDB9; }
+.gm-card.on { border-color: #4A7FC1; box-shadow: 0 0 0 2px rgba(74,127,193,0.25); }
+.gm-card .no { position: absolute; top: 4px; left: 6px; font-size: 9px; color: #A9B4BC; }
+.gm-card .badge { position: absolute; top: -7px; right: -5px; background: #4A7FC1; color: #fff; border-radius: 999px; font-size: 10px; font-weight: 700; padding: 1px 6px; }
+.gm-card.yet { background: #F3F5F7; border-style: dashed; cursor: default; }
+.gm-card.yet .q { width: 40px; height: 40px; border-radius: 8px; background: #DDE3E8; color: #A9B4BC; font-size: 20px; font-weight: 700; display: flex; align-items: center; justify-content: center; margin-bottom: 2px; }
+.gm-card.yet .nm { color: #A9B4BC; }
+.gm-card:active { transform: scale(0.97); }
+/* 画面に重ねて出す小窓(なかま・そうび) */
+.order-modal { position: fixed; inset: 0; z-index: 90; background: rgba(15,25,35,0.55); align-items: flex-start; justify-content: center; overflow-y: auto; padding: 16px 10px 40px; -webkit-overflow-scrolling: touch; }
+#battle-modal { z-index: 95; }
+.order-card { position: relative; width: 100%; max-width: 560px; background: #F7F9FB; border-radius: 18px; padding: 12px 12px 16px; box-shadow: 0 12px 40px rgba(0,0,0,0.25); margin: 0 auto; }
+.order-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.order-title { font-size: 16px; font-weight: 800; color: var(--ai-deep); letter-spacing: 0.08em; }
+.order-head .link { border: 1px solid var(--line); background: #fff; border-radius: 999px; padding: 5px 14px; font-size: 13px; text-decoration: none; }
+#party-modal-body { min-width: 0; max-width: 100%; overflow-x: hidden; }
+#party-modal-body .pt-body, .gm-groups { min-width: 0; max-width: 100%; }
+@media (max-width: 440px) {
+  .gm-slots { gap: 4px; }
+  .gm-slot { min-height: 84px; padding: 5px 1px 4px; }
+  .gm-slot .nm { font-size: 10px; white-space: normal; line-height: 1.2; text-align: center; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+  .gm-slot .role { font-size: 9px; padding: 0 4px; }
+  .gm-grid { grid-template-columns: repeat(auto-fill, minmax(70px, 1fr)); }
+  .gm-slot.empty .nm { display: block; white-space: nowrap; font-size: 9.5px; overflow: visible; text-overflow: clip; max-width: none; letter-spacing: -0.05em; }
+}
+.gm-quest { margin-top: 12px; border: 1px solid var(--line); border-radius: 12px; padding: 10px; background: #fff; }
+.gm-quest-head { display: flex; justify-content: space-between; font-size: 12.5px; font-weight: 700; color: var(--ai-deep); }
+.gm-pbar { height: 8px; border-radius: 999px; background: #E8EDF1; overflow: hidden; margin: 6px 0; }
+.gm-pbar i { display: block; height: 100%; background: #3E9C6A; border-radius: 999px; }
+.gm-quest ul { margin: 6px 0 0; padding: 0; list-style: none; }
+.gm-quest li { font-size: 12.5px; padding: 5px 0; border-top: 1px dashed var(--line); }
+.gm-quest li::before { content: "▶ "; color: #3E9C6A; font-size: 10px; }
+.gm-quest details summary { font-size: 12px; color: var(--ai); cursor: pointer; margin-top: 6px; }
+.gm-bgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); gap: 8px; }
+.gm-bcard { position: relative; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 10px 6px 8px; border: 2px solid #E1E7EC; border-radius: 12px; background: #fff; font-family: var(--sans); cursor: pointer; min-width: 0; text-align: center; }
+.gm-bcard .pic { height: 52px; display: flex; align-items: flex-end; justify-content: center; }
+.gm-bcard .pic svg { image-rendering: pixelated; display: block; }
+.gm-bcard b { font-size: 12.5px; color: var(--ai-deep); }
+.gm-bcard .ps { font-size: 10px; color: #5C6B78; background: #EEF3F1; border-radius: 999px; padding: 1px 7px; }
+.gm-bcard .fx { font-size: 10px; color: #3E7C59; line-height: 1.35; }
+.gm-bcard.on { border-color: #3E9C6A; background: #F0F8F3; box-shadow: 0 0 0 2px rgba(62,156,106,0.2); }
+.gm-bcard .badge { position: absolute; top: -8px; left: 50%; transform: translateX(-50%); background: #3E9C6A; color: #fff; border-radius: 999px; font-size: 10px; font-weight: 700; padding: 1px 8px; white-space: nowrap; }
+.gm-bcard.yet { background: #F3F5F7; border-style: dashed; cursor: default; }
+.gm-bcard.yet .pic { filter: brightness(0) opacity(0.18); }
+.gm-bcard.yet b { color: #A9B4BC; }
+.gm-bcard .how { font-size: 10px; color: #6B7882; line-height: 1.35; }
+.gm-bcard .gm-pbar { width: 100%; margin: 4px 0 0; height: 6px; }
+.gm-bcard .gm-pbar i { background: #4A7FC1; }
+.gm-bcard .pn { font-size: 10px; color: #4A7FC1; font-weight: 700; }
+.gm-bcard.ready { border-color: #E3A21A; }
+
 .st-box { border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
 .st-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 8px 11px; font-size: 12.5px; color: #5C6B78; border-top: 1px solid var(--line); }
 .st-row:first-child { border-top: none; }
@@ -838,7 +929,7 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
 <div id="party-modal" class="order-modal" style="display:none" onclick="if(event.target===this)closePartyModal()">
   <div class="order-card">
     <div class="order-head">
-      <span class="order-title">なかま</span>
+      <span class="order-title">🎮 なかま</span>
       <button class="link" onclick="closePartyModal()">閉じる</button>
     </div>
     <div id="party-modal-body"></div>
@@ -1419,7 +1510,7 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
   </section>
 
   <div class="toast" id="toast"></div>
-  <footer class="foot">OTCLinker — とみながグループ 店舗向けツール<br><span class="ver">版 2026-10-10 BZ(並べ替えと区分の統合)</span></footer>
+  <footer class="foot">OTCLinker — とみながグループ 店舗向けツール<br><span class="ver">版 2026-10-10 CA(なかま画面の整理)</span></footer>
 </div>
 
 <script>
@@ -4565,24 +4656,25 @@ function otherSection_(){
 }
 function buddySection_(){
   const own = petsOwned_(), cur = activePet_();
-  let h = '<div class="divider"><span>あいぼう ' + own.length + '/' + (PETS.length + 1) + '</span></div>'
-        + '<p class="hint">主人公の となりを 歩く どうぶつです。1体だけ つれて歩けます。</p>'
-        + '<div class="buddy-list">';
+  let h = '<p class="gm-help">主人公の となりを 歩く どうぶつです(' + own.length + '/' + (PETS.length + 1) + ')。カードをタップで つれて歩く あいぼうを えらべます。つれている子を もう一度タップすると お休みします。</p>'
+        + '<div class="gm-bgrid">';
   PETS.concat([HIME]).forEach(function(x){
     const has = own.indexOf(x.key) >= 0;
     const pr = petProgress_(x);
     if (has){
-      h += '<button class="buddy-card' + (cur === x.key ? ' on' : '') + '" onclick="setBuddy(\'' + x.key + '\')">'
-        + '<span class="bd-icon">' + dotSvg(x.key, Math.min(46, Math.round(((x.size||28) / 28) * 34)), mateLv_(x.key)) + '</span>'
-        + '<i class="pose">' + esc((PET_POSES[petPose_(x.key)]||{}).name || '') + '</i>'
+      h += '<button class="gm-bcard' + (cur === x.key ? ' on' : '') + '" onclick="setBuddy(\'' + x.key + '\')">'
+        + (cur === x.key ? '<span class="badge">つれてる</span>' : '')
+        + '<span class="pic">' + dotSvg(x.key, 44, mateLv_(x.key)) + '</span>'
         + '<b>' + esc(x.name) + '</b>'
-        + '<i>' + esc(PERSONA[x.key] ? PERSONA[x.key].p : "") + '</i>'
-        + '<i class="fx">' + esc(x.fx) + '</i>'
-        + (cur === x.key ? '<i class="onmark">つれてる</i>' : '') + '</button>';
+        + (PERSONA[x.key] ? '<span class="ps">' + esc(PERSONA[x.key].p) + '</span>' : '')
+        + '<span class="fx">' + esc(x.fx) + '</span></button>';
     } else {
-      h += '<div class="buddy-card yet">' + dotSvg("slot", 40)
-        + '<b>？？？</b><i class="fx">' + esc(x.how) + '</i>'
-        + '<i class="pg">' + Math.min(pr.now, pr.need) + ' / ' + pr.need + '</i></div>';
+      const now = Math.min(pr.now, pr.need), pct = pr.need ? Math.round(now / pr.need * 100) : 0;
+      h += '<div class="gm-bcard yet' + (now >= pr.need ? ' ready' : '') + '">'
+        + '<span class="pic">' + dotSvg(x.key, 44, 0) + '</span>'
+        + '<b>？？？</b><span class="how">' + esc(x.how) + '</span>'
+        + '<span class="gm-pbar"><i style="width:' + pct + '%"></i></span>'
+        + '<span class="pn">' + now + ' / ' + pr.need + '</span></div>';
     }
   });
   return h + '</div>';
@@ -5043,89 +5135,120 @@ function startPetIdle_(){
   window.__petTimer = setTimeout(loop, 3500);
 }
 let __partyTab = "mates";
+let __mateGroup = "kusuri";
 function setPartyTab(t){ __partyTab = t; openPartyModal(); }
+function setMateGroup(g){ __mateGroup = g; openPartyModal(); }
+function mateStars_(lv){ return lv >= 3 ? "★★★" : lv >= 2 ? "★★☆" : "★☆☆"; }
+// 上の「パーティ」:主人公・あいぼう・画面に出す なかま(3体)を 横一列の枠で見せる
+function partyPanel_(){
+  const st = dotStage(), gs = genkiState_(), g = genki_(), li = lvInfo_();
+  const bk = activePet_(), bi = bk ? petInfo_(bk) : null;
+  const picks = petPicks_();
+  let h = '<div class="gm-party' + (gs.key === "nemuri" ? " sleepy" : "") + '">'
+    + '<div class="gm-party-head"><span>パーティ</span><b>Lv ' + li.lv + '</b></div>'
+    + '<div class="gm-slots">'
+    + '<div class="gm-slot hero" onclick="setPartyTab(\'equip\')" title="タップで そうび">'
+    +   dotSvg(st.key, 46, 0, decoOf_(st.key), rpg_().equip)
+    +   '<span class="nm">' + esc(st.name) + '</span><span class="role">主人公</span></div>';
+  if (bk){
+    h += '<div class="gm-slot buddy" onclick="setPartyTab(\'buddy\')" title="タップで あいぼうを えらぶ">'
+      + dotSvg(bk, 40, mateLv_(bk))
+      + '<span class="nm">' + esc(bi ? bi.name : "") + '</span><span class="role">あいぼう</span></div>';
+  } else {
+    h += '<div class="gm-slot buddy empty" onclick="setPartyTab(\'buddy\')"><span class="plus">＋</span><span class="nm">' + (petsOwned_().length ? "お休み中" : "まだいない") + '</span><span class="role">あいぼう</span></div>';
+  }
+  for (let n = 0; n < PET_PICK_MAX; n++){
+    const k = picks[n];
+    if (k){
+      h += '<div class="gm-slot mate" onclick="togglePetPick(\'' + k + '\')" title="タップで はずす">'
+        + dotSvg(k, 34, mateLv_(k), decoOf_(k))
+        + '<span class="nm">' + esc(DOT_NAMES[k]) + '</span><span class="role">なかま' + (n + 1) + '</span></div>';
+    } else {
+      h += '<div class="gm-slot mate empty" onclick="setPartyTab(\'mates\')"><span class="plus">＋</span><span class="nm">' + (picks.length ? "あき" : "おまかせ") + '</span><span class="role">なかま' + (n + 1) + '</span></div>';
+    }
+  }
+  h += '</div>'
+    + '<div class="gm-bars">'
+    +   '<span>けいけん</span><span class="bar"><i style="width:' + li.pct + '%"></i></span><span>あと ' + Math.max(0, li.next - li.exp) + '</span>'
+    +   '<span>げんき</span><span class="bar"><i style="width:' + g + '%;background:' + gs.color + '"></i></span><span>' + esc(gs.label) + '</span>'
+    + '</div></div>';
+  return h;
+}
+// なかま図鑑:グループを1つずつ切り替えて、同じ大きさのカードで並べる
+function matesSection_(){
+  const st = dotStage(), picks = petPicks_();
+  const groups = [
+    { id:"kusuri",   label:"おくすり",   keys: DOT_MATES,       owned: st.mates,          cls:"",
+      how: "商品を25品目登録すると1体目、そのあと5品目ふえるごとに1体ずつ加わります(いま " + st.n + " 品目)。" },
+    { id:"senmon",   label:"せんもんしょく", keys: SENMON_MATES, owned: senmonOwned_(),   cls:"senmon",
+      how: "要指導医薬品・第1類医薬品の在庫が " + SENMON_NEED.join("・") + " 品目に届くと1体ずつ加わります(いま " + senmonCount_() + " 品目)。" },
+    { id:"gotouchi", label:"ごとうち",   keys: GOTOUCHI_MATES,  owned: gotouchiOwned_(), cls:"gotouchi",
+      how: "下の「やってみよう」を1つ試すごとに1体やってきます。" },
+    { id:"rare",     label:"レア",       keys: RARE_MATES,      owned: rareOwned_(),     cls:"rare",
+      how: "新しい商品を登録したとき、ごくまれに現れます。" }
+  ];
+  let cur = groups.filter(function(x){ return x.id === __mateGroup; })[0] || groups[0];
+  let h = '<p class="gm-help">カードをタップすると、画面右上に出す なかまに入ります(最大' + PET_PICK_MAX + '体)。もう一度タップで はずれます。'
+    + (picks.length ? ' <button class="link" onclick="clearPetPick()">おまかせに戻す</button>' : '') + '</p>';
+  h += '<div class="gm-groups">' + groups.map(function(x){
+    return '<button class="gm-group' + (x === cur ? ' on' : '') + '" onclick="setMateGroup(\'' + x.id + '\')">' + esc(x.label) + '<small>' + x.owned.length + '/' + x.keys.length + '</small></button>';
+  }).join("") + '</div>';
+  h += '<p class="gm-help">' + esc(cur.how) + '</p>';
+  h += '<div class="gm-grid">' + cur.keys.map(function(k, i){
+    const no = '<span class="no">No.' + (i + 1) + '</span>';
+    if (cur.owned.indexOf(k) < 0) return '<div class="gm-card yet">' + no + '<span class="q">？</span><span class="nm">？？？</span><span class="sub">まだ</span></div>';
+    const lv = mateLv_(k), dk = decoOf_(k), nx = mateNext_(k), pi = picks.indexOf(k);
+    return '<button class="gm-card ' + cur.cls + (pi >= 0 ? ' on' : '') + '" onclick="togglePetPick(\'' + k + '\')" title="' + (PERSONA[k] ? esc(PERSONA[k].p) + " / " : "") + mateLvLabel_(lv) + (dk ? " / " + DECOS[dk] : "") + '">'
+      + no + (pi >= 0 ? '<span class="badge">なかま' + (pi + 1) + '</span>' : '')
+      + dotSvg(k, 40, lv, dk)
+      + '<span class="nm">' + esc(DOT_NAMES[k]) + '</span>'
+      + '<span class="st">' + mateStars_(lv) + '</span>'
+      + '<span class="sub">' + (nx !== null ? 'しんか あと' + nx + '日' : (PERSONA[k] ? esc(PERSONA[k].p) : "")) + '</span>'
+      + '</button>';
+  }).join("") + '</div>';
+  if (cur.id === "gotouchi"){
+    const rest = QUESTS.filter(function(q){ return !questDone_(q.id); });
+    const done = QUESTS.length - rest.length;
+    h += '<div class="gm-quest"><div class="gm-quest-head"><span>やってみよう</span><span>' + done + ' / ' + QUESTS.length + '</span></div>'
+      + '<div class="gm-pbar"><i style="width:' + Math.round(done / QUESTS.length * 100) + '%"></i></div>';
+    if (!rest.length) h += '<p class="gm-help">ぜんぶ試しました!ごとうちのなかまが勢ぞろいです。</p>';
+    else {
+      h += '<ul>' + rest.slice(0, 3).map(function(q){ return '<li>' + esc(q.label) + '</li>'; }).join("") + '</ul>';
+      if (rest.length > 3) h += '<details><summary>のこり ' + (rest.length - 3) + ' こを見る</summary><ul>'
+        + rest.slice(3).map(function(q){ return '<li>' + esc(q.label) + '</li>'; }).join("") + '</ul></details>';
+    }
+    h += '</div>';
+  }
+  return h;
+}
 function openPartyModal(){
+  try { checkPets_(); } catch(e){}
   petGroup_();
-  const st = dotStage();
   const box = document.getElementById("party-modal-body");
-  const gs = genkiState_(), g = genki_();
-  const li = lvInfo_();
-
-  // 上の見出し(どこを見るか えらぶ)
   const own = petsOwned_();
   const tabs = [
-    { id:"mates",  label:"なかま",     n: allMates_().length },
-    { id:"buddy",  label:"あいぼう",   n: own.length },
-    { id:"equip",  label:"そうび",     n: EQUIP_SLOTS.filter(function(sl){ return rpg_().equip[sl.id]; }).length },
-    { id:"battle", label:"たおした敵", n: (rpg_().bosses || []).length + (rpg_().wins || 0) },
-    { id:"status", label:"ステータス", n: null },
-    { id:"other",  label:"その他",     n: null }
+    { id:"mates",  ic:"👥", label:"なかま",     n: allMates_().length },
+    { id:"buddy",  ic:"🐾", label:"あいぼう",   n: own.length },
+    { id:"equip",  ic:"🛡", label:"そうび",     n: EQUIP_SLOTS.filter(function(sl){ return rpg_().equip[sl.id]; }).length },
+    { id:"battle", ic:"⚔", label:"たたかい",   n: (rpg_().bosses || []).length + (rpg_().wins || 0) },
+    { id:"status", ic:"📊", label:"つよさ",     n: null },
+    { id:"other",  ic:"⚙", label:"その他",     n: null }
   ];
-  let head = '<div class="pt-tabs">' + tabs.map(function(t){
-    return '<button class="pt-tab' + (__partyTab === t.id ? ' on' : '') + '" onclick="setPartyTab(\'' + t.id + '\')">'
-      + esc(t.label) + (t.n !== null ? '<i>' + t.n + '</i>' : '') + '</button>';
+  const head = '<div class="gm-tabs">' + tabs.map(function(t){
+    return '<button class="gm-tab' + (__partyTab === t.id ? ' on' : '') + '" onclick="setPartyTab(\'' + t.id + '\')">'
+      + '<span class="ic">' + t.ic + '</span><span class="lb">' + esc(t.label) + '</span>'
+      + (t.n ? '<span class="bd">' + t.n + '</span>' : '') + '</button>';
   }).join("") + '</div>';
 
-  // つねに いちばん上に出す 舞台と げんき
-  let stage = '<div class="party-stage' + (gs.key === "nemuri" ? " sleepy" : "") + '">' + dotSvg(st.key, 46, 0, decoOf_(st.key), rpg_().equip);
-  allMates_().slice(0, 8).forEach(function(o){
-    stage += '<span class="' + (o.c ? o.c + "-glow" : "") + '">' + dotSvg(o.k, 34, mateLv_(o.k), decoOf_(o.k)) + '</span>';
-  });
-  if (allMates_().length > 8) stage += '<span class="stage-more">+' + (allMates_().length - 8) + '</span>';
-  stage += '</div>';
-  const bar = '<div class="pt-top">'
-    + '<div class="lv-row"><b>Lv ' + li.lv + '</b><span class="lv-bar"><i style="width:' + li.pct + '%"></i></span><span>つぎまで ' + Math.max(0, li.next - li.exp) + '</span></div>'
-    + '<div class="genki-row"><span>げんき</span><span class="genki-bar"><i style="width:' + g + '%;background:' + gs.color + '"></i></span><b style="color:' + gs.color + '">' + gs.label + '</b></div>'
-    + '</div>';
-
-  const picks = petPicks_();
-  const chip = function(k, owned, cls){
-    if (!owned) return '<span class="mate-chip yet">' + dotSvg("slot", 26) + '？</span>';
-    const lv = mateLv_(k), dk = decoOf_(k), nx = mateNext_(k);
-    const on = picks.indexOf(k) >= 0;
-    return '<button class="mate-chip ' + cls + (on ? ' picked' : '') + '" onclick="togglePetPick(\'' + k + '\')"'
-      + ' title="' + (PERSONA[k] ? PERSONA[k].p + " / " : "") + mateLvLabel_(lv) + (dk ? " / " + DECOS[dk] : "") + ' — タップで画面に出す">'
-      + dotSvg(k, 26, lv, dk) + esc(DOT_NAMES[k])
-      + (PERSONA[k] ? '<i class="pers">' + esc(PERSONA[k].p) + '</i>' : '')
-      + '<i class="lv">' + (lv >= 3 ? "★★★" : lv >= 2 ? "★★" : "★") + '</i>'
-      + (nx !== null ? '<i class="nx">あと' + nx + '日</i>' : '')
-      + (on ? '<i class="onmark">画面</i>' : '') + '</button>';
-  };
-  const group = function(title, keys, owned, cls, note){
-    return '<div class="divider"><span>' + title + ' ' + owned.length + '/' + keys.length + '</span></div>'
-      + '<div class="mate-list">' + keys.map(function(k){ return chip(k, owned.indexOf(k) >= 0, cls); }).join("") + '</div>'
-      + (note ? '<p class="hint">' + note + '</p>' : '');
-  };
-
   let body = "";
-  if (__partyTab === "mates"){
-    const rest = QUESTS.filter(function(q){ return !questDone_(q.id); });
-    body = '<p class="hint">タップすると 画面右上に出す なかまを えらべます(最大' + PET_PICK_MAX + '体)'
-      + (picks.length ? ' <button class="link" onclick="clearPetPick()">おまかせに戻す</button>' : '') + '</p>'
-      + '<div class="divider"><span>おくすりのなかま ' + st.mateN + '/' + DOT_MATES.length + '</span></div>'
-      + '<div class="mate-list">' + DOT_MATES.map(function(k, i){ return chip(k, i < st.mateN, ""); }).join("") + '</div>'
-      + group("せんもんしょくのなかま", SENMON_MATES, senmonOwned_(), "senmon",
-          "要指導医薬品・第1類医薬品の在庫が " + SENMON_NEED.join("・") + " 品目に届くと1体ずつ加わります(いま " + senmonCount_() + " 品目)。")
-      + group("ごとうちのなかま", GOTOUCHI_MATES, gotouchiOwned_(), "gotouchi", null)
-      + '<div class="divider"><span>やってみよう ' + (QUESTS.length - rest.length) + '/' + QUESTS.length + '</span></div>'
-      + (rest.length
-          ? '<ul class="quest-list">' + rest.map(function(q){ return '<li>' + esc(q.label) + '</li>'; }).join("") + '</ul>'
-            + '<p class="hint">ひとつ試すごとに、ごとうちのなかまが1体やってきます。</p>'
-          : '<p class="hint">ぜんぶ試しました!ごとうちのなかまが勢ぞろいです。</p>')
-      + group("レアななかま", RARE_MATES, rareOwned_(), "rare", "新しい商品を登録したとき、ごくまれに現れます。");
-  } else if (__partyTab === "buddy"){
-    body = buddySection_();
-  } else if (__partyTab === "equip"){
-    body = equipSection_();
-  } else if (__partyTab === "battle"){
-    body = battleSection_();
-  } else if (__partyTab === "status"){
-    body = statusSection_();
-  } else {
-    body = otherSection_();
-  }
+  if (__partyTab === "mates") body = matesSection_();
+  else if (__partyTab === "buddy") body = buddySection_();
+  else if (__partyTab === "equip") body = equipSection_();
+  else if (__partyTab === "battle") body = battleSection_();
+  else if (__partyTab === "status") body = statusSection_();
+  else body = otherSection_();
 
-  box.innerHTML = head + stage + bar + '<div class="pt-body">' + body + '</div>';
+  box.innerHTML = partyPanel_() + head + '<div class="pt-body">' + body + '</div>';
   document.getElementById("party-modal").style.display = "flex";
 }
 function closePartyModal(){ document.getElementById("party-modal").style.display = "none"; }
