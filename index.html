@@ -410,6 +410,16 @@ input:focus, select:focus { outline: 2px solid var(--ai); outline-offset: -1px; 
 .field-toggles label input { width: auto; }
 .selall-row { flex-direction: row; align-items: center; gap: 8px; font-size: 13px; color: var(--ink); }
 .selall-row input { width: auto; }
+.list-tools { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin: 4px 0 6px; }
+.list-tools .selall-row { margin: 0; }
+.list-tools #view-toggle { padding: 6px 14px; }
+.list-order { flex: 0 1 260px; min-width: 170px; }
+.skb-k { min-width: 0; width: 100%; overflow: hidden; white-space: nowrap; }
+@media (max-width: 560px) {
+  #tab-list .search { flex: 1 1 100%; min-width: 0; }
+  .list-order { flex: 1 1 100%; }
+  .skb-k.fn { font-size: 12px; }
+}
 .select-bar { font-size: 13.5px; background: #EDF2F0; border-radius: 8px; padding: 8px 12px; display: none; }
 .list-more { text-align: center; margin: 12px 0 4px; }
 .stock-list { list-style: none; padding: 0; display: flex; flex-direction: column; gap: 8px; }
@@ -959,12 +969,11 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
 
   <!-- ============ 在庫リスト ============ -->
   <section class="panel active" id="tab-list">
-    <div class="cat-chips" id="cat-chips"></div>
     <div class="row gap wrap">
       <input class="search" id="q" placeholder="商品名・ふりがな・JAN・メーカーで検索" oninput="searchInput()">
       <select id="cat-filter" onchange="renderList()" style="display:none"></select>
-      <select id="sort-by" onchange="renderList();if(this.value!=='new')doQuest('sort')"><option value="new">新規登録順</option><option value="aiueo">50音順</option><option value="expiry">有効期限順</option><option value="price-a">価格が安い順</option><option value="price-d">価格が高い順</option><option value="qty-a">在庫が少ない順</option></select>
-      <button class="btn ghost" id="view-toggle" onclick="toggleView()">表形式</button>
+      <select id="sort-by" style="display:none"><option value="new">新規登録順</option><option value="aiueo">50音順</option><option value="expiry">有効期限順</option></select>
+      <select id="list-order" class="list-order" onchange="onListOrder(this.value)" aria-label="並べ替えと区分の絞り込み"></select>
     </div>
     <div class="skb" id="skb">
       <div class="skb-bar">
@@ -980,7 +989,10 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
         <div class="skb-num" id="skb-num"></div>
       </div>
     </div>
-    <label class="selall-row"><input type="checkbox" id="sel-all" onchange="toggleSelectAll()"> 条件に合うものをすべて選択</label>
+    <div class="list-tools">
+      <label class="selall-row"><input type="checkbox" id="sel-all" onchange="toggleSelectAll()"> 条件に合うものをすべて選択</label>
+      <button class="btn ghost" id="view-toggle" onclick="toggleView()">表形式</button>
+    </div>
     <div class="select-bar" id="select-bar"></div>
     <div id="list-area"></div>
   </section>
@@ -1407,7 +1419,7 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
   </section>
 
   <div class="toast" id="toast"></div>
-  <footer class="foot">OTCLinker — とみながグループ 店舗向けツール<br><span class="ver">版 2026-10-10 BY(在庫検索キーボード)</span></footer>
+  <footer class="foot">OTCLinker — とみながグループ 店舗向けツール<br><span class="ver">版 2026-10-10 BZ(並べ替えと区分の統合)</span></footer>
 </div>
 
 <script>
@@ -2541,14 +2553,12 @@ function sortItems(arr){
     keyed.sort(function(a, b){ return a.k < b.k ? -1 : (a.k > b.k ? 1 : a.i - b.i); });
     for (let i = 0; i < keyed.length; i++) arr[i] = keyed[i].it;
   }
-  else if (by === "expiry") arr.sort((a,b) => {
-    if (!a.expiry && !b.expiry) return 0;
-    if (!a.expiry) return 1; if (!b.expiry) return -1;
-    return a.expiry.localeCompare(b.expiry);
-  });
-  else if (by === "price-a") arr.sort((a,b) => (a.price===""?Infinity:a.price) - (b.price===""?Infinity:b.price));
-  else if (by === "price-d") arr.sort((a,b) => (b.price===""?-Infinity:b.price) - (a.price===""?-Infinity:a.price));
-  else if (by === "qty-a") arr.sort((a,b) => a.qty - b.qty);
+  else if (by === "expiry"){
+    // 「2027/3」「2027年3月」など書き方が違っても、期限アラートと同じ読み方で日付順に並べる
+    const keyed = arr.map(function(it, i){ const d = parseExpiry_(it.expiry); return { it: it, t: d ? d.getTime() : Infinity, i: i }; });
+    keyed.sort(function(a, b){ return a.t - b.t || a.i - b.i; });
+    for (let i = 0; i < keyed.length; i++) arr[i] = keyed[i].it;
+  }
   // "new" は登録順(items先頭が新しい)なのでそのまま
 }
 // ===== 在庫検索:ひらがな・カタカナ・全角半角・小さい文字の違いを吸収して比べる =====
@@ -2702,6 +2712,40 @@ function showMoreList(){
   __listLimit += 120;
   renderList();
 }
+// 並べ替えと区分の絞り込みを1つの選択欄にまとめる。
+// 表示中の項目は常に「並べ替え」で、区分を絞っているときはその名前を後ろに添える
+const LIST_SORTS_ = [["new","新規登録順"],["aiueo","50音順"],["expiry","有効期限順"]];
+function renderListOrder_(cf, counts){
+  const sel = document.getElementById("list-order");
+  if (!sel) return;
+  const by = (document.getElementById("sort-by")||{}).value || "new";
+  const catOn = cf && cf !== "すべて";
+  const n = catOn ? (counts[cf] || 0) : S.items.length;
+  let h = '<optgroup label="並べ替え">';
+  LIST_SORTS_.forEach(function(o){
+    const lab = o[1] + (catOn ? "・" + (CAT_SHORT[cf] || cf) + "のみ" : "") + (o[0] === by ? "(" + n + "件)" : "");
+    h += '<option value="sort:' + o[0] + '"' + (o[0] === by ? " selected" : "") + '>' + lab + '</option>';
+  });
+  h += '</optgroup><optgroup label="区分で絞り込み">';
+  h += '<option value="cat:すべて">' + (catOn ? "" : "✓ ") + 'すべての区分 ' + S.items.length + '件</option>';
+  CATEGORIES.filter(function(c){ return counts[c]; }).forEach(function(c){
+    h += '<option value="cat:' + c + '">' + (cf === c ? "✓ " : "") + c + ' ' + counts[c] + '件</option>';
+  });
+  h += '</optgroup>';
+  sel.innerHTML = h;
+  sel.value = "sort:" + by;
+}
+function onListOrder(v){
+  v = String(v || "");
+  if (v.indexOf("sort:") === 0){
+    const by = v.slice(5);
+    document.getElementById("sort-by").value = by;
+    if (by !== "new") doQuest("sort");
+    renderList();
+  } else if (v.indexOf("cat:") === 0){
+    setCatFilter(v.slice(4));
+  }
+}
 function setCatFilter(c){
   if (c && c !== "すべて") doQuest("catfil");
   document.getElementById("cat-filter").value = c;
@@ -2712,11 +2756,7 @@ function renderList(){
   const cf0 = document.getElementById("cat-filter").value;
   const counts = {};
   S.items.forEach(it => { counts[it.category] = (counts[it.category] || 0) + 1; });
-  document.getElementById("cat-chips").innerHTML =
-    '<button class="cat-chip' + (cf0==="すべて"?' on':'') + '" onclick="setCatFilter(\'すべて\')">すべて ' + S.items.length + '</button>'
-    + CATEGORIES.filter(c => counts[c]).map(c =>
-      '<button class="cat-chip" style="border-color:' + CAT_COLOR[c] + ';' + (cf0===c ? 'background:'+CAT_COLOR[c]+';color:#fff' : 'color:'+CAT_COLOR[c]) + '" onclick="setCatFilter(\''+c+'\')">' + CAT_SHORT[c] + ' ' + counts[c] + '</button>'
-    ).join("");
+  renderListOrder_(cf0, counts);
 
   const q = document.getElementById("q").value.trim().toLowerCase();
   const cf = document.getElementById("cat-filter").value;
