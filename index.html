@@ -316,6 +316,76 @@ button.mate-chip { cursor: pointer; font-family: var(--sans); }
 .fx-shield { position: absolute; transform: translate(-50%, -50%); font-size: 46px; filter: drop-shadow(0 0 10px #7FB2FF); animation: fxShield 1.3s ease forwards; }
 @keyframes fxShield { 0%{opacity:0; transform:translate(-50%,-50%) scale(.3)} 25%{opacity:1; transform:translate(-50%,-50%) scale(1.15)} 75%{opacity:1} 100%{opacity:0; transform:translate(-50%,-50%) scale(1)} }
 .fx-lunge { animation: fxLunge 0.4s ease; }
+.fx-slash.rev { transform: rotate(35deg) scaleX(0); animation-name: fxSlash2; }
+@keyframes fxSlash2 { 0%{transform:rotate(35deg) scaleX(0); opacity:1} 60%{transform:rotate(35deg) scaleX(1.2); opacity:1} 100%{transform:rotate(35deg) scaleX(1.3); opacity:0} }
+.fx-num.ult { font-size: 40px; color: #FFE24D; -webkit-text-stroke: 1px #B3261E; }
+.fx-num.hurt.big { font-size: 32px; }
+/* カットイン(表情の アップ) */
+.fx-cutin { position: absolute; inset: 0; z-index: 3; }
+.ci-band { position: absolute; left: -20%; right: -20%; top: 34%; height: 118px; transform: skewY(-8deg); background: #000;
+  border-top: 4px solid var(--cc); border-bottom: 4px solid var(--cc); overflow: hidden; animation: ciIn 1.2s cubic-bezier(.2,.9,.2,1) forwards; box-shadow: 0 0 24px var(--cc); }
+.fx-cutin.enemy .ci-band { animation-name: ciInL; }
+@keyframes ciIn { 0%{transform:skewY(-8deg) translateX(100%)} 18%{transform:skewY(-8deg) translateX(0)} 80%{transform:skewY(-8deg) translateX(-2%); opacity:1} 100%{transform:skewY(-8deg) translateX(-110%); opacity:.9} }
+@keyframes ciInL { 0%{transform:skewY(-8deg) translateX(-100%)} 18%{transform:skewY(-8deg) translateX(0)} 80%{transform:skewY(-8deg) translateX(2%); opacity:1} 100%{transform:skewY(-8deg) translateX(110%); opacity:.9} }
+.ci-lines { position: absolute; inset: 0; opacity: .55; background: repeating-linear-gradient(90deg, transparent 0 18px, var(--cc) 18px 20px, transparent 20px 46px, rgba(255,255,255,.6) 46px 47px);
+  animation: ciLines .25s linear infinite; }
+@keyframes ciLines { from{background-position:0 0} to{background-position:-94px 0} }
+.ci-face { position: absolute; left: 24%; top: 6px; width: 132px; height: 104px; overflow: hidden; transform: skewY(8deg); border: 2px solid var(--cc); background: radial-gradient(circle, rgba(255,255,255,.25), transparent 70%);
+  animation: ciZoom 1.2s ease forwards; }
+.fx-cutin.enemy .ci-face { left: auto; right: 24%; }
+@keyframes ciZoom { 0%,15%{transform:skewY(8deg) scale(.7)} 30%{transform:skewY(8deg) scale(1.12)} 45%,100%{transform:skewY(8deg) scale(1)} }
+.ci-svg { position: absolute; left: -29px; image-rendering: pixelated; }
+.ci-svg svg { image-rendering: pixelated; }
+.ci-brow { position: absolute; top: 30px; width: 22px; height: 5px; background: #2B2B2B; border-radius: 2px; }
+.ci-brow.l { left: 32px; transform: rotate(18deg); } .ci-brow.r { right: 32px; transform: rotate(-18deg); }
+.ci-glint { position: absolute; top: 22px; right: 38px; width: 10px; height: 10px; background: #fff; clip-path: polygon(50% 0,62% 38%,100% 50%,62% 62%,50% 100%,38% 62%,0 50%,38% 38%); animation: ciGlint .5s ease .25s 2; }
+@keyframes ciGlint { 0%,100%{transform:scale(.4); opacity:.4} 50%{transform:scale(1.6); opacity:1} }
+.ci-eye { position: absolute; top: 30px; width: 14px; height: 6px; background: #FF2A1A; box-shadow: 0 0 10px #FF2A1A, 0 0 20px #FF2A1A; border-radius: 3px; animation: ciGlint .4s ease .2s 3; }
+.ci-eye.l { left: 38px; } .ci-eye.r { right: 38px; }
+.ci-text { position: absolute; right: 21%; left: 53%; top: 16px; transform: skewY(8deg); color: #fff; font-family: var(--sans); }
+.fx-cutin.enemy .ci-text { left: 21%; right: 50%; text-align: right; }
+.fx-cutin.enemy .ci-text b { font-size: 17px; }
+.ci-text b { display: block; font-size: 22px; font-weight: 900; letter-spacing: .06em; color: var(--cc); text-shadow: 2px 2px 0 #000, 0 0 12px var(--cc); line-height: 1.2; animation: ciTxt 1.2s ease forwards; }
+.ci-text span { display: block; margin-top: 6px; font-size: 12px; line-height: 1.5; }
+@keyframes ciTxt { 0%,20%{transform:scale(2.2); opacity:0} 32%{transform:scale(1); opacity:1} 100%{opacity:1} }
+/* 奥義・ひっさつの 衝撃 */
+.fx-ult { position: absolute; inset: 0; z-index: 2; --uc: #FFE27A; }
+.fx-ult b { position: absolute; inset: 0; background: radial-gradient(circle at 50% 30%, #fff 0%, var(--uc) 30%, transparent 70%); animation: ultFlash 1.2s ease forwards; }
+.fx-ult i { position: absolute; left: 50%; top: 30%; width: 40px; height: 40px; margin: -20px; border: 6px solid var(--uc); border-radius: 50%; animation: ultRing 1.1s ease-out forwards; box-shadow: 0 0 16px var(--uc); }
+.fx-ult i:nth-child(2) { animation-delay: .15s; } .fx-ult i:nth-child(3) { animation-delay: .3s; }
+@keyframes ultFlash { 0%{opacity:0} 15%{opacity:1} 40%{opacity:.6} 100%{opacity:0} }
+@keyframes ultRing { 0%{transform:scale(.2); opacity:1} 100%{transform:scale(9); opacity:0} }
+.rpg-screen.fx-quake { animation: quake .6s linear; }
+@keyframes quake { 0%,100%{transform:translateX(-50%)} 10%{transform:translate(calc(-50% - 9px),4px)} 20%{transform:translate(calc(-50% + 8px),-5px)} 30%{transform:translate(calc(-50% - 7px),3px)} 45%{transform:translate(calc(-50% + 6px),-2px)} 60%{transform:translate(calc(-50% - 4px),2px)} 80%{transform:translate(calc(-50% + 2px),-1px)} }
+.fx-warn { position: absolute; left: 0; right: 0; top: 40%; text-align: center; z-index: 3; }
+.fx-warn span { display: inline-block; background: #B3261E; color: #fff; font-family: var(--sans); font-weight: 900; font-size: 20px; letter-spacing: .12em; padding: 8px 18px; border: 3px solid #FFE24D;
+  animation: warnBlink 1.6s steps(1) forwards; box-shadow: 0 0 24px #B3261E; }
+@keyframes warnBlink { 0%{opacity:1} 15%{opacity:0} 25%{opacity:1} 40%{opacity:0} 50%{opacity:1} 90%{opacity:1} 100%{opacity:0} }
+.fx-enter { animation: enemyEnter .7s cubic-bezier(.3,1.6,.5,1); }
+@keyframes enemyEnter { 0%{transform:translateY(-120px) scale(.4); opacity:0} 100%{transform:none; opacity:1} }
+.fx-jump { animation: heroJump .45s ease; }
+@keyframes heroJump { 0%,100%{transform:translateY(0)} 45%{transform:translateY(-26px) scale(1.15)} }
+.fx-flee { animation: fxFlee .9s ease-in forwards; }
+@keyframes fxFlee { 30%{transform:translateX(-10px)} 100%{transform:translateX(300px); opacity:0} }
+.fx-aura.charge { width: 160px; height: 160px; margin: -80px 0 0 -80px; animation: chargeAura 1.3s ease forwards; }
+@keyframes chargeAura { 0%{opacity:0; transform:scale(1.6)} 50%{opacity:.9; transform:scale(.8)} 100%{opacity:0; transform:scale(1)} }
+.fx-confetti { position: absolute; inset: 0; z-index: 5; }
+.fx-confetti i { position: absolute; top: -10px; width: 7px; height: 11px; animation: confetti 2.2s ease-in forwards; }
+@keyframes confetti { 0%{transform:translate(0,0) rotate(0)} 100%{transform:translate(var(--dx), 560px) rotate(720deg); opacity:.8} }
+/* ひっさつゲージ */
+.rpg-tp { display: flex; align-items: center; gap: 6px; margin: -4px 0 8px; font-family: var(--sans); font-size: 10px; letter-spacing: .08em; }
+.rpg-tp b { flex: 1; height: 6px; border: 1px solid #FFD54A; background: #000; }
+.rpg-tp b i { display: block; height: 100%; background: linear-gradient(90deg, #FF9A2A, #FFE24D); transition: width .35s ease; }
+.rpg-tp.full span { color: #FFE24D; animation: rpgBlink .6s steps(2) infinite; }
+.rpg-c.rpg-sp { display: block; width: 100%; margin-top: 6px; text-align: center; padding-left: 6px; border-color: #FFE24D; color: #FFE24D; font-weight: 900; font-size: 15px;
+  box-shadow: 0 0 12px #FFB300, inset 0 0 10px rgba(255,213,74,.4); animation: spGlow 1s ease-in-out infinite; }
+@keyframes spGlow { 0%,100%{box-shadow:0 0 8px #FFB300} 50%{box-shadow:0 0 20px #FFE24D} }
+.join-ask { border: 2px solid #FFE24D; border-radius: 6px; padding: 10px; margin-top: 10px; }
+.join-ask .btn { margin-top: 6px; }
+.legend-in { animation: enemyEnter .8s cubic-bezier(.3,1.6,.5,1); }
+.strong-box { border-color: #E07A1F; }
+.gm-card.legend { background: linear-gradient(160deg, #3A1A0A, #7A2A12); color: #FFE9C2; border-color: #FFB347; }
+.gm-card.legend .nm { color: #FFE9C2; }
 @keyframes fxLunge { 0%,100%{transform:translateY(0) scale(1)} 40%{transform:translateY(22px) scale(1.18)} }
 .fx-run { animation: fxRun 0.9s ease-in forwards; }
 @keyframes fxRun { to { transform: translateX(-260px); opacity: 0; } }
@@ -1807,7 +1877,7 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
   </section>
 
   <div class="toast" id="toast"></div>
-  <footer class="foot">OTCLinker — とみながグループ 店舗向けツール<br><span class="ver">版 2026-10-14 CS(戦いの演出)</span></footer>
+  <footer class="foot">OTCLinker — とみながグループ 店舗向けツール<br><span class="ver">版 2026-10-14 CT(強敵・伝説のなかま・カットイン)</span></footer>
 </div>
 
 <script>
@@ -4088,8 +4158,74 @@ const CHARM_DESIGNS = {
     C.part(function(p){ p.rect(5, 9, 22, 19, "#6A3AA0"); p.rect(7, 15, 18, 8, "#F2E6FF"); p.rect(9, 17, 14, 1, "#B8A2D6"); p.rect(9, 19, 10, 1, "#B8A2D6"); });
     C.part(function(p){ p.rect(9, 1, 14, 3, "#F2C230"); p.px(9, 0, "#F2C230"); p.px(16, 0, "#F2C230"); p.px(22, 0, "#F2C230"); p.px(16, 2, "#E2463A"); });
     C.face(16, 11, { mouth: "grin", eyes: "angry", gap: 5, my: 2, cheek: false });
-  }
+  },
+  // ===== 熊本の 強敵(なかまに なると おだやかな顔に なる) =====
+  e_kazan: function(C){ charmKazan_(C, false); },     l_kazan: function(C){ charmKazan_(C, true); },
+  e_shiranui: function(C){ charmShiranui_(C, false); }, l_shiranui: function(C){ charmShiranui_(C, true); },
+  e_uzushio: function(C){ charmUzushio_(C, false); },  l_uzushio: function(C){ charmUzushio_(C, true); },
+  e_kawagiri: function(C){ charmKawagiri_(C, false); }, l_kawagiri: function(C){ charmKawagiri_(C, true); },
+  e_kinpika: function(C){ charmKinpika_(C, false); },  l_kinpika: function(C){ charmKinpika_(C, true); },
+  b_dragon: function(C){ charmDragon_(C, false); },    l_dragon: function(C){ charmDragon_(C, true); }
 };
+// こわい まゆげ(目の上に ななめの線)
+function charmBrow_(C, cx, ey, gap){
+  const y = ey - 2;
+  C.px(cx - gap - 2, y - 1, CK); C.px(cx - gap - 1, y - 1, CK); C.px(cx - gap, y, CK); C.px(cx - gap + 1, y, CK);
+  C.px(cx + gap + 1, y - 1, CK); C.px(cx + gap, y - 1, CK); C.px(cx + gap - 1, y, CK); C.px(cx + gap - 2, y, CK);
+}
+// 阿蘇の 火山灰の かいぶつ(山の からだに 赤い火口)
+function charmKazan_(C, nice){
+  C.feet(16, 29, "#2A2626", 6);
+  C.part(function(p){ p.tri(2, 28, 16, 5, 30, 28, "#5B5450"); p.rect(4, 22, 24, 6, "#5B5450"); p.tri(9, 28, 16, 12, 23, 28, "#6E6762"); });
+  C.part(function(p){ p.ell(16, 7, 5, 2, "#FF5A1F"); p.rect(14, 8, 4, 5, "#FF8A2A"); p.px(15, 13, "#FFC24A"); p.px(16, 14, "#FFC24A"); });
+  C.part(function(p){ p.ell(12, 2.5, 2.5, 2, "#9C9692"); p.ell(19, 2, 3, 2, "#B5AFAB"); p.ell(25, 3.5, 2, 1.6, "#9C9692"); }, { flat: true });
+  C.part(function(p){ p.ell(16, 20, 7, 4.5, "#A39A93"); }, { noline: true });
+  if (!nice) charmBrow_(C, 16, 18, 4);
+  C.face(16, 18, nice ? { mouth: "smile", eyes: "happy", gap: 4, cheek: true, cheekCol: "#FF8A6A" } : { mouth: "fang", eyes: "angry", gap: 4, cheek: false });
+}
+// 不知火の まぼろしの火(ゆらめく ほのお)
+function charmShiranui_(C, nice){
+  C.part(function(p){ p.ell(16, 20, 9, 8, "#FF7A1A"); p.tri(7, 20, 12, 2, 16, 14, "#FF7A1A"); p.tri(25, 20, 21, 4, 16, 14, "#FF7A1A"); p.tri(12, 14, 16, 0, 20, 14, "#FF9A2A"); });
+  C.part(function(p){ p.ell(16, 21, 5.5, 5, "#FFD34A"); p.tri(13, 18, 16, 10, 19, 18, "#FFE27A"); }, { noline: true });
+  if (!nice) charmBrow_(C, 16, 19, 3);
+  C.part(function(p){ p.ell(4, 10, 1.6, 1.6, "#FFB04A"); p.ell(28, 13, 1.4, 1.4, "#FFB04A"); p.ell(27, 6, 1, 1, "#FFE27A"); }, { flat: true });
+  C.face(16, 19, nice ? { mouth: "smile", eyes: "happy", gap: 3, cheekCol: "#FF5A3A" } : { mouth: "grin", eyes: "big", gap: 3, cheek: false });
+}
+// 天草の うずしお(青い うず)
+function charmUzushio_(C, nice){
+  C.feet(16, 29, "#1A3A5A", 5);
+  C.part(function(p){ p.ell(16, 17, 12, 11, "#2F7FD0"); });
+  C.part(function(p){ p.ell(16, 17, 8.5, 7.5, "#4FA3E8"); }, { noline: true });
+  C.part(function(p){ p.ell(16, 17, 5, 4.5, "#8FD0FF"); }, { noline: true });
+  C.part(function(p){ for (let t = 0.6; t < 12.2; t += 0.12){ const r = 2.2 + t * 0.8; const x = 16 + Math.cos(t) * r * 1.05, y = 17 + Math.sin(t) * r * 0.92; if (r > 4.6) p.px(x, y, "#E8F6FF"); } }, { flat: true, noline: true });
+  if (!nice) charmBrow_(C, 16, 15, 3);
+  C.part(function(p){ p.line(5, 12, 10, 8, CW); p.line(22, 6, 27, 11, CW); p.line(26, 22, 22, 27, CW); p.line(6, 23, 9, 27, CW); }, { flat: true, noline: true });
+  C.part(function(p){ p.tri(4, 9, 8, 3, 10, 9, "#2F7FD0"); p.tri(28, 9, 24, 3, 22, 9, "#2F7FD0"); });
+  C.face(16, 15, nice ? { mouth: "smile", eyes: "happy", gap: 3 } : { mouth: "o", eyes: "angry", gap: 3, cheek: false });
+}
+// 球磨川の 朝霧(ねむそうな 霧の かたまり)
+function charmKawagiri_(C, nice){
+  C.part(function(p){ p.ell(10, 15, 7, 6, "#E6EEF4"); p.ell(22, 14, 7, 6.5, "#E6EEF4"); p.ell(16, 11, 7, 6, "#F4F8FB"); p.ell(16, 19, 11, 6, "#DCE6EE"); });
+  C.part(function(p){ p.rect(5, 25, 22, 2, "#6FB3D9"); p.rect(8, 28, 16, 1, "#9FD0EA"); }, { flat: true });
+  C.face(16, 15, nice ? { mouth: "smile", eyes: "happy", gap: 4 } : { mouth: "wavy", eyes: "line", gap: 4, cheek: false });
+}
+// きんぴかの ホコリン(めったに 出ない。すぐ にげる)
+function charmKinpika_(C, nice){
+  C.part(function(p){ for (let i = 0; i < 10; i++){ const a = i / 10 * Math.PI * 2; p.ell(16 + Math.cos(a) * 8, 17 + Math.sin(a) * 7, 3, 3, "#F2C230"); } p.ell(16, 17, 8, 7, "#F2C230"); });
+  C.part(function(p){ p.ell(12, 13, 2, 1.4, "#FFF3B0"); p.px(23, 9, "#FFFFFF"); p.px(6, 22, "#FFFFFF"); }, { flat: true, noline: true });
+  C.face(16, 15, nice ? { mouth: "smile", eyes: "happy", gap: 3 } : { mouth: "o", eyes: "big", cheek: false });
+}
+// 火の国の りゅう(さいごの ボス)
+function charmDragon_(C, nice){
+  C.part(function(p){ p.tri(1, 8, 9, 14, 6, 22, "#8E1B1B"); p.tri(31, 8, 23, 14, 26, 22, "#8E1B1B"); });
+  C.feet(16, 29, "#5A0E0E", 6);
+  C.part(function(p){ p.ell(16, 20, 10, 9, "#C8322A"); p.ell(16, 22, 5.5, 6, "#FFC85A"); });
+  C.part(function(p){ p.ell(16, 10, 9, 7, "#D9402F"); p.rect(10, 12, 12, 5, "#E8584A"); });
+  C.part(function(p){ p.tri(8, 6, 6, 0, 11, 4, "#F2E2B0"); p.tri(24, 6, 26, 0, 21, 4, "#F2E2B0"); });
+  C.part(function(p){ p.px(13, 15, "#5A0E0E"); p.px(19, 15, "#5A0E0E"); }, { flat: true, noline: true });
+  if (!nice) charmBrow_(C, 16, 9, 4);
+  C.face(16, 9, nice ? { mouth: "smile", eyes: "happy", gap: 4, my: 4, cheekCol: "#FF8A6A" } : { mouth: "fang", eyes: "angry", gap: 4, my: 4, cheek: false });
+}
 // 絵を 作って 登録する
 (function(){
   Object.keys(CHARM_DESIGNS).forEach(function(k){
@@ -4163,6 +4299,15 @@ const QUESTS = [
 ];
 function ownedOf_(list, store){ return (S[store] || []).filter(function(k){ return list.indexOf(k) >= 0; }); }
 function rareOwned_(){ return ownedOf_(RARE_MATES, "rareMates"); }
+// 伝説の なかま(強敵を たおすと なかまに なることがある)
+const LEGEND_MATES = ["l_kawagiri","l_uzushio","l_shiranui","l_kazan","l_kinpika","l_dragon"];
+const LEGEND_FROM = { e_kawagiri:"l_kawagiri", e_uzushio:"l_uzushio", e_shiranui:"l_shiranui", e_kazan:"l_kazan", e_kinpika:"l_kinpika", b_dragon:"l_dragon" };
+function legendOwned_(){ return ownedOf_(LEGEND_MATES, "legendMates"); }
+function joinLegend_(k){
+  S.legendMates = S.legendMates || [];
+  if (S.legendMates.indexOf(k) < 0){ S.legendMates.push(k); mateMeta_(k); }
+  save();
+}
 function gotouchiOwned_(){ return ownedOf_(GOTOUCHI_MATES, "gotouchiMates"); }
 function senmonOwned_(){ return ownedOf_(SENMON_MATES, "senmonMates"); }
 function questDone_(id){ return (S.quests || []).indexOf(id) >= 0; }
@@ -4980,7 +5125,8 @@ function clearPetPick(){
 }
 function allMates_(){
   const st = dotStage();
-  return rareOwned_().map(function(k){ return { k: k, c: "rare" }; })
+  return legendOwned_().map(function(k){ return { k: k, c: "legend" }; })
+    .concat(rareOwned_().map(function(k){ return { k: k, c: "rare" }; }))
     .concat(senmonOwned_().map(function(k){ return { k: k, c: "senmon" }; }))
     .concat(gotouchiOwned_().map(function(k){ return { k: k, c: "gotouchi" }; }))
     .concat(st.mates.map(function(k){ return { k: k, c: "" }; }));
@@ -5221,7 +5367,7 @@ function startVs(phId){
   battleInit_(__battle);
   showBattleBox_();
   renderBattle_();
-  setTimeout(battleTurn_, 700);
+  setTimeout(battleTurn_, waitMs_(__battle, 700));
 }
 
 /* ===== レベル(けいけんち) ===== */
@@ -5383,8 +5529,24 @@ const ENEMIES = [
   { key:"b_yakuo",      name:"薬王(やくおう)",   hp: 900, atk: 88, def: 48, lv:9, size:88, boss:3,
     say:"【超ボス】薬王が あらわれた……!" }
 ];
+// 熊本の 強敵(Lv で 解放。たおすと なかまに なることも)・きんぴか・さいごの ボス
+ENEMIES.push(
+  { key:"e_kawagiri", name:"クマガワ・キリモヤ",   hp: 150, atk: 26, def: 18, lv:4, size:58, strong:1, unlock:6,
+    say:"【強敵】球磨川の 朝霧が かたまって 立ちはだかった!", place:"人吉・球磨" },
+  { key:"e_uzushio",  name:"アマクサ・ウズシオ",   hp: 175, atk: 30, def: 16, lv:4, size:60, strong:1, unlock:8,
+    say:"【強敵】天草の うずしおが ぐるぐる おそってきた!", place:"天草" },
+  { key:"e_shiranui", name:"シラヌイ・ユラメキ",   hp: 165, atk: 36, def: 12, lv:4, size:58, strong:1, unlock:10,
+    say:"【強敵】不知火の まぼろしの火が ゆらめいている!", place:"八代・不知火の海" },
+  { key:"e_kazan",    name:"アソノ・カザンバイ",   hp: 230, atk: 40, def: 22, lv:5, size:64, strong:1, unlock:13,
+    say:"【強敵】阿蘇の 火山灰の かいぶつが 目をさました!", place:"阿蘇" },
+  { key:"e_kinpika",  name:"キンピカ・ホコリン",   hp: 8,   atk: 6,  def: 240, lv:3, size:46, rare:1,
+    say:"きらっ! キンピカ・ホコリンが あらわれた!", place:"どこでも" },
+  { key:"b_dragon",   name:"ヒノクニ・ドラゴン",   hp: 1600, atk: 112, def: 62, lv:10, size:96, boss:4,
+    say:"【伝説】火の国の りゅう ヒノクニ・ドラゴンが 天を こがしている……!", place:"熊本城" }
+);
 // ボスは ふつうには出ない。条件を満たすと 挑めるようになる
 const BOSS_COND = {
+  b_dragon:     { wins: 60, lv: 30, after: "b_yakuo", label: "ヤクオウ・ザ・グレートを たおし、レベル30" },
   b_kaishu:     { wins: 10, lv: 5,  label: "バトル10勝 かつ レベル5" },
   b_tanaoroshi: { wins: 25, lv: 12, label: "バトル25勝 かつ レベル12" },
   b_yakuo:      { wins: 50, lv: 25, equip: 4, label: "バトル50勝・レベル25・そうび4か所すべて" }
@@ -5395,6 +5557,7 @@ function bossReady_(key){
   const r = rpg_();
   if ((r.wins || 0) < c.wins) return false;
   if (lvInfo_().lv < c.lv) return false;
+  if (c.after && !bossBeaten_(c.after)) return false;
   if (c.equip){
     const n = EQUIP_SLOTS.filter(function(sl){ return r.equip[sl.id]; }).length;
     if (n < c.equip) return false;
@@ -5464,6 +5627,7 @@ function partyPower_(){
   allMates_().forEach(function(o){
     const lv = mateLv_(o.k);
     atk += 1 + lv; def += lv; hp += 6 + lv * 3;
+    if (o.c === "legend"){ atk += 8 + lv * 2; def += 5 + lv; hp += 30 + lv * 6; }   // 伝説の なかまは 強い
   });
   // 相棒の分を足す
   const bd = petInfo_(activePet_());
@@ -5503,8 +5667,9 @@ function rpgOnOpen_(){
   if (genkiState_().key === "nemuri") return;  // 眠っているときは出ない
   if (Math.random() > 0.12) return;
   const pw = partyPower_();
-  const pool = ENEMIES.filter(function(e){ return !e.boss && e.lv <= (pw.heroLv >= 4 ? 3 : (pw.heroLv >= 2 ? 2 : 1)); });
-  const e = pool[Math.floor(Math.random() * pool.length)];
+  const pool = ENEMIES.filter(function(e){ return !e.boss && !e.strong && !e.rare && e.lv <= (pw.heroLv >= 4 ? 3 : (pw.heroLv >= 2 ? 2 : 1)); });
+  let e = pool[Math.floor(Math.random() * pool.length)];
+  if (lvInfo_().lv >= 3 && Math.random() < 0.06) e = enemyOf_("e_kinpika");
   r.enemy = e.key;
   r.count++;
   save();
@@ -5776,14 +5941,14 @@ function showBattleBox_(){
     }
   }
 }
-function startBattle(practice){
+function startBattle(practice, forceKey){
   const r = rpg_();
-  const eKey = practice ? "e_hokori" : r.enemy;
+  const eKey = forceKey || (practice ? "e_hokori" : r.enemy);
   const en = enemyOf_(eKey);
   if (!en){ toast("いまは てきが いません"); return; }
   const pw = partyPower_();
   __battle = {
-    practice: !!practice, en: en,
+    practice: !!practice, en: en, forced: !!forceKey,
     php: pw.hp, pmax: pw.hp, patk: pw.atk, pdef: pw.def,
     ehp: practice ? Math.round(en.hp * 0.6) : en.hp,
     emax: practice ? Math.round(en.hp * 0.6) : en.hp,
@@ -5795,7 +5960,7 @@ function startBattle(practice){
   if (ENEMY_LOOK[en.key]) __battle.log.push("しらべた: " + ENEMY_LOOK[en.key]);
   showBattleBox_();
   renderBattle_();
-  setTimeout(battleTurn_, 900);
+  setTimeout(battleTurn_, waitMs_(__battle, 900));
 }
 // ボスに いどむ
 function startBoss(key){
@@ -5813,7 +5978,7 @@ function startBoss(key){
   __battle.log.push(en.name + "が あらわれた!");
   showBattleBox_();
   renderBattle_();
-  setTimeout(battleTurn_, 1100);
+  setTimeout(battleTurn_, waitMs_(__battle, 1100));
 }
 function closeBattle(){
   const sc = document.getElementById("rpg-screen");
@@ -5834,6 +5999,13 @@ function battleTurn_(){
   const who = pet_().heroName || dotStage().name;
   // コマンドで たたかう(おまかせ でなければ ここで 入力を待つ)
   if (!b.auto){ b.waiting = true; b.menu = "main"; renderBattle_(); return; }
+  if ((b.tp || 0) >= 100){
+    heroSpecial_(b);
+    if (b.ehp <= 0){ b.done = true; b.log.push(b.en.name + "を たおした!"); renderBattle_(); setTimeout(battleWin_, waitMs_(b, 1400)); return; }
+    renderBattle_();
+    setTimeout(function(){ battleEnemy_(); }, waitMs_(b, 1300));
+    return;
+  }
 
   // なかまが まほうを 使うことがある(2ターンに1回くらい)
   const mates = spellMates_();
@@ -5842,9 +6014,9 @@ function battleTurn_(){
   if (mates.length && Math.random() < (b.turn === 1 ? 0.6 : 0.45)){
     const k = mates[Math.floor(Math.random() * mates.length)];
     applySpell_(b, k, true);
-    if (b.ehp <= 0){ b.done = true; b.log.push(b.en.name + "を たおした!"); renderBattle_(); setTimeout(battleWin_, 1400); return; }
+    if (b.ehp <= 0){ b.done = true; b.log.push(b.en.name + "を たおした!"); renderBattle_(); setTimeout(battleWin_, waitMs_(b, 1400)); return; }
     renderBattle_();
-    setTimeout(battleTurn2_, 1100);
+    setTimeout(battleTurn2_, waitMs_(b, 1100));
     return;
   }
   battleTurn2_();
@@ -5858,39 +6030,68 @@ function battleTurn2_(){
   if (!b.itemUsed || b.turn % 3 === 0){
     if (battleUseItem_(b, who)){
       b.itemUsed = true;
-      if (b.ehp <= 0){ b.done = true; b.log.push(b.en.name + "を たおした!"); renderBattle_(); setTimeout(battleWin_, 1400); return; }
+      if (b.ehp <= 0){ b.done = true; b.log.push(b.en.name + "を たおした!"); renderBattle_(); setTimeout(battleWin_, waitMs_(b, 1400)); return; }
       renderBattle_();
-      setTimeout(battleEnemy_, 1100);
+      setTimeout(battleEnemy_, waitMs_(b, 1100));
       return;
     }
   }
   heroAttack_(b);
-  if (b.ehp <= 0){ b.done = true; b.log.push(b.en.name + "を たおした!"); renderBattle_(); setTimeout(battleWin_, 1400); return; }
+  if (b.ehp <= 0){ b.done = true; b.log.push(b.en.name + "を たおした!"); renderBattle_(); setTimeout(battleWin_, waitMs_(b, 1400)); return; }
   renderBattle_();
-  setTimeout(function(){ battleEnemy_(); }, 900);
+  setTimeout(function(){ battleEnemy_(); }, waitMs_(b, 900));
 }
 // てきの番(むせていたり、とぼけたことを したりする)
 function battleEnemy_(sync){
   const b = __battle;
   if (!b || b.done) return;
   const who = pet_().heroName || dotStage().name;
-  if (b.stun){ b.stun = 0; b.guard = 0; fxq_(b, { t: "num", at: "enemy", text: "うごけない", cls: "dull" }); b.log.push(b.en.name + "は むせていて うごけない!"); renderBattle_(); setTimeout(battleTurn_, 1250); return; }
+  if (b.stun){ b.stun = 0; b.guard = 0; fxq_(b, { t: "num", at: "enemy", text: "うごけない", cls: "dull" }); b.log.push(b.en.name + "は むせていて うごけない!"); renderBattle_(); setTimeout(battleTurn_, waitMs_(b, 1250)); return; }
+  if (b.en.rare && Math.random() < 0.38){
+    b.done = true; b.fled = true; b.enemyFled = true;
+    b.log.push(b.en.name + "は にげだした!");
+    fxq_(b, { t: "flee" });
+    renderBattle_(); setTimeout(battleFled_, 1200); return;
+  }
+  if (!b.charged && (b.en.strong || b.en.boss) && Math.random() < 0.22){
+    b.charged = 1;
+    b.log.push(b.en.name + "は ちからを ためている……!");
+    b.log.push("(つぎの こうげきは あぶない! ぼうぎょ で そなえよう)");
+    fxq_(b, { t: "aura", at: "enemy", cls: "charge", col: "#FF3A1A" });
+    fxq_(b, { t: "num", at: "enemy", text: "ゴゴゴ……", cls: "hurt" });
+    renderBattle_(); setTimeout(battleTurn_, 1400); return;
+  }
   const qs = ENEMY_QUIRK[b.en.key];
-  if (qs && Math.random() < (b.en.boss ? 0.1 : 0.2)){ b.log.push(qs[Math.floor(Math.random() * qs.length)]); renderBattle_(); setTimeout(battleTurn_, 1250); return; }
+  if (!b.charged && qs && Math.random() < (b.en.boss ? 0.1 : 0.2)){ b.log.push(qs[Math.floor(Math.random() * qs.length)]); renderBattle_(); setTimeout(battleTurn_, waitMs_(b, 1250)); return; }
   let edmg = Math.max(1, Math.round((b.eatk * (0.85 + Math.random() * 0.3)) - b.pdef * 0.35));
+  const charged = !!b.charged;
+  let eo = 0;
+  if (charged){
+    b.charged = 0;
+    edmg = Math.round(edmg * 2.3);
+    const ATK = { e_kazan:"だいふんか", e_uzushio:"うずまき タックル", e_shiranui:"まぼろしの 火", e_kawagiri:"のみこむ 朝霧",
+                  b_kaishu:"かいしゅう ぜんぶ", b_tanaoroshi:"いちから かぞえなおし", b_yakuo:"ようほう・ようりょう ボム", b_dragon:"ごうか ブレス" };
+    const nm = ATK[b.en.key] || "ちからいっぱい こうげき";
+    b.log.push(b.en.name + "の 「" + nm + "」!!");
+    fxq_(b, { t: "cutin", side: "enemy", k: b.en.key, name: nm, shout: "くらえっ!!", col: "#B3261E" });
+    eo = 1150; b.slow = 1100;
+    fxq_(b, { t: "quake", d: eo });
+  }
+  tpAdd_(b, charged ? 30 : 14);
   const guarded = !!b.guard;
   if (b.guard){ edmg = Math.max(1, Math.round(edmg * 0.45)); b.guard = 0; }
   b.php = Math.max(0, b.php - edmg);
-  fxq_(b, { t: "lunge", at: "enemy" });
-  fxq_(b, { t: "flash", col: "#B3261E", d: 180 });
-  fxq_(b, { t: "shake", at: "party", d: 180 });
-  if (guarded) fxq_(b, { t: "shield", at: "party", d: 120 });
-  fxq_(b, { t: "num", at: "party", text: "-" + edmg, cls: "hurt", d: 200 });
-  b.log.push(b.en.name + "の こうげき!");
+  fxq_(b, { t: "lunge", at: "enemy", d: eo });
+  fxq_(b, { t: "flash", col: "#B3261E", d: eo + 180 });
+  fxq_(b, { t: "shake", at: "party", d: eo + 180 });
+  if (guarded) fxq_(b, { t: "shield", at: "party", d: eo + 120 });
+  fxq_(b, { t: "num", at: "party", text: "-" + edmg, cls: charged ? "hurt big" : "hurt", d: eo + 200 });
+  if (!charged) b.log.push(b.en.name + "の こうげき!");
+  if (guarded && charged) b.log.push("ぼうぎょで ダメージを おさえた!");
   b.log.push(who + "は " + edmg + " のダメージを うけた!");
-  if (b.php <= 0){ b.done = true; b.log.push("ぜんめつしてしまった……"); renderBattle_(); setTimeout(battleLose_, 1400); return; }
+  if (b.php <= 0){ b.done = true; b.log.push("ぜんめつしてしまった……"); renderBattle_(); setTimeout(battleLose_, waitMs_(b, 1400)); return; }
   renderBattle_();
-  setTimeout(battleTurn_, 1250);
+  setTimeout(battleTurn_, waitMs_(b, 1250));
 }
 function battleWin_(){
   const b = __battle, r = rpg_();
@@ -5899,9 +6100,9 @@ function battleWin_(){
     r.bosses = (r.bosses || []).concat([b.boss]).filter(function(v, i, a){ return a.indexOf(v) === i; });
     r.wins = (r.wins || 0) + 1;
     const en2 = b.en;
-    addExp_(en2.boss === 3 ? 800 : (en2.boss === 2 ? 300 : 150), "ボスを たおした");
+    addExp_(en2.boss >= 4 ? 2000 : (en2.boss === 3 ? 800 : (en2.boss === 2 ? 300 : 150)), "ボスを たおした");
     // ボスは かならず よいそうびを 落とす
-    const rank = en2.boss >= 3 ? [4] : (en2.boss >= 2 ? [3,4] : [2,3]);
+    const rank = en2.boss >= 3 ? [4] : (en2.boss >= 2 ? [3,4] : [2,3]);   // ドラゴンも 最高ランク
     const pool = Object.keys(EQUIPS).filter(function(k){ return rank.indexOf(EQUIPS[k].rank) >= 0 && (r.inv || []).indexOf(k) < 0; });
     let got = null;
     if (pool.length){ got = pool[Math.floor(Math.random() * pool.length)]; r.inv = (r.inv || []).concat([got]); }
@@ -5909,10 +6110,13 @@ function battleWin_(){
     // 超ボスに勝つと おひめさま が なかまに なる
     let hime = false;
     if (b.boss === "b_yakuo" && (S.hime !== true)){ S.hime = true; hime = true; }
+    if (b.boss === "b_dragon") joinLegend_("l_dragon");
+    fxPlay_({ t: "confetti" });
     save();
     checkAll_();
     battleBox_().innerHTML = '<div class="rpg-result">'
-      + '<div class="rpg-win-t">' + (en2.boss >= 3 ? "★ ヤクオウ・ザ・グレートを たおした! ★" : "ボスを たおした!") + '</div>'
+      + '<div class="rpg-win-t">' + (en2.boss >= 4 ? "★★ 伝説の りゅうを しずめた! ★★" : (en2.boss >= 3 ? "★ ヤクオウ・ザ・グレートを たおした! ★" : "ボスを たおした!")) + '</div>'
+      + (en2.boss >= 4 ? '<p><b>ヒノクニ・ドラゴン</b>が なかまに なった!</p>' : '')
       + '<div class="rpg-res-ico">' + dotSvg(en2.key, Math.min(64, en2.size || 56)) + '</div>'
       + (got ? '<p><b>' + esc(EQUIPS[got].name) + '</b> を 手に入れた!</p>' : '<p>けいけんちを たくさん もらった!</p>')
       + (hime ? '<div class="hime-get">' + dotSvg("m_hime", 56) + '<p><b>おくすり姫</b>が なかまに なった!<br>'
@@ -5936,7 +6140,10 @@ function battleWin_(){
     return;
   }
   r.wins = (r.wins || 0) + 1;
-  addExp_((b.practice ? 8 : 30 + b.en.lv * 15) + (b.pointCard ? 10 : 0), "バトルに 勝った");
+  r.beat = r.beat || {}; r.beat[b.en.key] = (r.beat[b.en.key] || 0) + 1;
+  const bonus = b.en.rare ? 300 : (b.en.strong ? 90 + b.en.lv * 20 : 0);
+  addExp_((b.practice ? 8 : 30 + b.en.lv * 15) + bonus + (b.pointCard ? 10 : 0), b.en.rare ? "キンピカを たおした" : "バトルに 勝った");
+  fxPlay_({ t: "confetti" });
   let gotItem = null;
   if (Math.random() < (b.practice ? 0.3 : 0.6)){ gotItem = randomItem_(); addItem_(gotItem); }
   checkAll_();
@@ -5944,14 +6151,22 @@ function battleWin_(){
   // 練習では手に入りにくい。そうびの効果で確率が上がる
   const rate = (b.practice ? 0.25 : 0.75) + equipFx_("drop") * 0.12;
   if (Math.random() < rate){
-    const rank = b.en.lv >= 3 ? [3,4] : (b.en.lv >= 2 ? [2,3] : [1,2]);
+    const rank = b.en.strong ? [3,4] : (b.en.lv >= 3 ? [3,4] : (b.en.lv >= 2 ? [2,3] : [1,2]));
     const pool = Object.keys(EQUIPS).filter(function(k){ return rank.indexOf(EQUIPS[k].rank) >= 0; });
     got = pool[Math.floor(Math.random() * pool.length)];
     r.inv = r.inv || [];
     if (r.inv.indexOf(got) < 0) r.inv.push(got);
     else got = got + "|dup";
   }
-  if (!b.practice) r.enemy = null;
+  if (!b.practice && !b.forced) r.enemy = null;
+  if (b.forced && r.enemy === b.en.key) r.enemy = null;
+  // 強敵・きんぴかは なかまに なりたがることがある
+  let joinKey = null;
+  const lk = LEGEND_FROM[b.en.key];
+  if (lk && (S.legendMates || []).indexOf(lk) < 0){
+    const first = (r.beat[b.en.key] || 0) <= 1;
+    if (Math.random() < (b.en.rare ? 0.5 : (first ? 0.6 : 0.35))) joinKey = lk;
+  }
   // げんきを少し消費(そうびの効果でへりにくい)
   const cost = Math.max(1, 5 - equipFx_("genki") * 2);
   const c = care_();
@@ -5970,7 +6185,23 @@ function battleWin_(){
     + (gotItem ? '<p>どうぐ「<b>' + esc(ITEMS[gotItem].name) + '</b>」を ひろった!</p>' : '')
     + (ENEMY_BYE[b.en.key] ? '<p class="hint">' + esc(ENEMY_BYE[b.en.key]) + '</p>' : '')
     + (b.pointCard ? '<p class="hint">ポイントカードの おかげで けいけんち +10</p>' : '')
+    + (bonus ? '<p>けいけんち ボーナス <b>+' + bonus + '</b>!</p>' : '')
+    + (joinKey ? '<div class="join-ask">' + dotSvg(b.en.key, 60) + '<p><b>' + esc(b.en.name) + '</b>が おきあがり<br>なかまに なりたそうに こちらを みている!</p>'
+        + '<p>なかまに してあげますか?</p><div class="row gap" style="justify-content:center">'
+        + '<button class="btn" onclick="acceptJoin_(\'' + joinKey + '\')">はい</button><button class="btn" onclick="closeBattle()">いいえ</button></div></div>'
+        : '<button class="btn" onclick="closeBattle()">とじる</button>')
+    + '</div>';
+}
+function acceptJoin_(k){
+  joinLegend_(k);
+  fxPlay_({ t: "confetti" });
+  const box = battleBox_();
+  box.innerHTML = '<div class="rpg-result"><div class="rpg-win-t">★ なかまに なった! ★</div>'
+    + '<div class="rpg-res-ico legend-in">' + dotSvg(k, 72) + '</div>'
+    + '<p><b>' + esc(DOT_NAMES[k]) + '</b>が なかまに くわわった!</p>'
+    + '<p class="hint">おうぎ「' + esc(SPELLS[k].name) + '」を つかえる(まほう から)。 ひっさつの カットインも 出ます。</p>'
     + '<button class="btn" onclick="closeBattle()">とじる</button></div>';
+  checkAll_();
 }
 function battleLose_(){
   const b = __battle, r = rpg_();
@@ -6012,6 +6243,49 @@ function battleLose_(){
     + '<p class="hint">負けても なくすものは ありません。</p>'
     + '<button class="btn" onclick="closeBattle()">とじる</button></div>';
 }
+/* ===== 伝説の なかまの おうぎ ===== */
+(function(){
+  const N = { l_kawagiri:"キリモヤくん", l_uzushio:"ウズシオどん", l_shiranui:"ユラメキさん", l_kazan:"カザンバイ親方", l_kinpika:"キンピカくん", l_dragon:"ヒノクニ・ドラゴン" };
+  Object.keys(N).forEach(function(k){ DOT_NAMES[k] = N[k]; });
+  SPELLS.l_kawagiri = { name:"きりがくれの いやし", kind:"heal", pow:0.45, fx:"mist", col:"#BFE3F5", say:"あさぎりが みんなを つつみこむ……", ult:1, shout:"ふわぁ…… まかせて" };
+  SPELLS.l_uzushio  = { name:"うずしお ドライブ",   kind:"dmg",  pow:2.4, fx:"wrap", col:"#4FA3E8", say:"巨大な うずが てきを のみこむ!", ult:1, shout:"ぐるぐる いくばい!" };
+  SPELLS.l_shiranui = { name:"しらぬいの まぼろし", kind:"debuff", pow:0.5, fx:"flame", col:"#FF9A2A", say:"無数の 火が ゆらめき、てきは 目を うばわれた!", ult:1, shout:"見えとる? ほんものは どれでしょう" };
+  SPELLS.l_kazan    = { name:"アソ だいふんか",     kind:"dmg",  pow:2.9, fx:"bomb", col:"#FF5A1F", say:"大地が ゆれ、火柱が たちのぼる!", ult:1, shout:"ドカンと いくぞ!!" };
+  SPELLS.l_kinpika  = { name:"キンピカ ラッキー",   kind:"buff", pow:1.7, fx:"gold", col:"#FFD54A", say:"まばゆい 光で ちからが みなぎる!", ult:1, shout:"きらーん☆" };
+  SPELLS.l_dragon   = { name:"火の国 ブレス",       kind:"dmg",  pow:3.6, fx:"flame", col:"#FF3A1A", say:"灼熱の ほのおが すべてを つつむ!!", ult:1, shout:"火の国の ちから、見せてやろう" };
+  ENEMY_LOOK.e_kawagiri = "朝の 球磨川に あらわれる。 ねむそうだが まどわせてくる。";
+  ENEMY_LOOK.e_uzushio  = "天草の 海の 大うず。 いきおいが ついたら 止まらない。";
+  ENEMY_LOOK.e_shiranui = "八代の 海に 夜だけ うかぶ 火。 どれが ほんものか わからない。";
+  ENEMY_LOOK.e_kazan    = "阿蘇の 火口に すむ 親方。 ちからを ためると とても あぶない。";
+  ENEMY_LOOK.e_kinpika  = "まぶしく かがやく ホコリン。 かたくて すぐ にげる。 たおすと けいけんちが たくさん。";
+  ENEMY_LOOK.b_dragon   = "熊本城の 天守に 舞いおりた 火の国の りゅう。 伝説の 中の 伝説。";
+  ENEMY_BYE.e_kawagiri = "キリモヤは 朝日に とけていった。";
+  ENEMY_BYE.e_uzushio  = "ウズシオは しおが ひいて しずかに なった。";
+  ENEMY_BYE.e_shiranui = "ユラメキは 夜明けとともに きえた。";
+  ENEMY_BYE.e_kazan    = "カザンバイは「やるのう」と 笑って 山へ かえった。";
+  ENEMY_BYE.e_kinpika  = "キンピカ・ホコリンは きらきらの 粉に なった。";
+})();
+// 強敵に いどむ(レベルで 解放)
+function startStrong(key){
+  const en = enemyOf_(key);
+  if (!en || lvInfo_().lv < (en.unlock || 0)){ toast("まだ レベルが たりません"); return; }
+  startBattle(false, key);
+}
+function strongList_(){
+  const lv = lvInfo_().lv, r = rpg_(), beat = r.beat || {};
+  const list = ENEMIES.filter(function(e){ return e.strong; });
+  let h = '<div class="boss-box strong-box"><div class="boss-title">🔥 熊本の 強敵に いどむ</div>';
+  list.forEach(function(e){
+    const ok = lv >= e.unlock, got = (S.legendMates || []).indexOf(LEGEND_FROM[e.key]) >= 0;
+    h += '<div class="boss-row' + (ok ? '' : ' locked') + '">'
+      + '<span class="boss-ico">' + (ok ? dotSvg(e.key, 34) : '<span class="boss-q">?</span>') + '</span>'
+      + '<span class="boss-info"><b>' + (ok ? esc(e.name) : "？？？") + '</b><i>' + esc(e.place) + ' ・ ' + (ok ? (beat[e.key] ? beat[e.key] + "回 たおした" : "まだ たおしていない") : "レベル" + e.unlock + "で 解放") + '</i></span>'
+      + (got ? '<span class="boss-done">なかま</span>' : '')
+      + (ok ? '<button class="btn" onclick="startStrong(\'' + e.key + '\')">いどむ</button>' : '<span class="boss-lock">🔒</span>')
+      + '</div>';
+  });
+  return h + '<p class="hint">強敵を たおすと、なかまに なりたそうに こちらを 見ることがあります。</p></div>';
+}
 /* ===== コマンドバトル ===== */
 // おまかせ(自動)か コマンドか。MP は なかまの まほうに使う
 function battleInit_(b){
@@ -6023,6 +6297,17 @@ function battleInit_(b){
   b.menu = "main";
   b.patk0 = b.patk; b.pdef0 = b.pdef; b.eatk0 = b.eatk;
   b.fx = [];
+  b.tp = 0;                         // ひっさつゲージ(100で ひっさつ)
+  // 出会いの 演出
+  if (b.en.boss || b.en.strong){
+    fxq_(b, { t: "warn", text: b.en.boss ? (b.en.boss >= 4 ? "伝説の ボス あらわる!!" : "ボス あらわる!") : "強敵 あらわる!", d: 100 });
+    fxq_(b, { t: "quake", d: 150 });
+    fxq_(b, { t: "cutin", side: "enemy", k: b.en.key, name: b.en.name, shout: (ENEMY_LOOK[b.en.key] || "").slice(0, 24), col: b.en.boss ? "#B3261E" : "#E07A1F", d: 900 });
+    b.slow = 2200;
+  } else if (b.en.rare){
+    fxq_(b, { t: "banner", text: "きらっ! めずらしい てき!", cls: "crit", d: 100 });
+  }
+  fxq_(b, { t: "enter", d: 0 });
 }
 // まほうの効果(自動・コマンド共通)
 function applySpell_(b, k, auto){
@@ -6032,27 +6317,36 @@ function applySpell_(b, k, auto){
   b.log.push(nm2 + "の " + sp.name + "!");
   if (sp.say) b.log.push(sp.say);
   const onEnemy = sp.kind === "dmg" || sp.kind === "debuff";
-  fxq_(b, { t: "spell", sp: sp, k: k, at: onEnemy ? "enemy" : "party" });
-  fxq_(b, { t: "banner", text: sp.name, col: sp.col, d: 0 });
+  tpAdd_(b, 10);
+  // 強い わざは カットイン(表情の アップ)。伝説の おうぎは さらに 派手に
+  const cut = sp.ult || (sp.kind === "dmg" && sp.pow >= 1.5) || Math.random() < 0.3;
+  const o = cut ? 1150 : 0;
+  if (cut){
+    fxq_(b, { t: "cutin", side: "mate", k: k, name: sp.name, shout: sp.shout || sp.say || "", col: sp.col });
+    b.slow = sp.ult ? 1700 : 1100;
+  }
+  if (sp.ult){ fxq_(b, { t: "ult", col: sp.col, d: o }); fxq_(b, { t: "quake", d: o + 100 }); }
+  fxq_(b, { t: "spell", sp: sp, k: k, at: onEnemy ? "enemy" : "party", d: o });
+  if (!cut) fxq_(b, { t: "banner", text: sp.name, col: sp.col, d: 0 });
   if (sp.kind === "dmg"){
     const d = Math.max(1, Math.round(b.patk * sp.pow * (auto ? (0.8 + Math.random() * 0.4) : (0.9 + Math.random() * 0.3))));
     b.ehp = Math.max(0, b.ehp - d);
     b.log.push(b.en.name + "に " + d + " のダメージ!");
-    fxq_(b, { t: "shake", at: "enemy", d: 450 });
-    fxq_(b, { t: "num", at: "enemy", text: String(d), cls: "dmg big", d: 450 });
+    fxq_(b, { t: "shake", at: "enemy", d: o + 450 });
+    fxq_(b, { t: "num", at: "enemy", text: String(d), cls: sp.ult ? "ult" : "dmg big", d: o + 450 });
   } else if (sp.kind === "heal"){
     const h = Math.round(b.pmax * (auto ? sp.pow : Math.max(sp.pow, 0.3)));
     b.php = Math.min(b.pmax, b.php + h);
     b.log.push(who + "は " + h + " かいふくした!");
-    fxq_(b, { t: "num", at: "party", text: "+" + h, cls: "heal", d: 400 });
+    fxq_(b, { t: "num", at: "party", text: "+" + h, cls: "heal", d: o + 400 });
   } else if (sp.kind === "buff"){
     b.patk = Math.round(b.patk * sp.pow);
     b.log.push(who + "たちの こうげきが 上がった!");
-    fxq_(b, { t: "num", at: "party", text: "こうげき↑", cls: "buff", d: 400 });
+    fxq_(b, { t: "num", at: "party", text: "こうげき↑", cls: "buff", d: o + 400 });
   } else if (sp.kind === "debuff"){
     b.eatk = Math.max(1, Math.round(b.eatk * sp.pow));
     b.log.push(b.en.name + "の こうげきが 下がった!");
-    fxq_(b, { t: "num", at: "enemy", text: "こうげき↓", cls: "debuff", d: 400 });
+    fxq_(b, { t: "num", at: "enemy", text: "こうげき↓", cls: "debuff", d: o + 400 });
   }
 }
 /* ===== 戦いの 画面効果 =====
@@ -6088,7 +6382,7 @@ function fxPlay_(e){
   } else if (e.t === "flash"){
     const d = add("fx-flash-ov", "", null, null, 450); d.style.background = e.col || "#fff";
   } else if (e.t === "slash" && R){
-    add("fx-slash", "", R.x + R.w / 2, R.y + R.h / 2, 600);
+    const d = add("fx-slash" + (e.rev ? " rev" : ""), "", R.x + R.w / 2, R.y + R.h / 2, 600);
   } else if (e.t === "banner"){
     const d = add("fx-banner " + (e.cls || ""), esc(e.text), null, null, 1300);
     if (e.col) d.style.setProperty("--bc", e.col);
@@ -6110,6 +6404,39 @@ function fxPlay_(e){
   } else if (e.t === "lunge"){
     const el = document.querySelector("#rpg-stage .rpg-enemy");
     if (el && !reduce){ el.classList.remove("fx-lunge"); void el.offsetWidth; el.classList.add("fx-lunge"); }
+  } else if (e.t === "cutin"){
+    const sc = document.getElementById("rpg-screen");
+    let svg = "", eye = 0.42;
+    if (e.side === "hero"){ svg = heroWalkSvg_(dotStage().key, 190, null, rpg_().equip); eye = 0.36; }
+    else { svg = dotSvg(e.k, 190, e.side === "mate" ? mateLv_(e.k) : null); eye = DOT_EYE[e.k] || 0.42; }
+    const top = Math.round(46 - eye * 190);
+    const d = add("fx-cutin " + (e.side || ""), '<div class="ci-band" style="--cc:' + (e.col || "#FFE24D") + '"><div class="ci-lines"></div>'
+      + '<div class="ci-face"><div class="ci-svg" style="top:' + top + 'px">' + svg + '</div>'
+      + (e.side === "enemy" ? '<i class="ci-eye l red"></i><i class="ci-eye r red"></i>' : '<i class="ci-brow l"></i><i class="ci-brow r"></i><i class="ci-glint"></i>')
+      + '</div><div class="ci-text"><b>' + esc(e.name || "") + '</b><span>' + esc(e.shout || "") + '</span></div></div>', null, null, 1250);
+    if (navigator.vibrate) navigator.vibrate([30, 30, 60]);
+  } else if (e.t === "ult"){
+    const d = add("fx-ult", '<i></i><i></i><i></i><b></b>', null, null, 1500);
+    d.style.setProperty("--uc", e.col || "#FFE27A");
+  } else if (e.t === "quake"){
+    const sc = document.getElementById("rpg-screen");
+    if (sc && !reduce){ sc.classList.remove("fx-quake"); void sc.offsetWidth; sc.classList.add("fx-quake"); setTimeout(function(){ sc.classList.remove("fx-quake"); }, 700); }
+  } else if (e.t === "warn"){
+    add("fx-warn", '<span>⚠ ' + esc(e.text) + ' ⚠</span>', null, null, 1700);
+  } else if (e.t === "enter"){
+    const el = document.querySelector("#rpg-stage .rpg-enemy");
+    if (el && !reduce){ el.classList.add("fx-enter"); setTimeout(function(){ el.classList.remove("fx-enter"); }, 800); }
+  } else if (e.t === "jump"){
+    const el = document.querySelector("#rpg-stage .rpg-party > :first-child");
+    if (el && !reduce){ el.classList.remove("fx-jump"); void el.offsetWidth; el.classList.add("fx-jump"); }
+  } else if (e.t === "flee"){
+    const el = document.querySelector("#rpg-stage .rpg-enemy");
+    if (el) el.classList.add("fx-flee");
+  } else if (e.t === "confetti"){
+    const cols = ["#FFE24D", "#FF6B5E", "#6BE38A", "#7FB2FF", "#FF9EC0", "#FFFFFF"];
+    let h = "";
+    for (let i = 0; i < 34; i++) h += '<i style="left:' + Math.round(Math.random() * 100) + '%;background:' + cols[i % cols.length] + ';animation-delay:' + (Math.random() * 0.5).toFixed(2) + 's;--dx:' + Math.round(Math.random() * 80 - 40) + 'px"></i>';
+    add("fx-confetti", h, null, null, 2600);
   } else if (e.t === "run"){
     const el = document.querySelector("#rpg-stage .rpg-party");
     if (el) el.classList.add("fx-run");
@@ -6130,7 +6457,28 @@ function statusTags_(b){
   if (b.stun) en.push("むせている");
   return { me: me, en: en };
 }
-function spellCost_(sp){ return sp.kind === "dmg" ? 2 : 1; }
+function tpAdd_(b, n){ b.tp = Math.min(100, (b.tp || 0) + n); }
+function waitMs_(b, base){ const x = base + (b.slow || 0); b.slow = 0; return x; }
+// 主人公の ひっさつ(ゲージが たまったら)
+function heroSpecial_(b){
+  const st = dotStage();
+  const who = pet_().heroName || st.name;
+  const nm = st.n >= 20 ? "白衣いっせん・極" : (st.n >= 10 ? "白衣いっせん" : "がんばり パンチ");
+  b.tp = 0;
+  let dmg = Math.max(5, Math.round(b.patk * 3.2 * (0.95 + Math.random() * 0.15) - (b.edef || 0) * 0.2));
+  if (b.en.rare) dmg = Math.max(dmg, b.ehp);             // きんぴかも ひっさつなら たおせる
+  b.ehp = Math.max(0, b.ehp - dmg);
+  b.log.push(who + "の ひっさつ! 「" + nm + "」!!");
+  b.log.push(b.en.name + "に " + dmg + " の 大ダメージ!");
+  fxq_(b, { t: "cutin", side: "hero", name: nm, shout: "みんなの けんこうは わたしが まもる!", col: "#FFD54A" });
+  fxq_(b, { t: "ult", col: "#FFE27A", d: 1150 });
+  fxq_(b, { t: "slash", at: "enemy", d: 1250 }); fxq_(b, { t: "slash", at: "enemy", d: 1380 });
+  fxq_(b, { t: "shake", at: "enemy", d: 1300 });
+  fxq_(b, { t: "num", at: "enemy", text: String(dmg), cls: "ult", d: 1350 });
+  b.slow = 1300;
+}
+function cmdSpecial_(){ const b = cmdBegin_(); if (!b) return; if ((b.tp || 0) < 100){ b.waiting = true; renderBattle_(); return; } heroSpecial_(b); cmdAfter_(b, 1300); }
+function spellCost_(sp){ if (sp.ult) return 3; return sp.kind === "dmg" ? 2 : 1; }
 function battleMenuHtml_(){
   const b = __battle;
   if (!b || b.done) return "";
@@ -6157,7 +6505,8 @@ function battleMenuHtml_(){
                      : '<p class="rpg-none">どうぐぶくろは からっぽだ</p>')
       + btn("もどる", "cmdMenu_('main')") + '</div>';
   }
-  return '<div class="rpg-cmds">'
+  return ((b.tp || 0) >= 100 ? '<button class="rpg-c rpg-sp" onclick="cmdSpecial_()">★ ひっさつ! ★<small>ゲージ MAX</small></button>' : '')
+    + '<div class="rpg-cmds">'
     + btn("たたかう", "cmdAttack_()")
     + btn("まほう", "cmdMenu_('spell')", !spellMates_().length)
     + btn("どうぐ", "cmdMenu_('item')")
@@ -6170,9 +6519,9 @@ function cmdMenu_(m){ const b = __battle; if (!b || !b.waiting) return; b.menu =
 function cmdBegin_(){ const b = __battle; if (!b || !b.waiting || b.done) return null; b.waiting = false; b.menu = "main"; return b; }
 // こちらの行動が終わったら てきの番へ
 function cmdAfter_(b, delay){
-  if (b.ehp <= 0){ b.done = true; b.log.push(b.en.name + "を たおした!"); renderBattle_(); setTimeout(battleWin_, 1400); return; }
+  if (b.ehp <= 0){ b.done = true; b.log.push(b.en.name + "を たおした!"); renderBattle_(); setTimeout(battleWin_, waitMs_(b, 1400)); return; }
   renderBattle_();
-  setTimeout(function(){ battleEnemy_(); }, delay || 1000);
+  setTimeout(function(){ battleEnemy_(); }, waitMs_(b, delay || 1000));
 }
 function heroAttack_(b){
   const who = pet_().heroName || dotStage().name;
@@ -6182,10 +6531,20 @@ function heroAttack_(b){
   b.ehp = Math.max(0, b.ehp - dmg);
   b.log.push(who + "の こうげき!");
   b.log.push((crit ? "会心の一撃!　" : "") + b.en.name + "に " + dmg + " のダメージ!");
-  fxq_(b, { t: "slash", at: "enemy" });
-  fxq_(b, { t: "shake", at: "enemy", d: 120 });
-  fxq_(b, { t: "num", at: "enemy", text: String(dmg), cls: crit ? "crit" : "dmg", d: 120 });
-  if (crit){ fxq_(b, { t: "flash", col: "#fff", d: 60 }); fxq_(b, { t: "banner", text: "会心の一撃!", cls: "crit", d: 0 }); }
+  tpAdd_(b, crit ? 30 : 18);
+  const o = crit ? 1150 : 0;
+  if (crit){
+    const shouts = ["いまだ!", "ここだっ!", "見えた!", "きまった!", "せいやっ!"];
+    fxq_(b, { t: "cutin", side: "hero", name: "会心の一撃!", shout: shouts[Math.floor(Math.random() * shouts.length)], col: "#FFE24D" });
+    fxq_(b, { t: "quake", d: o });
+    fxq_(b, { t: "flash", col: "#fff", d: o });
+    b.slow = 1100;
+  }
+  fxq_(b, { t: "jump", d: o });
+  fxq_(b, { t: "slash", at: "enemy", d: o + 80 });
+  if (crit) fxq_(b, { t: "slash", at: "enemy", d: o + 200, rev: 1 });
+  fxq_(b, { t: "shake", at: "enemy", d: o + 160 });
+  fxq_(b, { t: "num", at: "enemy", text: String(dmg), cls: crit ? "crit" : "dmg", d: o + 160 });
 }
 function cmdAttack_(){ const b = cmdBegin_(); if (!b) return; heroAttack_(b); cmdAfter_(b, 900); }
 function cmdSpell_(k){
@@ -6207,7 +6566,7 @@ function cmdItem_(k){
 function cmdGuard_(){
   const b = cmdBegin_(); if (!b) return;
   const who = pet_().heroName || dotStage().name;
-  b.guard = 1;
+  b.guard = 1; tpAdd_(b, 8);
   b.log.push(who + "は みを まもっている。");
   fxq_(b, { t: "shield", at: "party" });
   cmdAfter_(b, 700);
@@ -6241,11 +6600,12 @@ function setBattleAuto(on){ const r = rpg_(); r.battleAuto = !!on; save(); toast
 function battleFled_(){
   const b = __battle;
   if (!b) return;
+  if (b.enemyFled && rpg_().enemy === b.en.key){ rpg_().enemy = null; save(); }
   const box = battleBox_();
   box.innerHTML = '<div class="rpg-result">'
-    + '<div class="rpg-lose-t">にげきった!</div>'
+    + '<div class="rpg-lose-t">' + (b.enemyFled ? "にげられた……" : "にげきった!") + '</div>'
     + '<div class="rpg-res-ico">' + dotSvg(b.en.key, Math.min(64, b.en.size || 56)) + '</div>'
-    + '<p>' + esc(b.en.name) + 'は まだ どこかに いる。</p>'
+    + '<p>' + esc(b.en.name) + (b.enemyFled ? 'は すばやく にげていった。 ひっさつ なら 一撃で たおせるかも。' : 'は まだ どこかに いる。') + '</p>'
     + '<p class="hint">' + (b.boss || b.vs ? "準備を ととのえて また いどもう。" : "なかま画面の たたかい から また いどめます。") + '</p>'
     + '<button class="btn" onclick="closeBattle()">とじる</button></div>';
   const cmd = document.getElementById("rpg-cmd"); if (cmd) cmd.innerHTML = "";
@@ -6306,6 +6666,7 @@ function renderBattle_(){
       +   (b.mmax ? '<span>MP ' + b.mp + '/' + b.mmax + '</span>' : '')
       + '</div>'
       + '<div class="rpg-hpbar"><i style="width:' + pp + '%"></i></div>'
+      + '<div class="rpg-tp' + ((b.tp || 0) >= 100 ? ' full' : '') + '"><span>ひっさつ</span><b><i style="width:' + (b.tp || 0) + '%"></i></b></div>'
       + '<div class="rpg-msg">' + b.log.slice(-3).map(function(x){ return '<div>' + esc(x) + '</div>'; }).join("") + '</div>';
   }
   const cmd = document.getElementById("rpg-cmd");
@@ -6323,7 +6684,7 @@ function defeatedList_(){
   const beaten = r.bosses || [];
   let h = '<div class="divider"><span>たおした敵</span></div><div class="mate-list">';
   ENEMIES.forEach(function(e){
-    const done = e.boss ? beaten.indexOf(e.key) >= 0 : (r.wins || 0) > 0;
+    const done = e.boss ? beaten.indexOf(e.key) >= 0 : ((r.beat || {})[e.key] > 0 || (!e.strong && !e.rare && (r.wins || 0) > 0));
     h += done
       ? '<span class="mate-chip' + (e.boss ? ' rare' : '') + '">' + dotSvg(e.key, 26) + esc(e.name) + (e.boss ? '<i class="pers">ボス</i>' : '') + '</span>'
       : '<span class="mate-chip yet">' + dotSvg("slot", 26) + '？</span>';
@@ -6332,7 +6693,7 @@ function defeatedList_(){
   return h;
 }
 function bossList_(){
-  const bosses = ENEMIES.filter(function(e){ return e.boss; });
+  const bosses = ENEMIES.filter(function(e){ return e.boss; }).sort(function(a, b){ return a.boss - b.boss; });
   let h = '<div class="boss-box"><div class="boss-title">⚔ ボスに いどむ</div>';
   bosses.forEach(function(e){
     const ok = bossReady_(e.key), done = bossBeaten_(e.key);
@@ -6459,6 +6820,7 @@ function battleSection_(){
     + '<p class="hint">つよさ: こうげき ' + pw.atk + ' / まもり ' + pw.def + ' / たいりょく ' + pw.hp
     +   ' ／ せんせき ' + (r.wins || 0) + '勝 ' + (r.loses || 0) + '敗'
     +   ((v.win || v.lose) ? ' ／ 他店舗と ' + (v.win || 0) + '勝 ' + (v.lose || 0) + '敗' : '') + '</p>'
+    + strongList_()
     + bossList_()
     + '<p class="hint">他店舗との たいせんは「その他」→「店舗間の備蓄情報共有」の 薬局一覧から できます。'
     +   '自分の パーティは 備蓄をアップロードすると 相手にも 見えるようになります。</p>'
@@ -6628,6 +6990,15 @@ const NAZO = [
   ["朝は 4本、昼は 2本、夜は 3本の あしのものは?", "にんげん"]
 ];
 // 文の終わり(だよ・だね)を取ってから 口ぐせを付ける。言い切れない文(〜て、〜かな?)は そのまま
+// 伝説の なかまの せいかく
+(function(){
+  PERSONA.l_kawagiri = { p:"ねぼすけ", a:"sleep", t:function(s){ return s + "……ふわぁ"; }, c:["朝は とくいだよ。……ねむいけど","川の音を きくと おちつく","きりが はれたら 本気だす"] };
+  PERSONA.l_uzushio  = { p:"いきおいまかせ", a:"roll", t:function(s){ return s + "ばい!"; }, c:["海は ひろかばい!","ぐるぐる まわると たのしか","しおの 時間は まちがえんよ"] };
+  PERSONA.l_shiranui = { p:"ミステリアス", a:"vanish", t:function(s){ return s + "……かもね"; }, c:["わたしは どこに いるでしょう","夜の 海が すき","見えるものが すべてじゃ ないのよ"] };
+  PERSONA.l_kazan    = { p:"がんこ親方", a:"jump", t:function(s){ return s + "じゃ!"; }, c:["山は どっしり かまえるもんじゃ","わしの 灰は 畑の こやしにも なる","ふんかは 年に いっぺんで よか"] };
+  PERSONA.l_kinpika  = { p:"めだちたがり", a:"jump", t:function(s){ return s + "☆"; }, c:["きらーん☆","みがいてくれて ありがとう☆","にげ足には 自信が あるよ☆"] };
+  PERSONA.l_dragon   = { p:"いげんの かたまり", a:"jump", t:function(s){ return s + "。……ふむ"; }, c:["火の国を まもるのが わが つとめ","おぬしの 白衣、なかなか 似合うておる","城の 石垣は わしの 自慢じゃ"] };
+})();
 function personaSay_(per, s){
   let t = String(s).replace(/[!\uFF01]+$/, "");
   const m = t.match(/\s*(だよね|だよ|だね)$/);
@@ -6950,7 +7321,9 @@ function matesSection_(){
     { id:"gotouchi", label:"ごとうち",   keys: GOTOUCHI_MATES,  owned: gotouchiOwned_(), cls:"gotouchi",
       how: "下の「やってみよう」を1つ試すごとに1体やってきます。" },
     { id:"rare",     label:"レア",       keys: RARE_MATES,      owned: rareOwned_(),     cls:"rare",
-      how: "新しい商品を登録したとき、ごくまれに現れます。" }
+      how: "新しい商品を登録したとき、ごくまれに現れます。" },
+    { id:"legend",   label:"でんせつ",   keys: LEGEND_MATES,    owned: legendOwned_(),   cls:"legend",
+      how: "熊本の 強敵を たおすと、なかまに なりたそうに こちらを 見ることがあります。たたかいタブの「強敵に いどむ」から。" }
   ];
   let cur = groups.filter(function(x){ return x.id === __mateGroup; })[0] || groups[0];
   let h = '<p class="gm-help">カードをタップすると、画面右上に出す なかまに入ります(最大' + PET_PICK_MAX + '体)。もう一度タップで はずれます。'
