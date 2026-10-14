@@ -254,7 +254,7 @@ button.mate-chip { cursor: pointer; font-family: var(--sans); }
   top: calc(env(safe-area-inset-top) + 8px);
   width: min(420px, calc(100vw - 16px));
   height: min(52vh, 420px);
-  border-radius: 12px; border: 2px solid #fff; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  border-radius: 12px; border: 2px solid #fff; box-shadow: 0 10px 30px rgba(0,0,0,0.5), 0 0 0 200vmax rgba(20,14,8,.92);
   display: flex; align-items: stretch; justify-content: center; overflow: hidden; }
 .rpg-inner { width: 100%; height: 100%; display: flex; flex-direction: column; padding: 8px 10px 10px; overflow-y: auto; -webkit-overflow-scrolling: touch; }
 .rpg-close { position: absolute; top: 6px; right: 6px; z-index: 5;
@@ -384,6 +384,76 @@ button.mate-chip { cursor: pointer; font-family: var(--sans); }
 .join-ask .btn { margin-top: 6px; }
 .legend-in { animation: enemyEnter .8s cubic-bezier(.3,1.6,.5,1); }
 .strong-box { border-color: #E07A1F; }
+/* 右上の テレビ */
+#dot-pet { display: none !important; }
+.tv-btn { position: relative; width: 70px; height: 58px; border: 0; background: none; padding: 0; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.tv-btn:active { transform: scale(.95); }
+.tv-body { position: absolute; left: 3px; top: 2px; }
+.tv-screen { position: absolute; left: 10px; top: 19px; width: 42px; height: 30px; border-radius: 7px; overflow: hidden; display: flex; align-items: flex-end; justify-content: center;
+  background: radial-gradient(ellipse at center, #3E7A55 0%, #1B3A28 80%); box-shadow: inset 0 0 6px rgba(0,0,0,.6); }
+.tv-hero { margin-bottom: 1px; animation: tvWalk 2.4s ease-in-out infinite; }
+@keyframes tvWalk { 0%,100%{transform:translateX(-7px)} 50%{transform:translateX(7px)} }
+.tv-scan { position: absolute; inset: 0; background: repeating-linear-gradient(0deg, rgba(255,255,255,.08) 0 1px, transparent 1px 3px); pointer-events: none; animation: tvFlick 3s steps(1) infinite; }
+@keyframes tvFlick { 0%,96%{opacity:1} 97%{opacity:.4} 98%{opacity:1} }
+.tv-alert { position: absolute; top: -2px; right: -2px; min-width: 18px; height: 18px; border-radius: 9px; background: #E2463A; color: #fff; font-size: 11px; font-weight: 900; display: flex; align-items: center; justify-content: center; padding: 0 4px; border: 2px solid #fff; animation: lfReq 1s ease-in-out infinite; }
+.tv-alert.fight { background: #B3261E; }
+body.game-off .tv-btn { display: none !important; }
+@media print { .tv-btn { display: none !important; } }
+/* ゲーム画面(テレビの 中) */
+#party-modal.game-tv { padding: 0; background: rgba(20,14,8,.85); align-items: stretch; }
+#party-modal.game-tv .order-card { width: min(560px, 100%); max-width: 100%; margin: 0 auto; height: 100%; max-height: 100%; border-radius: 0; overflow-y: auto; -webkit-overflow-scrolling: touch;
+  background: #FBF7EF; border-left: 6px solid #8B5A2B; border-right: 6px solid #8B5A2B; padding: 0 12px 24px; }
+@media (min-width: 600px){ #party-modal.game-tv .order-card { height: calc(100% - 24px); margin-top: 12px; border-radius: 18px; border: 8px solid #8B5A2B; } }
+.tv-head { position: sticky; top: 0; z-index: 5; background: #1B2A22; color: #E8F5EA; margin: 0 -12px 10px; padding: 10px 12px; display: flex; align-items: center; gap: 8px; }
+.tv-head .order-title { font-weight: 900; letter-spacing: .06em; color: #FFE27A; font-size: 15px; white-space: nowrap; }
+.tv-stat { font-size: 11.5px; margin-left: auto; white-space: nowrap; }
+.tv-off { border: 1px solid #E8F5EA; background: transparent; color: #E8F5EA; border-radius: 999px; padding: 5px 10px; font-size: 12px; cursor: pointer; white-space: nowrap; }
+.gm-back { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.gm-back button { border: 1px solid var(--line); background: #fff; border-radius: 999px; padding: 6px 12px; font-size: 13px; cursor: pointer; }
+.gm-back b { font-size: 16px; } .gm-back .sub { margin-left: auto; }
+.gh-card { border: 2px solid #D8C8A8; background: #fff; border-radius: 14px; padding: 10px 12px; margin: 10px 0; }
+.gh-card.warn { border-color: #F0B07A; background: #FFF8F0; }
+.gh-title { font-weight: 800; font-size: 14px; margin-bottom: 6px; } .gh-title small { font-weight: 400; color: #8A7A60; font-size: 11px; margin-left: 4px; }
+.gh-tasks, .gh-issues { list-style: none; padding: 0; margin: 0; }
+.gh-tasks li, .gh-issues li { display: flex; align-items: center; gap: 8px; padding: 6px 0; border-bottom: 1px dashed #EADFC8; font-size: 12.5px; }
+.gh-tasks li:last-child, .gh-issues li:last-child { border-bottom: 0; }
+.gh-tasks li.done .lb { color: #8A9A8A; }
+.gh-tasks .ic { font-size: 16px; width: 22px; text-align: center; }
+.gh-tasks .lb, .gh-issues .lb { flex: 1; min-width: 0; }
+.gh-issues .lb b { display: block; font-size: 13px; } .gh-issues .lb small { color: #8A7A60; }
+.gh-go, .gh-claim, .gh-fight { border: 1px solid #1F2D3A; background: #fff; color: #1F2D3A; border-radius: 999px; padding: 5px 10px; font-size: 12px; cursor: pointer; white-space: nowrap; }
+.gh-claim { background: #FFD54A; border-color: #C98A00; font-weight: 700; animation: spGlow 1.2s ease-in-out infinite; }
+.gh-fight { background: #B3261E; color: #fff; border-color: #B3261E; }
+.got { font-size: 11px; color: #2E7D5B; white-space: nowrap; }
+.gh-help { font-size: 11.5px; color: #8A7A60; margin: 6px 0 0; }
+.gh-menu { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 12px; }
+.gh-tile { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 12px 4px 10px; border: 2px solid #D8C8A8; border-radius: 14px; background: #fff; cursor: pointer; font-family: var(--sans); }
+.gh-tile:active { transform: scale(.97); }
+.gh-tile .ic { font-size: 28px; line-height: 1.1; } .gh-tile b { font-size: 13.5px; } .gh-tile small { font-size: 10.5px; color: #C0392B; }
+.gm-tabs { display: none !important; }
+/* まなぶ */
+.lr-cats { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+.lr-cat { text-align: left; border: 2px solid #D8C8A8; background: #fff; border-radius: 12px; padding: 10px; cursor: pointer; display: flex; flex-direction: column; gap: 5px; }
+.lr-cat b { font-size: 13px; } .lr-cat small { font-size: 11px; color: #8A7A60; }
+.lr-cat.all { grid-column: 1 / -1; background: #FFF6D6; border-color: #F0D27A; }
+.lr-bar { display: block; height: 6px; background: #EEE; border-radius: 3px; overflow: hidden; } .lr-bar i { display: block; height: 100%; background: #2E7D5B; }
+.lr-note details { border: 1px solid var(--line); border-radius: 10px; padding: 6px 10px; margin-bottom: 6px; background: #fff; }
+.lr-note summary { cursor: pointer; font-weight: 700; font-size: 13px; }
+.lr-note ul { list-style: none; padding: 0; margin: 6px 0 0; }
+.lr-note li { padding: 6px 0; border-top: 1px dashed var(--line); font-size: 12px; }
+.lr-note li b { display: block; } .lr-note li span { color: #5C6B78; }
+.lr-note li.ng b { color: #B3261E; }
+.quiz-ov { position: fixed; inset: 0; z-index: 400; background: rgba(0,0,0,.55); display: flex; align-items: center; justify-content: center; padding: 16px; }
+.quiz-box { background: #FBF7EF; border: 4px solid #8B5A2B; border-radius: 16px; width: min(420px, 100%); padding: 14px; box-shadow: 0 10px 30px rgba(0,0,0,.4); animation: lrPop .5s cubic-bezier(.2,1.4,.4,1); }
+.quiz-head { display: flex; justify-content: space-between; align-items: center; font-weight: 800; font-size: 14px; margin-bottom: 8px; } .quiz-head span { font-size: 11px; color: #8A7A60; font-weight: 400; }
+.quiz-q { font-size: 15.5px; font-weight: 700; line-height: 1.6; margin: 4px 0 10px; }
+.quiz-a { display: flex; flex-direction: column; gap: 8px; }
+.quiz-a button { text-align: left; border: 2px solid #D8C8A8; background: #fff; border-radius: 12px; padding: 11px 12px; font-size: 14px; cursor: pointer; }
+.quiz-a button.right { border-color: #2E7D5B; background: #E8F6EC; font-weight: 700; }
+.quiz-a button.wrong { border-color: #B3261E; background: #FDECEA; }
+.quiz-mark { font-size: 22px; font-weight: 900; text-align: center; margin: 10px 0 4px; } .quiz-mark.ok { color: #2E7D5B; } .quiz-mark.ng { color: #B3261E; }
+.quiz-ex { font-size: 13px; line-height: 1.7; background: #fff; border-radius: 10px; padding: 8px 10px; margin: 4px 0 10px; }
+.quiz-next { width: 100%; }
 /* ぼうけんの地図 */
 .adv-chips { display: flex; gap: 5px; overflow-x: auto; padding-bottom: 6px; margin-bottom: 6px; }
 .adv-chip { flex: 0 0 auto; border: 1px solid var(--line); background: #fff; border-radius: 999px; padding: 6px 11px; font-size: 12px; cursor: pointer; white-space: nowrap; }
@@ -614,7 +684,7 @@ svg.bd8 { animation: bdDance 1.6s ease-in-out infinite, bdGold 2s ease-in-out in
 .bag-list li span { font-size: 11.5px; color: #6B7882; }
 /* 画面に重ねて出す小窓(なかま・そうび) */
 .order-modal { position: fixed; inset: 0; z-index: 90; background: rgba(15,25,35,0.55); align-items: flex-start; justify-content: center; overflow-y: auto; padding: 16px 10px 40px; -webkit-overflow-scrolling: touch; }
-#battle-modal { z-index: 95; }
+#battle-modal { z-index: 95; background: rgba(20,14,8,.94); }
 .order-card { position: relative; width: 100%; max-width: 560px; background: #F7F9FB; border-radius: 18px; padding: 12px 12px 16px; box-shadow: 0 12px 40px rgba(0,0,0,0.25); margin: 0 auto; }
 .order-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
 .order-title { font-size: 16px; font-weight: 800; color: var(--ai-deep); letter-spacing: 0.08em; }
@@ -1367,11 +1437,12 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
     <div class="row gap" style="margin-top:8px"><button class="btn" onclick="closeMakerNotice()">わかりました</button></div>
   </div>
 </div>
-<div id="party-modal" class="order-modal" style="display:none" onclick="if(event.target===this)closePartyModal()">
+<div id="party-modal" class="order-modal game-tv" style="display:none">
   <div class="order-card">
-    <div class="order-head">
-      <span class="order-title">🎮 なかま</span>
-      <button class="link" onclick="closePartyModal()">閉じる</button>
+    <div class="order-head tv-head">
+      <span class="order-title">📺 OTCLinker TV</span>
+      <span class="tv-stat" id="tv-stat"></span>
+      <button class="tv-off" onclick="closePartyModal()">テレビを けす</button>
     </div>
     <div id="party-modal-body"></div>
   </div>
@@ -1393,7 +1464,8 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
       </div>
     </div>
     <div class="pet-wrap">
-      <button class="dot-pet" id="dot-pet" aria-label="なかまをなでる(2回タップ、または長押しでなかま画面)"></button>
+      <button class="dot-pet" id="dot-pet" aria-hidden="true" tabindex="-1"></button>
+      <button class="tv-btn" id="tv-btn" onclick="openGame_()" aria-label="ゲーム画面を ひらく(テレビ)"></button>
       <div class="pet-say" id="pet-say" style="display:none"></div>
       <div class="pet-battle" id="pet-battle" style="display:none"></div>
     </div>
@@ -1877,7 +1949,7 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
         <li><b>在庫リスト</b>で商品にチェックを入れ、<b>値札・POP</b>で印刷。</li>
         <li>売れたら在庫リストの <b>−</b>、入荷したら <b>＋</b>。少なくなったら 🛒 で注文。</li>
       </ol>
-      <p class="hint">画面の右上の キャラクターは おまけの育成ゲームです。触らなくても 在庫管理には影響しません。不要なときは「見た目と音の設定」で かくせます。</p>
+      <p class="hint">画面の右上の テレビを 押すと、おまけの ゲームが ひらきます。アプリを 使うほど ゲームが すすみ、クイズで OTC医薬品や 法律の 知識も まなべます。不要なときは「見た目と音の設定」で かくせます。</p>
       <div class="row gap wrap"><button class="btn" onclick="showTab('scan')">商品を登録する</button><button class="btn ghost" onclick="showTab('list')">在庫リストを見る</button></div>
     </details>
     <h3 class="set-group">ふだん使うもの</h3>
@@ -1970,7 +2042,7 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
           <select id="beep-kind" onchange="saveBeepKind()"></select>
         </label>
         <p class="hint">音を選ぶとその場で鳴って確かめられます。端末がマナーモードのときは鳴りません。</p>
-        <label class="chk-row"><input type="checkbox" id="game-show" onchange="hideGameUntil_(!this.checked)"> キャラクター(おまけの育成ゲーム)を表示する</label>
+        <label class="chk-row"><input type="checkbox" id="game-show" onchange="hideGameUntil_(!this.checked)"> 右上の テレビ(おまけの ゲーム)を 表示する</label>
       </div>
     </details>
     <details class="set-card">
@@ -1987,7 +2059,7 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
   </section>
 
   <div class="toast" id="toast"></div>
-  <footer class="foot">OTCLinker — とみながグループ 店舗向けツール<br><span class="ver">版 2026-10-14 CW(なかよしで 見た目・強さ・動きが かわる)</span></footer>
+  <footer class="foot">OTCLinker — とみながグループ 店舗向けツール<br><span class="ver">版 2026-10-15 CX(テレビ・おしごと連動・クイズで まなぶ)</span></footer>
 </div>
 
 <script>
@@ -5286,6 +5358,7 @@ function renderDotPet(){
   if (rpg_().enemy) h += '<span class="pet-fight" title="てきが あらわれた!">⚔</span>';
   el.innerHTML = h;
   el.className = "dot-pet" + (gs.key === "nemuri" ? " sleepy" : (gs.key === "guttari" ? " weak" : ""));
+  try { renderTv_(); } catch(e){}
   const hn = pet_().heroName;
   el.title = "Lv" + lvInfo_().lv + " " + (hn ? hn + "(" + st.name + ")" : st.name)
     + "(" + st.n + "品目) / なかま " + line.length + "体 / " + gs.label;
@@ -5806,7 +5879,7 @@ function rpgOnOpen_(){
   r.count++;
   save();
   setTimeout(function(){
-    toast("⚔ " + e.say + " 右上のキャラクターを長押しすると たたかえます");
+    toast("⚔ " + e.say + " 右上の テレビから たたかえます");
     const el = document.getElementById("dot-pet");
     if (el){ el.classList.remove("rare-pop"); void el.offsetWidth; el.classList.add("rare-pop"); }
   }, 1600);
@@ -6128,7 +6201,7 @@ function closeBattle(){
   if (bm) bm.style.display = "none";
   __battle = null;
   renderDotPet();
-  if (__advReturn){ __advReturn = false; __partyTab = "adv"; openPartyModal(); return; }
+  if (__advReturn){ __advReturn = false; __partyTab = __advHome ? "home" : "adv"; __advHome = false; openPartyModal(); return; }
   if (document.getElementById("party-modal").style.display === "flex") openPartyModal();
 }
 function battleTurn_(){
@@ -6309,7 +6382,8 @@ function battleWin_(){
     else got = got + "|dup";
   }
   if (!b.practice && !b.forced) r.enemy = null;
-  if (b.adv){ try { advBattleWon_(b); } catch(e){} }
+  if (b.adv && b.adv.issue){ try { const G = game_(); G.issueWin = G.issueWin || {}; if (G.issueWin[b.adv.issue] !== today()){ G.issueWin[b.adv.issue] = today(); goldAdd_(30); } } catch(e){} }
+  else if (b.adv){ try { advBattleWon_(b); } catch(e){} }
   if (b.forced && r.enemy === b.en.key) r.enemy = null;
   // 強敵・きんぴかは なかまに なりたがることがある
   let joinKey = null;
@@ -6662,6 +6736,7 @@ function battleMenuHtml_(){
     + btn("たたかう", "cmdAttack_()")
     + btn("まほう", "cmdMenu_('spell')", !spellMates_().length)
     + btn("どうぐ", "cmdMenu_('item')")
+    + btn("ちしき", "cmdQuiz_()")
     + btn("ぼうぎょ", "cmdGuard_()")
     + btn("にげる", "cmdRun_()")
     + btn("おまかせ", "cmdAuto_()")
@@ -6738,6 +6813,28 @@ function cmdRun_(){
   }
   b.log.push("しかし まわりこまれてしまった!");
   cmdAfter_(b, 900);
+}
+// ちしき: クイズに 正解すると「ちしきの一撃」
+function cmdQuiz_(){
+  const b = cmdBegin_(); if (!b) return;
+  showQuiz_({ title: "📚 ちしき こうげき!", nextLabel: "たたかいに もどる", done: function(ok, q){
+    if (!__battle || __battle !== b) return;
+    const who = pet_().heroName || dotStage().name;
+    if (ok){
+      const dmg = Math.max(3, Math.round(b.patk * 2.3 * (0.95 + Math.random() * 0.15) - (b.edef || 0) * 0.25));
+      b.ehp = Math.max(0, b.ehp - dmg); tpAdd_(b, 25);
+      b.log.push(who + "の ちしきの一撃!");
+      b.log.push(b.en.name + "に " + dmg + " のダメージ!");
+      fxq_(b, { t: "cutin", side: "hero", name: "ちしきの一撃!", shout: "その こたえは…… これだ!", col: "#7FD4F5" });
+      fxq_(b, { t: "slash", at: "enemy", d: 1150 }); fxq_(b, { t: "shake", at: "enemy", d: 1200 });
+      fxq_(b, { t: "num", at: "enemy", text: String(dmg), cls: "crit", d: 1250 });
+      b.slow = 1100;
+    } else {
+      b.log.push(who + "は こたえに まよった……");
+      b.log.push("(解説は まなびノートに のこりました)");
+    }
+    cmdAfter_(b, 900);
+  } });
 }
 function cmdAuto_(){
   const b = cmdBegin_(); if (!b) return;
@@ -7422,9 +7519,9 @@ function startPetIdle_(){
   };
   window.__petTimer = setTimeout(loop, 3500);
 }
-let __partyTab = "mates";
+let __partyTab = "home";
 let __mateGroup = "kusuri";
-function setPartyTab(t){ __partyTab = t; openPartyModal(); }
+function setPartyTab(t){ __partyTab = t; openPartyModal(); try { const mb = document.querySelector("#party-modal .order-card"); if (mb) mb.scrollTop = 0; } catch(e){} }
 function setMateGroup(g){ __mateGroup = g; openPartyModal(); }
 function mateStars_(lv){ return lv >= 3 ? "★★★" : lv >= 2 ? "★★☆" : "★☆☆"; }
 // 上の「パーティ」:主人公・あいぼう・画面に出す なかま(3体)を 横一列の枠で見せる
@@ -7999,9 +8096,14 @@ function advGo(){
     advPop_("♨️", "温泉で ひとやすみ", "みんなの きぶんと げんきが 回復した");
   } else if (t === "❓"){
     const tv = C.trivia[(A.pos + A.ch) % C.trivia.length];
-    goldAdd_(10); A.seen[A.ch + ":" + A.pos] = 1;
-    A.msg = "📜 " + tv + "(+10G)";
-    advPop_("📜", C.name + " まめちしき", tv);
+    A.msg = "📜 " + C.name + "の まめちしき: " + tv;
+    save(); openPartyModal();
+    showQuiz_({ title: "❓ " + C.name + "の 道ばたで クイズ!", nextLabel: "ぼうけんに もどる", done: function(ok){
+      if (ok){ goldAdd_(25); const A2 = adv_(); A2.steps = Math.min(30, A2.steps + 1); A2.msg = "⭕ クイズに 正解! 25G と あしあと+1。 " + tv; }
+      else { goldAdd_(5); adv_().msg = "❌ ざんねん(5G)。 解説は まなびノートに。 " + tv; }
+      save(); openPartyModal();
+    } });
+    return;
   } else if (t === "👑"){ save(); openPartyModal(); advBoss(); return; }
   save(); openPartyModal();
 }
@@ -8059,6 +8161,275 @@ function advSection_(){
   h += '<div class="adv-legend">' + ADV_CHAPTERS.map(function(c, i){ return (A.cleared || []).indexOf(i) >= 0 ? '<span>✓ ' + esc(c.name) + '</span>' : ''; }).join("") + '</div>';
   return h;
 }
+
+/* ============ テレビ(ゲーム画面の入り口)と ゲームの ホーム ============ */
+let __tvTimer = null;
+function openGame_(){ __partyTab = "home"; openPartyModal(); }
+function renderTv_(){
+  const el = document.getElementById("tv-btn");
+  if (!el) return;
+  const st = dotStage();
+  let alert = "";
+  try {
+    const n = gameIssues_().reduce(function(a, x){ return a + (x.n > 0 ? 1 : 0); }, 0);
+    const q = dailyTasks_().filter(function(t){ return t.done && !t.claimed; }).length;
+    const req = lifeKeys_().filter(function(k){ return lifeMate_(k).req; }).length;
+    if (rpg_().enemy) alert = '<span class="tv-alert fight">⚔</span>';
+    else if (q) alert = '<span class="tv-alert">🎁</span>';
+    else if (n || req) alert = '<span class="tv-alert">!</span>';
+  } catch(e){}
+  el.innerHTML = '<svg class="tv-body" viewBox="0 0 72 60" width="64" height="54" aria-hidden="true">'
+    + '<line x1="30" y1="12" x2="20" y2="1" stroke="#3A3A3A" stroke-width="2" stroke-linecap="round"/><line x1="40" y1="12" x2="52" y2="2" stroke="#3A3A3A" stroke-width="2" stroke-linecap="round"/>'
+    + '<circle cx="20" cy="1.6" r="1.8" fill="#C0392B"/><circle cx="52" cy="2.4" r="1.8" fill="#C0392B"/>'
+    + '<rect x="2" y="11" width="68" height="42" rx="7" fill="#8B5A2B" stroke="#4A2E14" stroke-width="2"/>'
+    + '<rect x="6" y="15" width="46" height="34" rx="8" fill="#1B2A22" stroke="#2A1A0A" stroke-width="2"/>'
+    + '<circle cx="61" cy="22" r="4" fill="#E8D7B5" stroke="#4A2E14" stroke-width="1.5"/><line x1="61" y1="22" x2="63" y2="19.5" stroke="#4A2E14" stroke-width="1.4"/>'
+    + '<circle cx="61" cy="34" r="3" fill="#E8D7B5" stroke="#4A2E14" stroke-width="1.5"/>'
+    + '<rect x="57" y="41" width="8" height="1.6" fill="#4A2E14"/><rect x="57" y="44" width="8" height="1.6" fill="#4A2E14"/>'
+    + '<rect x="12" y="53" width="5" height="5" fill="#4A2E14"/><rect x="55" y="53" width="5" height="5" fill="#4A2E14"/></svg>'
+    + '<span class="tv-screen"><span class="tv-hero">' + heroWalkSvg_(st.key, 24, null, rpg_().equip) + '</span><i class="tv-scan"></i></span>' + alert;
+}
+// 在庫の 本当の もんだい(ゲームの てきに なる)
+function gameIssues_(){
+  const items = S.items || [];
+  const cnt = function(m){ return items.filter(function(it){ try { return quickMatch_(it, m); } catch(e){ return false; } }).length; };
+  const lastSt = (S.stockLog || []).filter(function(x){ return x.why === "棚卸し"; })[0];
+  const days = lastSt ? Math.floor((Date.now() - new Date(lastSt.t).getTime()) / 86400000) : null;
+  return [
+    { id:"exp",  enemy:"e_kigengire",  n: cnt("exp"),  label:"使用期限が 3か月以内・切れ", unit:"品", q:"exp" },
+    { id:"zero", enemy:"e_shinagire",  n: cnt("zero"), label:"在庫0の 商品", unit:"品", q:"zero" },
+    { id:"low",  enemy:"e_hokan",      n: cnt("low"),  label:"のこり 1〜2個の 商品", unit:"品", q:"low" },
+    { id:"noexp",enemy:"e_moushinsei", n: cnt("noexp"),label:"使用期限が 未入力", unit:"品", q:"noexp" },
+    { id:"stock",enemy:"e_nushi",      n: (items.length >= 5 && (days == null || days >= 30)) ? 1 : 0, label: days == null ? "棚卸しを まだ していない" : "前回の 棚卸しから " + days + "日", unit:"", q:"" }
+  ];
+}
+function game_(){
+  S.game = S.game || { daily: {}, issueWin: {} };
+  const G = S.game;
+  if (!G.daily || G.daily.day !== today()) G.daily = { day: today(), flags: {}, claimed: {} };
+  return G;
+}
+function dailyTasks_(){
+  const G = game_(), t0 = today();
+  const logs = (S.stockLog || []).filter(function(x){ return (x.t || "").slice(0, 10) === t0 || new Date(x.t).toDateString() === new Date().toDateString(); });
+  const has = function(re){ return logs.some(function(x){ return re.test(x.why || ""); }); };
+  const L = learn_();
+  const tasks = [
+    { id:"reg",  ic:"📦", label:"商品を 1つ 登録する(入庫も可)", done: has(/新規登録|入庫$/) || has(/^入庫$/), go:"scan" },
+    { id:"qty",  ic:"🔢", label:"在庫数を 更新する(＋−・棚卸し)", done: has(/入庫\(\+\)|出庫|棚卸し/), go:"list" },
+    { id:"exp",  ic:"📅", label:"使用期限の 近い商品を 確認する", done: !!G.daily.flags.exp, go:"exp" },
+    { id:"low",  ic:"🛒", label:"在庫が 少ない商品を 確認する", done: !!G.daily.flags.low, go:"low" },
+    { id:"quiz", ic:"📚", label:"まなぶ クイズに 3問 正解する(" + Math.min(3, L.okToday || 0) + "/3)", done: (L.okDay === today() && (L.okToday || 0) >= 3), go:"learn" }
+  ];
+  tasks.forEach(function(t){ t.claimed = !!G.daily.claimed[t.id]; });
+  return tasks;
+}
+// アプリの 画面へ(フィルターつき)
+function gameGoApp_(where){
+  const G = game_();
+  closePartyModal();
+  if (where === "scan"){ showTab("scan"); return; }
+  showTab("list");
+  if (where === "exp" || where === "zero" || where === "low" || where === "noexp"){
+    S.listQuick = where; if (where === "exp") G.daily.flags.exp = true; if (where === "zero" || where === "low") G.daily.flags.low = true;
+    save(); renderList();
+    toast("在庫リストを「" + ({exp:"期限が近い",zero:"在庫0",low:"在庫が少ない",noexp:"期限が未入力"})[where] + "」で しぼりこみました");
+  }
+  renderTv_();
+}
+function claimTask_(id){
+  const G = game_(), t = dailyTasks_().filter(function(x){ return x.id === id; })[0];
+  if (!t || !t.done || t.claimed) return;
+  G.daily.claimed[id] = true;
+  goldAdd_(20); const A = adv_(); A.steps = Math.min(30, A.steps + 2);
+  const all = dailyTasks_().every(function(x){ return x.claimed; });
+  if (all){ goldAdd_(60); const it = randomItem_(); addItem_(it); }
+  save();
+  advPop_(all ? "🏆" : "🎁", all ? "きょうの おしごと コンプリート!" : "おしごと たっせい!", all ? "ごほうび 20G・あしあと+2 に くわえて ボーナス 60G と どうぐ!" : "ごほうび 20G・あしあと +2");
+  openPartyModal();
+}
+// 在庫の もんだいの てきと たたかう(1日1回ずつ ボーナス)
+function fightIssue_(id){
+  const is = gameIssues_().filter(function(x){ return x.id === id; })[0];
+  if (!is || !is.n) return;
+  __advNext = { issue: id, place: is.label, mult: 1 + Math.min(1.5, is.n * 0.08) }; __advReturn = true; __advHome = true;
+  startBattle(false, is.enemy);
+}
+let __advHome = false;
+function gameHome_(){
+  const L = life_(), A = adv_(), li = lvInfo_(), st = dotStage(), G = game_();
+  const issues = gameIssues_(), tasks = dailyTasks_();
+  let h = partyPanel_();
+  h += '<div class="gh-card"><div class="gh-title">📋 きょうの おしごと <small>アプリを 使うと ゲームも すすむ</small></div><ul class="gh-tasks">'
+    + tasks.map(function(t){
+        return '<li class="' + (t.done ? 'done' : '') + '"><span class="ic">' + (t.done ? "✅" : t.ic) + '</span><span class="lb">' + esc(t.label) + '</span>'
+          + (t.claimed ? '<span class="got">うけとり済</span>' : (t.done ? '<button class="gh-claim" onclick="claimTask_(\'' + t.id + '\')">ごほうび</button>'
+             : '<button class="gh-go" onclick="' + (t.go === "learn" ? "setPartyTab('learn')" : "gameGoApp_('" + t.go + "')") + '">やる</button>'))
+          + '</li>';
+      }).join("") + '</ul></div>';
+  const live = issues.filter(function(x){ return x.n > 0; });
+  h += '<div class="gh-card warn"><div class="gh-title">⚠ 在庫の もんだいが てきに なって いる <small>ほんとうの 在庫から</small></div>'
+    + (live.length ? '<ul class="gh-issues">' + live.map(function(x){
+        const en = enemyOf_(x.enemy), won = (G.issueWin || {})[x.id] === today();
+        return '<li>' + dotSvg(x.enemy, 34) + '<span class="lb"><b>' + esc(en ? en.name : "") + (x.unit ? ' ×' + x.n : '') + '</b><small>' + esc(x.label) + (x.unit ? ' ' + x.n + x.unit : '') + '</small></span>'
+          + (x.q ? '<button class="gh-go" onclick="gameGoApp_(\'' + x.q + '\')">確認</button>' : '<button class="gh-go" onclick="gameGoApp_(\'list\')">棚卸し</button>')
+          + (won ? '<span class="got">たいじ済</span>' : '<button class="gh-fight" onclick="fightIssue_(\'' + x.id + '\')">たいじ</button>') + '</li>';
+      }).join("") + '</ul><p class="gh-help">ゲームで たおしても 在庫は かわりません。「確認」で ほんとうの 在庫も 見なおしましょう。</p>'
+      : '<p class="gh-help">いまは 在庫の もんだいは ありません。すばらしい!</p>') + '</div>';
+  const menu = [
+    ["adv", "🗺", "ぼうけん", "あしあと " + A.steps], ["battle", "⚔", "たたかい", rpg_().enemy ? "てきが いる!" : ""], ["learn", "📚", "まなぶ", "クイズ・ノート"],
+    ["life", "🏠", "くらし", lifeKeys_().filter(function(k){ return lifeMate_(k).req; }).length ? "おねがい あり" : ""], ["mates", "👥", "なかま", allMates_().length + "人"], ["buddy", "🐾", "あいぼう", petsOwned_().length + "ひき"],
+    ["equip", "🛡", "そうび", ""], ["status", "📊", "つよさ", "Lv " + li.lv], ["other", "⚙", "せってい", ""]
+  ];
+  h += '<div class="gh-menu">' + menu.map(function(m){
+    return '<button class="gh-tile" onclick="setPartyTab(\'' + m[0] + '\')"><span class="ic">' + m[1] + '</span><b>' + m[2] + '</b>' + (m[3] ? '<small>' + esc(m[3]) + '</small>' : '') + '</button>';
+  }).join("") + '</div>';
+  return h;
+}
+const GAME_TITLES = { adv:"🗺 ぼうけん", battle:"⚔ たたかい", learn:"📚 まなぶ", life:"🏠 くらし", mates:"👥 なかま", buddy:"🐾 あいぼう", equip:"🛡 そうび", status:"📊 つよさ", other:"⚙ せってい" };
+
+/* ============ まなぶ(OTC医薬品・病気・法律の クイズ) ============ */
+const QUIZ = [
+  // 区分と 販売の ルール
+  { id:"k1", c:"kubun", q:"要指導医薬品を 販売できるのは だれ?", a:["薬剤師","登録販売者","だれでも よい"], ok:0, ex:"要指導医薬品は 薬剤師が 対面で 情報提供を したうえで 販売します。" },
+  { id:"k2", c:"kubun", q:"第1類医薬品を 販売するとき、薬剤師に 義務づけられているのは?", a:["書面を 用いた 情報提供","情報提供は 不要","購入者の 住所の 記録"], ok:0, ex:"第1類医薬品は 薬剤師が 書面を 用いて 情報提供することが 義務です。" },
+  { id:"k3", c:"kubun", q:"第2類医薬品を 販売できるのは?", a:["薬剤師 または 登録販売者","薬剤師のみ","医師のみ"], ok:0, ex:"第2類・第3類医薬品は 薬剤師 または 登録販売者が 販売できます。" },
+  { id:"k4", c:"kubun", q:"第3類医薬品の 情報提供について 正しいのは?", a:["法律上の 義務規定は ない","書面での 説明が 義務","薬剤師しか 説明できない"], ok:0, ex:"第3類医薬品の 情報提供には 法律上の 義務規定は ありません(もちろん 求めがあれば 説明します)。" },
+  { id:"k5", c:"kubun", q:"指定第2類医薬品は どこに 陳列する?", a:["情報提供を 行う 設備から 7m以内","店の どこでも よい","レジの 中だけ"], ok:0, ex:"指定第2類医薬品は 原則として 情報提供設備から 7メートル以内の 範囲に 陳列します。" },
+  { id:"k6", c:"kubun", q:"第1類医薬品の 陳列方法として 正しいのは?", a:["購入者が 直接 手に取れないように","ほかの区分と まぜて よい","入口の ワゴンに 置く"], ok:0, ex:"第1類医薬品は 購入者が 直接 手に取れない 陳列設備などに 陳列します。" },
+  { id:"k7", c:"kubun", q:"一般用医薬品の 陳列で 正しいのは?", a:["リスク区分ごとに 分けて 陳列する","価格順に ならべる","区分は まぜて よい"], ok:0, ex:"一般用医薬品は 第1類・指定第2類・第2類・第3類の 区分ごとに 分けて 陳列します。" },
+  { id:"k8", c:"kubun", q:"指定第2類医薬品の パッケージの 表示は?", a:["「2」の 数字を 丸や 四角で 囲む","赤い 星マーク","なにも 表示しない"], ok:0, ex:"「第②類医薬品」のように 2の数字を 枠で 囲んで 表示します。" },
+  { id:"k9", c:"kubun", q:"濫用の おそれのある 医薬品を 若い人が 買うとき 確認するのは?", a:["氏名と 年齢","住所だけ","確認は 不要"], ok:0, ex:"若年者には 氏名・年齢を 確認し、適正な 使用の ための 情報提供を 行います(薬機法改正で ルールが 変わる 予定です。最新の 通知を 確認しましょう)。" },
+  { id:"k10", c:"kubun", q:"濫用の おそれのある 医薬品の 販売数量は 原則?", a:["1人 1包装","制限なし","1人 10包装まで"], ok:0, ex:"原則として 1人1包装に 限り、それ以上 求められたら 理由を 確認します(薬機法改正で ルールが 変わる 予定です。最新の 通知を 確認しましょう)。" },
+  // 成分と 注意
+  { id:"s1", c:"seibun", q:"抗ヒスタミン成分(鼻炎薬・かぜ薬など)を のんだあと 注意することは?", a:["車の 運転を しない(眠気)","運動を する","とくに なし"], ok:0, ex:"抗ヒスタミン成分は 眠気を おこすことが あり、乗り物の 運転は 避けます。" },
+  { id:"s2", c:"seibun", q:"アスピリン(アセチルサリチル酸)の 解熱鎮痛薬は 何歳未満に 使えない?", a:["15歳未満","3歳未満","65歳以上"], ok:0, ex:"一般用医薬品の アスピリン製剤は 15歳未満には 使用しません。" },
+  { id:"s3", c:"seibun", q:"子どもの 解熱に 比較的 使いやすい とされる 成分は?", a:["アセトアミノフェン","アスピリン","ロキソプロフェン"], ok:0, ex:"アセトアミノフェンは 小児用の 解熱鎮痛薬にも 使われる 成分です。" },
+  { id:"s4", c:"seibun", q:"ロキソプロフェンを 含む 内服の 鎮痛薬(例:ロキソニンS)の 区分は?", a:["第1類医薬品","第3類医薬品","医薬部外品"], ok:0, ex:"ロキソプロフェンナトリウムの 内服薬は 第1類医薬品です(薬剤師が 販売)。" },
+  { id:"s5", c:"seibun", q:"ファモチジン(H2ブロッカー)の 胃腸薬(例:ガスター10)の 区分は?", a:["第1類医薬品","第3類医薬品","医薬部外品"], ok:0, ex:"ファモチジンを 含む 胃腸薬は 第1類医薬品です。" },
+  { id:"s6", c:"seibun", q:"ケトプロフェン配合の 貼り薬で 気をつけることは?", a:["はった 部分を 日光に 当てない","お風呂に 入らない","冷蔵庫で 保管する"], ok:0, ex:"ケトプロフェンは 光線過敏症を おこすことが あり、使用中・使用後しばらく 日光を 避けます。" },
+  { id:"s7", c:"seibun", q:"コデイン類を 含む せき止めを 使えないのは 何歳未満?", a:["12歳未満","20歳未満","3歳未満"], ok:0, ex:"コデイン類を 含む 医薬品は 12歳未満には 使用しません。" },
+  { id:"s8", c:"seibun", q:"点眼薬の 使い方で 正しいのは?", a:["容器の 先を まつげや まぶたに つけない","家族と 共用する","開けたら 何年でも 使える"], ok:0, ex:"容器の 先が 触れると 汚染の 原因に。共用も 避けます。" },
+  { id:"s9", c:"seibun", q:"乗り物酔いの 薬は いつ のむと 効果的?", a:["乗る 30分くらい 前","降りた あと","寝る 前だけ"], ok:0, ex:"酔い止めは 乗り物に 乗る 30分前ごろに のむのが 一般的です。" },
+  { id:"s10", c:"seibun", q:"下痢止め(ロペラミドなど)を 自己判断で 使わないほうが よいのは?", a:["発熱や 血便を 伴う 下痢","食べすぎの 下痢","緊張による 下痢"], ok:0, ex:"感染症が 疑われる 下痢では、止めると 悪化する ことがあります。受診を すすめます。" },
+  { id:"s11", c:"seibun", q:"総合かぜ薬の はたらきは?", a:["症状を やわらげる","ウイルスを 退治する","かぜを 予防する"], ok:0, ex:"かぜ薬は 熱・せき・鼻水などの 症状を やわらげる 対症療法の 薬です。" },
+  { id:"s12", c:"seibun", q:"鎮痛薬を 飲みすぎて おこる 頭痛を 何という?", a:["薬剤の 使用過多による 頭痛","片頭痛","群発頭痛"], ok:0, ex:"頭痛薬を ひんぱんに 使うと かえって 頭痛が 続くことが。月に何日も 使うなら 受診を すすめます。" },
+  { id:"s13", c:"seibun", q:"妊娠中の 人が 市販薬を 使いたいとき 正しいのは?", a:["使う前に 医師・薬剤師に 相談","自己判断で 使う","量を 半分に すれば 何でも よい"], ok:0, ex:"妊娠中は 使えない 成分も あるため、必ず 相談してから 使います。" },
+  // 病気と セルフケア
+  { id:"b1", c:"byoki", q:"かぜの 原因で いちばん 多いのは?", a:["ウイルス","細菌","カビ"], ok:0, ex:"かぜの 多くは ウイルスが 原因で、抗菌薬(抗生物質)は ウイルスには 効きません。" },
+  { id:"b2", c:"byoki", q:"熱中症が 疑われるときの 水分補給に 適したものは?", a:["経口補水液など 塩分を 含む 飲み物","アルコール","コーヒーだけ"], ok:0, ex:"汗で 失われた 水分と 塩分を いっしょに 補給します。" },
+  { id:"b3", c:"byoki", q:"水虫の 原因は?", a:["白癬菌(カビの なかま)","ウイルス","花粉"], ok:0, ex:"水虫は 白癬菌という 真菌(カビ)の 感染症です。" },
+  { id:"b4", c:"byoki", q:"水虫の 薬は 症状が 消えたら?", a:["しばらく(1か月ほど) ぬり続ける","すぐ やめる","2倍 ぬる"], ok:0, ex:"皮膚の 奥に 菌が 残っているため、症状が 消えても しばらく 続けます。" },
+  { id:"b5", c:"byoki", q:"花粉症の 薬を 効果的に 使うコツは?", a:["花粉が 飛び始める ころから 使う","症状が ひどくなるまで 待つ","1日だけ 使う"], ok:0, ex:"早めに 使い始めると 症状を 軽くできる ことが あります(初期療法)。" },
+  { id:"b6", c:"byoki", q:"やけどの 応急手当で 正しいのは?", a:["すぐに 流水で 冷やす","バターを ぬる","水ぶくれを つぶす"], ok:0, ex:"まずは 流水で 十分に 冷やします。水ぶくれは つぶしません。" },
+  { id:"b7", c:"byoki", q:"口内炎が 2週間 以上 治らないときは?", a:["医療機関を 受診する","そのまま 様子を みる","塩を ぬる"], ok:0, ex:"長引く 口内炎は ほかの 病気の 可能性も あり、受診を すすめます。" },
+  { id:"b8", c:"byoki", q:"急な 高熱・関節痛・強い だるさ。インフルエンザかも? の ときは?", a:["早めに 医療機関に 相談","市販薬で 様子を 見続ける","運動して 汗を かく"], ok:0, ex:"インフルエンザが 疑われる ときは 早めの 受診が 大切です。" },
+  { id:"b9", c:"byoki", q:"高齢の 人が 薬を 使うときの 注意は?", a:["副作用が 出やすいことが ある","量を 多めにする","とくに ない"], ok:0, ex:"高齢者は 薬の 代謝が おそくなり、副作用が 出やすいことが あります。" },
+  { id:"b10", c:"byoki", q:"胸やけの 原因として 多いのは?", a:["胃酸の 逆流","花粉","便秘"], ok:0, ex:"胃酸が 食道に 逆流すると 胸やけが おこります。" },
+  // 法律と 制度
+  { id:"h1", c:"hou", q:"医薬品の 品質・有効性・安全性を 確保する 法律は?", a:["医薬品医療機器等法(薬機法)","食品衛生法","道路交通法"], ok:0, ex:"「医薬品、医療機器等の品質、有効性及び安全性の確保等に関する法律」(薬機法)です。" },
+  { id:"h2", c:"hou", q:"セルフメディケーション税制で 控除の 対象に なるのは、年間 いくらを 超えた 分?", a:["12,000円","5,000円","100,000円"], ok:0, ex:"対象の 医薬品の 購入額が 年間 12,000円を 超えた 分が 控除の 対象です。" },
+  { id:"h3", c:"hou", q:"セルフメディケーション税制の 控除額の 上限は?", a:["88,000円","12,000円","200,000円"], ok:0, ex:"控除額の 上限は 88,000円です。" },
+  { id:"h4", c:"hou", q:"医薬品を 正しく 使ったのに 重い 副作用が 出たときの 公的な 制度は?", a:["医薬品副作用被害救済制度","自動車保険","とくに ない"], ok:0, ex:"医薬品副作用被害救済制度(PMDA)は 市販薬にも 適用されます。" },
+  { id:"h5", c:"hou", q:"登録販売者が 販売できるのは?", a:["第2類・第3類医薬品","要指導医薬品","第1類医薬品"], ok:0, ex:"要指導医薬品と 第1類医薬品は 薬剤師が 販売します。" },
+  { id:"h6", c:"hou", q:"市販薬の 添付文書は どうする?", a:["必要なときに 読めるよう 保管する","開けたら すぐ 捨てる","読まなくて よい"], ok:0, ex:"添付文書には「必要なときに読めるよう大切に保管」と 書かれています。" },
+  { id:"h7", c:"hou", q:"お薬手帳に 市販薬を 書いても よい?", a:["書ける(のみ合わせの 確認に 役立つ)","処方薬しか 書けない","書くと 違反"], ok:0, ex:"市販薬や サプリも 記録すると、のみ合わせの 確認に 役立ちます。" },
+  { id:"h8", c:"hou", q:"箱に 書かれた「使用期限」の 意味は?", a:["未開封で 正しく 保管した ときの 期限","開封してからの 期限","製造した 日"], ok:0, ex:"表示の 使用期限は 未開封の 状態での 期限です。開封後は 早めに 使います。" }
+];
+const QUIZ_CAT = { kubun:"区分と 販売ルール", seibun:"成分と 注意", byoki:"病気と セルフケア", hou:"法律と 制度", mine:"うちの お店の 商品" };
+function learn_(){ S.learn = S.learn || { rec: {}, okDay: "", okToday: 0, total: 0, ok: 0 }; return S.learn; }
+// 自分の 店の 商品から 作る 問題(区分あて)
+function mineQuiz_(){
+  const KUBUN = ["要指導医薬品","第1類医薬品","指定第2類医薬品","第2類医薬品","第3類医薬品"];
+  const its = (S.items || []).filter(function(it){ return KUBUN.indexOf(it.category) >= 0 && it.name; });
+  if (!its.length) return null;
+  const it = its[Math.floor(Math.random() * its.length)];
+  const others = KUBUN.filter(function(k){ return k !== it.category; }).sort(function(){ return Math.random() - 0.5; }).slice(0, 2);
+  const seller = /要指導|第1類/.test(it.category) ? "薬剤師が 販売します。" : "薬剤師 または 登録販売者が 販売できます。";
+  return { id:"m_" + it.id, c:"mine", q:"うちの お店の「" + it.name + "」の 区分は?", a:[it.category].concat(others), ok:0, ex:"「" + it.name + "」は " + it.category + "(登録データより)。" + seller };
+}
+function pickQuiz_(cat){
+  if (cat === "mine" || (!cat && Math.random() < 0.2)){ const m = mineQuiz_(); if (m) return m; }
+  const L = learn_();
+  let pool = QUIZ.filter(function(q){ return !cat || cat === "mine" || q.c === cat; });
+  // まだ まちがえている 問題を 出やすく
+  pool = pool.slice().sort(function(a, b){
+    const ra = L.rec[a.id] || {}, rb = L.rec[b.id] || {};
+    return ((rb.ng || 0) - (rb.ok || 0) + Math.random() * 2) - ((ra.ng || 0) - (ra.ok || 0) + Math.random() * 2);
+  });
+  return pool[0];
+}
+// クイズの 小窓(どこからでも 使える)
+function showQuiz_(opt){
+  opt = opt || {};
+  const q = opt.q || pickQuiz_(opt.cat);
+  if (!q){ if (opt.done) opt.done(false); return; }
+  const order = q.a.map(function(_, i){ return i; }).sort(function(){ return Math.random() - 0.5; });
+  const d = document.createElement("div");
+  d.className = "quiz-ov";
+  d.innerHTML = '<div class="quiz-box"><div class="quiz-head">' + esc(opt.title || "📚 クイズ") + '<span>' + esc(QUIZ_CAT[q.c] || "") + '</span></div>'
+    + '<p class="quiz-q">' + esc(q.q) + '</p><div class="quiz-a">'
+    + order.map(function(i){ return '<button data-i="' + i + '">' + esc(q.a[i]) + '</button>'; }).join("") + '</div><div class="quiz-res"></div></div>';
+  document.body.appendChild(d);
+  d.querySelectorAll(".quiz-a button").forEach(function(btn){
+    btn.addEventListener("click", function(){
+      if (d.__done) return; d.__done = true;
+      const i = +btn.getAttribute("data-i"), ok = i === q.ok;
+      d.querySelectorAll(".quiz-a button").forEach(function(b2){ const j = +b2.getAttribute("data-i"); if (j === q.ok) b2.classList.add("right"); else if (b2 === btn) b2.classList.add("wrong"); b2.disabled = true; });
+      const L = learn_();
+      L.rec[q.id] = L.rec[q.id] || { ok: 0, ng: 0, c: q.c, q: q.q, ex: q.ex };
+      L.rec[q.id][ok ? "ok" : "ng"]++; L.rec[q.id].q = q.q; L.rec[q.id].ex = q.ex; L.rec[q.id].c = q.c;
+      L.total++; if (ok) L.ok++;
+      if (ok){ if (L.okDay !== today()){ L.okDay = today(); L.okToday = 0; } L.okToday++; }
+      save();
+      d.querySelector(".quiz-res").innerHTML = '<div class="quiz-mark ' + (ok ? "ok" : "ng") + '">' + (ok ? "⭕ せいかい!" : "❌ ざんねん") + '</div>'
+        + '<p class="quiz-ex">' + esc(q.ex) + '</p><button class="btn quiz-next">' + esc(opt.nextLabel || "つぎへ") + '</button>';
+      if (navigator.vibrate) navigator.vibrate(ok ? [20, 30, 40] : 60);
+      d.querySelector(".quiz-next").addEventListener("click", function(){ d.parentNode && d.parentNode.removeChild(d); if (opt.done) opt.done(ok, q); });
+    });
+  });
+}
+// まなぶ の 画面
+let __quizRun = null;
+function startQuizRun_(cat){
+  __quizRun = { cat: cat, n: 0, ok: 0, max: 5 };
+  quizRunNext_();
+}
+function quizRunNext_(){
+  const R = __quizRun; if (!R) return;
+  if (R.n >= R.max){
+    const g = R.ok * 8; goldAdd_(g); addExp_(R.ok * 4, "クイズ");
+    save();
+    advPop_(R.ok >= 4 ? "🏅" : "📖", R.max + "問中 " + R.ok + "問 せいかい!", "ごほうび " + g + "G。まちがえた 問題は まなびノートで 見なおせます", R.ok >= 4 ? "up" : "happy");
+    __quizRun = null; openPartyModal(); return;
+  }
+  R.n++;
+  showQuiz_({ cat: R.cat, title: "📚 " + (QUIZ_CAT[R.cat] || "いろいろ") + " " + R.n + "/" + R.max, nextLabel: R.n >= R.max ? "けっかを 見る" : "つぎへ",
+    done: function(ok){ if (ok) R.ok++; quizRunNext_(); } });
+}
+function learnSection_(){
+  const L = learn_();
+  const cats = ["kubun", "seibun", "byoki", "hou"];
+  let h = '<p class="gm-help">OTC医薬品・病気・法律の 知識を クイズで まなべます。正解すると ゴールドと けいけんち。たたかいの「ちしき」コマンドや、ぼうけんの ❓ マスでも 出題されます。</p>';
+  h += '<div class="lr-cats">' + cats.concat(["mine"]).map(function(c){
+    const qs = QUIZ.filter(function(q){ return q.c === c; });
+    const learned = c === "mine" ? Object.keys(L.rec).filter(function(k){ return k.indexOf("m_") === 0 && L.rec[k].ok; }).length : qs.filter(function(q){ return (L.rec[q.id] || {}).ok; }).length;
+    const total = c === "mine" ? (S.items || []).length : qs.length;
+    const pct = total ? Math.round(learned / total * 100) : 0;
+    return '<button class="lr-cat" onclick="startQuizRun_(\'' + c + '\')"><b>' + esc(QUIZ_CAT[c]) + '</b><span class="lr-bar"><i style="width:' + pct + '%"></i></span><small>' + (c === "mine" ? "登録商品から 出題" : "おぼえた " + learned + "/" + total) + '</small></button>';
+  }).join("") + '<button class="lr-cat all" onclick="startQuizRun_(\'\')"><b>🎲 ぜんぶから 5問</b><small>正解率 ' + (L.total ? Math.round(L.ok / L.total * 100) : 0) + '%(' + L.total + '問)</small></button></div>';
+  // まなびノート
+  const recs = Object.keys(L.rec).map(function(k){ return Object.assign({ id: k }, L.rec[k]); }).filter(function(r){ return r.q; });
+  h += '<div class="divider"><span>まなびノート(' + recs.length + ')</span></div>';
+  if (!recs.length) h += '<p class="gm-help">まだ ありません。クイズに こたえると ここに 解説が たまっていきます。</p>';
+  else h += '<div class="lr-note">' + cats.concat(["mine"]).map(function(c){
+    const rs = recs.filter(function(r){ return r.c === c; });
+    if (!rs.length) return "";
+    return '<details' + (rs.some(function(r){ return r.ng > r.ok; }) ? ' open' : '') + '><summary>' + esc(QUIZ_CAT[c]) + '(' + rs.length + ')</summary><ul>'
+      + rs.map(function(r){ return '<li class="' + (r.ok > 0 && r.ok >= r.ng ? 'ok' : 'ng') + '"><b>' + (r.ok > 0 && r.ok >= r.ng ? "⭕" : "🔁") + ' ' + esc(r.q) + '</b><span>' + esc(r.ex) + '</span></li>'; }).join("") + '</ul></details>';
+  }).join("") + '</div>';
+  return h;
+}
 function openPartyModal(){
   try { checkPets_(); } catch(e){}
   petGroup_();
@@ -8074,11 +8445,17 @@ function openPartyModal(){
     { id:"status", ic:"📊", label:"つよさ",     n: null },
     { id:"other",  ic:"⚙", label:"その他",     n: null }
   ];
-  const head = '<div class="gm-tabs">' + tabs.map(function(t){
-    return '<button class="gm-tab' + (__partyTab === t.id ? ' on' : '') + '" onclick="setPartyTab(\'' + t.id + '\')">'
-      + '<span class="ic">' + t.ic + '</span><span class="lb">' + esc(t.label) + '</span>'
-      + (t.n ? '<span class="bd">' + t.n + '</span>' : '') + '</button>';
-  }).join("") + '</div>';
+  // テレビの 上の ステータス
+  try { const ts = document.getElementById("tv-stat"); if (ts) ts.innerHTML = '💰 ' + (life_().gold || 0) + 'G　👣 ' + adv_().steps + '　Lv ' + lvInfo_().lv; } catch(e){}
+  if (__partyTab === "home" || !GAME_TITLES[__partyTab]){
+    __partyTab = "home";
+    box.innerHTML = gameHome_();
+    document.getElementById("party-modal").style.display = "flex";
+    renderTv_();
+    return;
+  }
+  const head = '<div class="gm-back"><button onclick="setPartyTab(\'home\')">◀ メニュー</button><b>' + GAME_TITLES[__partyTab] + '</b>'
+    + (__partyTab === "mates" ? '<button class="sub" onclick="setPartyTab(\'buddy\')">🐾 あいぼう</button>' : (__partyTab === "buddy" ? '<button class="sub" onclick="setPartyTab(\'mates\')">👥 なかま</button>' : '')) + '</div>';
 
   let body = "";
   if (__partyTab === "mates") body = matesSection_();
@@ -8088,12 +8465,14 @@ function openPartyModal(){
   else if (__partyTab === "equip") body = equipSection_();
   else if (__partyTab === "battle") body = battleSection_();
   else if (__partyTab === "status") body = statusSection_();
+  else if (__partyTab === "learn") body = learnSection_();
   else body = otherSection_();
 
-  box.innerHTML = partyPanel_() + head + '<div class="pt-body">' + body + '</div>';
+  box.innerHTML = head + '<div class="pt-body">' + body + '</div>';
+  renderTv_();
   document.getElementById("party-modal").style.display = "flex";
 }
-function closePartyModal(){ document.getElementById("party-modal").style.display = "none"; }
+function closePartyModal(){ document.getElementById("party-modal").style.display = "none"; renderTv_(); }
 
 /* ============ 画像処理(縮小) ============ */
 // ファイル→縮小したdataURL
