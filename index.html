@@ -384,6 +384,28 @@ button.mate-chip { cursor: pointer; font-family: var(--sans); }
 .join-ask .btn { margin-top: 6px; }
 .legend-in { animation: enemyEnter .8s cubic-bezier(.3,1.6,.5,1); }
 .strong-box { border-color: #E07A1F; }
+/* ぼうけんの地図 */
+.adv-chips { display: flex; gap: 5px; overflow-x: auto; padding-bottom: 6px; margin-bottom: 6px; }
+.adv-chip { flex: 0 0 auto; border: 1px solid var(--line); background: #fff; border-radius: 999px; padding: 6px 11px; font-size: 12px; cursor: pointer; white-space: nowrap; }
+.adv-chip.on { background: #1F2D3A; color: #fff; border-color: #1F2D3A; } .adv-chip.lock { color: #B8C2CC; }
+.adv-map { background: var(--mc); border: 3px solid var(--mi); border-radius: 14px; padding: 12px 10px; position: relative; overflow: hidden; }
+.adv-map::before { content: ""; position: absolute; inset: 0; opacity: .18; background: radial-gradient(circle at 20% 30%, var(--mi) 0 2px, transparent 3px) 0 0/26px 26px; }
+.adv-title { position: relative; display: flex; align-items: baseline; gap: 8px; color: var(--mi); margin-bottom: 10px; }
+.adv-title b { font-size: 18px; letter-spacing: .08em; } .adv-title span { font-size: 12px; }
+.adv-path { position: relative; display: flex; flex-wrap: wrap; align-items: center; gap: 0; row-gap: 34px; padding: 30px 2px 4px; }
+.adv-node { position: relative; width: 38px; height: 38px; border-radius: 50%; background: #fff; border: 2px solid var(--mi); display: flex; align-items: center; justify-content: center; flex: 0 0 auto; }
+.adv-node.past { opacity: .45; } .adv-node.here { box-shadow: 0 0 0 4px #FFD54A; }
+.adv-node.boss { width: 46px; height: 46px; background: #FFF3D6; border-color: #B3261E; }
+.adv-t { font-size: 18px; line-height: 1; }
+.adv-hero { position: absolute; bottom: 26px; left: 50%; transform: translateX(-50%); animation: lfIdle 1.2s ease-in-out infinite; z-index: 1; }
+.adv-line { flex: 0 0 auto; width: 10px; height: 3px; background: var(--mi); opacity: .5; }
+.adv-msg { position: relative; margin-top: 12px; background: rgba(255,255,255,.85); border-radius: 10px; padding: 8px 10px; font-size: 12.5px; line-height: 1.6; color: #1F2D3A; }
+.adv-ctl { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: 10px 0 6px; }
+.adv-steps { font-size: 14px; } .adv-steps b { font-size: 18px; }
+.adv-go { min-width: 150px; font-size: 16px; } .adv-go.boss { border-color: #B3261E; color: #B3261E; }
+.adv-clear { font-weight: 700; color: #C98A00; }
+.adv-ic { font-size: 64px; line-height: 1.2; }
+.adv-legend { display: flex; flex-wrap: wrap; gap: 6px; font-size: 11.5px; color: #2E7D5B; }
 /* なかまの くらし */
 .lf-top { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-bottom: 8px; }
 .lf-gold { font-weight: 700; font-size: 14px; margin-right: auto; background: #FFF6D6; border: 1px solid #F0D27A; border-radius: 999px; padding: 4px 12px; }
@@ -520,7 +542,7 @@ button.mate-chip { cursor: pointer; font-family: var(--sans); }
 .pt-body { margin-top: 6px; }
 .stage-more { align-self: center; font-size: 11px; color: #5C6B78; }
 /* ===== なかま画面(ゲーム風) ===== */
-.gm-tabs { display: grid; grid-template-columns: repeat(7, minmax(0,1fr)); gap: 4px; margin-bottom: 10px; }
+.gm-tabs { display: grid; grid-template-columns: repeat(8, minmax(0,1fr)); gap: 4px; margin-bottom: 10px; }
 .gm-tab { position: relative; display: flex; flex-direction: column; align-items: center; gap: 1px; padding: 7px 2px 6px; border: 1px solid var(--line); background: #fff; color: #5C6B78; border-radius: 10px; font-size: 11px; font-family: var(--sans); cursor: pointer; min-width: 0; }
 .gm-tab .ic { font-size: 18px; line-height: 1.1; }
 .gm-tab .lb { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
@@ -1945,7 +1967,7 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
   </section>
 
   <div class="toast" id="toast"></div>
-  <footer class="foot">OTCLinker — とみながグループ 店舗向けツール<br><span class="ver">版 2026-10-14 CU(なかまの くらし)</span></footer>
+  <footer class="foot">OTCLinker — とみながグループ 店舗向けツール<br><span class="ver">版 2026-10-14 CV(ぼうけんの地図)</span></footer>
 </div>
 
 <script>
@@ -5460,7 +5482,7 @@ function lvInfo_(){
 }
 // けいけんちを あたえる
 function addExp_(n, why){
-  try { goldAdd_(Math.max(1, Math.round(n / 3))); } catch(e){}
+  try { goldAdd_(Math.max(1, Math.round(n / 3))); if (!/バトル|ボス|勝|たお|たたかった|いどんだ|キンピカ/.test(why || "")) advStepGain_(n); } catch(e){}
   const L = lv_();
   const before = lvOf_(L.exp);
   L.exp += n;
@@ -6026,7 +6048,13 @@ function startBattle(practice, forceKey){
     edef: practice ? Math.round((en.def || 0) * 0.6) : (en.def || 0),
     log: [], turn: 0, done: false
   };
+  if (__advNext){
+    const m = __advNext.mult || 1, b0 = __battle;
+    b0.ehp = b0.emax = Math.round(b0.ehp * m); b0.eatk = Math.round(b0.eatk * (0.6 + m * 0.4)); b0.edef = Math.round(b0.edef * (0.6 + m * 0.4));
+    b0.adv = __advNext; __advNext = null;
+  }
   battleInit_(__battle);
+  if (__battle.adv && __battle.adv.place) __battle.log.push("【" + __battle.adv.place + "】");
   if (ENEMY_LOOK[en.key]) __battle.log.push("しらべた: " + ENEMY_LOOK[en.key]);
   showBattleBox_();
   renderBattle_();
@@ -6060,6 +6088,7 @@ function closeBattle(){
   if (bm) bm.style.display = "none";
   __battle = null;
   renderDotPet();
+  if (__advReturn){ __advReturn = false; __partyTab = "adv"; openPartyModal(); return; }
   if (document.getElementById("party-modal").style.display === "flex") openPartyModal();
 }
 function battleTurn_(){
@@ -6229,6 +6258,7 @@ function battleWin_(){
     else got = got + "|dup";
   }
   if (!b.practice && !b.forced) r.enemy = null;
+  if (b.adv){ try { advBattleWon_(b); } catch(e){} }
   if (b.forced && r.enemy === b.en.key) r.enemy = null;
   // 強敵・きんぴかは なかまに なりたがることがある
   let joinKey = null;
@@ -7791,6 +7821,161 @@ function lifeShop_(){
   if (tab === "wear") h += Object.keys(WEARS).map(function(d){ const own = L.wears.indexOf(d) >= 0; return '<div class="lf-item"><span class="ic">' + dotSvg(lifeKeys_()[0] || "tablet", 34, 1, d) + '</span><b>' + esc(DECOS[d]) + '</b><small>' + (own ? "もっている" : "みんなで つかえる") + '</small><button class="btn"' + (own ? ' disabled' : '') + ' onclick="lifeBuy(\'wear\',\'' + d + '\')">' + (own ? "かった" : WEARS[d] + "G") + '</button></div>'; }).join("");
   return h + '</div>';
 }
+
+/* ============ ぼうけんの地図(熊本めぐり) ============
+   あしあと(業務で たまる)を 1つ使って 1マス すすむ。マスには たたかい・たからばこ・名物・できごと・温泉・ボス。
+   章の ボスを たおすと つぎの 地方へ。手に入れた 名物は「くらし」の ごはんに なる。 */
+let __advNext = null, __advReturn = false;
+const ADV_CHAPTERS = [
+  { name:"熊本市", sub:"城下町を ゆく", col:"#F3E3C3", ink:"#6B4A1F", path:"S⚔🎁❓🍙⚔♨⚔B",
+    foes:["e_hokori","e_chirakari","e_shinagire"], boss:{ key:"e_nushi", mult:1.6 }, foods:["f_dango","f_taipien","f_ramen"],
+    trivia:["熊本城は 加藤清正が きずいた お城。 石垣の「武者返し」が 有名だ。","水前寺成趣園には 東海道五十三次を 思わせる 庭が ある。","「いきなりだんご」は さつまいもと あんこを 生地で つつんだ おやつ。"],
+    story:["熊本の あちこちで ザイコの みだれが おきている……。白衣のゆうしゃは 城下町から 旅に でた。", "ザイコヌーシを しずめた! 北の 菊池・山鹿へ むかおう。"] },
+  { name:"菊池・山鹿", sub:"渓谷と 灯籠の 里", col:"#DDEFE0", ink:"#2E5A3A", path:"S⚔❓🍙⚔🎁⚔♨⚔B",
+    foes:["e_hokan","e_kigengire","e_chirakari"], boss:{ key:"e_kigengire", mult:3.2 }, foods:["f_kuri","f_mizu"],
+    trivia:["菊池渓谷は 水が きれいで、夏でも すずしい 名所。","山鹿灯籠まつりでは、頭に 金灯籠を のせた 女性たちが おどる。","山鹿温泉は 江戸時代から 多くの 旅人を いやしてきた。"],
+    story:["菊池の 渓谷に しめきりの 赤まるが 舞っている……!", "シメキリカレンダーを しずめた! 東の 阿蘇へ。"] },
+  { name:"阿蘇", sub:"火の山と 大草原", col:"#E8F2D0", ink:"#4A5A1A", path:"S⚔🎁⚔❓♨🍙⚔⚔🎁B",
+    foes:["e_moushinsei","e_nushi","e_hokan"], boss:{ key:"e_kazan", mult:1.3 }, foods:["f_akaushi","f_milk"],
+    trivia:["阿蘇には 世界でも 有数の 大きさの カルデラが ある。","草千里ヶ浜では 馬が のんびり 草を はんでいる。","黒川温泉は 阿蘇の 北、南小国町に ある 温泉郷。"],
+    story:["阿蘇の 火口で 火山灰の 親方が 目を さました!", "カザンバイを しずめた! 西の 天草の 海へ。"] },
+  { name:"天草", sub:"島めぐりと うず潮", col:"#D6ECF8", ink:"#1F4A6B", path:"S⚔🍙❓⚔🎁♨⚔⚔❓B",
+    foes:["e_nushi","e_moushinsei","e_kigengire"], boss:{ key:"e_uzushio", mult:1.35 }, foods:["f_karaage","f_tako"],
+    trivia:["天草は 大小 たくさんの 島々から なる 地域。","天草の 海では 野生の イルカに 会えることも。","天草四郎の 物語が 語りつがれている。"],
+    story:["天草の 海が ぐるぐる うずまいている!", "ウズシオを しずめた! 南の 八代・不知火の 海へ。"] },
+  { name:"八代・水俣", sub:"い草の 里と 不知火", col:"#F6E7D8", ink:"#6B3A1F", path:"S⚔❓🍙⚔🎁⚔♨⚔🍙B",
+    foes:["e_kigengire","e_nushi","e_moushinsei"], boss:{ key:"e_shiranui", mult:1.4 }, foods:["f_banpei","f_tomato"],
+    trivia:["八代は 畳の 材料になる い草の 一大産地。","晩白柚(ばんぺいゆ)は 八代の 特産の 大きな かんきつ。","不知火(しらぬい)は 八代海に 夜、無数の 火が ゆらめいて 見える 現象。"],
+    story:["夜の 海に まぼろしの 火が ゆらめく……。", "ユラメキを しずめた! さいごの 地方、人吉・球磨へ。"] },
+  { name:"人吉・球磨", sub:"川下りと 山あい", col:"#E0EAF0", ink:"#2A4050", path:"S⚔🎁⚔❓🍙♨⚔⚔🎁⚔B",
+    foes:["e_nushi","e_moushinsei","e_kigengire"], boss:{ key:"e_kawagiri", mult:1.7 }, foods:["f_ayu","f_kuri"],
+    trivia:["球磨川は 日本三大急流の ひとつに 数えられる。","人吉は 鎌倉時代から 相良(さがら)氏が おさめた 城下町。","球磨地方は 米どころで、球磨焼酎も 知られる。"],
+    story:["球磨川の 朝霧が 町を つつみこんだ……。", "キリモヤを しずめた! いよいよ 熊本城へ もどろう。"] },
+  { name:"熊本城", sub:"火の国の 天守へ", col:"#F8DCD6", ink:"#7A1F1F", path:"S⚔⚔❓🎁⚔♨⚔⚔B",
+    foes:["e_kazan","e_uzushio","e_shiranui"], boss:{ key:"b_dragon", mult:0.62 }, foods:["f_akaushi","f_dango"],
+    trivia:["熊本城の 天守閣は 地震の あと 復旧され、ふたたび 町を 見守っている。","石垣を のぼる 敵を はね返す「武者返し」は 熊本城の 名物。"],
+    story:["熊本城の 天守に 火の国の りゅうが 舞いおりた!!", "火の国に へいわが もどった! ありがとう、白衣のゆうしゃ。 (ぼうけん クリア!)"] }
+];
+// 名物(くらしの たべものに 追加)
+FOODS.f_mizu    = { name:"菊池の 名水",       price:8,  ic:"💧" };
+FOODS.f_milk    = { name:"阿蘇の ぎゅうにゅう", price:15, ic:"🥛" };
+FOODS.f_karaage = { name:"天草の からあげ",   price:30, ic:"🍗" };
+FOODS.f_tako    = { name:"天草の たこめし",   price:30, ic:"🐙" };
+FOODS.f_tomato  = { name:"八代の トマト",     price:15, ic:"🍅" };
+FOODS.f_ayu     = { name:"球磨川の あゆ",     price:35, ic:"🐟" };
+function adv_(){
+  S.adv = S.adv || { ch: 0, pos: 0, steps: 5, acc: 0, day: "", cleared: [], msg: "", seen: {} };
+  const A = S.adv;
+  if (A.day !== today()){ A.day = today(); A.steps = Math.min(30, (A.steps || 0) + 5); }   // 毎日 あしあと +5
+  return A;
+}
+function advStepGain_(n){ const A = adv_(); A.acc = (A.acc || 0) + n; while (A.acc >= 25){ A.acc -= 25; A.steps = Math.min(30, A.steps + 1); } }
+function advSquares_(ch){ return Array.from(ADV_CHAPTERS[ch].path.replace("B", "👑")); }
+function advPop_(ic, title, text, kind){
+  const d = document.createElement("div");
+  d.className = "life-react " + (kind || "happy");
+  d.innerHTML = '<div class="lr-box"><div class="lr-face adv-ic">' + ic + '</div><div class="lr-marks">' + ["✨","✨","⭐","✨"].map(function(x, i){ return '<i style="--i:' + i + '">' + x + '</i>'; }).join("") + '</div>'
+    + '<div class="lr-text">' + esc(title) + '</div><div class="lr-sub">' + esc(text) + '</div></div>';
+  document.body.appendChild(d);
+  setTimeout(function(){ if (d.parentNode) d.parentNode.removeChild(d); }, 2600);
+}
+function advGo(){
+  const A = adv_(), C = ADV_CHAPTERS[A.ch];
+  if (!C){ toast("ぼうけんは クリアしました!"); return; }
+  const sq = advSquares_(A.ch);
+  if (A.pos >= sq.length - 1){ advBoss(); return; }
+  if (A.steps <= 0){ toast("あしあとが ありません(業務を すると たまります。毎日 +5)"); return; }
+  A.steps--; A.pos++;
+  const t = sq[A.pos];
+  __partyTab = "adv";
+  const L = life_();
+  if (t === "⚔"){
+    const foe = C.foes[Math.floor(Math.random() * C.foes.length)];
+    A.msg = "⚔ " + (enemyOf_(foe) || {}).name + "が あらわれた!";
+    save(); openPartyModal();
+    setTimeout(function(){
+      __advNext = { ch: A.ch, place: C.name, mult: 1 + A.ch * 0.35 }; __advReturn = true;
+      startBattle(false, foe);
+    }, 500);
+    return;
+  }
+  if (t === "🎁"){
+    const r = Math.random();
+    if (r < 0.45){ const g = 20 + A.ch * 10 + Math.floor(Math.random() * 30); goldAdd_(g); A.msg = "🎁 たからばこ! " + g + "G を 手に入れた"; advPop_("💰", "たからばこ!", g + " G を 手に入れた"); }
+    else if (r < 0.75){ const ks = Object.keys(GIFTS); const g = ks[Math.floor(Math.random() * ks.length)]; L.gifts[g] = (L.gifts[g] || 0) + 1; A.msg = "🎁 たからばこ! 「" + GIFTS[g].name + "」を 手に入れた"; advPop_(GIFTS[g].ic, "たからばこ!", "「" + GIFTS[g].name + "」(プレゼント)を 手に入れた"); }
+    else { const it = randomItem_(); addItem_(it); A.msg = "🎁 たからばこ! どうぐ「" + ITEMS[it].name + "」"; advPop_(ITEM_ICON[it] || "🎁", "たからばこ!", "どうぐ「" + ITEMS[it].name + "」を 手に入れた"); }
+  } else if (t === "🍙"){
+    const f = C.foods[Math.floor(Math.random() * C.foods.length)];
+    L.foods[f] = (L.foods[f] || 0) + 2;
+    A.msg = "🍙 " + C.name + "の 名物「" + FOODS[f].name + "」を 2つ もらった!";
+    advPop_(FOODS[f].ic, C.name + "の 名物!", "「" + FOODS[f].name + "」を 2つ もらった(くらしで ごはんに)");
+  } else if (t === "♨"){
+    lifeKeys_().forEach(function(k){ const m = lifeMate_(k); m.mood = Math.min(100, m.mood + 15); });
+    const c = care_(); c.genki = Math.min(100, c.genki + 15);
+    A.msg = "♨ 温泉で ひとやすみ。 みんなの きぶんと げんきが 回復した";
+    advPop_("♨️", "温泉で ひとやすみ", "みんなの きぶんと げんきが 回復した");
+  } else if (t === "❓"){
+    const tv = C.trivia[(A.pos + A.ch) % C.trivia.length];
+    goldAdd_(10); A.seen[A.ch + ":" + A.pos] = 1;
+    A.msg = "📜 " + tv + "(+10G)";
+    advPop_("📜", C.name + " まめちしき", tv);
+  } else if (t === "👑"){ save(); openPartyModal(); advBoss(); return; }
+  save(); openPartyModal();
+}
+function advBoss(){
+  const A = adv_(), C = ADV_CHAPTERS[A.ch];
+  if (!C) return;
+  A.msg = "👑 " + ((enemyOf_(C.boss.key) || {}).name || "ボス") + "が 立ちはだかった!";
+  save();
+  __advNext = { ch: A.ch, place: C.name, boss: true, mult: C.boss.mult }; __advReturn = true;
+  startBattle(false, C.boss.key);
+}
+function advBattleWon_(b){
+  const A = adv_();
+  if (b.adv.boss && b.adv.ch === A.ch){
+    const C = ADV_CHAPTERS[A.ch];
+    A.cleared = (A.cleared || []).concat([A.ch]).filter(function(v, i, a){ return a.indexOf(v) === i; });
+    goldAdd_(100 + A.ch * 50);
+    A.msg = "🎉 " + C.story[1] + "(ごほうび " + (100 + A.ch * 50) + "G)";
+    lifeNews_("🗺 " + C.name + "の ぼうけんを クリアした!");
+    if (A.ch < ADV_CHAPTERS.length - 1){ A.ch++; A.pos = 0; }
+    else { A.done = true; A.pos = advSquares_(A.ch).length - 1; }
+  } else {
+    const g = 8 + b.adv.ch * 4; goldAdd_(g);
+    A.msg = "⚔ " + b.en.name + "を たおした! (+" + g + "G)";
+  }
+  save();
+}
+function setAdvCh(i){ const A = adv_(); if (i <= Math.max.apply(null, [0].concat((A.cleared || []).map(function(x){ return x + 1; })))){ if (i !== A.ch){ A.ch = i; A.pos = 0; } save(); openPartyModal(); } }
+function advSection_(){
+  const A = adv_(), ch = Math.min(A.ch, ADV_CHAPTERS.length - 1), C = ADV_CHAPTERS[ch];
+  const sq = advSquares_(ch);
+  const maxOpen = Math.max.apply(null, [0].concat((A.cleared || []).map(function(x){ return x + 1; })));
+  let h = '<div class="adv-chips">' + ADV_CHAPTERS.map(function(c, i){
+    const open = i <= maxOpen, done = (A.cleared || []).indexOf(i) >= 0;
+    return '<button class="adv-chip' + (i === ch ? ' on' : '') + (open ? '' : ' lock') + '"' + (open ? ' onclick="setAdvCh(' + i + ')"' : ' disabled') + '>'
+      + (done ? '✓ ' : (open ? '' : '🔒 ')) + esc(open ? c.name : "？？？") + '</button>';
+  }).join("") + '</div>';
+  h += '<div class="adv-map" style="--mc:' + C.col + ';--mi:' + C.ink + '">'
+    + '<div class="adv-title"><b>' + esc(C.name) + '</b><span>' + esc(C.sub) + '</span></div>'
+    + '<div class="adv-path">' + sq.map(function(t, i){
+        const cls = (i < A.pos ? 'past' : (i === A.pos ? 'here' : '')) + (t === "👑" ? ' boss' : '');
+        return '<div class="adv-node ' + cls + '"><span class="adv-t">' + (t === "S" ? "🚩" : t) + '</span>'
+          + (i === A.pos ? '<span class="adv-hero">' + heroWalkSvg_(dotStage().key, 34, null, rpg_().equip) + '</span>' : '') + '</div>';
+      }).join('<i class="adv-line"></i>') + '</div>'
+    + (A.msg ? '<div class="adv-msg">' + esc(A.msg) + '</div>' : '<div class="adv-msg">' + esc(C.story[0]) + '</div>')
+    + '</div>';
+  const atBoss = A.pos >= sq.length - 1;
+  h += '<div class="adv-ctl"><span class="adv-steps">👣 あしあと <b>' + A.steps + '</b></span>'
+    + (A.done && ch === ADV_CHAPTERS.length - 1 && (A.cleared || []).indexOf(ch) >= 0
+        ? '<span class="adv-clear">🏆 ぜんぶ クリア!</span>'
+        : (atBoss ? '<button class="btn adv-go boss" onclick="advBoss()">👑 ボスに いどむ</button>' : '<button class="btn adv-go" onclick="advGo()">すすむ ▶</button>'))
+    + '</div>';
+  h += '<p class="gm-help">あしあとは 毎日 +5、業務(登録・棚卸し・たたかい など)でも たまります(最大30)。'
+    + '⚔ たたかい ／ 🎁 たからばこ ／ 🍙 名物(くらしの ごはん) ／ ❓ まめちしき ／ ♨ 温泉 ／ 👑 ボス</p>';
+  h += '<div class="adv-legend">' + ADV_CHAPTERS.map(function(c, i){ return (A.cleared || []).indexOf(i) >= 0 ? '<span>✓ ' + esc(c.name) + '</span>' : ''; }).join("") + '</div>';
+  return h;
+}
 function openPartyModal(){
   try { checkPets_(); } catch(e){}
   petGroup_();
@@ -7798,6 +7983,7 @@ function openPartyModal(){
   const own = petsOwned_();
   const tabs = [
     { id:"mates",  ic:"👥", label:"なかま",     n: allMates_().length },
+    { id:"adv",    ic:"🗺", label:"ぼうけん",   n: (function(){ try { return adv_().steps; } catch(e){ return 0; } })() },
     { id:"life",   ic:"🏠", label:"くらし",     n: (function(){ try { return lifeKeys_().filter(function(k){ return lifeMate_(k).req; }).length; } catch(e){ return 0; } })() },
     { id:"buddy",  ic:"🐾", label:"あいぼう",   n: own.length },
     { id:"equip",  ic:"🛡", label:"そうび",     n: EQUIP_SLOTS.filter(function(sl){ return rpg_().equip[sl.id]; }).length },
@@ -7815,6 +8001,7 @@ function openPartyModal(){
   if (__partyTab === "mates") body = matesSection_();
   else if (__partyTab === "buddy") body = buddySection_();
   else if (__partyTab === "life") body = lifeSection_();
+  else if (__partyTab === "adv") body = advSection_();
   else if (__partyTab === "equip") body = equipSection_();
   else if (__partyTab === "battle") body = battleSection_();
   else if (__partyTab === "status") body = statusSection_();
