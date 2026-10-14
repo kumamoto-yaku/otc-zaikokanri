@@ -375,6 +375,9 @@ button.mate-chip { cursor: pointer; font-family: var(--sans); }
 .gm-card.yet .q { width: 40px; height: 40px; border-radius: 8px; background: #DDE3E8; color: #A9B4BC; font-size: 20px; font-weight: 700; display: flex; align-items: center; justify-content: center; margin-bottom: 2px; }
 .gm-card.yet .nm { color: #A9B4BC; }
 .gm-card:active { transform: scale(0.97); }
+.bag-list { list-style: none; padding: 0; margin: 6px 0; display: grid; gap: 6px; }
+.bag-list li { background: #fff; border: 1px solid var(--line); border-radius: 10px; padding: 8px 10px; font-size: 13px; display: flex; flex-direction: column; gap: 2px; }
+.bag-list li span { font-size: 11.5px; color: #6B7882; }
 /* 画面に重ねて出す小窓(なかま・そうび) */
 .order-modal { position: fixed; inset: 0; z-index: 90; background: rgba(15,25,35,0.55); align-items: flex-start; justify-content: center; overflow-y: auto; padding: 16px 10px 40px; -webkit-overflow-scrolling: touch; }
 #battle-modal { z-index: 95; }
@@ -658,6 +661,8 @@ input:focus, select:focus { outline: 2px solid var(--ai); outline-offset: -1px; 
 .seg button.on { background: var(--ai); color: #fff; }
 .tag-sheet { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; }
 .price-tag, .price-tag *, .pcard *, .pop-card * { box-sizing: border-box; }
+/* 中身が はみ出したとき 上にずれて隠れないよう、縮めずに 下へ伸ばして 測れるようにする */
+.price-tag .tag-inner > *, .price-tag .tag-mid > * { flex-shrink: 0; }
 .price-tag { border: 1.5px solid var(--ink); border-radius: 0; text-align: center; background: #fff; break-inside: avoid; display: flex; flex-direction: column; box-sizing: border-box; overflow: hidden; }
 .price-tag.tag-h { flex-direction: row; align-items: stretch; }
 .price-tag.tag-h-rev { flex-direction: row-reverse; }
@@ -665,7 +670,7 @@ input:focus, select:focus { outline: 2px solid var(--ai); outline-offset: -1px; 
 .tag-cat-v { writing-mode: vertical-rl; text-orientation: upright; display: flex; align-items: center; justify-content: center; padding: 4px 2px; letter-spacing: 0.1em; flex-shrink: 0; }
 .price-tag .tag-inner { width: 100%; height: 100%; display: flex; flex-direction: column; }
 .price-tag .tag-top { flex: 0 0 auto; }
-.price-tag .tag-mid { flex: 1 1 auto; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 2px; min-height: 0; padding: 4px 6px; }
+.price-tag .tag-mid { flex: 1 0 auto; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 2px; padding: 4px 6px; }
 .price-tag .tag-bot { flex: 0 0 auto; display: flex; justify-content: center; align-items: flex-end; max-width: 100%; overflow: hidden; padding: 2px 4px 4px; }
 .tag-cat { color: #fff; font-size: 11px; letter-spacing: 0.15em; padding: 3px 0; }
 .tag-name { font-family: var(--serif); font-weight: 600; font-size: 16px; line-height: 1.3; overflow-wrap: anywhere; word-break: break-word; }
@@ -778,7 +783,8 @@ input:focus, select:focus { outline: 2px solid var(--ai); outline-offset: -1px; 
 .btn-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 8px; }
 .btn-grid .btn { width: 100%; }
 #card-edit-q { flex: 1 1 100%; min-width: 0; }
-.chk-row label { display: inline-flex; flex-direction: row; align-items: center; gap: 8px; font-size: 13px; color: var(--ink); }
+.chk-row label { display: block; font-size: 13px; color: var(--ink); line-height: 1.6; }
+.chk-row label input { vertical-align: middle; margin: -2px 6px 0 0; }
 .sub-cost { color: #8A6D3B; }
 .sub-staff { color: #6A3FA0; }
 .sub-memo { color: #5C6B78; font-style: italic; }
@@ -980,11 +986,71 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
     page-break-after: auto !important;
   }
   /* 用紙より高いPOP(A4指定など)は高さを内容なりにして切れを防ぐ */
-  .pop-card { min-height: 0 !important; max-width: 194mm !important; max-height: 281mm !important; }
+  .pop-card { max-width: 194mm !important; max-height: 281mm !important; }
   /* 値札の内側は縮小処理の対象なので、印刷でも同じ見え方を保つ */
   .tag-inner { break-inside: avoid !important; page-break-inside: avoid !important; }
   .dot-pet, .pet-say, .pet-battle, .order-modal, .info-pop, .toast,
   .steps, .expiry-alert, .list-more, .cam-tools, .backup-alert, .storage-warn { display: none !important; }
+}
+
+/* ================================================================
+   デザインの一新(版CK)— 画面表示だけに効かせる。印刷には影響させない
+   ================================================================ */
+@media screen {
+  :root { --bg: #EEF2F5; --card: #FFFFFF; --sub: #5C6B78; --soft: #F5F8FA; --line: #DCE3E8; --shadow: 0 1px 2px rgba(16,32,48,0.06), 0 4px 14px rgba(16,32,48,0.06); --radius: 16px; }
+  body { background: var(--bg); -webkit-font-smoothing: antialiased; }
+  .chrome { padding-bottom: calc(40px + env(safe-area-inset-bottom)); }
+  /* ヘッダー */
+  .header { padding: 14px 2px 10px; }
+  .brand-mark { border-radius: 12px; box-shadow: var(--shadow); }
+  .brand h1 { font-family: var(--sans); font-weight: 800; letter-spacing: 0.02em; font-size: 20px; }
+  /* タブ:パソコンでは上の切り替えボタン */
+  .tabs { border-bottom: none; background: var(--bg); padding: 6px 0 10px; gap: 6px; z-index: 40; }
+  .tab { display: flex; align-items: center; justify-content: center; gap: 6px; border: 1px solid var(--line) !important; border-radius: 12px !important; background: var(--card); color: var(--sub); padding: 10px 8px; font-size: 14px; font-weight: 600; box-shadow: var(--shadow); }
+  .tab .tab-ic { display: inline-flex; line-height: 0; }
+  .tab.active { background: var(--ai); color: #fff; border-color: var(--ai) !important; }
+  /* 本文のカード */
+  .panel { border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); padding: 18px 16px 22px; }
+  /* ボタン(主ボタンは 白地+色枠のまま。押しやすい大きさに) */
+  .btn { border-radius: 12px; min-height: 44px; padding: 10px 18px; font-weight: 700; }
+  .btn.ghost { border-color: var(--line); color: var(--ai); font-weight: 600; }
+  .btn.ghost:hover { border-color: var(--ai); }
+  .btn.big { min-height: 52px; }
+  /* 入力欄 */
+  input:not([type="checkbox"]):not([type="radio"]):not([type="color"]), select { border-radius: 10px; min-height: 44px; border-color: var(--line); background: var(--soft); }
+  input:focus, select:focus { outline: 2px solid var(--ai); outline-offset: -1px; background: #fff; }
+  label { color: var(--sub); }
+  /* 設定のカード */
+  .set-card { border-radius: var(--radius); box-shadow: var(--shadow); padding: 14px 16px; }
+  details.set-card > summary { list-style: none; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  details.set-card > summary::-webkit-details-marker { display: none; }
+  details.set-card > summary::after { content: ""; width: 9px; height: 9px; border-right: 2px solid var(--sub); border-bottom: 2px solid var(--sub); transform: rotate(45deg); transition: transform .2s; flex: 0 0 auto; margin-right: 4px; }
+  details.set-card[open] > summary::after { transform: rotate(-135deg); }
+  .set-h { font-family: var(--sans); font-weight: 700; border-left-width: 4px; }
+  /* 在庫リストの商品 */
+  .stock-item { border-radius: 14px; box-shadow: 0 1px 2px rgba(16,32,48,0.05); padding: 12px; }
+  .stock-name { font-weight: 700; }
+  .qty-ctrl button { width: 36px; height: 36px; }
+  /* 切り替え(値札シート/POP/…) */
+  .seg { border-radius: 12px; border-color: var(--line); box-shadow: var(--shadow); }
+  .seg button { font-weight: 600; }
+  .seg button.on { background: var(--ai); }
+  /* 案内の帯 */
+  .print-selbar, .hint { line-height: 1.65; }
+  .toast { box-shadow: 0 10px 30px rgba(0,0,0,0.25); }
+  .foot { padding-bottom: 8px; }
+}
+/* スマホ:タブを 画面の下に 固定する(親指で押しやすい位置) */
+@media screen and (max-width: 700px) {
+  .tabs { position: fixed; left: 0; right: 0; bottom: 0; top: auto; margin: 0; padding: 6px 8px calc(6px + env(safe-area-inset-bottom)); background: rgba(255,255,255,0.97); border-top: 1px solid var(--line); box-shadow: 0 -4px 18px rgba(16,32,48,0.08); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+  .tab { flex-direction: column; gap: 2px; padding: 6px 2px 5px; font-size: 11px; box-shadow: none; border: none !important; background: transparent; }
+  .tab.active { background: transparent; color: var(--ai); }
+  .tab.active .tab-ic { background: var(--ai); color: #fff; border-radius: 10px; padding: 3px 14px; }
+  .tab .tab-ic { padding: 3px 14px; }
+  .chrome { padding-bottom: calc(92px + env(safe-area-inset-bottom)); }
+  .toast { bottom: calc(86px + env(safe-area-inset-bottom)); }
+  .ord-sheet { padding-bottom: calc(14px + env(safe-area-inset-bottom)); }
+  .panel { padding: 16px 14px 20px; }
 }
 </style>
 </head>
@@ -1055,10 +1121,10 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
   </header>
 
   <nav class="tabs" role="tablist">
-    <button class="tab active" data-tab="list" onclick="showTab('list')">在庫リスト</button>
-    <button class="tab" data-tab="print" onclick="showTab('print')">値札・POP</button>
-    <button class="tab" data-tab="scan" onclick="showTab('scan')">商品登録</button>
-    <button class="tab" data-tab="share" onclick="showTab('share')">その他</button>
+    <button class="tab active" data-tab="list" onclick="showTab('list')"><span class="tab-ic"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h10" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span><span class="tab-lb">在庫リスト</span></button>
+    <button class="tab" data-tab="print" onclick="showTab('print')"><span class="tab-ic"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M3.5 12.5 11 5h8v8l-7.5 7.5a1.4 1.4 0 0 1-2 0l-6-6a1.4 1.4 0 0 1 0-2z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><circle cx="15.5" cy="8.5" r="1.6" fill="currentColor"/></svg></span><span class="tab-lb">値札・POP</span></button>
+    <button class="tab" data-tab="scan" onclick="showTab('scan')"><span class="tab-ic"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M4 8V5h3M17 5h3v3M20 16v3h-3M7 19H4v-3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M8 8v8M11 8v8M14 8v8M17 8v8" stroke="currentColor" stroke-width="1.6"/></svg></span><span class="tab-lb">商品登録</span></button>
+    <button class="tab" data-tab="share" onclick="showTab('share')"><span class="tab-ic"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 2.8v2.6M12 18.6v2.6M2.8 12h2.6M18.6 12h2.6M5.5 5.5l1.8 1.8M16.7 16.7l1.8 1.8M5.5 18.5l1.8-1.8M16.7 7.3l1.8-1.8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span><span class="tab-lb">その他</span></button>
   </nav>
 
   <div id="expiry-alert" class="expiry-alert" style="display:none"></div>
@@ -1623,7 +1689,7 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
   </section>
 
   <div class="toast" id="toast"></div>
-  <footer class="foot">OTCLinker — とみながグループ 店舗向けツール<br><span class="ver">版 2026-10-10 CJ(e健康ショップの開き方を変更)</span></footer>
+  <footer class="foot">OTCLinker — とみながグループ 店舗向けツール<br><span class="ver">版 2026-10-14 CM(キャラクターの性格を一新)</span></footer>
 </div>
 
 <script>
@@ -3237,9 +3303,572 @@ const DOT_SPRITES = {
   slot: ["........................","........................","...KKKKKKKKKKKKKKKKKK...","..KKKKKKKKKKKKKKKKKKKK..","..KKK..............KKK..","..KK................KK..","..KK................KK..","..KK................KK..","..KK................KK..","..KK................KK..","..KK.......KK.......KK..","..KK......KKKK......KK..","..KK......KKKK......KK..","..KK.......KK.......KK..","..KK................KK..","..KK................KK..","..KK................KK..","..KK................KK..","..KK................KK..","..KKK..............KKK..","..KKKKKKKKKKKKKKKKKKKK..","...KKKKKKKKKKKKKKKKKK...","........................","........................"]
 };
 // 目の高さ(スプライトごとに自動検出。衣装をこの位置に合わせる)
-// あいぼう(どうぶつ)の向きを そろえる:横向きの子は みんな 左(主人公のほう)を向く
-DOT_SPRITES.p_chick = DOT_SPRITES.p_chick.map(function(r){ return r.split("").reverse().join(""); });
 const DOT_EYE = {"baby": 0.391,"child": 0.328,"apprentice": 0.328,"warrior": 0.391,"hero": 0.266,"tablet": 0.391,"capsule": 0.266,"powder": 0.266,"troche": 0.266,"eyedrop": 0.453,"ointment": 0.391,"patch": 0.266,"tape": 0.266,"syrup": 0.391,"drink": 0.453,"supp": 0.391,"inhaler": 0.391,"inject": 0.391,"g_okigusuri": 0.328,"g_renkon": 0.266,"g_jagaimo": 0.391,"g_ringo": 0.453,"g_gyutan": 0.328,"g_takoyaki": 0.391,"g_yatsuhashi": 0.391,"g_shika": 0.391,"g_momiji": 0.38,"g_udon": 0.453,"g_mentaiko": 0.328,"g_shisa": 0.328,"g2_ichigo": 0.391,"g2_mikan": 0.328,"g2_rakkasei": 0.266,"g2_budou": 0.328,"g2_megane": 0.328,"g2_kiritanpo": 0.391,"g2_soba": 0.453,"g2_ebifly": 0.391,"g2_kibidango": 0.391,"g2_sakuranbo": 0.516,"g2_ocha": 0.453,"g2_konnyaku": 0.266,"s_hakase": 0.328,"s_monshin": 0.266,"s_nyubachi": 0.453,"s_choshinki": 0.391,"r_gold": 0.328,"r_rainbow": 0.266,"r_phantom": 0.453,"slot": 0.396,"p_wolf": 0.328,"p_fox": 0.328,"p_cat": 0.266,"p_dog": 0.266,"p_rabbit": 0.453,"p_hamster": 0.328,"p_chick": 0.328,"p_penguin": 0.266,"p_owl": 0.328,"p_tanuki": 0.328,"p_bear": 0.266,"p_tiger": 0.38,"e_moushinsei": 0.203,"e_hokan": 0.203,"b_kaishu": 0.266,"b_tanaoroshi": 0.203,"b_yakuo": 0.203,"m_hime": 0.391};
+/* ============ キャラクターの絵(版CL・オリジナルの「まるっこい」画風) ============
+   32升の上に 部品(丸・四角)を重ね、部品ごとに 黒いふちと 下側の影を付けて組み立てる。
+   色は 自動で 1文字の記号に置きかえ、これまでの描画の仕組み(DOT_SPRITES)に そのまま渡す。 */
+const __charmChar = {};
+let __charmNext = 0x4E00;
+function charmTok_(hex){
+  hex = hex.toUpperCase();
+  if (__charmChar[hex]) return __charmChar[hex];
+  const ch = String.fromCharCode(__charmNext++);
+  DOT_PAL[ch] = hex; __charmChar[hex] = ch;
+  return ch;
+}
+function charmShade_(hex, a){
+  const n = parseInt(hex.slice(1), 16);
+  let r = (n >> 16) & 255, g = (n >> 8) & 255, b = n & 255;
+  if (a >= 0){ r += (255 - r) * a; g += (255 - g) * a; b += (255 - b) * a; } else { r *= 1 + a; g *= 1 + a; b *= 1 + a; }
+  return "#" + [r, g, b].map(function(v){ v = Math.max(0, Math.min(255, Math.round(v))); return (v < 16 ? "0" : "") + v.toString(16); }).join("").toUpperCase();
+}
+function charmLuma_(hex){ const n = parseInt(hex.slice(1), 16); return ((n >> 16) & 255) * 0.3 + ((n >> 8) & 255) * 0.59 + (n & 255) * 0.11; }
+const CK = "#2B2B2B", CW = "#FFFFFF", CSKIN = "#FFD9B8", CPINK = "#FF9EB5";
+function charmSprite_(draw){
+  const N = 32, g = [];
+  for (let y = 0; y < N; y++){ const r = []; for (let x = 0; x < N; x++) r.push(null); g.push(r); }
+  const inb = function(x, y){ return x >= 0 && y >= 0 && x < N && y < N; };
+  let eyeY = 12;
+  const C = {};
+  // 部品:描いた範囲のまわりに ふち、いちばん下の段に 影
+  C.part = function(fn, opt){
+    const mine = {};
+    const put = function(x, y, col){ x = Math.round(x); y = Math.round(y); if (!inb(x, y)) return; g[y][x] = col; mine[y * N + x] = col; };
+    const P = {
+      px: put,
+      rect: function(x, y, w, h, col){ for (let yy = 0; yy < h; yy++) for (let xx = 0; xx < w; xx++) put(x + xx, y + yy, col); },
+      ell: function(cx, cy, rx, ry, col, y0, y1){
+        for (let y = Math.floor(cy - ry); y <= Math.ceil(cy + ry); y++){
+          if (y0 != null && y < y0) continue; if (y1 != null && y > y1) continue;
+          for (let x = Math.floor(cx - rx); x <= Math.ceil(cx + rx); x++){
+            const dx = (x + 0.5 - cx) / rx, dy = (y + 0.5 - cy) / ry;
+            if (dx * dx + dy * dy <= 1) put(x, y, col);
+          }
+        }
+      },
+      tri: function(x0, y0, x1, y1, x2, y2, col){
+        const minx = Math.floor(Math.min(x0, x1, x2)), maxx = Math.ceil(Math.max(x0, x1, x2));
+        const miny = Math.floor(Math.min(y0, y1, y2)), maxy = Math.ceil(Math.max(y0, y1, y2));
+        const s = function(ax, ay, bx, by, cx, cy){ return (ax - cx) * (by - cy) - (bx - cx) * (ay - cy); };
+        for (let y = miny; y <= maxy; y++) for (let x = minx; x <= maxx; x++){
+          const px = x + 0.5, py = y + 0.5;
+          const d1 = s(px, py, x0, y0, x1, y1), d2 = s(px, py, x1, y1, x2, y2), d3 = s(px, py, x2, y2, x0, y0);
+          if (!((d1 < 0 || d2 < 0 || d3 < 0) && (d1 > 0 || d2 > 0 || d3 > 0))) put(x, y, col);
+        }
+      },
+      line: function(x0, y0, x1, y1, col){
+        const n = Math.max(Math.abs(x1 - x0), Math.abs(y1 - y0), 1);
+        for (let i = 0; i <= n; i++) put(x0 + (x1 - x0) * i / n, y0 + (y1 - y0) * i / n, col);
+      }
+    };
+    fn(P);
+    const keys = Object.keys(mine);
+    // 影:その部品の 下はしの段を 少し暗く
+    if (!(opt && opt.flat)) keys.forEach(function(k){
+      const i = +k, x = i % N, y = (i / N) | 0, col = mine[k];
+      if (col === CK || charmLuma_(col) < 50) return;
+      if (!mine[(y + 1) * N + x] && y + 1 < N) g[y][x] = charmShade_(col, -0.2);
+      else if (!mine[y * N + x + 1] && x + 1 < N) g[y][x] = charmShade_(col, -0.1);
+    });
+    if (!(opt && opt.noline)) keys.forEach(function(k){
+      const i = +k, x = i % N, y = (i / N) | 0;
+      [[1, 0], [-1, 0], [0, 1], [0, -1]].forEach(function(d){
+        const nx = x + d[0], ny = y + d[1];
+        if (inb(nx, ny) && mine[ny * N + nx] === undefined) g[ny][nx] = CK;
+      });
+    });
+  };
+  // 顔(目・口・ほお)。目は 小さい黒い点、口は いろいろ
+  C.face = function(cx, ey, o){
+    o = o || {};
+    eyeY = ey;
+    const gap = o.gap || 3, ew = o.ew || 1, eh = o.eh || 2;
+    const ex1 = Math.round(cx - gap - ew / 2), ex2 = Math.round(cx + gap - ew / 2);
+    const eye = function(x){
+      if (o.eyes === "line"){ for (let i = 0; i < ew + 1; i++) set(x + i, ey + 1, CK); return; }
+      if (o.eyes === "happy"){ set(x, ey + 1, CK); set(x + 1, ey, CK); set(x + 2, ey + 1, CK); return; }
+      if (o.eyes === "big"){ for (let yy = 0; yy < 3; yy++) for (let xx = 0; xx < 2; xx++) set(x + xx, ey + yy, CK); set(x, ey, CW); return; }
+      if (o.eyes === "x"){ set(x, ey, CK); set(x + 1, ey + 1, CK); set(x + 1, ey, CK); set(x, ey + 1, CK); return; }
+      if (o.eyes === "angry"){ set(x, ey, CK); set(x + 1, ey + 1, CK); set(x, ey + 1, CK); return; }
+      for (let yy = 0; yy < eh; yy++) for (let xx = 0; xx < ew; xx++) set(x + xx, ey + yy, CK);
+    };
+    eye(ex1); eye(o.eyes === "happy" ? ex2 - 1 : ex2);
+    const my = ey + (o.my || 3), mx = Math.round(cx);
+    const m = o.mouth || "smile";
+    const mc = o.mc || "#8A3B2E";
+    if (m === "smile"){ set(mx - 2, my, mc); set(mx - 1, my + 1, mc); set(mx, my + 1, mc); set(mx + 1, my, mc); }
+    else if (m === "o"){ set(mx - 1, my, mc); set(mx, my, mc); set(mx - 1, my + 1, mc); set(mx, my + 1, mc); }
+    else if (m === "flat"){ set(mx - 1, my, mc); set(mx, my, mc); }
+    else if (m === "grin"){ for (let i = -2; i <= 1; i++) set(mx + i, my, mc); for (let i = -1; i <= 0; i++) set(mx + i, my + 1, "#E86A6A"); }
+    else if (m === "cat"){ set(mx - 2, my, mc); set(mx - 1, my + 1, mc); set(mx, my, mc); set(mx + 1, my + 1, mc); set(mx + 2, my, mc); }
+    else if (m === "frown"){ set(mx - 2, my + 1, mc); set(mx - 1, my, mc); set(mx, my, mc); set(mx + 1, my + 1, mc); }
+    else if (m === "wavy"){ set(mx - 2, my, mc); set(mx - 1, my + 1, mc); set(mx, my, mc); set(mx + 1, my + 1, mc); }
+    else if (m === "fang"){ for (let i = -2; i <= 1; i++) set(mx + i, my, mc); set(mx - 2, my + 1, CW); set(mx + 1, my + 1, CW); }
+    if (o.cheek !== false){ const cc = o.cheekCol || CPINK; set(ex1 - 1 - (o.cheekOut || 0), ey + 2, cc); set(ex2 + ew + (o.cheekOut || 0), ey + 2, cc); }
+  };
+  const set = function(x, y, col){ x = Math.round(x); y = Math.round(y); if (inb(x, y)) g[y][x] = col; };
+  C.px = set;
+  // 足(ちょこんと2つ)
+  C.feet = function(cx, y, col, sp){
+    sp = sp || 3; col = col || "#5A4636";
+    C.part(function(p){ p.rect(Math.round(cx - sp - 2), y, 3, 2, col); });
+    C.part(function(p){ p.rect(Math.round(cx + sp - 1), y, 3, 2, col); });
+  };
+  // うで(小さな丸い手)
+  C.arms = function(lx, rx, y, col){
+    C.part(function(p){ p.rect(lx, y, 2, 2, col || CSKIN); });
+    C.part(function(p){ p.rect(rx, y, 2, 2, col || CSKIN); });
+  };
+  draw(C);
+  return {
+    rows: g.map(function(r){ return r.map(function(c){ return c == null ? "." : (c === CK ? "K" : charmTok_(c)); }).join(""); }),
+    eye: (eyeY + 0.5) / 32
+  };
+}
+
+const CHARM_DESIGNS = {
+  // ===== おくすりのなかま =====
+  tablet: function(C){ // 割線のある まるい錠剤
+    C.feet(16, 27, "#8A9AA6");
+    C.arms(6, 24, 17, "#F2F4F6");
+    C.part(function(p){ p.ell(16, 16, 9.5, 9, "#F7F8FA"); p.rect(8, 15, 17, 1, "#D5DCE2"); });
+    C.face(16, 11, { mouth: "smile", my: 7 });
+  },
+  capsule: function(C){ // 2色の カプセル(赤と白)
+    C.feet(16, 27, "#7A2A22");
+    C.part(function(p){ p.ell(16, 11, 7, 6, "#E2463A", null, 14); p.rect(9, 11, 15, 4, "#E2463A"); });
+    C.part(function(p){ p.rect(9, 15, 15, 7, "#FFF6E8"); p.ell(16, 21, 7, 5, "#FFF6E8", 21); });
+    C.arms(6, 24, 16, "#FFF6E8");
+    C.face(16, 16, { mouth: "o" });
+  },
+  powder: function(C){ // 粉薬の つつみ(三角おりの 紙)
+    C.feet(16, 27, "#9A8C70");
+    C.part(function(p){ p.rect(7, 10, 18, 15, "#FFFDF4"); p.tri(7, 10, 25, 10, 16, 4, "#FFFDF4"); p.line(7, 10, 16, 16, "#E5DFC8"); p.line(24, 10, 16, 16, "#E5DFC8"); });
+    C.arms(5, 25, 17, "#FFFDF4");
+    C.part(function(p){ p.px(23, 5, "#F0EEE6"); p.px(26, 7, "#F0EEE6"); }, { flat: true });
+    C.face(16, 17, { mouth: "wavy" });
+  },
+  troche: function(C){ // ピンクの ドーナツ型トローチ
+    C.feet(16, 27, "#A0526A");
+    C.part(function(p){ p.ell(16, 16, 10, 9, "#FF9EC0"); p.ell(16, 9.5, 2.2, 1.6, "#FFF0F6"); });
+    C.arms(4, 26, 17, "#FF9EC0");
+    C.face(16, 14, { mouth: "smile", cheekCol: "#FF6F96" });
+  },
+  eyedrop: function(C){ // 目薬(青いキャップ・しずく)
+    C.feet(16, 27, "#4C6C88");
+    C.part(function(p){ p.rect(13, 3, 6, 5, "#3F8FE0"); p.rect(14, 2, 4, 1, "#3F8FE0"); });
+    C.part(function(p){ p.ell(16, 17, 8, 9.5, "#DDF1FF"); p.rect(10, 18, 12, 3, "#9FD2F7"); });
+    C.arms(6, 24, 17, "#DDF1FF");
+    C.part(function(p){ p.ell(25.5, 7, 1.6, 2.2, "#7FC4F5"); });
+    C.face(16, 12, { mouth: "o", eyes: "big" });
+  },
+  ointment: function(C){ // 塗り薬のチューブ(ふたがぼうし)
+    C.feet(16, 27, "#4E7A57");
+    C.part(function(p){ p.rect(13, 3, 6, 4, "#3E9B4F"); });
+    C.part(function(p){ p.rect(9, 7, 14, 18, "#F3FBF4"); p.rect(9, 20, 14, 2, "#7FC48A"); p.rect(10, 24, 12, 1, "#CFE6D3"); });
+    C.arms(6, 24, 15, "#F3FBF4");
+    C.face(16, 12, { mouth: "smile" });
+  },
+  patch: function(C){ // 湿布(四角くて ひんやり)
+    C.feet(16, 27, "#6B8AA1");
+    C.part(function(p){ p.rect(5, 8, 22, 17, "#E9F6FF"); p.rect(5, 8, 22, 2, "#BFE2FA"); });
+    C.part(function(p){ for (let i = 0; i < 4; i++) p.px(8 + i * 5, 22, "#BFE2FA"); }, { flat: true, noline: true });
+    C.arms(2, 28, 15, "#E9F6FF");
+    C.face(16, 13, { mouth: "flat", eyes: "line", gap: 4 });
+  },
+  tape: function(C){ // テープ(まるいロール)
+    C.feet(16, 27, "#8A7A5A");
+    C.part(function(p){ p.ell(16, 16, 10, 9.5, "#FFF3D6"); p.ell(16, 16, 4, 3.6, "#C9B48A"); p.ell(16, 16, 2.4, 2, "#FFFFFF"); });
+    C.part(function(p){ p.rect(24, 20, 5, 3, "#FFF3D6"); });
+    C.face(16, 8, { mouth: "smile", my: 3, gap: 4 });
+  },
+  syrup: function(C){ // シロップのびん(ピンクの液)
+    C.feet(16, 27, "#7A4A58");
+    C.part(function(p){ p.rect(13, 2, 6, 3, "#F2F2F2"); });
+    C.part(function(p){ p.rect(12, 5, 8, 3, "#FFE4EC"); p.ell(16, 17, 9, 9, "#FFE4EC"); p.ell(16, 20, 8, 5, "#FF7FA6", 18); });
+    C.arms(5, 25, 15, "#FFE4EC");
+    C.face(16, 12, { mouth: "smile", cheekCol: "#FF7FA6" });
+  },
+  drink: function(C){ // 栄養ドリンク(茶色のびん・はちまき)
+    C.feet(16, 27, "#4A3020");
+    C.part(function(p){ p.rect(13, 2, 6, 3, "#E8C547"); });
+    C.part(function(p){ p.rect(12, 5, 8, 4, "#A0602A"); p.rect(9, 9, 14, 17, "#A0602A"); p.rect(9, 15, 14, 6, "#FFE27A"); });
+    C.part(function(p){ p.rect(8, 9, 16, 2, "#E2463A"); p.rect(24, 8, 3, 2, "#E2463A"); });
+    C.arms(6, 24, 15, "#A0602A");
+    C.face(16, 12, { mouth: "grin", eyes: "angry", cheek: false });
+  },
+  supp: function(C){ // 坐薬(しろい ろうそく型)
+    C.feet(16, 27, "#9AA0A6");
+    C.part(function(p){ p.ell(16, 9, 5.5, 7, "#FBFBFB", null, 10); p.rect(11, 9, 11, 16, "#FBFBFB"); });
+    C.arms(8, 22, 17, "#FBFBFB");
+    C.face(16, 12, { mouth: "o", gap: 2 });
+  },
+  inhaler: function(C){ // 吸入器(L字・まじめ顔)
+    C.feet(13, 27, "#5A6A78");
+    C.part(function(p){ p.rect(8, 4, 10, 21, "#B8C6D4"); p.rect(9, 4, 8, 2, "#8FA2B4"); });
+    C.part(function(p){ p.rect(18, 17, 9, 6, "#7C94AB"); });
+    C.part(function(p){ p.ell(28.5, 18.5, 1.2, 1.2, "#E8F4FF"); p.ell(29.5, 15.5, 1, 1, "#E8F4FF"); }, { flat: true, noline: true });
+    C.face(13, 10, { mouth: "flat", gap: 2 });
+  },
+  inject: function(C){ // 注射器(ちょっと とがった性格)
+    C.feet(16, 28, "#7A8A96");
+    C.part(function(p){ p.rect(15, 1, 2, 4, "#C9D1D8"); });
+    C.part(function(p){ p.rect(10, 5, 12, 2, "#9AA6B2"); p.rect(11, 7, 10, 15, "#EAF7FF"); p.rect(12, 13, 8, 8, "#7FD4F5"); });
+    C.part(function(p){ p.rect(15, 22, 2, 3, "#9AA6B2"); p.rect(12, 25, 8, 2, "#9AA6B2"); });
+    C.arms(8, 22, 14, "#EAF7FF");
+    C.face(16, 9, { mouth: "fang", eyes: "angry", gap: 2, my: 2 });
+  },
+  // ===== ごとうちの なかま =====
+  g_okigusuri: function(C){ // 置き薬の箱(ふたつきの 木箱)
+    C.feet(16, 27, "#5A3A1C");
+    C.part(function(p){ p.rect(6, 9, 20, 16, "#D6A35E"); p.rect(6, 9, 20, 3, "#B07A3A"); p.rect(13, 16, 6, 4, "#E2463A"); p.px(16, 17, CW); p.px(15, 18, CW); p.px(16, 18, CW); p.px(17, 18, CW); });
+    C.face(16, 13, { mouth: "smile", my: 9, gap: 5 });
+  },
+  g_renkon: function(C){ // からしれんこん(黄色い穴あき)
+    C.feet(16, 27, "#8A6A20");
+    C.part(function(p){ p.ell(16, 16, 10, 9.5, "#F2C94C"); [[11,12],[21,12],[10,19],[22,19],[16,21]].forEach(function(o){ p.ell(o[0], o[1], 1.6, 1.6, "#FFF4C2"); }); });
+    C.face(16, 14, { mouth: "smile", gap: 3 });
+  },
+  g_jagaimo: function(C){ // じゃがいも(でこぼこ)
+    C.feet(16, 27, "#6A4A28");
+    C.part(function(p){ p.ell(16, 16, 10, 8.5, "#C99A5B"); p.px(9, 12, "#A97A40"); p.px(23, 18, "#A97A40"); p.px(13, 21, "#A97A40"); });
+    C.arms(5, 25, 17, "#C99A5B");
+    C.face(16, 13, { mouth: "grin", eyes: "happy" });
+  },
+  g_ringo: function(C){ // りんご(かじりあと)
+    C.feet(16, 27, "#7A1E18");
+    C.part(function(p){ p.rect(15, 3, 2, 4, "#6B4423"); });
+    C.part(function(p){ p.ell(19.5, 5, 3, 1.6, "#5BB85F"); });
+    C.part(function(p){ p.ell(16, 16, 10, 9.5, "#E2463A"); p.ell(26, 15, 2.6, 3, "#FFF4E0"); });
+    C.face(15, 13, { mouth: "smile" });
+  },
+  g_gyutan: function(C){ // 牛たん(のびた舌のような 形)
+    C.feet(16, 27, "#7A3A30");
+    C.part(function(p){ p.ell(16, 16, 11, 7.5, "#E89A8A"); p.rect(6, 16, 20, 1, "#D07A6A"); p.px(10, 20, "#F7C3B8"); p.px(21, 21, "#F7C3B8"); });
+    C.face(16, 12, { mouth: "o", gap: 4 });
+  },
+  g_takoyaki: function(C){ // たこやき(ソース・青のり・かつおぶし)
+    C.feet(16, 27, "#6A3A1C");
+    C.part(function(p){ p.ell(16, 17, 10, 9, "#E8B064"); p.ell(16, 12, 9, 4, "#7A3A1C", null, 13); p.px(12, 9, "#5BB85F"); p.px(19, 10, "#5BB85F"); p.px(15, 9, "#FFF4E0"); p.px(21, 11, "#FFC9A8"); });
+    C.part(function(p){ p.tri(18, 6, 22, 5, 21, 8, "#F7D2B0"); });
+    C.face(16, 16, { mouth: "smile" });
+  },
+  g_yatsuhashi: function(C){ // 生八ッ橋(三角に たたんだ)
+    C.feet(16, 27, "#8A6A50");
+    C.part(function(p){ p.tri(4, 25, 28, 25, 16, 5, "#F5E6CF"); p.line(9, 18, 16, 25, "#E3CBA8"); });
+    C.part(function(p){ p.ell(16, 21, 3, 2, "#8A3B4E"); }, { noline: true });
+    C.face(16, 14, { mouth: "flat", gap: 3 });
+  },
+  g_shika: function(C){ // しか(おじぎする)
+    C.feet(16, 27, "#5A3A1C");
+    C.part(function(p){ p.line(9, 3, 11, 9, "#8A5A2B"); p.line(8, 5, 6, 3, "#8A5A2B"); p.line(23, 3, 21, 9, "#8A5A2B"); p.line(24, 5, 26, 3, "#8A5A2B"); });
+    C.part(function(p){ p.ell(16, 16, 9, 8.5, "#C98A4E"); p.ell(16, 20, 4, 2.6, "#F3E2CC"); p.px(11, 20, "#F3E2CC"); p.px(21, 19, "#F3E2CC"); });
+    C.part(function(p){ p.ell(16, 19, 1.4, 1, CK); }, { noline: true, flat: true });
+    C.face(16, 13, { mouth: "flat", my: 9, cheek: false });
+  },
+  g_momiji: function(C){ // もみじまんじゅう(もみじ型)
+    C.feet(16, 27, "#7A4A1C");
+    C.part(function(p){ p.ell(16, 17, 9, 8, "#D88A40"); p.tri(16, 3, 13, 11, 19, 11, "#D88A40"); p.tri(5, 10, 10, 13, 9, 17, "#D88A40"); p.tri(27, 10, 22, 13, 23, 17, "#D88A40"); });
+    C.face(16, 15, { mouth: "smile" });
+  },
+  g_udon: function(C){ // うどん(どんぶりから 顔)
+    C.feet(16, 28, "#6A3A1C");
+    C.part(function(p){ p.ell(16, 12, 8, 6, "#FFF8E6"); p.line(11, 9, 11, 16, "#F0E4C2"); p.line(16, 7, 16, 17, "#F0E4C2"); p.line(21, 9, 21, 16, "#F0E4C2"); });
+    C.part(function(p){ p.rect(5, 16, 22, 4, "#C0392B"); p.ell(16, 20, 11, 6, "#C0392B", 20); p.rect(5, 17, 22, 1, "#1E1E1E"); });
+    C.part(function(p){ p.ell(22, 12, 2, 1.4, "#F7C3D0"); }, { noline: true });
+    C.face(15, 10, { mouth: "smile", my: 3 });
+  },
+  g_mentaiko: function(C){ // めんたいこ(ぷっくり 赤)
+    C.feet(16, 27, "#8A2A2A");
+    C.part(function(p){ p.ell(11, 17, 7, 8, "#F06A5A"); p.ell(21, 17, 7, 8, "#F06A5A"); p.px(9, 12, "#FFB0A0"); p.px(22, 13, "#FFB0A0"); p.px(12, 22, "#FFB0A0"); });
+    C.face(16, 14, { mouth: "o", gap: 5 });
+  },
+  g_shisa: function(C){ // シーサーっぽい 守り犬(オリジナル)
+    C.feet(16, 27, "#8A4A20");
+    C.part(function(p){ p.ell(16, 16, 10, 9, "#E8A04A"); for (let i = 0; i < 7; i++) p.ell(7 + i * 3, 8 + (i % 2), 1.8, 1.8, "#C0692A"); });
+    C.part(function(p){ p.ell(16, 19, 3.5, 2, "#F7D2A0"); }, { noline: true });
+    C.face(16, 13, { mouth: "fang", eyes: "big", my: 7, cheek: false });
+  },
+  g2_ichigo: function(C){ // いちご
+    C.feet(16, 27, "#7A1E18");
+    C.part(function(p){ p.ell(16, 7, 6, 2.5, "#3E9B4F"); p.rect(15, 3, 2, 3, "#3E9B4F"); });
+    C.part(function(p){ p.ell(16, 15, 10, 8, "#F04A5A", null, 16); p.tri(6, 15, 26, 15, 16, 27, "#F04A5A"); [[10,13],[15,11],[21,13],[12,19],[19,19],[16,23]].forEach(function(o){ p.px(o[0], o[1], "#FFE27A"); }); });
+    C.face(16, 13, { mouth: "smile", gap: 4 });
+  },
+  g2_mikan: function(C){ // みかん(はっぱつき)
+    C.feet(16, 27, "#8A4A1C");
+    C.part(function(p){ p.ell(19, 6, 3, 1.6, "#3E9B4F"); });
+    C.part(function(p){ p.ell(16, 16, 10.5, 9, "#F59A2A"); p.px(10, 11, "#FFC46A"); p.px(22, 20, "#D97A1A"); });
+    C.face(16, 14, { mouth: "smile" });
+  },
+  g2_rakkasei: function(C){ // らっかせい(くびれ)
+    C.feet(16, 28, "#6A4A28");
+    C.part(function(p){ p.ell(16, 10, 7, 6.5, "#E3B97A"); p.ell(16, 21, 7.5, 6.5, "#E3B97A"); p.rect(11, 14, 10, 3, "#E3B97A"); p.px(13, 7, "#C99A5B"); p.px(19, 22, "#C99A5B"); p.px(14, 24, "#C99A5B"); });
+    C.face(16, 9, { mouth: "smile", gap: 3 });
+  },
+  g2_budou: function(C){ // ぶどう(ふさ)
+    C.feet(16, 28, "#3A2A4A");
+    C.part(function(p){ p.rect(15, 2, 2, 3, "#6B4423"); p.ell(20, 4, 3, 1.5, "#3E9B4F"); });
+    C.part(function(p){ [[10,8],[16,7],[22,8],[8,13],[14,13],[20,13],[24,13],[11,18],[17,18],[22,18],[14,23],[19,23]].forEach(function(o){ p.ell(o[0], o[1], 3.2, 3.2, "#8A5ACB"); }); });
+    C.face(16, 12, { mouth: "o", gap: 4 });
+  },
+  g2_megane: function(C){ // めがね(ふくいの 職人わざ風・オリジナル)
+    C.feet(16, 26, "#2A2A2A");
+    C.part(function(p){ p.ell(9, 15, 6, 5.5, "#DDF1FF"); p.ell(23, 15, 6, 5.5, "#DDF1FF"); p.rect(14, 13, 4, 2, "#5A5A5A"); });
+    C.part(function(p){ p.rect(2, 12, 2, 2, "#5A5A5A"); p.rect(28, 12, 2, 2, "#5A5A5A"); });
+    C.px(8, 14, CK); C.px(8, 15, CK); C.px(22, 14, CK); C.px(22, 15, CK); C.px(15, 19, "#8A3B2E"); C.px(16, 19, "#8A3B2E");
+  },
+  g2_kiritanpo: function(C){ // きりたんぽ(くしに ささった)
+    C.feet(16, 28, "#6A4A28");
+    C.part(function(p){ p.rect(15, 1, 2, 27, "#C99A5B"); });
+    C.part(function(p){ p.ell(16, 14, 6, 11, "#F2DEB0"); p.px(13, 8, "#D8B878"); p.px(18, 19, "#D8B878"); p.px(14, 22, "#D8B878"); });
+    C.face(16, 11, { mouth: "smile", gap: 2 });
+  },
+  g2_soba: function(C){ // ざるそば
+    C.feet(16, 23, "#5A3A1C");
+    C.part(function(p){ p.ell(16, 13, 9, 6, "#8C7A5E"); p.line(10, 10, 12, 16, "#7A684C"); p.line(15, 8, 15, 17, "#7A684C"); p.line(20, 9, 19, 16, "#7A684C"); });
+    C.part(function(p){ p.rect(4, 18, 24, 4, "#D9B36A"); p.rect(4, 19, 24, 1, "#B8904A"); });
+    C.face(16, 11, { mouth: "smile", my: 3 });
+  },
+  g2_ebifly: function(C){ // エビフライ(しっぽ つき)
+    C.feet(15, 28, "#8A4A1C");
+    C.part(function(p){ p.tri(13, 6, 17, 6, 12, 0, "#F0602A"); p.tri(13, 6, 17, 6, 19, 0, "#F0602A"); });
+    C.part(function(p){ p.ell(15, 16, 8, 11, "#E3A04A"); for (let y = 8; y < 26; y += 3) p.px(12 + (y % 2), y, "#C98030"); for (let y = 9; y < 26; y += 3) p.px(18 - (y % 2), y, "#C98030"); });
+    C.face(15, 13, { mouth: "smile", gap: 3 });
+  },
+  g2_kibidango: function(C){ // きびだんご(3つ だんご)
+    C.feet(16, 28, "#8A6A30");
+    C.part(function(p){ p.ell(9, 19, 5, 5, "#F2DE9A"); }); C.part(function(p){ p.ell(23, 19, 5, 5, "#F2DE9A"); });
+    C.part(function(p){ p.ell(16, 13, 6, 6, "#F7E8B0"); });
+    C.face(16, 11, { mouth: "smile", gap: 2 });
+    C.px(8, 18, CK); C.px(10, 18, CK); C.px(22, 18, CK); C.px(24, 18, CK);
+  },
+  g2_sakuranbo: function(C){ // さくらんぼ(ふたご)
+    C.feet(16, 28, "#7A1E18");
+    C.part(function(p){ p.line(16, 3, 10, 13, "#3E7C2A"); p.line(16, 3, 22, 13, "#3E7C2A"); p.ell(19, 4, 3, 1.4, "#5BB85F"); });
+    C.part(function(p){ p.ell(9.5, 19, 6, 6, "#E0283C"); }); C.part(function(p){ p.ell(22.5, 19, 6, 6, "#E0283C"); });
+    C.px(8, 18, CK); C.px(11, 18, CK); C.px(21, 18, CK); C.px(24, 18, CK); C.px(9, 21, "#7A1E18"); C.px(10, 21, "#7A1E18"); C.px(22, 21, "#7A1E18"); C.px(23, 21, "#7A1E18");
+  },
+  g2_ocha: function(C){ // 湯のみの お茶
+    C.feet(16, 28, "#3A5A3A");
+    C.part(function(p){ p.line(13, 1, 12, 4, "#E0E8E0"); p.line(19, 1, 20, 4, "#E0E8E0"); }, { noline: true, flat: true });
+    C.part(function(p){ p.rect(7, 7, 18, 19, "#8FC28A"); p.rect(7, 7, 18, 3, "#C9E6B0"); p.ell(16, 18, 2.6, 2.6, "#5A8A50"); });
+    C.face(16, 13, { mouth: "smile", eyes: "happy" });
+  },
+  g2_konnyaku: function(C){ // こんにゃく(ぷるぷる 灰色)
+    C.feet(16, 27, "#4A4A50");
+    C.part(function(p){ p.rect(7, 9, 18, 16, "#9A9AA6"); p.ell(16, 9, 9, 2, "#9A9AA6"); [[10,13],[14,19],[21,12],[19,22],[11,22]].forEach(function(o){ p.px(o[0], o[1], "#6A6A76"); }); });
+    C.face(16, 14, { mouth: "wavy" });
+  },
+  // ===== せんもんしょくの なかま =====
+  s_hakase: function(C){ // はかせ(白ひげ・まるめがね)
+    C.feet(16, 28, "#3A3A3A");
+    C.part(function(p){ p.rect(9, 17, 14, 10, CW); p.rect(15, 17, 2, 10, "#D9DFE4"); });
+    C.part(function(p){ p.ell(16, 11, 8, 7.5, CSKIN); p.ell(16, 5, 7, 2.6, "#F2F2F2", null, 6); p.ell(16, 16, 5, 2.4, "#F2F2F2", 15); p.rect(7, 8, 2, 4, "#F2F2F2"); p.rect(23, 8, 2, 4, "#F2F2F2"); });
+    C.part(function(p){ p.ell(12.5, 11, 2.4, 2.4, "#DDF1FF"); p.ell(19.5, 11, 2.4, 2.4, "#DDF1FF"); }, { flat: true });
+    C.px(12, 11, CK); C.px(19, 11, CK);
+  },
+  s_monshin: function(C){ // 問診票(クリップボード)
+    C.feet(16, 28, "#5A4636");
+    C.part(function(p){ p.rect(6, 5, 20, 22, "#C99A5B"); p.rect(8, 8, 16, 17, CW); for (let y = 17; y < 24; y += 2) p.rect(10, y, 12, 1, "#B8C2CC"); p.px(10, 17, "#3E9B4F"); });
+    C.part(function(p){ p.rect(12, 3, 8, 3, "#9AA6B2"); });
+    C.face(16, 10, { mouth: "smile", my: 4 });
+  },
+  s_nyubachi: function(C){ // 乳鉢と乳棒
+    C.feet(16, 28, "#6A6A6A");
+    C.part(function(p){ p.line(19, 3, 23, 12, "#E8E2D6"); p.line(20, 3, 24, 12, "#E8E2D6"); });
+    C.part(function(p){ p.ell(16, 18, 11, 8, "#F4F2EC", 14); p.rect(5, 13, 22, 2, "#DCD7CB"); });
+    C.face(16, 18, { mouth: "smile", my: 3 });
+  },
+  s_choshinki: function(C){ // 聴診器(まるい 頭)
+    C.feet(16, 28, "#3A3F47");
+    C.part(function(p){ p.line(9, 3, 9, 10, "#3A3F47"); p.line(23, 3, 23, 10, "#3A3F47"); p.line(9, 10, 16, 14, "#3A3F47"); p.line(23, 10, 16, 14, "#3A3F47"); });
+    C.part(function(p){ p.ell(16, 20, 7.5, 6.5, "#C9D1D8"); p.ell(16, 20, 4.5, 3.8, "#E8EEF2"); });
+    C.face(16, 18, { mouth: "o", gap: 2, my: 3, cheek: false });
+  },
+  // ===== レアな なかま =====
+  r_gold: function(C){ // きんの カプセル
+    C.feet(16, 27, "#8A6A10");
+    C.part(function(p){ p.ell(16, 11, 7, 6, "#E8B820", null, 14); p.rect(9, 11, 15, 4, "#E8B820"); });
+    C.part(function(p){ p.rect(9, 15, 15, 7, "#FFE27A"); p.ell(16, 21, 7, 5, "#FFE27A", 21); });
+    C.arms(6, 24, 16, "#FFE27A");
+    C.face(16, 16, { mouth: "grin", eyes: "happy" });
+  },
+  r_rainbow: function(C){ // にじいろの 錠剤
+    C.feet(16, 27, "#6A5AA0");
+    const cols = ["#F06A6A", "#F5A04A", "#F5D84A", "#7DC383", "#5FA8D3", "#9B7EDE"];
+    C.part(function(p){ p.ell(16, 16, 9.5, 9, "#FFFFFF"); for (let i = 0; i < 6; i++) p.rect(7, 8 + i * 3, 19, 3, cols[i]); p.ell(16, 16, 9.5, 9, "#FFFFFF", 26); });
+    C.part(function(p){ p.ell(16, 14, 5, 3, "#FFFFFF"); }, { noline: true });
+    C.face(16, 13, { mouth: "smile", my: 3 });
+  },
+  r_phantom: function(C){ // すけすけの 薬びん(おばけ風)
+    C.part(function(p){ p.rect(13, 3, 6, 3, "#DCE4F0"); });
+    C.part(function(p){ p.ell(16, 14, 9, 9, "#EEF3FF", null, 18); p.rect(7, 14, 19, 9, "#EEF3FF"); for (let i = 0; i < 4; i++) p.ell(9 + i * 5, 23, 2.5, 2.5, "#EEF3FF"); });
+    C.face(16, 13, { mouth: "o", eyes: "big", cheek: false });
+  },
+  // ===== あいぼう(どうぶつ・正面向き) =====
+  p_chick: function(C){
+    C.feet(16, 27, "#F08A3C", 2);
+    C.part(function(p){ p.ell(16, 18, 8, 8, "#FFE14D"); p.px(16, 4, "#FFE14D"); p.px(15, 5, "#FFE14D"); });
+    C.part(function(p){ p.tri(14, 18, 18, 18, 16, 21, "#F59A2A"); });
+    C.face(16, 15, { mouth: "none", gap: 3 });
+  },
+  p_dog: function(C){ // しば犬(まき尾)
+    C.feet(16, 28, "#8A4A1C");
+    C.part(function(p){ p.ell(25, 18, 3, 3, "#E8A04A"); });
+    C.part(function(p){ p.ell(16, 21, 7, 6, "#E8A04A"); p.ell(16, 23, 4, 3, "#FFF0D8"); });
+    C.part(function(p){ p.tri(8, 9, 10, 2, 13, 7, "#E8A04A"); p.tri(24, 9, 22, 2, 19, 7, "#E8A04A"); p.ell(16, 11, 8.5, 6.5, "#E8A04A"); p.ell(16, 14, 5, 3, "#FFF0D8"); });
+    C.part(function(p){ p.ell(16, 13, 1.4, 1, CK); }, { noline: true, flat: true });
+    C.face(16, 10, { mouth: "none", gap: 4 });
+  },
+  p_cat: function(C){
+    C.feet(16, 28, "#6A6A6A");
+    C.part(function(p){ p.line(24, 24, 28, 15, "#A8A8B0"); p.line(25, 24, 29, 15, "#A8A8B0"); });
+    C.part(function(p){ p.ell(16, 21, 7, 6, "#C8C8D0"); });
+    C.part(function(p){ p.tri(7, 10, 9, 2, 13, 6, "#C8C8D0"); p.tri(25, 10, 23, 2, 19, 6, "#C8C8D0"); p.ell(16, 11, 9, 6.5, "#C8C8D0"); p.px(9, 6, "#FF9EB5"); p.px(22, 6, "#FF9EB5"); });
+    C.face(16, 10, { mouth: "cat", my: 3, gap: 4 });
+  },
+  p_hamster: function(C){
+    C.feet(16, 27, "#E89A8A", 3);
+    C.part(function(p){ p.ell(10, 9, 2.4, 2.4, "#F2C08A"); }); C.part(function(p){ p.ell(22, 9, 2.4, 2.4, "#F2C08A"); });
+    C.part(function(p){ p.ell(16, 17, 9, 8.5, "#F2C08A"); p.ell(16, 20, 6, 5, "#FFF6E8"); });
+    C.face(16, 14, { mouth: "cat", my: 3, gap: 3 });
+  },
+  p_rabbit: function(C){
+    C.feet(16, 28, "#C8C8C8");
+    C.part(function(p){ p.ell(12, 6, 2, 5, CW); p.ell(20, 6, 2, 5, CW); p.px(12, 5, "#FFC8D6"); p.px(20, 5, "#FFC8D6"); });
+    C.part(function(p){ p.ell(16, 19, 8.5, 8, CW); });
+    C.face(16, 16, { mouth: "cat", my: 3, gap: 3 });
+  },
+  p_penguin: function(C){
+    C.feet(16, 28, "#F59A2A");
+    C.part(function(p){ p.ell(16, 16, 9, 11, "#2F3A4A"); p.ell(16, 19, 6, 7, CW); p.ell(16, 11, 6, 4, CW); });
+    C.arms(5, 25, 17, "#2F3A4A");
+    C.part(function(p){ p.tri(14, 13, 18, 13, 16, 15, "#F59A2A"); });
+    C.face(16, 10, { mouth: "none", gap: 3 });
+  },
+  p_fox: function(C){
+    C.feet(16, 28, "#8A3A10");
+    C.part(function(p){ p.ell(25, 20, 4, 3, "#F08A3C"); p.px(28, 18, CW); p.px(28, 19, CW); });
+    C.part(function(p){ p.ell(16, 21, 6.5, 6, "#F08A3C"); p.ell(16, 23, 4, 3, CW); });
+    C.part(function(p){ p.tri(7, 10, 8, 1, 13, 6, "#F08A3C"); p.tri(25, 10, 24, 1, 19, 6, "#F08A3C"); p.ell(16, 11, 9, 6, "#F08A3C"); p.tri(9, 12, 23, 12, 16, 17, CW); });
+    C.part(function(p){ p.ell(16, 15, 1.2, 1, CK); }, { noline: true, flat: true });
+    C.face(16, 10, { mouth: "none", eyes: "line", gap: 4 });
+  },
+  p_tanuki: function(C){
+    C.feet(16, 28, "#4A3020");
+    C.part(function(p){ p.ell(16, 21, 8, 6.5, "#9A7A5A"); p.ell(16, 22, 4.5, 4.5, "#E8D6B8"); });
+    C.part(function(p){ p.ell(9, 6, 2.5, 2.5, "#6A4A30"); p.ell(23, 6, 2.5, 2.5, "#6A4A30"); p.ell(16, 11, 9, 6.5, "#9A7A5A"); p.ell(12, 11, 3, 2.2, "#4A3020"); p.ell(20, 11, 3, 2.2, "#4A3020"); p.ell(16, 14, 3, 2, "#E8D6B8"); });
+    C.face(16, 10, { mouth: "none", gap: 4, cheek: false });
+    C.px(12, 10, CW); C.px(20, 10, CW);
+  },
+  p_owl: function(C){
+    C.feet(16, 28, "#E8A04A");
+    C.part(function(p){ p.tri(7, 9, 8, 3, 12, 7, "#8A5A2B"); p.tri(25, 9, 24, 3, 20, 7, "#8A5A2B"); p.ell(16, 17, 10, 11, "#8A5A2B"); p.ell(16, 21, 6, 6, "#E8D2A8"); });
+    C.part(function(p){ p.ell(12, 13, 3.4, 3.4, CW); p.ell(20, 13, 3.4, 3.4, CW); }, { flat: true });
+    C.part(function(p){ p.tri(15, 15, 17, 15, 16, 18, "#F59A2A"); });
+    C.px(12, 13, CK); C.px(12, 14, CK); C.px(20, 13, CK); C.px(20, 14, CK);
+  },
+  p_wolf: function(C){
+    C.feet(16, 28, "#4A5560");
+    C.part(function(p){ p.ell(16, 21, 8, 6.5, "#8A97A6"); p.ell(16, 23, 4.5, 3.5, "#DDE3EA"); });
+    C.part(function(p){ p.tri(6, 10, 7, 0, 13, 5, "#8A97A6"); p.tri(26, 10, 25, 0, 19, 5, "#8A97A6"); p.ell(16, 11, 9.5, 6.5, "#8A97A6"); p.ell(16, 14, 5, 3, "#DDE3EA"); });
+    C.part(function(p){ p.ell(16, 13, 1.4, 1, CK); }, { noline: true, flat: true });
+    C.face(16, 9, { mouth: "fang", eyes: "angry", my: 6, gap: 4, cheek: false });
+  },
+  p_bear: function(C){
+    C.feet(16, 28, "#4A2E18", 4);
+    C.part(function(p){ p.ell(8, 5, 3, 3, "#8A5A2B"); p.ell(24, 5, 3, 3, "#8A5A2B"); p.ell(16, 16, 11, 11, "#8A5A2B"); p.ell(16, 15, 4.5, 3, "#D6B48A"); p.ell(16, 22, 6, 4.5, "#D6B48A"); });
+    C.part(function(p){ p.ell(16, 14, 1.6, 1, CK); }, { noline: true, flat: true });
+    C.face(16, 10, { mouth: "flat", my: 6, gap: 4, cheek: false });
+  },
+  p_tiger: function(C){
+    C.feet(16, 28, "#8A4A10", 4);
+    C.part(function(p){ p.ell(8, 6, 3, 3, "#F59A2A"); p.ell(24, 6, 3, 3, "#F59A2A"); p.ell(16, 16, 11, 10.5, "#F59A2A"); p.ell(16, 18, 6, 4, CW);
+      [[6,13],[26,13],[7,18],[25,18]].forEach(function(o){ p.rect(o[0], o[1], 2, 1, CK); }); p.rect(14, 6, 1, 3, CK); p.rect(17, 6, 1, 3, CK); });
+    C.part(function(p){ p.ell(16, 16, 1.6, 1, CK); }, { noline: true, flat: true });
+    C.face(16, 11, { mouth: "fang", my: 7, gap: 4, cheek: false });
+  },
+  m_hime: function(C){ // おくすり姫(ティアラ・ドレス)
+    C.feet(16, 28, "#B04A7A");
+    C.part(function(p){ p.tri(7, 27, 25, 27, 16, 14, "#FF9EC0"); p.rect(8, 23, 16, 4, "#FF9EC0"); p.rect(10, 24, 12, 1, "#FFD0E0"); });
+    C.part(function(p){ p.ell(16, 10, 7.5, 7, CSKIN); p.ell(16, 6, 8, 3.5, "#E8A04A", null, 7); p.rect(8, 7, 2, 7, "#E8A04A"); p.rect(22, 7, 2, 7, "#E8A04A"); });
+    C.part(function(p){ p.rect(12, 1, 8, 2, "#F2C230"); p.px(13, 0, "#F2C230"); p.px(16, 0, "#F2C230"); p.px(19, 0, "#F2C230"); p.px(16, 1, "#E2463A"); });
+    C.face(16, 10, { mouth: "smile", gap: 3 });
+  },
+  // ===== てき(とぼけた ザイコの もんだい) =====
+  e_hokori: function(C){ // ホコリン(ふわふわ 灰色)
+    C.part(function(p){ for (let i = 0; i < 10; i++){ const a = i / 10 * Math.PI * 2; p.ell(16 + Math.cos(a) * 8, 17 + Math.sin(a) * 7, 3, 3, "#B8BCC4"); } p.ell(16, 17, 8, 7, "#B8BCC4"); });
+    C.face(16, 14, { mouth: "wavy", eyes: "big", cheek: false });
+  },
+  e_chirakari: function(C){ // チラカリーノ(はこと 紙の山)
+    C.feet(16, 28, "#5A3A1C");
+    C.part(function(p){ p.rect(5, 15, 12, 11, "#C99A5B"); p.rect(5, 15, 12, 2, "#A97A40"); });
+    C.part(function(p){ p.rect(14, 9, 13, 9, "#F2F2F2"); p.rect(16, 11, 9, 1, "#B8C2CC"); p.rect(16, 13, 7, 1, "#B8C2CC"); });
+    C.part(function(p){ p.ell(22, 23, 5, 3.5, "#7FC4F5"); });
+    C.face(11, 19, { mouth: "grin", gap: 2, cheek: false });
+  },
+  e_shinagire: function(C){ // カラッポ箱(空っぽの だんボール)
+    C.feet(16, 28, "#5A3A1C");
+    C.part(function(p){ p.rect(5, 10, 22, 16, "#D6A35E"); p.tri(5, 10, 10, 4, 12, 10, "#E8BC7A"); p.tri(27, 10, 22, 4, 20, 10, "#E8BC7A"); p.rect(7, 12, 18, 3, "#5A3A1C"); });
+    C.face(16, 17, { mouth: "o", eyes: "big", gap: 4, cheek: false });
+  },
+  e_hokan: function(C){ // マチガエル(まちがった場所に いる かえる)
+    C.feet(16, 28, "#2E6B3A", 5);
+    C.part(function(p){ p.ell(10, 9, 3.5, 3.5, "#5BB85F"); p.ell(22, 9, 3.5, 3.5, "#5BB85F"); p.ell(16, 18, 11, 8.5, "#5BB85F"); p.ell(16, 21, 6, 4, "#D8F0C0"); });
+    C.part(function(p){ p.ell(10, 9, 1.8, 1.8, CW); p.ell(22, 9, 1.8, 1.8, CW); }, { noline: true, flat: true });
+    C.px(10, 9, CK); C.px(22, 9, CK);
+    C.part(function(p){ p.rect(20, 1, 9, 4, "#FFE27A"); p.px(24, 2, CK); p.px(24, 3, CK); }, {});
+    C.face(16, 13, { mouth: "smile", my: 2, eyes: "line", gap: 8, cheek: false });
+  },
+  e_kigengire: function(C){ // シメキリカレンダー(赤い まる)
+    C.feet(16, 28, "#3A3A3A");
+    C.part(function(p){ p.rect(6, 6, 20, 20, CW); p.rect(6, 6, 20, 5, "#E2463A"); for (let y = 13; y < 25; y += 3) for (let x = 8; x < 25; x += 4) p.px(x, y, "#B8C2CC"); p.ell(20, 19, 3, 3, "#FFE0E0"); });
+    C.part(function(p){ p.px(10, 4, "#5A5A5A"); p.px(10, 5, "#5A5A5A"); p.px(21, 4, "#5A5A5A"); p.px(21, 5, "#5A5A5A"); });
+    C.face(14, 14, { mouth: "frown", eyes: "angry", gap: 3, cheek: false });
+  },
+  e_moushinsei: function(C){ // ショルイノヤマ(書類の山)
+    C.feet(16, 29, "#5A4636");
+    for (let i = 0; i < 6; i++) C.part(function(p){ p.rect(6 + (i % 2), 6 + i * 3, 20, 3, i % 2 ? "#F7F7F2" : "#FFFFFF"); });
+    C.face(16, 14, { mouth: "wavy", eyes: "line", gap: 4, cheek: false });
+  },
+  e_nushi: function(C){ // ザイコヌーシ(大きな ひげの ぬし)
+    C.feet(16, 29, "#3A2A4A", 5);
+    C.part(function(p){ p.ell(16, 16, 12, 12, "#8A5ACB"); p.tri(6, 8, 4, 1, 11, 5, "#8A5ACB"); p.tri(26, 8, 28, 1, 21, 5, "#8A5ACB"); p.ell(16, 21, 7, 3, "#E8E8F2", 20); });
+    C.face(16, 12, { mouth: "grin", eyes: "angry", gap: 4, my: 4, cheek: false });
+  },
+  b_kaishu: function(C){ // カイシュウ大王(回収かごの 王さま)
+    C.feet(16, 29, "#2A2A2A", 6);
+    C.part(function(p){ p.rect(4, 11, 24, 16, "#3F7FD0"); for (let x = 6; x < 27; x += 3) p.rect(x, 13, 1, 12, "#2F5FA0"); p.rect(4, 11, 24, 2, "#2F5FA0"); });
+    C.part(function(p){ p.rect(9, 4, 14, 3, "#F2C230"); p.px(9, 2, "#F2C230"); p.px(9, 3, "#F2C230"); p.px(16, 1, "#F2C230"); p.px(16, 2, "#F2C230"); p.px(16, 3, "#F2C230"); p.px(22, 2, "#F2C230"); p.px(22, 3, "#F2C230"); });
+    C.part(function(p){ p.rect(8, 7, 16, 5, "#FFE0C0"); });
+    C.face(16, 8, { mouth: "grin", eyes: "angry", gap: 4, my: 2, cheek: false });
+  },
+  b_tanaoroshi: function(C){ // タナオロシ将軍(たなの よろい)
+    C.feet(16, 29, "#3A2A1C", 6);
+    C.part(function(p){ p.rect(3, 6, 26, 21, "#8A5A2B"); for (let y = 12; y < 26; y += 5) p.rect(3, y, 26, 1, "#5A3A1C"); [[6,8],[12,8],[20,13],[8,18],[24,18],[14,23]].forEach(function(o){ p.rect(o[0], o[1], 3, 3, ["#E2463A","#5FA8D3","#F5D84A"][o[0] % 3]); }); });
+    C.part(function(p){ p.tri(3, 6, 7, 0, 10, 6, "#C0392B"); p.tri(29, 6, 25, 0, 22, 6, "#C0392B"); });
+    C.face(16, 8, { mouth: "fang", eyes: "angry", gap: 5, my: 2, cheek: false });
+  },
+  b_yakuo: function(C){ // ヤクオウ・ザ・グレート(大きな くすりびんの王)
+    C.feet(16, 29, "#3A1A4A", 6);
+    C.part(function(p){ p.rect(11, 5, 10, 4, "#2A2A2A"); });
+    C.part(function(p){ p.rect(5, 9, 22, 19, "#6A3AA0"); p.rect(7, 15, 18, 8, "#F2E6FF"); p.rect(9, 17, 14, 1, "#B8A2D6"); p.rect(9, 19, 10, 1, "#B8A2D6"); });
+    C.part(function(p){ p.rect(9, 1, 14, 3, "#F2C230"); p.px(9, 0, "#F2C230"); p.px(16, 0, "#F2C230"); p.px(22, 0, "#F2C230"); p.px(16, 2, "#E2463A"); });
+    C.face(16, 11, { mouth: "grin", eyes: "angry", gap: 5, my: 2, cheek: false });
+  }
+};
+// 絵を 作って 登録する
+(function(){
+  Object.keys(CHARM_DESIGNS).forEach(function(k){
+    try {
+      const r = charmSprite_(CHARM_DESIGNS[k]);
+      DOT_SPRITES[k] = r.rows;
+      DOT_EYE[k] = r.eye;
+    } catch(e){}
+  });
+})();
+
 // なかまが加わる順番(先に何が来るかは伏せて、加わるたびに名前を発表する)
 const DOT_MATES = ["tablet","capsule","powder","troche","eyedrop","ointment","patch","tape","syrup","drink","supp","inhaler","inject"];
 const DOT_NAMES = {
@@ -3510,10 +4139,10 @@ function dotStage(){
   const n = (S.items || []).length;
   let key, name;
   if (n >= 20){ key = "hero"; name = "白衣のゆうしゃ"; }
-  else if (n >= 15){ key = "warrior"; name = "やくざいし"; }
-  else if (n >= 10){ key = "apprentice"; name = "みならい"; }
-  else if (n >= 5){ key = "child"; name = "こども"; }
-  else { key = "baby"; name = "あかちゃん"; }
+  else if (n >= 15){ key = "warrior"; name = "いちにんまえ薬剤師"; }
+  else if (n >= 10){ key = "apprentice"; name = "みならいくん"; }
+  else if (n >= 5){ key = "child"; name = "わんぱくキッズ"; }
+  else { key = "baby"; name = "ねむねむベビー"; }
   // 25品目から、5品目ごとに なかま が1体ずつ加わる
   const mateN = n < 25 ? 0 : Math.min(DOT_MATES.length, Math.floor((n - 20) / 5));
   let next = null;
@@ -3908,7 +4537,7 @@ function dotSvg(key, px, lv, deco, equip, frame){
   if (isHero){
     const ck = key + "|" + (frame ? 1 : 0) + "|" + (equip ? [equip.head, equip.body, equip.hand, equip.acc].join(",") : "");
     grid = __heroGridCache[ck] || (__heroGridCache[ck] = heroGrid_(key, equip, frame));
-  } else grid = hiresRows_(rows);
+  } else grid = hiresRows_(rows, !!(typeof CHARM_DESIGNS !== "undefined" && CHARM_DESIGNS[key]));
   r += hrPaths_(grid, px);
   // あいぼう(どうぶつ)は 服を着ない。かわりに ポーズで表現する。
   if (deco && typeof isPet_ === "function" && isPet_(key)) deco = null;
@@ -4385,7 +5014,8 @@ function addExp_(n, why){
   save();
   if (after > before){
     setTimeout(function(){
-      toast("レベルが " + after + " に あがった!" + (why ? "(" + why + ")" : ""));
+      const quips = ["しかし きゅうりょうは かわらない。", "なんだか 肩こりが へった 気がする。", "たなの 高いところに 手が とどきそうだ。", "おくすりの 名前を 3つ 早口で 言えるように なった。", "ねぐせが すこし おとなしく なった。"];
+      toast("レベルが " + after + " に あがった!" + (why ? "(" + why + ")" : "") + " " + quips[after % quips.length]);
       checkAll_();
       const el = document.getElementById("dot-pet");
       if (el){ el.classList.remove("rare-pop"); void el.offsetWidth; el.classList.add("rare-pop"); }
@@ -4645,6 +5275,161 @@ function rpgOnOpen_(){
     if (el){ el.classList.remove("rare-pop"); void el.offsetWidth; el.classList.add("rare-pop"); }
   }, 1600);
 }
+
+/* ============ 版CL:新しい なまえ と ユーモアの しかけ ============ */
+(function(){
+  const NM = {
+    tablet:"ワリセンくん", capsule:"ツートンさん", powder:"コナコナ", troche:"ナメール", eyedrop:"テンガンちゃん",
+    ointment:"ヌリヌリ", patch:"ペッタン", tape:"ハリハリ", syrup:"アマアマ", drink:"ゲンキダス",
+    supp:"ザヤどん", inhaler:"スースー先輩", inject:"チクリン",
+    g_okigusuri:"オキバコ", g_renkon:"ツーンコ", g_jagaimo:"ゴロイモ", g_ringo:"カジリンゴ", g_gyutan:"タンタン",
+    g_takoyaki:"アツアツタコ丸", g_yatsuhashi:"ハッシー", g_shika:"オジギシカ", g_momiji:"モミモミ",
+    g_udon:"コシツヨシ", g_mentaiko:"ピリリコ", g_shisa:"マモリーヌ",
+    g2_ichigo:"ツブツブ", g2_mikan:"ムッキー", g2_rakkasei:"カラッキー", g2_budou:"ブドウ組", g2_megane:"ズレテール",
+    g2_kiritanpo:"タンポくん", g2_soba:"ズルズル", g2_ebifly:"サクサクエビ", g2_kibidango:"ダンゴトリオ",
+    g2_sakuranbo:"フタゴンボ", g2_ocha:"チャバシラ", g2_konnyaku:"プルプル",
+    s_hakase:"ヤクガク博士", s_monshin:"モンシンボード", s_nyubachi:"スリスリ", s_choshinki:"ドクドク",
+    r_gold:"キンキラさん", r_rainbow:"ナナイロ", r_phantom:"スケスケ"
+  };
+  Object.keys(NM).forEach(function(k){ DOT_NAMES[k] = NM[k]; });
+  const PN = { p_chick:"ヒヨコのピヨ助", p_dog:"しば犬のコロ", p_cat:"ねこのグレ", p_hamster:"ハムスターのほっぺ",
+    p_rabbit:"うさぎのミミ", p_penguin:"ペンギンのペタペタ", p_fox:"きつねのコンタ", p_tanuki:"たぬきのポン吉",
+    p_owl:"ふくろうのホー先生", p_wolf:"おおかみのガルル", p_bear:"くまのドスコイ", p_tiger:"とらのシマシマ" };
+  PETS.forEach(function(x){ if (PN[x.key]) x.name = PN[x.key]; });
+  HIME.name = "おくすり姫"; HIME.how = "ヤクオウ・ザ・グレート(超ボス)を たおすと なかまに なる";
+  const EN = {
+    e_hokori:     ["ホコリン",          "ホコリンが ころがってきた!"],
+    e_chirakari:  ["チラカリーノ",      "チラカリーノが うりばを ちらかしている!"],
+    e_shinagire:  ["カラッポ箱",        "カラッポ箱が「なにも ないよ」と 言っている!"],
+    e_hokan:      ["マチガエル",        "マチガエルが まちがった たなに すわっている!"],
+    e_kigengire:  ["シメキリカレンダー", "シメキリカレンダーが 赤まるを つけてきた!"],
+    e_moushinsei: ["ショルイノヤマ",    "ショルイノヤマが どさっと くずれてきた!"],
+    e_nushi:      ["ザイコヌーシ",      "ザイコヌーシが「数が あわんのう」と つぶやいた!"],
+    b_kaishu:     ["カイシュウ大王",    "【中ボス】カイシュウ大王が かごを ゆらして あらわれた!"],
+    b_tanaoroshi: ["タナオロシ将軍",    "【大ボス】タナオロシ将軍が 全部 数えなおせと さけんでいる!"],
+    b_yakuo:      ["ヤクオウ・ザ・グレート", "【超ボス】ヤクオウ・ザ・グレートが 王かんを なおしながら あらわれた……!"]
+  };
+  ENEMIES.forEach(function(e){ if (EN[e.key]){ e.name = EN[e.key][0]; e.say = EN[e.key][1]; } });
+  const EQ = {
+    q_cap:"ねぐせかくしキャップ", q_mask:"ひみつのマスク", q_nurse:"かりもののナースキャップ", q_loupe:"なんでも拡大ルーペ",
+    q_goggle:"まばたききんしゴーグル", q_shield:"くしゃみバリア", q_helmet:"あんぜんだいいちヘルメット", q_crown:"ヤクオウのかんむり(ちょっと重い)",
+    q_coat:"ふつうの白衣", q_apron:"しみぬきエプロン", q_scrub:"うごきやすいスクラブ", q_gown:"ひらひらガウン",
+    q_lead:"ずっしりエプロン", q_guard:"クリーンスーツ(暑い)", q_vest:"ピカピカベスト", q_gold:"きんの白衣(目立ちすぎ)",
+    q_pin:"つまみじょうずピンセット", q_spatula:"ひとさじスプーン", q_pestle:"ごりごりにゅうぼう", q_syringe:"おもちゃの注射器",
+    q_counter:"かぞえトレー", q_spoon:"ぴったりスプーン", q_mortar:"にゅうばちハンマー", q_scale:"きっちりてんびん",
+    q_autoclave:"あつあつオートクレーブ", q_saji:"でんせつのさじ",
+    q_steth:"どきどき聴診器", q_gloves:"ぴったり手ぶくろ", q_glass:"だてめがね", q_thermo:"ねつはかり",
+    q_badge:"がんばったバッジ", q_pouch:"なんでもポーチ", q_bag:"おうしんカバン(重い)", q_book:"ぶあつい本(まくら用)",
+    q_omamori:"きんの聴診器"
+  };
+  Object.keys(EQ).forEach(function(k){ if (EQUIPS[k]) EQUIPS[k].name = EQ[k]; });
+})();
+// てきを「しらべる」と わかること
+const ENEMY_LOOK = {
+  e_hokori: "たなの うらで 生まれた。 そうじきが にがて。",
+  e_chirakari: "片づけると 弱る。 本人は 片づけが 苦手。",
+  e_shinagire: "なかみは からっぽ。 さびしがりや。",
+  e_hokan: "いつも 1だん ずれた たなに いる。 悪気は ない。",
+  e_kigengire: "月末に なると 強くなる。 赤ペンを 持っている。",
+  e_moushinsei: "上の 紙ほど いそいでいる らしい。",
+  e_nushi: "ザイコの 数を 1つだけ ずらすのが 趣味。",
+  b_kaishu: "回収の お知らせを 集めるのが 生きがい。",
+  b_tanaoroshi: "年に1回 本気を 出す。 数え まちがいに きびしい。",
+  b_yakuo: "すべての くすりの 王。 ただし 王かんが すぐ ずれる。"
+};
+// てきが こうげきの かわりに する とぼけた こうどう
+const ENEMY_QUIRK = {
+  e_hokori: ["ホコリンは ころころ ころがっている。", "ホコリンは くしゃみを がまんしている。"],
+  e_chirakari: ["チラカリーノは レシートを ばらまいた。 しかし だれも こまらなかった。", "チラカリーノは 片づけようとして やめた。"],
+  e_shinagire: ["カラッポ箱は 自分の なかみを たしかめている。", "カラッポ箱は「入荷まだ?」と きいてきた。"],
+  e_hokan: ["マチガエルは となりの たなに うつった。 まだ ちがう。", "マチガエルは ゲロゲロ ないた。"],
+  e_kigengire: ["シメキリカレンダーは ページを 1まい めくった。", "シメキリカレンダーは 赤ペンの キャップを なくした。"],
+  e_moushinsei: ["ショルイノヤマは ハンコを さがしている。", "ショルイノヤマは 1まい ふえた。"],
+  e_nushi: ["ザイコヌーシは 数を かぞえまちがえた。", "ザイコヌーシは ひげを なでている。"],
+  b_kaishu: ["カイシュウ大王は かごの 中を のぞきこんでいる。"],
+  b_tanaoroshi: ["タナオロシ将軍は「いちから やりなおし!」と さけんだ。 しかし だれも 聞いていない。"],
+  b_yakuo: ["ヤクオウ・ザ・グレートは 王かんの 位置を なおした。", "ヤクオウ・ザ・グレートは 用法・用量を 守っている。"]
+};
+const ENEMY_BYE = {
+  e_hokori: "ホコリンは そうじきに すいこまれていった。",
+  e_chirakari: "チラカリーノは しぶしぶ 片づけを はじめた。",
+  e_shinagire: "カラッポ箱は 入荷を まつことにした。",
+  e_hokan: "マチガエルは 正しい たなへ はねていった。",
+  e_kigengire: "シメキリカレンダーは 来月に かえっていった。",
+  e_moushinsei: "ショルイノヤマは ファイルに おさまった。",
+  e_nushi: "ザイコヌーシは 数が あって ごきげんに なった。"
+};
+// どうぐ(戦いで ひとりでに 使う。ちょっと 役に立たない物も ある)
+const ITEMS = {
+  i_nodoame:  { name:"のどあめ",           desc:"たいりょくを 3わり かいふく。 スーッとする。", kind:"heal", pow:0.3 },
+  i_techo:    { name:"おくすり手帳",       desc:"まもりが 上がる。 なんだか 安心する。",       kind:"def",  pow:1.3 },
+  i_hakka:    { name:"ハッカ油",           desc:"てきが むせて 1回 休む。",                   kind:"stun" },
+  i_water:    { name:"ただの水",           desc:"のむと おいしい。 それだけ。",                kind:"none", say:"ゴクゴク……。 ただの 水だった。 おいしい。" },
+  i_umbrella: { name:"だれかの 忘れ物の傘", desc:"ひらいても 室内なので 何も おきない。",       kind:"none", say:"かさを ひらいた。 ここは 室内だ。" },
+  i_receipt:  { name:"ながすぎるレシート", desc:"てきの こうげきが 下がる。",                  kind:"weak", pow:0.75, say:"レシートを ひろげた。 てきは 長さに ひるんだ!" },
+  i_point:    { name:"ポイントカード",     desc:"勝つと けいけんちが すこし ふえる。",         kind:"exp" },
+  i_gum:      { name:"あたりつきガム",     desc:"6回に1回 あたる。 あたると 大ダメージ。",    kind:"gamble" },
+  i_nekosogi: { name:"ねぐせなおしスプレー", desc:"こうげきが 上がる。 見た目も ととのう。",    kind:"atk",  pow:1.25 }
+};
+const ITEM_KEYS = Object.keys(ITEMS);
+function bag_(){ const r = rpg_(); r.bag = r.bag || {}; return r.bag; }
+function addItem_(k, n){ const b = bag_(); b[k] = (b[k] || 0) + (n || 1); save(); }
+function randomItem_(){ return ITEM_KEYS[Math.floor(Math.random() * ITEM_KEYS.length)]; }
+// 戦いの中で どうぐを 使う(ひとりでに)。使ったら true
+function battleUseItem_(b, who){
+  const bag = bag_();
+  const have = ITEM_KEYS.filter(function(k){ return bag[k] > 0; });
+  if (!have.length) return false;
+  let k = null;
+  if (b.php < b.pmax * 0.4 && bag.i_nodoame > 0) k = "i_nodoame";
+  else if (Math.random() < 0.2) k = have[Math.floor(Math.random() * have.length)];
+  if (!k || (k === "i_nodoame" && b.php > b.pmax * 0.7)) return false;
+  const it = ITEMS[k];
+  bag[k]--; if (bag[k] <= 0) delete bag[k];
+  b.log.push(who + "は " + it.name + "を つかった!");
+  if (it.kind === "heal"){ const h = Math.round(b.pmax * it.pow); b.php = Math.min(b.pmax, b.php + h); b.log.push("のどが スーッとした! " + h + " かいふく!"); }
+  else if (it.kind === "def"){ b.pdef = Math.round(b.pdef * it.pow) + 1; b.log.push("手帳を ひらいた。 なんだか 安心する。 まもりが 上がった!"); }
+  else if (it.kind === "stun"){ b.stun = 1; b.log.push(b.en.name + "は むせている!"); }
+  else if (it.kind === "weak"){ b.eatk = Math.max(1, Math.round(b.eatk * it.pow)); b.log.push(it.say); }
+  else if (it.kind === "atk"){ b.patk = Math.round(b.patk * it.pow); b.log.push("ねぐせが なおった! こうげきが 上がった!"); }
+  else if (it.kind === "exp"){ b.pointCard = true; b.log.push("ポイントカードを 見せた。 てきは 少し こまっている。"); }
+  else if (it.kind === "gamble"){
+    if (Math.random() < 1 / 6){ const d = Math.max(30, Math.round(b.emax * 0.35)); b.ehp = Math.max(0, b.ehp - d); b.log.push("あたり!! " + b.en.name + "に " + d + " のダメージ!"); }
+    else b.log.push("はずれ。 あまい。");
+  }
+  else b.log.push(it.say || "しかし なにも おこらなかった。");
+  save();
+  return true;
+}
+// アプリを ひらいたときの ふしぎな できごと(1日1回まで)
+const ODD_EVENTS = [
+  function(){ const k = randomItem_(); addItem_(k); return "あいぼうが へんなものを くわえてきた。「" + ITEMS[k].name + "」を 手に入れた!"; },
+  function(){ addItem_("i_nodoame"); return "レジの横に のどあめが ひとつ 落ちていた。 ありがたく いただいた。"; },
+  function(){ return "なかまたちが 開店前に 体操を している。 いちに、さんし。"; },
+  function(){ return "たなの すみで ホコリンが ねむっている。 そっとしておいた。"; },
+  function(){ addItem_("i_umbrella"); return "だれかの 傘が 置いてあった。 なぜか どうぐぶくろに 入った。"; },
+  function(){ return "マチガエルが 正しい たなを 聞いてきた。 ていねいに 教えてあげた。"; },
+  function(){ addItem_("i_gum"); return "あたりつきガムを もらった。 まだ 開けていない。"; },
+  function(){ return "ザイコヌーシが 遠くで「数が あったぞい」と 言っている気がする。"; }
+];
+function oddEvent_(){
+  const r = rpg_(), t = today();
+  if (r.oddDay === t || Math.random() > 0.35) return;
+  r.oddDay = t;
+  const msg = ODD_EVENTS[Math.floor(Math.random() * ODD_EVENTS.length)]();
+  save();
+  setTimeout(function(){ toast("ふしぎな できごと: " + msg); }, 2600);
+}
+function bagSection_(){
+  const bag = bag_();
+  const have = ITEM_KEYS.filter(function(k){ return bag[k] > 0; });
+  return '<div class="divider"><span>どうぐぶくろ</span></div>'
+    + (have.length
+        ? '<ul class="bag-list">' + have.map(function(k){ return '<li><b>' + esc(ITEMS[k].name) + '</b> ×' + bag[k] + '<span>' + esc(ITEMS[k].desc) + '</span></li>'; }).join("") + '</ul>'
+          + '<p class="hint">どうぐは たたかいの 中で ひとりでに 使われます(ピンチの ときは のどあめ)。</p>'
+        : '<p class="hint">まだ 何も ありません。 たたかいに 勝ったり、ふしぎな できごとで 手に入ります。</p>');
+}
+
 function enemyOf_(key){ return ENEMIES.filter(function(e){ return e.key === key; })[0] || null; }
 
 /* ===== なかまの まほう ===== */
@@ -4748,9 +5533,10 @@ function startBattle(practice){
     edef: practice ? Math.round((en.def || 0) * 0.6) : (en.def || 0),
     log: [], turn: 0, done: false
   };
+  if (ENEMY_LOOK[en.key]) __battle.log.push("しらべた: " + ENEMY_LOOK[en.key]);
   showBattleBox_();
   renderBattle_();
-  setTimeout(battleTurn_, 700);
+  setTimeout(battleTurn_, 900);
 }
 // ボスに いどむ
 function startBoss(key){
@@ -4825,6 +5611,16 @@ function battleTurn2_(){
   const b = __battle;
   if (!b || b.done) return;
   const who = pet_().heroName || dotStage().name;
+  // どうぐを 使うことがある(使ったら その分 こうげきは 休み)
+  if (!b.itemUsed || b.turn % 3 === 0){
+    if (battleUseItem_(b, who)){
+      b.itemUsed = true;
+      if (b.ehp <= 0){ b.done = true; b.log.push(b.en.name + "を たおした!"); renderBattle_(); setTimeout(battleWin_, 1400); return; }
+      renderBattle_();
+      setTimeout(battleEnemy_, 1100);
+      return;
+    }
+  }
   const crit = Math.random() < 0.08 + equipFx_("crit") * 0.10;
   let dmg = Math.max(1, Math.round((b.patk * (0.85 + Math.random() * 0.3)) - (b.edef != null ? b.edef * 0.35 : b.en.atk * 0.15)));
   if (crit) dmg = Math.round(dmg * 1.8);
@@ -4833,6 +5629,16 @@ function battleTurn2_(){
   b.log.push((crit ? "会心の一撃!　" : "") + b.en.name + "に " + dmg + " のダメージ!");
   if (crit) flashFx_("crit");
   if (b.ehp <= 0){ b.done = true; b.log.push(b.en.name + "を たおした!"); renderBattle_(); setTimeout(battleWin_, 1400); return; }
+  battleEnemy_(true);
+}
+// てきの番(むせていたり、とぼけたことを したりする)
+function battleEnemy_(sync){
+  const b = __battle;
+  if (!b || b.done) return;
+  const who = pet_().heroName || dotStage().name;
+  if (b.stun){ b.stun = 0; b.log.push(b.en.name + "は むせていて うごけない!"); renderBattle_(); setTimeout(battleTurn_, 1250); return; }
+  const qs = ENEMY_QUIRK[b.en.key];
+  if (qs && Math.random() < (b.en.boss ? 0.1 : 0.2)){ b.log.push(qs[Math.floor(Math.random() * qs.length)]); renderBattle_(); setTimeout(battleTurn_, 1250); return; }
   let edmg = Math.max(1, Math.round((b.eatk * (0.85 + Math.random() * 0.3)) - b.pdef * 0.35));
   b.php = Math.max(0, b.php - edmg);
   b.log.push(b.en.name + "の こうげき!");
@@ -4843,6 +5649,7 @@ function battleTurn2_(){
 }
 function battleWin_(){
   const b = __battle, r = rpg_();
+  if (!b) return;   // 決着の前に 閉じられた場合
   if (b.boss){
     r.bosses = (r.bosses || []).concat([b.boss]).filter(function(v, i, a){ return a.indexOf(v) === i; });
     r.wins = (r.wins || 0) + 1;
@@ -4860,10 +5667,10 @@ function battleWin_(){
     save();
     checkAll_();
     battleBox_().innerHTML = '<div class="rpg-result">'
-      + '<div class="rpg-win-t">' + (en2.boss >= 3 ? "★ 薬王を たおした! ★" : "ボスを たおした!") + '</div>'
+      + '<div class="rpg-win-t">' + (en2.boss >= 3 ? "★ ヤクオウ・ザ・グレートを たおした! ★" : "ボスを たおした!") + '</div>'
       + '<div class="rpg-res-ico">' + dotSvg(en2.key, Math.min(64, en2.size || 56)) + '</div>'
       + (got ? '<p><b>' + esc(EQUIPS[got].name) + '</b> を 手に入れた!</p>' : '<p>けいけんちを たくさん もらった!</p>')
-      + (hime ? '<div class="hime-get">' + dotSvg("m_hime", 56) + '<p><b>おひめさま</b>が なかまに なった!<br>'
+      + (hime ? '<div class="hime-get">' + dotSvg("m_hime", 56) + '<p><b>おくすり姫</b>が なかまに なった!<br>'
                 + '<span class="hint">「なかま」画面から つれて歩けます</span></p></div>' : '')
       + '<button class="btn" onclick="closeBattle()">とじる</button></div>';
     return;
@@ -4884,7 +5691,9 @@ function battleWin_(){
     return;
   }
   r.wins = (r.wins || 0) + 1;
-  addExp_(b.practice ? 8 : 30 + b.en.lv * 15, "バトルに 勝った");
+  addExp_((b.practice ? 8 : 30 + b.en.lv * 15) + (b.pointCard ? 10 : 0), "バトルに 勝った");
+  let gotItem = null;
+  if (Math.random() < (b.practice ? 0.3 : 0.6)){ gotItem = randomItem_(); addItem_(gotItem); }
   checkAll_();
   let got = null;
   // 練習では手に入りにくい。そうびの効果で確率が上がる
@@ -4912,11 +5721,15 @@ function battleWin_(){
     + (key
         ? '<p>' + (dup ? "もう持っている " : "") + '<b>' + esc(EQUIPS[key].name) + '</b> を' + (dup ? "見つけた" : "手に入れた!") + '</p>'
           + (dup ? '' : '<p class="hint">「なかま」画面の そうび から着せかえられます</p>')
-        : '<p>なにも 落とさなかった……</p>')
+        : '<p>そうびは 落とさなかった……</p>')
+    + (gotItem ? '<p>どうぐ「<b>' + esc(ITEMS[gotItem].name) + '</b>」を ひろった!</p>' : '')
+    + (ENEMY_BYE[b.en.key] ? '<p class="hint">' + esc(ENEMY_BYE[b.en.key]) + '</p>' : '')
+    + (b.pointCard ? '<p class="hint">ポイントカードの おかげで けいけんち +10</p>' : '')
     + '<button class="btn" onclick="closeBattle()">とじる</button></div>';
 }
 function battleLose_(){
   const b = __battle, r = rpg_();
+  if (!b) return;   // 決着の前に 閉じられた場合
   if (b.boss){
     r.loses = (r.loses || 0) + 1;
     addExp_(20, "ボスに いどんだ");
@@ -5042,7 +5855,7 @@ function bossList_(){
       + (ok ? '<button class="btn" onclick="startBoss(\'' + e.key + '\')">いどむ</button>' : '<span class="boss-lock">🔒</span>')
       + '</div>';
   });
-  if (S.hime) h += '<p class="hint">薬王を たおして おひめさま を なかまに しました。</p>';
+  if (S.hime) h += '<p class="hint">ヤクオウ・ザ・グレートを たおして おくすり姫を なかまに しました。</p>';
   return h + '</div>';
 }
 // そうび(着せかえ)
@@ -5157,7 +5970,8 @@ function battleSection_(){
     +   '自分の パーティは 備蓄をアップロードすると 相手にも 見えるようになります。</p>'
     + '<p class="hint">なかまが増える・なかまが しんかする・げんきが高い ほど強くなります。負けても なくすものは ありません。</p>'
     + '</div>'
-    + defeatedList_();
+    + defeatedList_()
+    + bagSection_();
 }
 function openEquip(){
   const r = rpg_();
@@ -5238,81 +6052,74 @@ function pet_(){
 const PAT_LIMIT = 5;          // なでてげんきになるのは1日5回まで
 // 状況に合わせたひとこと(困りごとがあれば教えてくれる)
 const PERSONA = {
-  m_hime: { p:"けだかい(気高い)", a:"float", t:function(s){ return s + "ですわ。……よろしくてよ"; },
-    c:["わたくしが ついておりますわ","おきばりなさいませ","この店を まもりましょう"] },
-  p_chick: { p:"ぴよぴよ", a:"hop", t:function(s){ return s + "ぴよ〜"; },
-    c:["ぴよ? ぴよぴよ!","たまごの ときの ゆめを 見たぴよ","ついていっても いいぴよ?"] },
-  p_dog: { p:"ちゅうけん(忠犬)", a:"wag", t:function(s){ return s + "ワン! おまかせください!"; },
-    c:["ごしゅじんさま、おかえりなさい!","しっぽが とまらないワン","おともします、どこまでも!"] },
-  p_hamster: { p:"ほおぶくろ", a:"hop", t:function(s){ return s + "……もぐもぐ。ほっぺに ためとくね"; },
-    c:["ひまわりのタネ、ある?","ほっぺが いっぱいで しゃべれない","くるくる 走るの すきなの"] },
-  p_rabbit: { p:"さみしがりや", a:"hop", t:function(s){ return s + "……ねえ、そばに いてくれる?"; },
-    c:["ひとりだと さみしくて……","ぴょんっ! おどろいた?","みみが 長いから よく聞こえるの"] },
-  p_penguin: { p:"れいせい", a:"slide", t:function(s){ return s + "。……以上、報告おわり"; },
-    c:["氷の上なら 誰にも 負けない","スッ……(すべっていった)","冷たいのは 体だけです"] },
-  p_owl: { p:"ものしり", a:"fly", t:function(s){ return s + "。ホゥ……覚えておくと よいぞ"; },
-    c:["夜のことなら わしに 聞け","首は 270度 まわるのじゃ","知は 力なり、ホゥ"] },
-  p_tanuki: { p:"ばけるのが好き", a:"roll", t:function(s){ return s + "ぽん! ……って、化けてみただけ"; },
-    c:["ぽんぽこ ぽん!","葉っぱを 頭に のせてみた","つぎは なにに 化けようかな"] },
-  p_bear: { p:"どうもう(獰猛)", a:"charge", t:function(s){ return s + "だ。……ガアアッ!!"; },
-    c:["グルルル……近づくな","ハチミツを よこせ","この腕、丸太より 太いぞ"] },
-  p_tiger: { p:"ひゃくじゅうの王", a:"bite", t:function(s){ return s + "だ。……ガオオオオッ!!"; },
-    c:["ガオッ! したがえ!","この しま模様が 目に入らぬか","狩りの 時間だ"] },
-  p_wolf: { p:"こうは(硬派)", a:"dash", t:function(s){ return s + "だ。……ぬかるなよ"; },
-    c:["おれが ついている かぎり 心配ない","群れは 一人を 見すてない","遠吠えの ひとつも したい夜だ"] },
-  p_fox: { p:"いたずら好き", a:"vanish", t:function(s){ return s + "だコン。……なーんて、ウソかもよ?"; },
-    c:["ボクに 化かされてみる?","しっぽの数、かぞえてごらん","こっそり ついてってるコン"] },
-  p_cat: { p:"きまぐれ", a:"sleep", t:function(s){ return s + "だニャ。……ま、どうでもいいけどニャ"; },
-    c:["……ふぁ〜あ。ねむいニャ","なでるなら 気が向いたときだけニャ","ひなたが あいてるニャ"] },
-  baby: { p:"あかちゃん", a:"shy", t:function(s){ return s + "でちゅ〜"; }, c:["あぶ〜、あぶぶ〜","まんま……","たかい たかい して〜"] },
-  child: { p:"げんきいっぱい", a:"jump", t:function(s){ return s + "だよ! ねえねえ!"; }, c:["そとで あそびたい!","ぼく はやく おおきくなりたい!","つぎは なにする?"] },
-  apprentice: { p:"がんばりや", a:"dash", t:function(s){ return s + "です! ぼく もっと がんばります"; }, c:["きょうも けいこ けいこ!","いつか ゆうしゃに なるんだ","まだまだ みならいです……"] },
-  warrior: { p:"たよれる先輩", a:"wiggle", t:function(s){ return s + "だ。まかせておけ"; }, c:["店のことは わたしが 見ておく","こまったら いつでも 言ってくれ","白衣は 戦闘服みたいなものだな"] },
-  hero: { p:"ゆうかんな勇者", a:"jump", t:function(s){ return s + "だ! さあ ゆこう!"; }, c:["この店は わたしが まもる!","なかまが いれば こわくない","きょうも 平和だ!"] },
-  tablet: { p:"きまじめ", a:"wiggle", t:function(s){ return s + "です。きちんと 確認しましょう"; }, c:["整理整頓は 基本です","手順どおりが いちばんです","割線は まっすぐが 美しい"] },
-  capsule: { p:"ツンデレ", a:"peek", t:function(s){ return s + "よ……べ、べつに 教えたかったわけじゃ ないんだからね"; }, c:["ふ、ふん。ひまだから 来ただけよ","なでるなら……ま、まあ いいけど","あんたのこと 心配してないから!"] },
-  powder: { p:"ダジャレ好き", a:"squash", t:function(s){ return s + "だよ。……なんてね、さんざい(散財)しちゃ ダメだよ〜"; }, c:["こなを こなす、なんちゃって","さんざい だけに サンザン だね〜","ぶんぽう(分包)より ぶんぽう(文法)が むずかしい"] },
-  troche: { p:"のんびり", a:"float", t:function(s){ return s + "だねぇ。ま、ゆっくり いこうよ"; }, c:["まんなかの あな、のぞいてみる?","ころころ ころがるの すきなんだ","あわてなくても だいじょうぶ〜"] },
-  eyedrop: { p:"なきむし", a:"shy", t:function(s){ return s + "だよ……うぅっ、なみだが とまらないよぉ"; }, c:["ひとりに しないで〜","また うるうる してきた……","やさしくされると すぐ泣いちゃう"] },
-  ointment: { p:"せわやき", a:"wiggle", t:function(s){ return s + "よ。だいじょうぶ? わたしが 見ておくね"; }, c:["きずついたら いつでも おいで","ちゃんと ごはん たべた?","ぬりぬり してあげよっか"] },
-  patch: { p:"むくち", a:"sleep", t:function(s){ return s + "だ。……以上"; }, c:["……。","ひえひえ。","……ん。"] },
-  tape: { p:"てれや", a:"shy", t:function(s){ return s + "です……あっ、じろじろ 見ないで〜"; }, c:["ま、巻かれるの 苦手で……","は、はずかしいよぉ","そんなに 近づかないで……"] },
-  syrup: { p:"あまえんぼ", a:"float", t:function(s){ return s + "だよ! ねえ もっと かまって〜"; }, c:["ぎゅーっ して ほしいな","ひとりは やだ〜","あまいものは しあわせだね"] },
-  drink: { p:"ねっけつ", a:"jump", t:function(s){ return s + "だァーッ!! もえてきたァ!!"; }, c:["気合いだ! 気合いで のりきれ!!","一気に いくぞォ!!","つかれた?ならば 飲むしかない!!"] },
-  supp: { p:"はずかしがり", a:"shy", t:function(s){ return s + "です……その、あんまり 見ないで ください"; }, c:["ぼく、うしろ向きで いいですか……","は、はずかしい 仕事なんです","でも 効きめは 一番なんですよ……"] },
-  inhaler: { p:"りくつっぽい", a:"spin", t:function(s){ return s + "です。統計的にも 妥当な結果ですね"; }, c:["呼吸とは すなわち 生命活動の基本です","効率を 考えると こうなります","つまり 論理的に 正しいわけです"] },
-  inject: { p:"おこりっぽい", a:"shock", t:function(s){ return s + "だ! さっさと やれ!!"; }, c:["チクッと いくぞ、覚悟しろ!","ぐずぐずするな!","おい、まだ 終わってないぞ!!"] },
-  s_hakase: { p:"はかせ", a:"spin", t:function(s){ return s + "だな。実に 興味深い"; }, c:["この現象には 明確な理由が あるのだよ","研究とは 積み重ねだよ、うむ","仮説を 立ててみようではないか"] },
-  s_monshin: { p:"しつもん魔", a:"peek", t:function(s){ return s + "ですね。ところで、ほかに 気になることは?"; }, c:["どこが つらいですか?","いつから ですか?","アレルギーは ありますか?"] },
-  s_nyubachi: { p:"しょくにん", a:"squash", t:function(s){ return s + "だ。……手を 動かせ"; }, c:["すり方に 心が でる","道具は 裏切らねぇ","無駄口 たたく暇があるならな"] },
-  s_choshinki: { p:"しんぱいしょう", a:"shy", t:function(s){ return s + "だよ……だいじょうぶ かなあ、心配だなあ"; }, c:["ちょっと 音が 気になって……","ねえ、ほんとに 平気?","なにか あったら すぐ言ってね……"] },
-  r_gold: { p:"たかびしゃ", a:"wiggle", t:function(s){ return s + "ですわ。……感謝なさい、教えてあげたのよ"; }, c:["わたくしに ふさわしい 店ですこと","おだまり。金には 品格が あるのよ","なでても よろしくてよ"] },
-  r_rainbow: { p:"わらいじょうご", a:"jump", t:function(s){ return s + "だよ。あははっ、おかしいっ!"; }, c:["あははっ! なんでもない けど おかしい!","ふふっ、笑うと 元気でるよね!","にじって 見るだけで 笑っちゃう"] },
-  r_phantom: { p:"なぞなぞ好き", a:"vanish", t:function(s){ return s + "だ。……ところで、なぞなぞは いかが?"; }, c:["ふふ……わたしが 見えるかね","すけて いるのは 心も 同じ","こたえは 風の中……なんてね"] },
-  g_okigusuri: { p:"りちぎな商売人", a:"wiggle", t:function(s){ return s + "でございます。先用後利、これが 商いの道"; }, c:["富山から はるばる 参りました","使った分だけ いただきます","信用が いちばんの 財産ですな"] },
-  g_renkon: { p:"からくち", a:"shock", t:function(s){ return s + "だよ。……甘いこと 言ってんじゃないよ"; }, c:["ツーンと くるでしょ?","甘い店には 客は 来ないよ","辛口で わるかったね"] },
-  g_jagaimo: { p:"おおらか", a:"float", t:function(s){ return s + "だべさ〜。まあ なんとかなるっしょ"; }, c:["ほっかいどうは でっかいどう〜","あわてない あわてない","ジャガイモは 土の中で のんびりよ"] },
-  g_ringo: { p:"くいしんぼう", a:"squash", t:function(s){ return s + "だ! ところで なにか たべもの ない?"; }, c:["おなか すいたなあ","シャリッと いい音でしょ","たべることは いきること!"] },
-  g_gyutan: { p:"おどりずき", a:"wiggle", t:function(s){ return s + "だよ! さあ いっしょに おどろう!"; }, c:["タンゴの リズムで いこう!","体を うごかすと 気分が いいよ!","ステップ ステップ ターン!"] },
-  g_takoyaki: { p:"かんさい人", a:"squash", t:function(s){ return s + "やで〜。……知らんけど"; }, c:["なんでやねん!","もうかりまっか?","アツアツのうちに どうぞ〜"] },
-  g_yatsuhashi: { p:"はんなり", a:"float", t:function(s){ return s + "どすえ。ゆるりと まいりましょう"; }, c:["京の水は やわらこおすなあ","おこしやす〜","あんじょう おきばりやす"] },
-  g_shika: { p:"あきらめ気味", a:"shy", t:function(s){ return s + "です。……まあ、シカたないですね"; }, c:["どうせ ぼくなんて……","おじぎしか とりえが ないので","まあ こんなもんです"] },
-  g_momiji: { p:"ふうりゅう", a:"float", t:function(s){ return s + "でございますな。……秋の夕暮れのようで"; }, c:["もみじの色は 心を しずめます","一句 詠みたくなりますなあ","移ろうものほど 美しい"] },
-  g_udon: { p:"おうえん団", a:"jump", t:function(s){ return s + "や! いけるぞ、ファイトーッ!!"; }, c:["コシで 勝負や!!","そこだ! いまだ! おしーっ!!","きみなら できる! ぜったい できる!"] },
-  g_mentaiko: { p:"めんどうみがいい", a:"wiggle", t:function(s){ return s + "ばい。こまっとったら 言いんしゃい"; }, c:["博多んもんは 情が あついとよ","めんたい 食うたら 元気になるばい","あんた、無理しよらんね?"] },
-  g_shisa: { p:"ポジティブ", a:"float", t:function(s){ return s + "さぁ〜。なんくるないさ〜"; }, c:["てーげー てーげー","わじわじー しても いいことないさ","海を 見たら 落ちつくよ〜"] },
-  g2_ichigo: { p:"れいぎ正しい", a:"wiggle", t:function(s){ return s + "でございます。ご報告 いたします"; }, c:["一期一会、この出会いに 感謝を","ごきげん うるわしゅう","本日も よろしくお願いいたします"] },
-  g2_mikan: { p:"自信なさげ", a:"shy", t:function(s){ return s + "……たぶん、あってると 思うんですけど……"; }, c:["ぼく、まだ 未完成なので……","すっぱかったら ごめんなさい","これで いいのかなあ……"] },
-  g2_rakkasei: { p:"けんやく家", a:"peek", t:function(s){ return s + "です。ムダづかいは いけませんよ"; }, c:["一円を 笑うものは 一円に 泣く","殻まで だいじに 使いましょう","安いときに まとめ買いです"] },
-  g2_budou: { p:"体育会系", a:"dash", t:function(s){ return s + "であります! ハイッ、了解であります!!"; }, c:["押忍!! 本日も 鍛錬であります!","声が 小さい! もう一度!!","根性で なんとかします!!"] },
-  g2_megane: { p:"分析好き", a:"spin", t:function(s){ return s + "ですね。数字で 見ると よく分かります"; }, c:["傾向を 見てみましょう","データは 嘘を つきません","前年比で 考えると……"] },
-  g2_kiritanpo: { p:"マイペース", a:"float", t:function(s){ return s + "だよ……ふぁ〜あ。まあ ぼちぼちで"; }, c:["いま ちょうど 焼けたとこ","いそがなくても 減らないよ","なべの 季節が 待ちどおしい"] },
-  g2_soba: { p:"けんしんてき", a:"wiggle", t:function(s){ return s + "です。わたしは ずっと そばに いますよ"; }, c:["どんなときも そばに います","つらいときは 呼んでください","そばに いるだけで いいんです"] },
-  g2_ebifly: { p:"ツッコミ", a:"shock", t:function(s){ return s + "や。……って、それ 先に言うてや!"; }, c:["なんでやねん! ……あ、ちがった","揚げ足 とるのが 得意です","そこ ツッコむとこ ちゃうやろ!"] },
-  g2_kibidango: { p:"おやぶん肌", a:"jump", t:function(s){ return s + "だ! さあ なかまを あつめるぞ!"; }, c:["だんごを やるから ついてこい!","なかまは 多いほど たのしい!","おれに まかせておけ!"] },
-  g2_sakuranbo: { p:"ふたごの息ぴったり", a:"wiggle", t:function(s){ return s + "だよ!「うん、そのとおり!」"; }, c:["ねえ、そうだよね?「そうだね!」","ふたりで ひとつなの","いつも いっしょなんだ「いっしょ!」"] },
-  g2_ocha: { p:"おちゃめ", a:"peek", t:function(s){ return s + "だよ。……なーんてね、おちゃらけ でした!"; }, c:["お茶目に いこうよ〜","いたずら しちゃおうかな","お茶でも どうぞ〜、ずずっ"] },
-  g2_konnyaku: { p:"とぼけ", a:"squash", t:function(s){ return s + "ですかな。……はて、なんの話でしたかな"; }, c:["ぷるぷる しております","つかみどころが ないと よく言われます","こんにゃくは 味が しみてこそ"] }
+  // ===== 主人公 =====
+  baby: { p:"ねむねむ", a:"sleep", t:function(s){ return s + "……すやぁ"; }, c:["ふにゃ……(ねごと)","おしゃぶり どこ……","すやすや……むにゃ"] },
+  child: { p:"なんでも知りたがり", a:"jump", t:function(s){ return s + "! ねえねえ、それ なあに?"; }, c:["なんで くすりは にがいの?","バーコードって しましまだね!","ぼくも ピッって やりたい!"] },
+  apprentice: { p:"メモ魔", a:"dash", t:function(s){ return s + "ですね。……メモ メモ、っと"; }, c:["きょう 覚えたこと、もう ノート3ページです","先輩、もう一回 お願いします!","付せんが 足りなくなってきました"] },
+  warrior: { p:"冷静な いちにんまえ", a:"wiggle", t:function(s){ return s + "だね。落ち着いて いこう"; }, c:["ダブルチェックは 心の安定","まずは お茶を 一杯","在庫は うそを つかない"] },
+  hero: { p:"白衣の ゆうしゃ(ちょっと天然)", a:"jump", t:function(s){ return s + "だ! ……あれ、ペンどこ やったっけ"; }, c:["この店は わたしが まもる! ……ペンは どこ?","白衣の ポケットは 四次元だ","きょうも 平和で なにより"] },
+  // ===== おくすりの なかま =====
+  tablet: { p:"きっちり几帳面", a:"wiggle", t:function(s){ return s + "です。割線どおり、きっちり 半分に しておきました"; }, c:["まんなかで 割れるのが ほこりです","ずれていると 気になって ねむれません","整理整頓、よし!"] },
+  capsule: { p:"二重人格(赤と白)", a:"peek", t:function(s){ return s + "。……と、赤いほうの ぼくが 言っています"; }, c:["白い ぼくは のんびり、赤い ぼくは せっかち","中身は ひみつです","どっちの ぼくに 話しかけた?"] },
+  powder: { p:"ダジャレ職人", a:"squash", t:function(s){ return s + "。……こなだけに、こなれた 説明でしょ?"; }, c:["さんざい だけに サンザン ですな","粉骨砕身、ってね","くしゃみ 一発で 行方不明に なります"] },
+  troche: { p:"マイペースな なめなめ", a:"float", t:function(s){ return s + "だよぉ。……ゆっくり とけていこ〜"; }, c:["かんだら ダメだよぉ","のどに やさしく、心にも やさしく","あわてると すぐ 小さくなっちゃう"] },
+  eyedrop: { p:"感動屋", a:"shy", t:function(s){ return s + "……うぅ、いい話すぎて 目が うるうるします"; }, c:["さし過ぎ 注意です、ぼくも 気をつけます","1てき に 心を こめて","ぼくを 見ると みんな 上を 向きますね"] },
+  ointment: { p:"世話焼きの お母さん", a:"wiggle", t:function(s){ return s + "よ。うすーく のばして、ていねいにね"; }, c:["あら、手が かさかさじゃない","ぬりすぎは よくないのよ","ふたは ちゃんと しめなさい"] },
+  patch: { p:"クールで ひんやり", a:"sleep", t:function(s){ return s + "。……ひんやり"; }, c:["……ひえっ。","はがすときは ゆっくり。","肩こり、まかせて。"] },
+  tape: { p:"なかなか 本題に 入らない", a:"shy", t:function(s){ return s + "……あ、その前に 話の はじっこを さがしてて"; }, c:["はじっこが 見つからないと 落ちつかないの","くるくる まわっちゃう","ぺたっと くっつくのが すき"] },
+  syrup: { p:"あまえんぼ", a:"float", t:function(s){ return s + "だよ〜。……あまくして くれたら 言うこと 聞くよ"; }, c:["スプーン 1ぱい分の しあわせ","子どもに 人気なの、えへへ","べたべた するのが すき〜"] },
+  drink: { p:"熱血 どりんく", a:"jump", t:function(s){ return s + "だァーッ!! ファイト いっぱーつ……とは 言わないぞ!!"; }, c:["朝の 一本が 勝負だ!!","げんきは 前借り できないぞ!","のみすぎ 注意だ、そこは 冷静だ!"] },
+  supp: { p:"はずかしがり屋", a:"shy", t:function(s){ return s + "です……あの、うしろから 失礼します"; }, c:["ぼくの 話は 小声で おねがいします","効きめには 自信が あります","そっと しておいて ください"] },
+  inhaler: { p:"理屈っぽい 先輩", a:"spin", t:function(s){ return s + "だ。呼吸の タイミングが 9わりだよ"; }, c:["吸って、止めて、ゆっくり はく。基本だ","うがいも わすれずに","先輩と 呼びなさい"] },
+  inject: { p:"せっかちで ちょっと こわい", a:"shock", t:function(s){ return s + "だ! チクッと 早めに 片づけるぞ!"; }, c:["ちょっと チクッと するだけだ!","目を つぶってれば すぐ 終わる!","ぐずぐず するのは キライだ!"] },
+  // ===== ごとうちの なかま =====
+  g_okigusuri: { p:"律儀な 商人", a:"wiggle", t:function(s){ return s + "でございます。使った分だけ、いただきます"; }, c:["箱の中は いつも きっちり","おまけの 紙ふうせん、いりますか?","信用が いちばんの 商品です"] },
+  g_renkon: { p:"ツーンと 辛口", a:"shock", t:function(s){ return s + "だよ。……ツーンと きた?"; }, c:["穴から 見とおしは バッチリ","甘い 考えは 通じないよ","辛口だけど 根は いいやつ"] },
+  g_jagaimo: { p:"のんびり 土の子", a:"float", t:function(s){ return s + "だべ〜。まあ、なんとか なるっしょ"; }, c:["芽が 出るまで 待つのが コツ","でこぼこでも いいべさ","ほくほく するのが いちばん"] },
+  g_ringo: { p:"かじりかけ", a:"squash", t:function(s){ return s + "! ……あ、ひとくち もらってた"; }, c:["シャリッ。……あ、ごめん つい","1日1こ、からだに いいんだよ","赤いのは はずかしいから じゃないよ"] },
+  g_gyutan: { p:"ふにゃっと やわらか", a:"wiggle", t:function(s){ return s + "だよ。……あ、舌が まわらない"; }, c:["かむほど 味が でるタイプ","厚切りに あこがれてる","しゃべるのは ちょっと 苦手"] },
+  g_takoyaki: { p:"アツアツ 関西", a:"squash", t:function(s){ return s + "やで! 中身が 熱いから 気ぃつけてや"; }, c:["タコ 入ってへん日も あるで","くるっと ひっくり返すのが 腕の 見せどころ","アツアツのうちに どうぞ〜"] },
+  g_yatsuhashi: { p:"おっとり はんなり", a:"float", t:function(s){ return s + "どすえ。……三角に たたんで おきました"; }, c:["あんこは 中に しまっとくもんどす","ゆるりと まいりまひょ","京の いけずは 冗談どすえ"] },
+  g_shika: { p:"おじぎ が止まらない", a:"shy", t:function(s){ return s + "です。……ぺこり、ぺこり、ぺこり"; }, c:["おじぎされると おじぎ返しちゃう","せんべいは 好物です","まあ、シカたないですね"] },
+  g_momiji: { p:"秋の 詩人", a:"float", t:function(s){ return s + "。……ひらり、と 一句 うかびました"; }, c:["色づく たなの 秋の風","中の あんこが 心の あたたかさ","季節を かんじて いきましょう"] },
+  g_udon: { p:"コシの強い 応援団", a:"jump", t:function(s){ return s + "や! コシで のりきれーっ!!"; }, c:["のびても くじけるな!!","つゆは だいじ、気合も だいじ!","ズルッと 一気に いけーっ!"] },
+  g_mentaiko: { p:"ピリッと 世話好き", a:"wiggle", t:function(s){ return s + "ばい。ピリッと 気をつけんしゃい"; }, c:["つぶつぶの 数だけ 元気が でるとよ","辛いのは 愛情ばい","あんた、ごはん 食べた?"] },
+  g_shisa: { p:"まもり神(自称)", a:"float", t:function(s){ return s + "さ〜。この店は まもっとくさ〜"; }, c:["入口で ずっと 見張ってるさ〜","わるいものは 通さないよ","なんくるないさ〜"] },
+  g2_ichigo: { p:"つぶつぶ 気にしい", a:"wiggle", t:function(s){ return s + "です。……あ、つぶつぶの 数 かぞえないで"; }, c:["つぶつぶは 種なんです、ほんとうは","赤くなったら 食べごろです","ショートケーキの 上が 夢の舞台"] },
+  g2_mikan: { p:"むかれるのが 苦手", a:"shy", t:function(s){ return s + "……あの、皮は 自分で むけます"; }, c:["白い すじも 栄養です","こたつの 上が 定位置です","すっぱかったら ごめんなさい"] },
+  g2_rakkasei: { p:"カラに こもる", a:"peek", t:function(s){ return s + "です。……カラの 中から 失礼します"; }, c:["ふたりで 1つの カラに 住んでます","ムダづかいは しない主義","からっと 明るく いきたいんです"] },
+  g2_budou: { p:"団体行動 命", a:"dash", t:function(s){ return s + "であります! ブドウ組、全員 そろいました!"; }, c:["一粒の 遅刻も 許されません!","房ごと がんばります!","点呼! いち、に、さん……(以下 略)"] },
+  g2_megane: { p:"すぐ ずれる", a:"spin", t:function(s){ return s + "ですね。……あ、また ずれた"; }, c:["くもったら ふいてください","鼻あてが ちょっと かゆい","ずれても 見える ものは 見えてます"] },
+  g2_kiritanpo: { p:"くしざし マイペース", a:"float", t:function(s){ return s + "だよ……焼けるまで 待とうよ"; }, c:["なべに 入るのが 夢","まんなかは 空洞、心は 満タン","こんがり いい色でしょ"] },
+  g2_soba: { p:"そばにいる 名人", a:"wiggle", t:function(s){ return s + "です。……ずっと おそばに"; }, c:["ズルズル 音を 立てても いいんです","ざるに 乗ると 落ちつきます","細く 長く いきましょう"] },
+  g2_ebifly: { p:"サクサク ツッコミ", a:"shock", t:function(s){ return s + "や! ……って、しっぽまで 食べるんかい!"; }, c:["衣が 本体ちゃうで!","タルタルは 正義や","サクッと いこか!"] },
+  g2_kibidango: { p:"三人で 一人前", a:"jump", t:function(s){ return s + "だよ!(上)「そうだね!」(左)「うん!」(右)"; }, c:["くしの 上で 会議中","だれが 先に 食べられるかで もめてます","おともの 分も ありますよ"] },
+  g2_sakuranbo: { p:"ふたごで 息ぴったり", a:"wiggle", t:function(s){ return s + "!「「ね〜!」」"; }, c:["「わたし」「ぼく」「ふたりで ひとつ!」","くきで つながってるの","どっちが 先に 赤くなるか 勝負中"] },
+  g2_ocha: { p:"ほっと 一服", a:"peek", t:function(s){ return s + "です。……まあ、お茶でも どうぞ"; }, c:["茶柱が 立つと いいこと あるよ","ずずっ……ふう","あわてると やけどしますよ"] },
+  g2_konnyaku: { p:"ぷるぷる とぼけ", a:"squash", t:function(s){ return s + "ですかな。……はて、何の 話でしたかな"; }, c:["つかみどころが ないと よく言われます","味が しみるまで 時間が かかります","ぷるるん"] },
+  // ===== せんもんしょくの なかま =====
+  s_hakase: { p:"話が 長い 博士", a:"spin", t:function(s){ return s + "だな。……そもそも 薬学の 歴史は だね"; }, c:["わしが 若いころは ちょうざいも 手作業でな……","実に 興味深い","メガネを かけたまま メガネを さがしておる"] },
+  s_monshin: { p:"質問が 止まらない", a:"peek", t:function(s){ return s + "ですね。ところで、いつから ですか?"; }, c:["アレルギーは ありますか?","ほかに 飲んでいる お薬は?","チェック欄、ぜんぶ 埋まりました?"] },
+  s_nyubachi: { p:"無口な 職人", a:"squash", t:function(s){ return s + "だ。……ごりごり"; }, c:["すり方に 心が でる","……ごりごり。","道具は うそを つかねぇ"] },
+  s_choshinki: { p:"なんでも 聞きたがる", a:"shy", t:function(s){ return s + "……ちょっと 胸の音 聞かせて?"; }, c:["ドクドク……いい音","しーっ、静かに……","つめたかったら ごめんね"] },
+  // ===== レアな なかま =====
+  r_gold: { p:"キラキラ 自慢", a:"wiggle", t:function(s){ return s + "ですわ。……まぶしくて ごめんあそばせ"; }, c:["わたくし、金メッキでは ございませんの","光るのも 仕事のうち","サングラスを どうぞ"] },
+  r_rainbow: { p:"気分屋(7色)", a:"jump", t:function(s){ return s + "だよ! ……きょうは 何色の 気分かな"; }, c:["赤い日は 元気、青い日は 冷静","雨のあとは 出番です","7色ぜんぶ 本気です"] },
+  r_phantom: { p:"なぞなぞ好きの すけすけ", a:"vanish", t:function(s){ return s + "だ。……ところで、なぞなぞは いかが?"; }, c:["ふふ……わたしが 見えるかね","すけて いるのは 中身が ないから ではない","こたえは 棚の すきまに……"] },
+  // ===== あいぼう =====
+  p_chick: { p:"なんでも まね", a:"hop", t:function(s){ return s + "ぴよ! ……いまの まね してみた ぴよ"; }, c:["ピッ! ……バーコードの まねぴよ","ついていっても いいぴよ?","からを 取っておいてあるぴよ"] },
+  p_dog: { p:"出迎え 担当", a:"wag", t:function(s){ return s + "ワン! しっぽで お知らせ!"; }, c:["おかえりなさいワン!","さんぽの 時間 まだワン?","しっぽが 止まらないワン"] },
+  p_cat: { p:"きまぐれ 店番", a:"sleep", t:function(s){ return s + "ニャ。……レジの上は ゆずらないニャ"; }, c:["だんボールは わたしの 城ニャ","気が向いたら 手伝うニャ","……ふぁ〜あ"] },
+  p_hamster: { p:"ほおぶくろ 貯金", a:"hop", t:function(s){ return s + "……もぐもぐ、ほっぺに しまっとくね"; }, c:["ほっぺの 中は 在庫 たっぷり","くるくる 回るのが 日課","ひまわりのタネ、ある?"] },
+  p_rabbit: { p:"耳が いい", a:"hop", t:function(s){ return s + "……みみで 聞いてたよ"; }, c:["遠くの レジの音まで 聞こえるの","ぴょんっ! びっくりした?","にんじん色の 付せん、かわいいね"] },
+  p_penguin: { p:"報告 きっちり", a:"slide", t:function(s){ return s + "。……以上、ペタペタ 報告でした"; }, c:["床が つめたいと 元気が 出ます","スッ……(すべっていった)","整列は とくいです"] },
+  p_fox: { p:"いたずら 化け上手", a:"vanish", t:function(s){ return s + "だコン。……なーんて、本当かな?"; }, c:["しっぽの 数、かぞえてごらん","きみも 化かされてみる?","こっそり ついてってるコン"] },
+  p_tanuki: { p:"化けそこない", a:"roll", t:function(s){ return s + "ぽん! ……あ、しっぽ 出てた"; }, c:["きょうは 招き猫に 化けてみた(しっぱい)","葉っぱを 頭に のせてみた","ぽんぽこ ぽん!"] },
+  p_owl: { p:"夜ふかし 物知り", a:"fly", t:function(s){ return s + "。ホゥ……覚えておくと よいぞ"; }, c:["夜の 在庫は わしに まかせよ","首は 270度 まわるのじゃ","知は 力なり、ホゥ"] },
+  p_wolf: { p:"群れを 大事にする", a:"dash", t:function(s){ return s + "だ。……群れは 一人を 見すてない"; }, c:["おれが いる かぎり 心配ない","月が きれいな 夜だ","アオーン(遠吠えの 練習中)"] },
+  p_bear: { p:"力もち だけど やさしい", a:"charge", t:function(s){ return s + "だ。……どすこい、運ぶのは まかせろ"; }, c:["ダンボール 10箱 まで いける","ハチミツは 1日 ひとさじまで","冬は ちょっと ねむい"] },
+  p_tiger: { p:"しまもよう 自慢", a:"bite", t:function(s){ return s + "だ。……しまの 数は ひみつだ"; }, c:["ガオッ! ……おどろいた?","しまもようは 毎朝 数えている","ネコあつかい するな"] },
+  m_hime: { p:"おてんば姫", a:"float", t:function(s){ return s + "ですわ! ……あ、王かん 落としましたわ"; }, c:["わたくしも レジを 打ってみたいですわ","ドレスで 走ると 転びますの","おくすりの 国から まいりましたの"] }
 };
 function personaOf_(key){ return PERSONA[key] || PERSONA.tablet; }
 // なぞなぞ(すけすけビンさんの担当)
@@ -5326,6 +6133,14 @@ const NAZO = [
   ["水を 入れると 軽くなるもの なあに?", "ふうせん(うくから)"],
   ["朝は 4本、昼は 2本、夜は 3本の あしのものは?", "にんげん"]
 ];
+// 文の終わり(だよ・だね)を取ってから 口ぐせを付ける。言い切れない文(〜て、〜かな?)は そのまま
+function personaSay_(per, s){
+  let t = String(s).replace(/[!\uFF01]+$/, "");
+  const m = t.match(/\s*(だよね|だよ|だね)$/);
+  if (m) t = t.slice(0, t.length - m[0].length);
+  if (/(て|かな[?\uFF1F]|[?\uFF1F]|ね|よ)$/.test(t)) return s;
+  return per.t(t);
+}
 function petLine_(key){
   const st = dotStage(), gs = genkiState_(), p = pet_();
   // あいぼう(どうぶつ)は 鳴き声だけ
@@ -5368,7 +6183,7 @@ function petLine_(key){
   const f = dayFact_();
   if (f.text){
     const times = (f.kind === "fact") ? 3 : 2;
-    for (let i = 0; i < times; i++) pool.push([per.t(f.text.replace(/!$/, "")), per.a]);
+    for (let i = 0; i < times; i++) pool.push([personaSay_(per, f.text), per.a]);
   }
   if (expired) pool.push([per.t("きげんぎれが " + expired + "こ"), "shock"]);
   if (soon) pool.push([per.t("もうすぐ きげんの おくすりが " + soon + "こ"), "peek"]);
@@ -6426,6 +7241,7 @@ function fitTags(){
     if (!avail || avail < 16) return;
     // 各テキスト要素を段階的に縮小(実測しながら収まるまで)
     // 前回の縮小を もとに戻してから 測り直す(繰り返すたびに 小さくなるのを防ぐ)
+    tag.querySelectorAll("[data-fithide]").forEach(function(el){ el.style.removeProperty("display"); el.removeAttribute("data-fithide"); });
     box.querySelectorAll("*").forEach(function(el){
       el.style.removeProperty("font-size");
       el.style.removeProperty("margin-top");
@@ -6435,12 +7251,20 @@ function fitTags(){
     // 値札の中の 文字すべてを 対象にする(帯・取り消し線の値段・割引の印も含む)
     const els = box.querySelectorAll(".tag-name, .tag-yen, .tag-maker, .tag-cat, .tag-tax, "
       + ".tag-off-band, .tag-was, .tag-offlabel, .tag-jannum, .tag-price, .tag-price-off");
+    const over = function(){ return box.scrollHeight > tag.clientHeight + 1 || tag.scrollHeight > tag.clientHeight + 1; };
+    // とても小さい値札では、文字を読めないほど縮めるより 優先度の低いものを省く
+    // (メーカー → JANの数字 → 税込 → バーコード の順。商品名と値段は 必ず残す)
+    const hideOrder = [".tag-maker", ".barcode-num", ".tag-tax", ".tag-bot"];
+    for (let k = 0; k < hideOrder.length && box.scrollHeight > tag.clientHeight * 1.35; k++){
+      box.querySelectorAll(hideOrder[k]).forEach(function(el){ el.style.setProperty("display", "none", "important"); el.setAttribute("data-fithide", "1"); });
+    }
     let guard = 0;
-    while (box.scrollHeight > tag.clientHeight && guard < 120){
+    while (over() && guard < 120){
       guard++;
       els.forEach(el => {
         const cur = parseFloat(getComputedStyle(el).fontSize);
-        if (cur <= 3) return;
+        const floor = (el.classList.contains("tag-name") || el.classList.contains("tag-yen")) ? 5 : 3;
+        if (cur <= floor) return;
         // 「半額」などの目立たせたい文字は ゆっくり縮める
         const keep = el.classList.contains("tag-off-band") || el.classList.contains("tag-offlabel")
                   || el.classList.contains("tag-yen");
@@ -6792,7 +7616,8 @@ function popCardHtml_(it, ps, pf, copy, note){
   const dim = (pf.size === "custom")
     ? { w: pf.width, h: pf.height }
     : { w: POP_SIZES[pf.size || "a5"].w, h: POP_SIZES[pf.size || "a5"].h };
-  const cardCss = 'font-family:' + ff + ' !important;width:' + dim.w + 'mm;' + (dim.h ? 'min-height:' + dim.h + 'mm;' : '');
+  // 高さも 実寸で固定する(min-height だと 印刷時に縦横比の指定が勝って A5 が短くなっていた)
+  const cardCss = 'font-family:' + ff + ' !important;width:' + dim.w + 'mm;' + (dim.h ? 'height:' + dim.h + 'mm;aspect-ratio:auto;' : '');
   let h = '<div class="pop-card ps-' + ps + '" style="' + cardCss + '">';
   if (ps === "sale") h += '<div class="pop-sale-badge">特売</div>';
   if (ps === "new") h += '<div class="pop-new-badge">NEW</div>';
@@ -7386,6 +8211,7 @@ function bootUi_(){
   updateBrand();
   try { initKeyboard_(); } catch(e){}
   try { loadOrderLogin_(); loadOrderUrls_(); } catch(e){}
+  try { oddEvent_(); } catch(e){}
   renderList();
   showExpiryAlert();
   showBackupAlert();
