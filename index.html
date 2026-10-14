@@ -406,6 +406,26 @@ button.mate-chip { cursor: pointer; font-family: var(--sans); }
 .adv-clear { font-weight: 700; color: #C98A00; }
 .adv-ic { font-size: 64px; line-height: 1.2; }
 .adv-legend { display: flex; flex-wrap: wrap; gap: 6px; font-size: 11.5px; color: #2E7D5B; }
+/* なかよしで かわる 見た目と 動き */
+svg.bd3, svg.bd4 { animation: bdHop 2.4s ease-in-out infinite; }
+svg.bd5 { animation: bdHop 2s ease-in-out infinite; filter: drop-shadow(0 0 3px rgba(255,111,150,.75)); }
+svg.bd6, svg.bd7 { animation: bdHop 1.8s ease-in-out infinite, bdShine 2.4s ease-in-out infinite; filter: drop-shadow(0 0 4px rgba(255,111,150,.9)); }
+svg.bd8 { animation: bdDance 1.6s ease-in-out infinite, bdGold 2s ease-in-out infinite; filter: drop-shadow(0 0 5px #FFD54A); }
+@keyframes bdHop { 0%,70%,100%{transform:translateY(0)} 80%{transform:translateY(-12%)} 90%{transform:translateY(0)} 95%{transform:translateY(-4%)} }
+@keyframes bdShine { 0%,100%{filter:drop-shadow(0 0 3px rgba(255,111,150,.7)) brightness(1)} 50%{filter:drop-shadow(0 0 7px rgba(255,200,230,1)) brightness(1.15)} }
+@keyframes bdGold { 0%,100%{filter:drop-shadow(0 0 4px #FFD54A) brightness(1.02)} 50%{filter:drop-shadow(0 0 10px #FFE27A) brightness(1.2)} }
+@keyframes bdDance { 0%,100%{transform:rotate(0) translateY(0)} 25%{transform:rotate(-7deg) translateY(-6%)} 50%{transform:rotate(0) translateY(0)} 75%{transform:rotate(7deg) translateY(-6%)} }
+@media (prefers-reduced-motion: reduce){ svg.bd3, svg.bd4, svg.bd5, svg.bd6, svg.bd7, svg.bd8 { animation: none !important; } }
+.pet-unit.bondy { position: relative; }
+.pet-unit.bondy::after { content: "💗"; position: absolute; top: -6px; right: -4px; font-size: 10px; animation: bondHeart 2.6s ease-in-out infinite; pointer-events: none; }
+@keyframes bondHeart { 0%{opacity:0; transform:translateY(4px) scale(.6)} 30%{opacity:1} 70%{opacity:1; transform:translateY(-8px) scale(1)} 100%{opacity:0; transform:translateY(-14px)} }
+.lf-me { cursor: pointer; }
+.lf-me .lf-heartfx i, .lf-me .lf-spark i { position: absolute; font-style: normal; font-size: 16px; animation: bondHeart 2.4s ease-in-out infinite; pointer-events: none; }
+.lf-me .lf-heartfx i:nth-child(1) { left: -6px; top: 10px; } .lf-me .lf-heartfx i:nth-child(2) { right: -8px; top: 0; animation-delay: .8s; } .lf-me .lf-heartfx i:nth-child(3) { right: 10px; top: -16px; animation-delay: 1.6s; }
+.lf-me .lf-spark i { font-size: 13px; animation-name: ciGlint; animation-duration: 1.4s; }
+.lf-me .lf-spark i:nth-child(1) { left: 0; top: 40px; } .lf-me .lf-spark i:nth-child(2) { right: 0; top: 54px; animation-delay: .5s; } .lf-me .lf-spark i:nth-child(3) { left: 40px; top: -8px; animation-delay: 1s; }
+.lf-perks ul { list-style: none; padding: 0; margin: 0; font-size: 12px; }
+.lf-perks li { padding: 3px 0; color: #9AA7AF; } .lf-perks li.on { color: #1F2D3A; } .lf-perks li b { display: inline-block; width: 34px; color: #E2466A; }
 /* なかまの くらし */
 .lf-top { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-bottom: 8px; }
 .lf-gold { font-weight: 700; font-size: 14px; margin-right: auto; background: #FFF6D6; border: 1px solid #F0D27A; border-radius: 999px; padding: 4px 12px; }
@@ -1967,7 +1987,7 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
   </section>
 
   <div class="toast" id="toast"></div>
-  <footer class="foot">OTCLinker — とみながグループ 店舗向けツール<br><span class="ver">版 2026-10-14 CV(ぼうけんの地図)</span></footer>
+  <footer class="foot">OTCLinker — とみながグループ 店舗向けツール<br><span class="ver">版 2026-10-14 CW(なかよしで 見た目・強さ・動きが かわる)</span></footer>
 </div>
 
 <script>
@@ -3716,6 +3736,7 @@ function charmShade_(hex, a){
 }
 function charmLuma_(hex){ const n = parseInt(hex.slice(1), 16); return ((n >> 16) & 255) * 0.3 + ((n >> 8) & 255) * 0.59 + (n & 255) * 0.11; }
 const CK = "#2B2B2B", CW = "#FFFFFF", CSKIN = "#FFD9B8", CPINK = "#FF9EB5";
+let __charmFaceOv = null;
 function charmSprite_(draw){
   const N = 32, g = [];
   for (let y = 0; y < N; y++){ const r = []; for (let x = 0; x < N; x++) r.push(null); g.push(r); }
@@ -3773,6 +3794,7 @@ function charmSprite_(draw){
   // 顔(目・口・ほお)。目は 小さい黒い点、口は いろいろ
   C.face = function(cx, ey, o){
     o = o || {};
+    if (__charmFaceOv) o = Object.assign({}, o, __charmFaceOv(o));
     eyeY = ey;
     const gap = o.gap || 3, ew = o.ew || 1, eh = o.eh || 2;
     const ex1 = Math.round(cx - gap - ew / 2), ex2 = Math.round(cx + gap - ew / 2);
@@ -4325,6 +4347,16 @@ function charmDragon_(C, nice){
       DOT_EYE[k] = r.eye;
     } catch(e){}
   });
+  // なかよしに なると いつも にこにこ顔(なかまだけ。敵は 作らない)
+  __charmFaceOv = function(o){
+    const m = o.mouth || "smile";
+    return { eyes: "happy", mouth: (m === "grin" || m === "cat" || m === "smile") ? m : "smile", cheek: true };
+  };
+  Object.keys(CHARM_DESIGNS).forEach(function(k){
+    if (/^(e_|b_|l_)/.test(k)) return;
+    try { const r = charmSprite_(CHARM_DESIGNS[k]); DOT_SPRITES[k + "~h"] = r.rows; DOT_EYE[k + "~h"] = r.eye; } catch(e){}
+  });
+  __charmFaceOv = null;
 })();
 
 // なかまが加わる順番(先に何が来るかは伏せて、加わるたびに名前を発表する)
@@ -4974,6 +5006,11 @@ function dotSvg(key, px, lv, deco, equip, frame){
   // しんかの飾り(マント・えり・かんむり・羽・きらめき)は キャラが分かりにくくなるので 描かない(しんかは ★で表示)
   lv = 0;
   let rows = DOT_SPRITES[key] || DOT_SPRITES.baby;
+  // なかよしレベル(くらし)で 見た目が かわる
+  let bl = 0;
+  try { const lm = S.life && S.life.mates && S.life.mates[key]; if (lm) bl = lifeLv_(lm.bond); } catch(e){}
+  if (bl >= 4 && DOT_SPRITES[key + "~h"]) rows = DOT_SPRITES[key + "~h"];
+  if (bl >= 8) px = Math.round(px * 1.1);
   // あいぼうは いまの ポーズで描く
   if (typeof isPet_ === "function" && isPet_(key)) rows = poseRows_(rows, petPose_(key));
   const n = rows.length;
@@ -4982,7 +5019,7 @@ function dotSvg(key, px, lv, deco, equip, frame){
     return '<rect x="'+(Math.round(x*10)/10)+'" y="'+(Math.round(y*10)/10)+'" width="'+(Math.round(w*10)/10)+'" height="'+(Math.round(h*10)/10)+'" fill="'+c+'"/>';
   };
   const tan = (deco === "tan") ? ' style="filter:sepia(0.4) saturate(1.5) hue-rotate(-12deg)"' : '';
-  let r = '<svg width="'+px+'" height="'+px+'" viewBox="0 0 '+px+' '+px+'" shape-rendering="crispEdges"'+tan+'>';
+  let r = '<svg width="'+px+'" height="'+px+'" viewBox="0 0 '+px+' '+px+'" shape-rendering="crispEdges"'+tan+(bl >= 3 ? ' class="bd' + Math.min(bl, 8) + '"' : '')+'>';
   // 進化の飾りは体の後ろに描く
   if (SHOW_EVO_DECO && lv >= 2){
     const W = px;
@@ -5241,7 +5278,8 @@ function renderDotPet(){
   if (buddy) h += '<span class="pet-unit buddy" data-key="' + buddy + '">' + dotSvg(buddy, Math.round(((bi && bi.size) || 28) * 1.12), mateLv_(buddy), decoOf_(buddy)) + '</span>';
   shown2.forEach(function(o){
     const lvm = mateLv_(o.k);   // しんかするほど 少し 大きくなる
-    h += '<span class="pet-unit ' + o.c + '" data-key="' + o.k + '">' + dotSvg(o.k, 30 + (Math.max(1, lvm) - 1) * 3, lvm, decoOf_(o.k)) + '</span>';
+    const blv = bondLv_(o.k);
+    h += '<span class="pet-unit ' + o.c + (blv >= 5 ? ' bondy' : '') + '" data-key="' + o.k + '">' + dotSvg(o.k, 30 + (Math.max(1, lvm) - 1) * 3, lvm, decoOf_(o.k)) + '</span>';
   });
   const rest = picks.length ? 0 : (line.length - shown2.length);
   if (rest > 0) h += '<span class="mate-more">+' + rest + '</span>';
@@ -5720,6 +5758,8 @@ function partyPower_(){
     const lv = mateLv_(o.k);
     atk += 1 + lv; def += lv; hp += 6 + lv * 3;
     if (o.c === "legend"){ atk += 8 + lv * 2; def += 5 + lv; hp += 30 + lv * 6; }   // 伝説の なかまは 強い
+    const bl = bondLv_(o.k);                                                          // なかよしレベルで 強くなる
+    if (bl >= 2){ atk += Math.round((bl - 1) * 1.5); def += bl - 1; hp += (bl - 1) * 5; }
   });
   // 相棒の分を足す
   const bd = petInfo_(activePet_());
@@ -6179,6 +6219,17 @@ function battleEnemy_(sync){
   tpAdd_(b, charged ? 30 : 14);
   const guarded = !!b.guard;
   if (b.guard){ edmg = Math.max(1, Math.round(edmg * 0.45)); b.guard = 0; }
+  // なかよしレベル5以上の なかまが かばってくれる
+  if (!guarded){
+    const cover = allMates_().map(function(o){ return o.k; }).filter(function(k){ return bondLv_(k) >= 5; });
+    if (cover.length && Math.random() < 0.12 + cover.length * 0.02){
+      const ck = cover[Math.floor(Math.random() * cover.length)];
+      edmg = Math.max(1, Math.round(edmg * 0.4));
+      b.log.push(lifeName_(ck) + "が かばってくれた!");
+      fxq_(b, { t: "banner", text: lifeName_(ck) + "が かばった!", col: "#FF8FB1", d: eo });
+      fxq_(b, { t: "num", at: "party", text: "💗", cls: "heal", d: eo + 100 });
+    }
+  }
   b.php = Math.max(0, b.php - edmg);
   fxq_(b, { t: "lunge", at: "enemy", d: eo });
   fxq_(b, { t: "flash", col: "#B3261E", d: eo + 180 });
@@ -6418,6 +6469,7 @@ function applySpell_(b, k, auto){
   if (sp.say) b.log.push(sp.say);
   const onEnemy = sp.kind === "dmg" || sp.kind === "debuff";
   tpAdd_(b, 10);
+  const bboost = 1 + Math.max(0, bondLv_(k) - 1) * 0.06;    // なかよしほど まほうが 強い
   // 強い わざは カットイン(表情の アップ)。伝説の おうぎは さらに 派手に
   const cut = sp.ult || (sp.kind === "dmg" && sp.pow >= 1.5) || Math.random() < 0.3;
   const o = cut ? 1150 : 0;
@@ -6429,13 +6481,13 @@ function applySpell_(b, k, auto){
   fxq_(b, { t: "spell", sp: sp, k: k, at: onEnemy ? "enemy" : "party", d: o });
   if (!cut) fxq_(b, { t: "banner", text: sp.name, col: sp.col, d: 0 });
   if (sp.kind === "dmg"){
-    const d = Math.max(1, Math.round(b.patk * sp.pow * (auto ? (0.8 + Math.random() * 0.4) : (0.9 + Math.random() * 0.3))));
+    const d = Math.max(1, Math.round(b.patk * sp.pow * bboost * (auto ? (0.8 + Math.random() * 0.4) : (0.9 + Math.random() * 0.3))));
     b.ehp = Math.max(0, b.ehp - d);
     b.log.push(b.en.name + "に " + d + " のダメージ!");
     fxq_(b, { t: "shake", at: "enemy", d: o + 450 });
     fxq_(b, { t: "num", at: "enemy", text: String(d), cls: sp.ult ? "ult" : "dmg big", d: o + 450 });
   } else if (sp.kind === "heal"){
-    const h = Math.round(b.pmax * (auto ? sp.pow : Math.max(sp.pow, 0.3)));
+    const h = Math.round(b.pmax * (auto ? sp.pow : Math.max(sp.pow, 0.3)) * bboost);
     b.php = Math.min(b.pmax, b.php + h);
     b.log.push(who + "は " + h + " かいふくした!");
     fxq_(b, { t: "num", at: "party", text: "+" + h, cls: "heal", d: o + 400 });
@@ -6578,7 +6630,7 @@ function heroSpecial_(b){
   b.slow = 1300;
 }
 function cmdSpecial_(){ const b = cmdBegin_(); if (!b) return; if ((b.tp || 0) < 100){ b.waiting = true; renderBattle_(); return; } heroSpecial_(b); cmdAfter_(b, 1300); }
-function spellCost_(sp){ if (sp.ult) return 3; return sp.kind === "dmg" ? 2 : 1; }
+function spellCost_(sp, k){ const c = sp.ult ? 3 : (sp.kind === "dmg" ? 2 : 1); return (k && bondLv_(k) >= 7) ? Math.max(1, c - 1) : c; }
 function battleMenuHtml_(){
   const b = __battle;
   if (!b || b.done) return "";
@@ -6591,7 +6643,7 @@ function battleMenuHtml_(){
     const ks = spellMates_();
     return '<div class="rpg-cmds rpg-sub">'
       + (ks.length ? ks.map(function(k){
-          const sp = spellOf_(k); const c = spellCost_(sp);
+          const sp = spellOf_(k); const c = spellCost_(sp, k);
           const nm = DOT_NAMES[k] || (petInfo_(k) ? petInfo_(k).name : "なかま");
           return btn(sp.name, "cmdSpell_('" + k + "')", b.mp < c, nm + " ・ MP" + c);
         }).join("") : '<p class="rpg-none">まほうを つかえる なかまが いない</p>')
@@ -6650,7 +6702,7 @@ function cmdAttack_(){ const b = cmdBegin_(); if (!b) return; heroAttack_(b); cm
 function cmdSpell_(k){
   const b = cmdBegin_(); if (!b) return;
   const sp = spellOf_(k); if (!sp) return;
-  const c = spellCost_(sp);
+  const c = spellCost_(sp, k);
   if (b.mp < c){ b.waiting = true; b.log.push("MPが たりない!"); renderBattle_(); return; }
   b.mp -= c;
   fxq_(b, { t: "num", at: "party", text: "MP -" + c, cls: "mp" });
@@ -7588,6 +7640,16 @@ function lifeEvent_(keys){
 // ゴールド(業務で けいけんちが 入ると いっしょに たまる)
 function goldAdd_(n){ const L = life_(); L.gold = Math.max(0, (L.gold || 0) + Math.round(n)); }
 // なかよし度を ふやす(レベルが 上がると ごほうび)
+const LIFE_PERK = {
+  2: "こうげき・まもり・たいりょくが 少し 上がった",
+  3: "うれしそうに よく はねるように なった",
+  4: "いつも にこにこ顔に なった",
+  5: "ハートを とばすように なった・たたかいで かばってくれる",
+  6: "きらきら かがやくように なった・まほうが 強くなった",
+  7: "まほうの MP が 1 へった",
+  8: "金色に かがやき、ひとまわり 大きく なった!"
+};
+function bondLv_(k){ try { const lm = S.life && S.life.mates && S.life.mates[k]; return lm ? lifeLv_(lm.bond) : 1; } catch(e){ return 1; } }
 function bondAdd_(k, n){
   const m = lifeMate_(k), before = lifeLv_(m.bond);
   m.bond = Math.max(0, m.bond + n);
@@ -7600,6 +7662,7 @@ function lifeReact_(k, kind, text, sub){
   const host = document.body;
   const d = document.createElement("div");
   d.className = "life-react " + kind;
+  if (kind === "up"){ const mm = /(\d+)/.exec(text || ""); const lvp = mm ? +mm[1] : 0; if (LIFE_PERK[lvp]) sub = (sub ? sub + " ／ " : "") + LIFE_PERK[lvp]; }
   const marks = { love: ["💖","💕","💗","✨"], happy: ["♪","✨","♪"], meh: ["…"], bad: ["💦","💦"], angry: ["💢"], up: ["⭐","✨","🎉","💗"] }[kind] || ["✨"];
   d.innerHTML = '<div class="lr-box"><div class="lr-face">' + dotSvg(k, 130, mateLv_(k), lifeMate_(k).outfit || null) + '</div>'
     + '<div class="lr-marks">' + marks.concat(marks).map(function(x, i){ return '<i style="--i:' + i + '">' + x + '</i>'; }).join("") + '</div>'
@@ -7653,6 +7716,20 @@ const TALK_Q = [
   ["犬と ねこ、どっちが すき?", "犬", "ねこ"],
   ["夏と 冬、どっちが すき?", "夏", "冬"]
 ];
+// なでる(なかよしレベルで 反応が かわる)
+function lifePet(k){
+  const m = lifeMate_(k), lv = lifeLv_(m.bond);
+  const hk = new Date().getHours();
+  let up = 0;
+  if (m.pet !== today() + "|" + hk){ m.pet = today() + "|" + hk; m.mood = Math.min(100, m.mood + 4); up = bondAdd_(k, 1); }
+  const hero = pet_().heroName || "せんせい";
+  if (lv >= 7) lifeReact_(k, "love", "だいすき!!", hero + "と いっしょで しあわせ");
+  else if (lv >= 5) lifeReact_(k, "love", "えへへ〜♪", "もっと なでて!");
+  else if (lv >= 3) lifeReact_(k, "happy", "うれしいな", "ぴょんぴょん はねている");
+  else lifeReact_(k, "meh", "……?", "まだ ちょっと てれている");
+  if (up) setTimeout(function(){ lifeReact_(k, "up", "なかよしレベル " + up + "!", "ごほうび " + (up * 15) + "G"); }, 2000);
+  save(); setTimeout(openPartyModal, 60);
+}
 function lifeTalk(k){
   const m = lifeMate_(k), per = personaOf_(k);
   const req = lifeDone_(k, "talk");
@@ -7765,7 +7842,9 @@ function lifeRoom_(k){
   let h = '<button class="link" onclick="setLifeView(\'home\')">← なかまの家に もどる</button>';
   h += '<div class="lf-big" style="--wall:' + roomCol_(k) + '"><div class="lf-floor"></div>'
     + (m.req ? '<div class="lf-bubble">' + REQ_IC[m.req.type] + ' ' + esc(reqText_(k, m.req)) + '</div>' : '<div class="lf-bubble calm">' + esc((per.c || ["……"])[hash32_(k + today()) % ((per.c || [1]).length)]) + '</div>')
-    + '<div class="lf-me">' + dotSvg(k, 104, mateLv_(k), m.outfit || null) + '</div></div>';
+    + '<div class="lf-me bl' + lv + '" onclick="lifePet(\'' + k + '\')" title="なでる">' + dotSvg(k, 104, mateLv_(k), m.outfit || null)
+    + (lv >= 5 ? '<span class="lf-heartfx"><i>💗</i><i>💕</i><i>💗</i></span>' : '') + (lv >= 6 ? '<span class="lf-spark"><i>✨</i><i>✨</i><i>✨</i></span>' : '') + '</div></div>'
+    + '<p class="gm-help" style="text-align:center;margin-top:-4px">なかまを タップすると なでられます</p>';
   h += '<div class="lf-name">' + esc(lifeName_(k)) + ' <span class="lf-hearts">' + "❤".repeat(lv) + "♡".repeat(Math.max(0, LIFE_LV.length - lv)) + '</span></div>'
     + '<div class="lf-bars"><span>きぶん ' + moodFace_(m) + '</span><i class="lf-bar mood"><b style="width:' + Math.round(m.mood) + '%"></b></i>'
     + '<span>おなか</span><i class="lf-bar full"><b style="width:' + Math.round(m.full) + '%"></b></i></div>'
@@ -7798,6 +7877,10 @@ function lifeRoom_(k){
       + '<button class="btn" onclick="__lifeSub=\'play\';openPartyModal()">🤝 あそぶ' + (quar.length ? '・なかなおり' : '') + '</button>'
       + '</div>';
   }
+  // なかよしで かわること
+  h += '<div class="lf-perks"><div class="divider"><span>なかよしで かわること</span></div><ul>'
+    + Object.keys(LIFE_PERK).map(function(n){ n = +n; return '<li class="' + (lv >= n ? 'on' : '') + '"><b>Lv' + n + '</b> ' + (lv >= n ? '' : '🔒 ') + esc(LIFE_PERK[n]) + '</li>'; }).join("")
+    + '</ul></div>';
   // プロフィール
   h += '<div class="lf-prof"><div class="divider"><span>プロフィール</span></div><dl>'
     + '<dt>せいかく</dt><dd>' + esc(per.p || "") + '</dd>'
