@@ -401,13 +401,25 @@ body.game-off .tv-btn { display: none !important; }
 @media print { .tv-btn { display: none !important; } }
 
 /* ===== テレビを つけた 画面(なかまを ながめる) ===== */
-.tv-watch { position: fixed; inset: 0; z-index: 97; background: #241A12; display: flex; justify-content: center; align-items: stretch; padding: calc(env(safe-area-inset-top) + 8px) 8px calc(env(safe-area-inset-bottom) + 8px); }
+.tv-watch { position: fixed; inset: 0; z-index: 97; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: calc(env(safe-area-inset-top) + 8px) 8px calc(env(safe-area-inset-bottom) + 8px); overflow: hidden;
+  background: linear-gradient(180deg, #E9DCC2 0, #E2D2B4 62%, #8A5A32 62%, #7A4E2A 100%); }
+.tv-watch::before { content: ""; position: absolute; inset: 0 0 38% 0; background: repeating-linear-gradient(90deg, rgba(160,120,70,.10) 0 18px, transparent 18px 36px); pointer-events: none; }
+.tv-watch::after { content: ""; position: absolute; left: 0; right: 0; top: 62%; height: 6px; background: #5E3B1C; pointer-events: none; }
+.tvw-set { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; width: min(94vw, calc((100vh - 230px) * 1.333 + 34px), 820px); width: min(94vw, calc((100dvh - 230px) * 1.333 + 34px), 820px); }
+.tvw-ant { position: relative; width: 120px; height: 46px; margin-bottom: -4px; }
+.tvw-ant i { position: absolute; bottom: 6px; left: 50%; width: 3px; height: 52px; background: #3A3A3A; border-radius: 2px; transform-origin: 50% 100%; }
+.tvw-ant i:nth-child(1) { transform: rotate(-32deg); } .tvw-ant i:nth-child(2) { transform: rotate(28deg); }
+.tvw-ant i::before { content: ""; position: absolute; top: -4px; left: -2.5px; width: 8px; height: 8px; border-radius: 50%; background: #C0392B; }
+.tvw-ant b { position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 40px; height: 14px; border-radius: 20px 20px 4px 4px; background: #4A4A4A; }
+.tvw-legs { display: flex; justify-content: space-between; width: 78%; height: 22px; }
+.tvw-legs i { width: 12px; height: 100%; background: #3E2610; border-radius: 0 0 4px 4px; }
+.tvw-legs i:first-child { transform: skewX(12deg); } .tvw-legs i:last-child { transform: skewX(-12deg); }
 .tv-watch.zoom { animation: tvZoom .55s cubic-bezier(.2,.8,.25,1) both; }
 @keyframes tvZoom { from { transform: scale(.07); opacity: .3; border-radius: 40px; } to { transform: none; opacity: 1; } }
 .tv-watch.fade { animation: tvFade .25s ease both; }
 @keyframes tvFade { from { opacity: 0; } to { opacity: 1; } }
-.tvw-cab { width: min(560px, 100%); display: flex; flex-direction: column; gap: 10px; background: linear-gradient(180deg, #A06A35, #7E4F22 60%, #6B4119); border: 3px solid #3E2610; border-radius: 26px; padding: 14px 14px 12px; box-shadow: inset 0 2px 0 rgba(255,255,255,.18), 0 10px 30px rgba(0,0,0,.5); }
-.tvw-screen { position: relative; flex: 1; min-height: 0; overflow: hidden; border-radius: 34px / 44px; border: 6px solid #1A120A; background: #000; cursor: pointer; box-shadow: inset 0 0 40px rgba(0,0,0,.65); -webkit-tap-highlight-color: transparent; }
+.tvw-cab { width: 100%; display: flex; flex-direction: column; gap: 10px; background: linear-gradient(180deg, #A06A35, #7E4F22 60%, #6B4119); border: 3px solid #3E2610; border-radius: 26px; padding: 14px 14px 12px; box-shadow: inset 0 2px 0 rgba(255,255,255,.18), 0 10px 30px rgba(0,0,0,.5); }
+.tvw-screen { position: relative; width: 100%; aspect-ratio: 4 / 3; overflow: hidden; border-radius: 12% / 15%; border: 6px solid #1A120A; background: #000; cursor: pointer; box-shadow: inset 0 0 40px rgba(0,0,0,.65); -webkit-tap-highlight-color: transparent; }
 .tvw-scene, .tvw-stage { position: absolute; inset: 0; }
 .tvw-scene { overflow: hidden; }
 .tvw-sky { position: absolute; inset: 0; }
@@ -426,18 +438,19 @@ body.game-off .tv-btn { display: none !important; }
 .tvw-body.walking { animation: tvTrot .42s ease-in-out infinite; }
 @keyframes tvTrot { 0%,100% { transform: translateY(0) rotate(-2deg); } 50% { transform: translateY(-4px) rotate(2deg); } }
 .tvw-shadow { width: 60%; height: 6px; margin-top: -3px; border-radius: 50%; background: rgba(0,0,0,.18); }
+.tv-watch.small .tvw-name { display: none; }
 .tvw-name { font-size: 10.5px; color: rgba(255,255,255,.95); background: rgba(0,0,0,.35); padding: 0 5px; border-radius: 6px; margin-top: 2px; white-space: nowrap; }
-.tvw-say { position: absolute; bottom: calc(100% + 4px); left: 0; width: max-content; max-width: min(230px, 70vw); background: #fff; color: #222; border: 2px solid #222; border-radius: 12px; padding: 5px 9px; font-size: 12.5px; line-height: 1.45; z-index: 3; animation: sayPop .2s ease; box-shadow: 0 2px 0 rgba(0,0,0,.25); }
+.tvw-say { position: absolute; bottom: calc(100% + 4px); left: 0; width: max-content; max-width: min(240px, 62vw); background: #fff; color: #222; border: 2px solid #222; border-radius: 12px; padding: 5px 9px; font-size: 12.5px; line-height: 1.45; z-index: 3; animation: sayPop .2s ease; box-shadow: 0 2px 0 rgba(0,0,0,.25); }
 .tvw-say::after { content: ""; position: absolute; bottom: -8px; left: var(--ax, 50%); width: 10px; height: 10px; background: #fff; border-right: 2px solid #222; border-bottom: 2px solid #222; transform: rotate(45deg); }
 .tvw-say small { display: block; color: #777; font-size: 10.5px; }
 .tvw-emo { position: absolute; top: -14px; right: -6px; font-size: 18px; animation: fxItem 1.6s ease both; pointer-events: none; }
-.tvw-top { position: absolute; top: 10px; left: 14px; right: 14px; display: flex; align-items: center; gap: 8px; color: #fff; font-size: 12px; font-weight: 700; text-shadow: 0 1px 2px rgba(0,0,0,.6); pointer-events: none; }
+.tvw-top { position: absolute; top: 5%; left: 6%; right: 6%; display: flex; align-items: center; gap: 8px; color: #fff; font-size: 12px; font-weight: 700; text-shadow: 0 1px 2px rgba(0,0,0,.6); pointer-events: none; }
 .tvw-top .ch { background: rgba(0,0,0,.45); border: 1px solid rgba(255,255,255,.6); border-radius: 4px; padding: 1px 6px; font-family: monospace; letter-spacing: .08em; }
 .tvw-top #tvw-clock { margin-left: auto; font-family: monospace; }
-.tvw-ticker { position: absolute; left: 0; right: 0; bottom: 0; height: 26px; background: rgba(20,20,40,.78); color: #FFE27A; font-size: 12.5px; overflow: hidden; white-space: nowrap; display: flex; align-items: center; pointer-events: none; }
+.tvw-ticker { position: absolute; left: 0; right: 0; bottom: 0; height: 9%; min-height: 20px; background: rgba(20,20,40,.78); color: #FFE27A; font-size: 12px; overflow: hidden; white-space: nowrap; display: flex; align-items: center; pointer-events: none; }
 .tvw-ticker span { display: inline-block; padding-left: 100%; animation: tvTicker 38s linear infinite; }
 @keyframes tvTicker { from { transform: translateX(0); } to { transform: translateX(-100%); } }
-.tvw-hint { position: absolute; left: 50%; bottom: 36px; transform: translateX(-50%); color: #fff; font-size: 12px; background: rgba(0,0,0,.45); padding: 3px 12px; border-radius: 999px; white-space: nowrap; animation: tvHint 2.4s ease-in-out infinite; pointer-events: none; }
+.tvw-hint { position: relative; z-index: 1; margin-top: 14px; color: #5E3B1C; font-size: 13px; font-weight: 700; background: rgba(255,255,255,.55); padding: 4px 14px; border-radius: 999px; white-space: nowrap; animation: tvHint 2.4s ease-in-out infinite; cursor: pointer; }
 @keyframes tvHint { 0%,100% { opacity: .35; } 50% { opacity: 1; } }
 .tvw-scan { position: absolute; inset: 0; pointer-events: none; background: repeating-linear-gradient(0deg, rgba(0,0,0,.10) 0 1px, transparent 1px 3px); }
 .tvw-glare { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(ellipse at 30% 15%, rgba(255,255,255,.16), transparent 45%); }
@@ -1498,12 +1511,13 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
   </div>
 </div>
 <div id="tv-watch" class="tv-watch" style="display:none">
+ <div class="tvw-set">
+  <div class="tvw-ant"><i></i><i></i><b></b></div>
   <div class="tvw-cab">
     <div class="tvw-screen" id="tvw-screen" onclick="tvwToMenu_()" role="button" aria-label="タッチで メニューへ">
       <div class="tvw-scene" id="tvw-scene"></div>
       <div class="tvw-stage" id="tvw-stage"></div>
       <div class="tvw-top"><span class="ch">CH 1</span><span>なかまの ようす</span><span id="tvw-clock"></span></div>
-      <div class="tvw-hint">▶ がめんを タッチすると メニュー</div>
       <div class="tvw-ticker"><span id="tvw-tick"></span></div>
       <i class="tvw-scan"></i><i class="tvw-glare"></i><i class="tvw-on"></i>
     </div>
@@ -1514,6 +1528,9 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
       <button class="tvw-btn" onclick="tvwOff_()">テレビを けす</button>
     </div>
   </div>
+  <div class="tvw-legs"><i></i><i></i></div>
+ </div>
+ <div class="tvw-hint" onclick="tvwToMenu_()">▶ がめんを タッチすると メニュー</div>
 </div>
 <div id="party-modal" class="order-modal game-tv" style="display:none">
   <div class="order-card">
@@ -2137,7 +2154,7 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
   </section>
 
   <div class="toast" id="toast"></div>
-  <footer class="foot">OTCLinker — とみながグループ 店舗向けツール<br><span class="ver">版 2026-10-15 CY(テレビで なかまを ながめる)</span></footer>
+  <footer class="foot">OTCLinker — とみながグループ 店舗向けツール<br><span class="ver">版 2026-10-15 CZ(テレビを ブラウン管の 4:3に)</span></footer>
 </div>
 
 <script>
@@ -7282,7 +7299,7 @@ const PERSONA = {
   g2_ocha: { p:"ほっと 一服", a:"peek", t:function(s){ return s + "です。……まあ、お茶でも どうぞ"; }, c:["茶柱が 立つと いいこと あるよ","ずずっ……ふう","あわてると やけどしますよ"] },
   g2_konnyaku: { p:"ぷるぷる とぼけ", a:"squash", t:function(s){ return s + "ですかな。……はて、何の 話でしたかな"; }, c:["つかみどころが ないと よく言われます","味が しみるまで 時間が かかります","ぷるるん"] },
   // ===== せんもんしょくの なかま =====
-  s_hakase: { p:"話が 長い 博士", a:"spin", t:function(s){ return s + "だな。……そもそも 薬学の 歴史は だね"; }, c:["わしが 若いころは ちょうざいも 手作業でな……","実に 興味深い","メガネを かけたまま メガネを さがしておる"] },
+  s_hakase: { p:"話が 長い 博士", a:"spin", t:function(s){ return s + "だな。……そもそも 薬学の 歴史は だね……"; }, c:["わしが 若いころは ちょうざいも 手作業でな……","実に 興味深い","メガネを かけたまま メガネを さがしておる"] },
   s_monshin: { p:"質問が 止まらない", a:"peek", t:function(s){ return s + "ですね。ところで、いつから ですか?"; }, c:["アレルギーは ありますか?","ほかに 飲んでいる お薬は?","チェック欄、ぜんぶ 埋まりました?"] },
   s_nyubachi: { p:"無口な 職人", a:"squash", t:function(s){ return s + "だ。……ごりごり"; }, c:["すり方に 心が でる","……ごりごり。","道具は うそを つかねぇ"] },
   s_choshinki: { p:"なんでも 聞きたがる", a:"shy", t:function(s){ return s + "……ちょっと 胸の音 聞かせて?"; }, c:["ドクドク……いい音","しーっ、静かに……","つめたかったら ごめんね"] },
@@ -8300,13 +8317,16 @@ function tvwRender_(){
   const acts = tvwActors_();
   const n = acts.length;
   // テレビの 画面が 大きいほど キャラも 大きく
-  const sh = (document.getElementById("tvw-screen").getBoundingClientRect().height) || 600;
-  const k = Math.max(1, Math.min(1.75, sh / 500));
+  // 拡大アニメの 途中でも ずれないよう、変形の影響を うけない offsetHeight で はかる
+  const sh = document.getElementById("tvw-screen").offsetHeight || 300;
+  const k = Math.max(0.6, Math.min(1.6, sh / 360));
+  // 画面が 小さいときは 名前を かくして すっきり
+  document.getElementById("tv-watch").classList.toggle("small", sh < 330);
   acts.forEach(function(a){ a.size = Math.round(a.size * k); });
   stage.innerHTML = "";
   acts.forEach(function(a, i){
     a.x = Math.round(12 + (76 / Math.max(1, n - 1)) * i + (Math.random() * 6 - 3));
-    a.y = Math.round(13 + ((i * 7) % 17) + Math.random() * 3);
+    a.y = Math.round(12 + ((i * 7) % 17) + Math.random() * 3);
     const el = document.createElement("div");
     el.className = "tvw-a";
     el.style.left = a.x + "%"; el.style.bottom = a.y + "%"; el.style.zIndex = String(40 - a.y);
@@ -8321,6 +8341,7 @@ function tvwOpen_(zoom){
   const w = document.getElementById("tv-watch");
   if (!w) return;
   tvwStop_();
+  w.style.display = "flex";
   const acts = tvwRender_();
   __tvw = { acts: acts, timer: null, says: 0, t0: Date.now() };
   try {
