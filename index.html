@@ -399,6 +399,66 @@ button.mate-chip { cursor: pointer; font-family: var(--sans); }
 .tv-alert.fight { background: #B3261E; }
 body.game-off .tv-btn { display: none !important; }
 @media print { .tv-btn { display: none !important; } }
+
+/* ===== テレビを つけた 画面(なかまを ながめる) ===== */
+.tv-watch { position: fixed; inset: 0; z-index: 97; background: #241A12; display: flex; justify-content: center; align-items: stretch; padding: calc(env(safe-area-inset-top) + 8px) 8px calc(env(safe-area-inset-bottom) + 8px); }
+.tv-watch.zoom { animation: tvZoom .55s cubic-bezier(.2,.8,.25,1) both; }
+@keyframes tvZoom { from { transform: scale(.07); opacity: .3; border-radius: 40px; } to { transform: none; opacity: 1; } }
+.tv-watch.fade { animation: tvFade .25s ease both; }
+@keyframes tvFade { from { opacity: 0; } to { opacity: 1; } }
+.tvw-cab { width: min(560px, 100%); display: flex; flex-direction: column; gap: 10px; background: linear-gradient(180deg, #A06A35, #7E4F22 60%, #6B4119); border: 3px solid #3E2610; border-radius: 26px; padding: 14px 14px 12px; box-shadow: inset 0 2px 0 rgba(255,255,255,.18), 0 10px 30px rgba(0,0,0,.5); }
+.tvw-screen { position: relative; flex: 1; min-height: 0; overflow: hidden; border-radius: 34px / 44px; border: 6px solid #1A120A; background: #000; cursor: pointer; box-shadow: inset 0 0 40px rgba(0,0,0,.65); -webkit-tap-highlight-color: transparent; }
+.tvw-scene, .tvw-stage { position: absolute; inset: 0; }
+.tvw-scene { overflow: hidden; }
+.tvw-sky { position: absolute; inset: 0; }
+.tvw-sun { position: absolute; width: 46px; height: 46px; border-radius: 50%; top: 13%; right: 14%; }
+.tvw-cloud { position: absolute; height: 16px; border-radius: 16px; background: rgba(255,255,255,.85); animation: tvCloud linear infinite; }
+.tvw-cloud::before { content: ""; position: absolute; left: 22%; top: -9px; width: 40%; height: 20px; border-radius: 50%; background: inherit; }
+@keyframes tvCloud { from { transform: translateX(-140px); } to { transform: translateX(640px); } }
+.tvw-star { position: absolute; width: 2px; height: 2px; background: #fff; border-radius: 50%; animation: sparkTw 2.6s ease-in-out infinite; }
+.tvw-mtn { position: absolute; left: 0; right: 0; bottom: 45%; width: 100%; height: 22%; }
+.tvw-ground { position: absolute; left: 0; right: 0; bottom: 0; height: 46%; }
+.tvw-ground::before { content: ""; position: absolute; inset: 0; background: repeating-linear-gradient(90deg, rgba(0,0,0,.05) 0 2px, transparent 2px 14px); }
+.tvw-a { position: absolute; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; transition-property: left, bottom; transition-timing-function: linear; }
+.tvw-flip { transition: transform .2s; }
+.tvw-flip.l { transform: scaleX(-1); }
+.tvw-body { display: block; transform-origin: 50% 100%; }
+.tvw-body.walking { animation: tvTrot .42s ease-in-out infinite; }
+@keyframes tvTrot { 0%,100% { transform: translateY(0) rotate(-2deg); } 50% { transform: translateY(-4px) rotate(2deg); } }
+.tvw-shadow { width: 60%; height: 6px; margin-top: -3px; border-radius: 50%; background: rgba(0,0,0,.18); }
+.tvw-name { font-size: 10.5px; color: rgba(255,255,255,.95); background: rgba(0,0,0,.35); padding: 0 5px; border-radius: 6px; margin-top: 2px; white-space: nowrap; }
+.tvw-say { position: absolute; bottom: calc(100% + 4px); left: 0; width: max-content; max-width: min(230px, 70vw); background: #fff; color: #222; border: 2px solid #222; border-radius: 12px; padding: 5px 9px; font-size: 12.5px; line-height: 1.45; z-index: 3; animation: sayPop .2s ease; box-shadow: 0 2px 0 rgba(0,0,0,.25); }
+.tvw-say::after { content: ""; position: absolute; bottom: -8px; left: var(--ax, 50%); width: 10px; height: 10px; background: #fff; border-right: 2px solid #222; border-bottom: 2px solid #222; transform: rotate(45deg); }
+.tvw-say small { display: block; color: #777; font-size: 10.5px; }
+.tvw-emo { position: absolute; top: -14px; right: -6px; font-size: 18px; animation: fxItem 1.6s ease both; pointer-events: none; }
+.tvw-top { position: absolute; top: 10px; left: 14px; right: 14px; display: flex; align-items: center; gap: 8px; color: #fff; font-size: 12px; font-weight: 700; text-shadow: 0 1px 2px rgba(0,0,0,.6); pointer-events: none; }
+.tvw-top .ch { background: rgba(0,0,0,.45); border: 1px solid rgba(255,255,255,.6); border-radius: 4px; padding: 1px 6px; font-family: monospace; letter-spacing: .08em; }
+.tvw-top #tvw-clock { margin-left: auto; font-family: monospace; }
+.tvw-ticker { position: absolute; left: 0; right: 0; bottom: 0; height: 26px; background: rgba(20,20,40,.78); color: #FFE27A; font-size: 12.5px; overflow: hidden; white-space: nowrap; display: flex; align-items: center; pointer-events: none; }
+.tvw-ticker span { display: inline-block; padding-left: 100%; animation: tvTicker 38s linear infinite; }
+@keyframes tvTicker { from { transform: translateX(0); } to { transform: translateX(-100%); } }
+.tvw-hint { position: absolute; left: 50%; bottom: 36px; transform: translateX(-50%); color: #fff; font-size: 12px; background: rgba(0,0,0,.45); padding: 3px 12px; border-radius: 999px; white-space: nowrap; animation: tvHint 2.4s ease-in-out infinite; pointer-events: none; }
+@keyframes tvHint { 0%,100% { opacity: .35; } 50% { opacity: 1; } }
+.tvw-scan { position: absolute; inset: 0; pointer-events: none; background: repeating-linear-gradient(0deg, rgba(0,0,0,.10) 0 1px, transparent 1px 3px); }
+.tvw-glare { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(ellipse at 30% 15%, rgba(255,255,255,.16), transparent 45%); }
+.tvw-on { position: absolute; inset: 0; pointer-events: none; background: #000; opacity: 0; }
+.tvw-on::after { content: ""; position: absolute; left: 0; right: 0; top: 50%; height: 100%; margin-top: -50%; background: #fff; opacity: 0; }
+.tv-watch.zoom .tvw-on { animation: crtBlack .95s ease both; }
+.tv-watch.zoom .tvw-on::after { animation: crtLine .95s ease both; }
+@keyframes crtBlack { 0%,50% { opacity: 1; } 100% { opacity: 0; } }
+@keyframes crtLine { 0%,45% { opacity: 0; transform: scale(.05,.004); } 55% { opacity: 1; transform: scale(1,.006); } 72% { opacity: .9; transform: scale(1,1); } 100% { opacity: 0; transform: scale(1,1); } }
+.tvw-panel { display: flex; align-items: center; gap: 8px; }
+.tvw-brand { color: #F6E3C0; font-weight: 900; letter-spacing: .08em; font-size: 13px; margin-right: auto; text-shadow: 0 1px 0 #3E2610; }
+.tvw-btn { white-space: nowrap; border: 2px solid #3E2610; border-radius: 999px; padding: 9px 16px; font-size: 13.5px; font-weight: 800; cursor: pointer; background: #F6E3C0; color: #3E2610; box-shadow: 0 3px 0 #3E2610; }
+.tvw-btn:active { transform: translateY(2px); box-shadow: 0 1px 0 #3E2610; }
+.tvw-btn.menu { background: #FFE27A; }
+.tvw-knob { width: 22px; height: 22px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #F6E3C0, #B89868); border: 2px solid #3E2610; position: relative; flex: none; }
+.tvw-knob::after { content: ""; position: absolute; left: 9px; top: 2px; width: 2px; height: 8px; background: #3E2610; }
+.tvw-knob.s { width: 16px; height: 16px; } .tvw-knob.s::after { left: 6px; height: 6px; }
+.tv-watch-btn { border: 1px solid #FFE27A; background: transparent; color: #FFE27A; border-radius: 999px; padding: 4px 10px; font-weight: 900; font-size: 13px; cursor: pointer; white-space: nowrap; }
+@media (max-width: 440px){ .tvw-brand { display: none; } .tvw-panel { justify-content: flex-end; } .tvw-knob:first-of-type { margin-right: auto; } }
+@media (prefers-reduced-motion: reduce){ .tv-watch.zoom, .tv-watch.zoom .tvw-on, .tv-watch.zoom .tvw-on::after { animation: none; } .tvw-on { display: none; } }
+@media print { .tv-watch { display: none !important; } }
 /* ゲーム画面(テレビの 中) */
 #party-modal.game-tv { padding: 0; background: rgba(20,14,8,.85); align-items: stretch; }
 #party-modal.game-tv .order-card { width: min(560px, 100%); max-width: 100%; margin: 0 auto; height: 100%; max-height: 100%; border-radius: 0; overflow-y: auto; -webkit-overflow-scrolling: touch;
@@ -1437,10 +1497,28 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
     <div class="row gap" style="margin-top:8px"><button class="btn" onclick="closeMakerNotice()">わかりました</button></div>
   </div>
 </div>
+<div id="tv-watch" class="tv-watch" style="display:none">
+  <div class="tvw-cab">
+    <div class="tvw-screen" id="tvw-screen" onclick="tvwToMenu_()" role="button" aria-label="タッチで メニューへ">
+      <div class="tvw-scene" id="tvw-scene"></div>
+      <div class="tvw-stage" id="tvw-stage"></div>
+      <div class="tvw-top"><span class="ch">CH 1</span><span>なかまの ようす</span><span id="tvw-clock"></span></div>
+      <div class="tvw-hint">▶ がめんを タッチすると メニュー</div>
+      <div class="tvw-ticker"><span id="tvw-tick"></span></div>
+      <i class="tvw-scan"></i><i class="tvw-glare"></i><i class="tvw-on"></i>
+    </div>
+    <div class="tvw-panel">
+      <span class="tvw-brand">OTCLinker TV</span>
+      <span class="tvw-knob"></span><span class="tvw-knob s"></span>
+      <button class="tvw-btn menu" onclick="tvwToMenu_()">メニュー ▶</button>
+      <button class="tvw-btn" onclick="tvwOff_()">テレビを けす</button>
+    </div>
+  </div>
+</div>
 <div id="party-modal" class="order-modal game-tv" style="display:none">
   <div class="order-card">
     <div class="order-head tv-head">
-      <span class="order-title">📺 OTCLinker TV</span>
+      <button class="order-title tv-watch-btn" onclick="tvwBack_()" title="なかまを ながめる 画面に もどる">📺 ながめる</button>
       <span class="tv-stat" id="tv-stat"></span>
       <button class="tv-off" onclick="closePartyModal()">テレビを けす</button>
     </div>
@@ -2059,7 +2137,7 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
   </section>
 
   <div class="toast" id="toast"></div>
-  <footer class="foot">OTCLinker — とみながグループ 店舗向けツール<br><span class="ver">版 2026-10-15 CX(テレビ・おしごと連動・クイズで まなぶ)</span></footer>
+  <footer class="foot">OTCLinker — とみながグループ 店舗向けツール<br><span class="ver">版 2026-10-15 CY(テレビで なかまを ながめる)</span></footer>
 </div>
 
 <script>
@@ -7009,12 +7087,13 @@ function statusSection_(){
 function otherSection_(){
   return '<div class="divider"><span>あそびかた</span></div>'
     + '<ul class="quest-list">'
-    + '<li>キャラを 1回タップ:なでる(ひとこと返してくれます)</li>'
-    + '<li>2回タップ・長押し:この画面がひらきます</li>'
+    + '<li>右上の テレビを タップ:なかまの ようすを ながめられます(画面を タッチで メニュー)</li>'
+    + '<li>メニューの「📺 ながめる」で いつでも ながめる画面に もどれます</li>'
     + '<li>商品を登録するほど 主人公が成長し、なかまが増えます</li>'
     + '<li>アプリを使わないと げんきが へり、9日ほどで 眠ってしまいます</li>'
     + '<li>なかまは いっしょに過ごすと 3だんかいに しんかします</li>'
     + '</ul>'
+    + '<label class="gm-opt" style="display:flex;gap:8px;align-items:center;margin:8px 0;font-size:13px"><input type="checkbox" ' + (game_().tvDirect ? 'checked ' : '') + 'onchange="setTvDirect(this.checked)">テレビを つけたら すぐ メニューを ひらく(ながめる画面を とばす)</label>'
     + '<div class="divider"><span>きょうの ようす</span></div>'
     + '<p class="hint">きょうの衣装: ' + (DECOS[seasonDeco_()] || "—") + 'の季節です。日によって着替えます。</p>'
     + '<p class="hint">' + esc(dayFact_().text || "") + '</p>'
@@ -8164,7 +8243,230 @@ function advSection_(){
 
 /* ============ テレビ(ゲーム画面の入り口)と ゲームの ホーム ============ */
 let __tvTimer = null;
-function openGame_(){ __partyTab = "home"; openPartyModal(); }
+function openGame_(){
+  __partyTab = "home";
+  if (game_().tvDirect){ openPartyModal(); return; }
+  tvwOpen_(true);
+}
+/* ===== テレビを つけた 画面:なかまを ながめる ===== */
+let __tvw = null;
+function tvwActors_(){
+  const st = dotStage(), bk = activePet_(), picks = petPicks_();
+  const line = allMates_().map(function(o){ return o.k; });
+  let mates = picks.length ? picks.slice() : [];
+  // 選んでいない ときは、なかよしの 高い順に 何体か でてくる
+  if (mates.length < 4){
+    const rest = line.filter(function(k){ return mates.indexOf(k) < 0; })
+      .sort(function(a, b){ return bondLv_(b) - bondLv_(a) || (Math.random() - .5); });
+    mates = mates.concat(rest.slice(0, 4 - mates.length));
+  }
+  const list = [{ k: st.key, hero: true, size: 62, name: (pet_().heroName || st.name) }];
+  if (bk){ const bi = petInfo_(bk); list.push({ k: bk, pet: true, size: Math.round(((bi && bi.size) || 28) * 1.9), name: bi ? bi.name : "" }); }
+  mates.forEach(function(k){ list.push({ k: k, size: 54 + (bondLv_(k) >= 8 ? 4 : 0), name: DOT_NAMES[k] || "" }); });
+  return list;
+}
+function tvwScene_(){
+  const h = new Date().getHours();
+  const tod = (h >= 5 && h < 10) ? "am" : (h >= 10 && h < 16) ? "day" : (h >= 16 && h < 19) ? "eve" : "night";
+  const sky = { am:"linear-gradient(#9FD4F5,#E6F4FB)", day:"linear-gradient(#4FA8E8,#BFE3F7)", eve:"linear-gradient(#F59A62,#FBD9A5)", night:"linear-gradient(#0E1A3A,#2B3F6E)" }[tod];
+  const sun = tod === "night" ? "background:#FFF6C8;box-shadow:0 0 18px #FFF6C8;" : (tod === "eve" ? "background:#FF7A3D;box-shadow:0 0 26px #FFB070;top:30%;" : "background:#FFE066;box-shadow:0 0 26px #FFE066;");
+  const g = tod === "night" ? "#2E4A2E" : (tod === "eve" ? "#7DA24A" : "#86C25A");
+  const m1 = tod === "night" ? "#1C2B48" : (tod === "eve" ? "#9A6A6A" : "#6E9BC0"), m2 = tod === "night" ? "#24384F" : (tod === "eve" ? "#B07C6A" : "#8FB7D3");
+  let h2 = '<div class="tvw-sky" style="background:' + sky + '"></div><div class="tvw-sun" style="' + sun + '"></div>';
+  if (tod === "night"){ for (let i = 0; i < 18; i++) h2 += '<i class="tvw-star" style="left:' + (5 + (i * 37) % 90) + '%;top:' + (6 + (i * 23) % 40) + '%;animation-delay:' + (i % 5) * .5 + 's"></i>'; }
+  else { [[12, 40, 70], [30, 26, 95], [20, 60, 120]].forEach(function(c, i){ h2 += '<i class="tvw-cloud" style="top:' + c[0] + '%;width:' + c[1] + 'px;animation-duration:' + c[2] + 's;animation-delay:-' + (i * 31) + 's"></i>'; }); }
+  // 遠くの山(阿蘇の 外輪山を イメージした オリジナルの 稜線)と 小さな お城
+  h2 += '<svg class="tvw-mtn" viewBox="0 0 400 100" preserveAspectRatio="none"><path d="M0 70 L40 48 L80 60 L130 30 L165 44 L190 36 L230 52 L270 28 L300 40 L340 34 L400 56 L400 100 L0 100Z" fill="' + m2 + '"/>'
+    + '<path d="M0 86 L60 66 L110 78 L170 60 L240 80 L300 64 L360 76 L400 70 L400 100 L0 100Z" fill="' + m1 + '"/>'
+    + '<g fill="' + m1 + '" transform="translate(318 46)"><rect x="0" y="22" width="34" height="10"/><path d="M-4 22 L38 22 L30 14 L4 14Z"/><rect x="7" y="6" width="20" height="8"/><path d="M2 8 L32 8 L25 0 L9 0Z"/></g></svg>'
+    + '<div class="tvw-ground" style="background:' + g + '"></div>';
+  return h2;
+}
+function tvwTicker_(){
+  const out = [];
+  try { const f = dayFact_(); if (f.text) out.push("📅 " + f.text.replace(/\s*(だよ|だね)?[!!]*$/, "")); } catch(e){}
+  try {
+    gameIssues_().forEach(function(x){ if (x.n) out.push("⚠ " + x.label + (x.unit ? " " + x.n + x.unit : "")); });
+    const left = dailyTasks_().filter(function(t){ return !t.done; }).length;
+    out.push(left ? "📋 きょうの おしごと のこり " + left + "つ" : "📋 きょうの おしごと ぜんぶ できました");
+  } catch(e){}
+  try { const q = QUIZ[Math.floor(Math.random() * QUIZ.length)]; out.push("📚 まめちしき:" + q.ex); } catch(e){}
+  return out.join("　　◆　　");
+}
+function tvwRender_(){
+  const stage = document.getElementById("tvw-stage");
+  document.getElementById("tvw-scene").innerHTML = tvwScene_();
+  document.getElementById("tvw-tick").textContent = tvwTicker_();
+  const acts = tvwActors_();
+  const n = acts.length;
+  // テレビの 画面が 大きいほど キャラも 大きく
+  const sh = (document.getElementById("tvw-screen").getBoundingClientRect().height) || 600;
+  const k = Math.max(1, Math.min(1.75, sh / 500));
+  acts.forEach(function(a){ a.size = Math.round(a.size * k); });
+  stage.innerHTML = "";
+  acts.forEach(function(a, i){
+    a.x = Math.round(12 + (76 / Math.max(1, n - 1)) * i + (Math.random() * 6 - 3));
+    a.y = Math.round(13 + ((i * 7) % 17) + Math.random() * 3);
+    const el = document.createElement("div");
+    el.className = "tvw-a";
+    el.style.left = a.x + "%"; el.style.bottom = a.y + "%"; el.style.zIndex = String(40 - a.y);
+    const svg = a.hero ? heroWalkSvg_(a.k, a.size, decoOf_(a.k), rpg_().equip) : dotSvg(a.k, a.size, mateLv_(a.k), a.pet ? null : decoOf_(a.k));
+    el.innerHTML = '<div class="tvw-flip"><div class="tvw-body">' + svg + '</div></div><i class="tvw-shadow"></i><span class="tvw-name">' + esc(a.name) + '</span>';
+    stage.appendChild(el);
+    a.el = el; a.body = el.querySelector(".tvw-body"); a.flip = el.querySelector(".tvw-flip"); a.busy = 0;
+  });
+  return acts;
+}
+function tvwOpen_(zoom){
+  const w = document.getElementById("tv-watch");
+  if (!w) return;
+  tvwStop_();
+  const acts = tvwRender_();
+  __tvw = { acts: acts, timer: null, says: 0, t0: Date.now() };
+  try {
+    const b = document.getElementById("tv-btn").getBoundingClientRect();
+    w.style.transformOrigin = (b.left + b.width / 2) + "px " + (b.top + b.height / 2) + "px";
+  } catch(e){}
+  w.classList.remove("zoom", "fade"); void w.offsetWidth;
+  w.classList.add(zoom ? "zoom" : "fade");
+  w.style.display = "flex";
+  document.body.style.overflow = "hidden";
+  tvwClock_();
+  // 電源が入ってから うごきだす
+  setTimeout(function(){
+    if (!__tvw) return;
+    tvwSay_(__tvw.acts[0], tvwGreet_());
+    __tvw.timer = setInterval(tvwTick_, 1400);
+  }, zoom ? 1000 : 300);
+}
+function tvwGreet_(){
+  const h = new Date().getHours();
+  return h < 11 ? "おはよう! きょうも がんばろう" : (h < 17 ? "おつかれさま! ひとやすみ していく?" : "きょうも おつかれさまでした");
+}
+function tvwStop_(){
+  if (__tvw && __tvw.timer) clearInterval(__tvw.timer);
+  __tvw = null;
+}
+function tvwHide_(){
+  tvwStop_();
+  const w = document.getElementById("tv-watch");
+  if (w){ w.style.display = "none"; w.classList.remove("zoom", "fade"); }
+  document.body.style.overflow = "";
+}
+function tvwToMenu_(){ tvwHide_(); __partyTab = "home"; openPartyModal(); try { document.querySelector("#party-modal .order-card").scrollTop = 0; } catch(e){} }
+function tvwOff_(){ tvwHide_(); renderTv_(); }
+function tvwBack_(){ closePartyModal(); tvwOpen_(false); }
+function tvwClock_(){
+  const c = document.getElementById("tvw-clock");
+  if (c){ const d = new Date(); c.textContent = String(d.getHours()).padStart(2, "0") + ":" + String(d.getMinutes()).padStart(2, "0"); }
+}
+function tvwSay_(a, text, sub, ms){
+  if (!a || !a.el || !text) return;
+  const old = a.el.querySelector(".tvw-say"); if (old) old.remove();
+  const b = document.createElement("div");
+  b.className = "tvw-say";
+  b.innerHTML = esc(text) + (sub ? "<small>" + esc(sub) + "</small>" : "");
+  a.el.appendChild(b);
+  // 画面から はみださない 位置に おいて、三角は 話している キャラを さす
+  try {
+    const sr = document.getElementById("tvw-screen").getBoundingClientRect(), ar = a.el.getBoundingClientRect(), bw = b.offsetWidth;
+    const cx = ar.left + ar.width / 2;
+    let left = cx - bw / 2;
+    left = Math.max(sr.left + 8, Math.min(sr.right - 8 - bw, left));
+    b.style.left = (left - ar.left) + "px";
+    b.style.setProperty("--ax", Math.max(10, Math.min(bw - 20, cx - left - 6)) + "px");
+  } catch(e){}
+  a.el.style.zIndex = "80";
+  if (__tvw) __tvw.says++;
+  a.busy = Date.now() + (ms || 3400);
+  setTimeout(function(){ b.remove(); a.el.style.zIndex = String(40 - a.y); if (__tvw) __tvw.says = Math.max(0, __tvw.says - 1); }, ms || 3400);
+}
+function tvwAct_(a, act){
+  if (!a || !a.body || !act) return;
+  const cls = "act-" + act;
+  a.body.classList.remove("walking");
+  a.body.className = "tvw-body"; void a.body.offsetWidth;
+  a.body.classList.add(cls);
+  setTimeout(function(){ a.body.classList.remove(cls); }, 1900);
+}
+function tvwEmo_(a, emo){
+  if (!a || !a.el) return;
+  const e = document.createElement("i"); e.className = "tvw-emo"; e.textContent = emo;
+  a.el.appendChild(e); setTimeout(function(){ e.remove(); }, 1700);
+}
+function tvwWalk_(a, x){
+  x = Math.max(8, Math.min(92, x));
+  const dist = Math.abs(x - a.x);
+  if (dist < 3) return;
+  const dur = Math.max(0.8, dist * 0.09);
+  // どうぶつは 横向き(頭が左)、ほかは 正面。進む向きに あわせて 反転する
+  const right = x > a.x;
+  a.flip.classList.toggle("l", !!a.pet && right);
+  a.el.style.transitionDuration = dur + "s";
+  a.el.style.left = x + "%";
+  a.x = x;
+  a.body.className = "tvw-body walking";
+  a.busy = Date.now() + dur * 1000 + 200;
+  setTimeout(function(){ if (a.body) a.body.classList.remove("walking"); }, dur * 1000);
+}
+const TVW_REPLY = ["へえ〜", "なるほど", "それ わかる", "ほんとに?", "ふふっ", "いいね", "えっ、そうなの?", "まかせて"];
+const TVW_SOLO = ["jump", "wiggle", "spin", "squash", "peek", "shy", "float", "dash", "hop"];
+function tvwTick_(){
+  const T = __tvw;
+  if (!T) return;
+  if (document.hidden) return;
+  if (Date.now() - T.t0 > 30 * 60000){ tvwOff_(); return; }   // つけっぱなし 防止(30分)
+  tvwClock_();
+  const now = Date.now();
+  const free = T.acts.filter(function(a){ return a.busy < now; });
+  if (!free.length) return;
+  const a = free[Math.floor(Math.random() * free.length)];
+  const gs = genkiState_();
+  const night = new Date().getHours() >= 22 || new Date().getHours() < 5;
+  if (gs.key === "nemuri" || (night && Math.random() < 0.5)){
+    tvwAct_(a, "sleep"); tvwSay_(a, "zzz……", null, 2600); return;
+  }
+  const r = Math.random();
+  if (r < 0.36){
+    tvwWalk_(a, a.x + (Math.random() < 0.5 ? -1 : 1) * (10 + Math.random() * 30));
+  } else if (r < 0.66){
+    if (T.says >= 2){ tvwAct_(a, a.pet ? petMove_(a.k).a : TVW_SOLO[Math.floor(Math.random() * TVW_SOLO.length)]); a.busy = now + 1900; return; }
+    let ln;
+    try { ln = petLine_(a.k); } catch(e){ ln = ["……", "jump"]; }
+    tvwSay_(a, ln[0], a.pet ? ln[2] : null);
+    tvwAct_(a, ln[1]);
+  } else if (r < 0.80){
+    const act = a.pet ? petMove_(a.k).a : (personaOf_(a.k).a || TVW_SOLO[Math.floor(Math.random() * TVW_SOLO.length)]);
+    tvwAct_(a, act); a.busy = now + 1900;
+    if (Math.random() < 0.4) tvwEmo_(a, ["♪", "✨", "💦", "❗", "💡", "♥"][Math.floor(Math.random() * 6)]);
+  } else if (r < 0.95){
+    // ふたりで おしゃべり
+    const talk = free.filter(function(o){ return o !== a && !o.pet; });
+    if (a.pet || !talk.length || T.says >= 1){ tvwAct_(a, "jump"); a.busy = now + 1200; return; }
+    const b = talk[Math.floor(Math.random() * talk.length)];
+    const side = a.x < b.x ? 1 : -1;
+    tvwWalk_(a, b.x - side * 14);
+    const pa = personaOf_(a.k), pb = personaOf_(b.k);
+    const wait = Math.max(900, parseFloat(a.el.style.transitionDuration || "1") * 1000);
+    a.busy = b.busy = now + wait + 6200;
+    setTimeout(function(){
+      if (!__tvw) return;
+      tvwSay_(a, pa.c[Math.floor(Math.random() * pa.c.length)], null, 3000);
+      setTimeout(function(){
+        if (!__tvw) return;
+        let rep = TVW_REPLY[Math.floor(Math.random() * TVW_REPLY.length)];
+        try { rep = personaSay_(pb, rep); } catch(e){}
+        tvwSay_(b, rep, null, 2800); tvwAct_(b, "jump");
+        if (bondLv_(a.k) >= 5 || bondLv_(b.k) >= 5) tvwEmo_(b, "♥");
+      }, 2900);
+    }, wait);
+  } else {
+    // みんなで そろって
+    const act = ["jump", "spin", "wiggle", "hop"][Math.floor(Math.random() * 4)];
+    T.acts.forEach(function(o, i){ setTimeout(function(){ if (__tvw) tvwAct_(o, act); }, i * 120); o.busy = now + 2200; });
+  }
+}
+function setTvDirect(v){ game_().tvDirect = !!v; save(); toast(v ? "テレビを つけたら すぐ メニューを ひらきます" : "テレビを つけたら なかまの ようすを ながめられます"); }
 function renderTv_(){
   const el = document.getElementById("tv-btn");
   if (!el) return;
