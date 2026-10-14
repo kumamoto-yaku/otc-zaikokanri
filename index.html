@@ -434,10 +434,12 @@ body.game-off .tv-btn { display: none !important; }
 .tvw-a { position: absolute; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; transition-property: left, bottom; transition-timing-function: linear; }
 .tvw-flip { transition: transform .2s; }
 .tvw-flip.l { transform: scaleX(-1); }
-.tvw-body { display: block; transform-origin: 50% 100%; }
+.tvw-body { display: block; line-height: 0; transform-origin: 50% 100%; }
+.tvw-body > svg, .tvw-body > .walk2, .tvw-enemy svg { display: block; }
+.tvw-enemy > div { line-height: 0; }
 .tvw-body.walking { animation: tvTrot .42s ease-in-out infinite; }
 @keyframes tvTrot { 0%,100% { transform: translateY(0) rotate(-2deg); } 50% { transform: translateY(-4px) rotate(2deg); } }
-.tvw-shadow { width: 60%; height: 6px; margin-top: -3px; border-radius: 50%; background: rgba(0,0,0,.18); }
+.tvw-shadow { width: 66%; height: 8px; margin-top: -5px; border-radius: 50%; background: rgba(0,0,0,.18); }
 .tv-watch.small .tvw-name { display: none; }
 .tvw-name { font-size: 10.5px; color: rgba(255,255,255,.95); background: rgba(0,0,0,.35); padding: 0 5px; border-radius: 6px; margin-top: 2px; white-space: nowrap; }
 .tvw-say { position: absolute; bottom: calc(100% + 4px); left: 0; width: max-content; max-width: min(240px, 62vw); background: #fff; color: #222; border: 2px solid #222; border-radius: 12px; padding: 5px 9px; font-size: 12.5px; line-height: 1.45; z-index: 3; animation: sayPop .2s ease; box-shadow: 0 2px 0 rgba(0,0,0,.25); }
@@ -472,6 +474,31 @@ body.game-off .tv-btn { display: none !important; }
 @media (max-width: 440px){ .tvw-brand { display: none; } .tvw-panel { justify-content: flex-end; } .tvw-knob:first-of-type { margin-right: auto; } }
 @media (prefers-reduced-motion: reduce){ .tv-watch.zoom, .tv-watch.zoom .tvw-on, .tv-watch.zoom .tvw-on::after { animation: none; } .tvw-on { display: none; } }
 @media print { .tv-watch { display: none !important; } }
+
+.tvw-a .tvw-flip { position: relative; z-index: 1; }
+.tvw-shadow { position: relative; z-index: 0; }
+.tvw-props { position: absolute; inset: 0; pointer-events: none; }
+.tvw-banner { position: absolute; left: 50%; top: 22%; transform: translateX(-50%); z-index: 90; white-space: nowrap; font-weight: 900; font-size: clamp(16px, 4.2vw, 30px); color: #fff; letter-spacing: .08em; padding: .2em .9em; border-radius: 10px; background: rgba(0,0,0,.55); border: 2px solid #fff; animation: tvBanner 2.2s ease both; text-shadow: 0 2px 0 rgba(0,0,0,.5); }
+.tvw-banner.red { background: rgba(170,20,20,.82); } .tvw-banner.gold { background: rgba(190,120,0,.85); } .tvw-banner.green { background: rgba(30,120,60,.85); }
+@keyframes tvBanner { 0% { opacity: 0; transform: translateX(-50%) scale(.4); } 14% { opacity: 1; transform: translateX(-50%) scale(1.12); } 22% { transform: translateX(-50%) scale(1); } 80% { opacity: 1; } 100% { opacity: 0; transform: translateX(-50%) translateY(-10px); } }
+.tvw-enemy { position: absolute; transform: translateX(-50%); transition: left 1.2s ease-out; z-index: 30; display: flex; flex-direction: column; align-items: center; }
+.tvw-enemy.hit { animation: fxHit .5s ease; }
+.tvw-enemy.bye { animation: tvBye .9s ease forwards; }
+@keyframes tvBye { 0% { opacity: 1; } 30% { transform: translateX(-50%) translateY(-14px) rotate(-12deg); } 100% { opacity: 0; transform: translateX(120px) translateY(-30px) rotate(30deg); } }
+.tvw-dmg { position: absolute; font-weight: 900; color: #FFE24D; font-size: 20px; text-shadow: 0 2px 0 #000, 0 0 4px #000; animation: fxNum 1s ease both; z-index: 95; transform: translateX(-50%); }
+.tvw-slash { position: absolute; width: 70px; height: 5px; background: linear-gradient(90deg, transparent, #fff, transparent); animation: fxSlash .4s ease both; z-index: 94; }
+.tvw-flash { position: absolute; inset: 0; background: #fff; animation: fxFlash .35s ease both; z-index: 93; }
+.tvw-sheet { position: absolute; left: 50%; transform: translateX(-50%); bottom: 14%; width: 46%; height: 13%; border-radius: 6px; z-index: 2;
+  background: repeating-conic-gradient(#D9483B 0 25%, #fff 0 50%) 0 0 / 18px 18px; box-shadow: 0 3px 0 rgba(0,0,0,.18); animation: tvFade .5s ease both; transform-origin: 50% 100%; }
+.tvw-food { position: absolute; font-size: clamp(16px, 3.6vw, 28px); z-index: 3; animation: tvFade .4s ease both; transform: translateX(-50%); }
+.tvw-food.eaten { opacity: .25; transform: translateX(-50%) scale(.6); transition: all .6s; }
+.tvw-flags { position: absolute; left: 0; right: 0; top: 16%; height: 22px; z-index: 5; display: flex; justify-content: space-around; animation: tvFade .5s ease both; }
+.tvw-flags::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 2px; background: #666; }
+.tvw-flags i { width: 12px; height: 16px; clip-path: polygon(0 0, 100% 0, 50% 100%); }
+.tvw-line { position: absolute; bottom: 7%; top: 52%; width: 4px; background: repeating-linear-gradient(#fff 0 8px, transparent 8px 14px); z-index: 1; animation: tvFade .5s ease both; }
+.tvw-tape { position: absolute; bottom: 7%; top: 52%; width: 4px; background: #E53935; z-index: 1; }
+.tvw-rank { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); font-size: 11px; font-weight: 900; color: #fff; background: #C0392B; border-radius: 999px; padding: 0 6px; white-space: nowrap; z-index: 4; animation: sayPop .2s ease; }
+.tvw-rank.r1 { background: #D4A017; } .tvw-rank.r2 { background: #8E9AA6; } .tvw-rank.r3 { background: #B0703A; }
 /* ゲーム画面(テレビの 中) */
 #party-modal.game-tv { padding: 0; background: rgba(20,14,8,.85); align-items: stretch; }
 #party-modal.game-tv .order-card { width: min(560px, 100%); max-width: 100%; margin: 0 auto; height: 100%; max-height: 100%; border-radius: 0; overflow-y: auto; -webkit-overflow-scrolling: touch;
@@ -2154,7 +2181,7 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
   </section>
 
   <div class="toast" id="toast"></div>
-  <footer class="foot">OTCLinker — とみながグループ 店舗向けツール<br><span class="ver">版 2026-10-15 CZ(テレビを ブラウン管の 4:3に)</span></footer>
+  <footer class="foot">OTCLinker — とみながグループ 店舗向けツール<br><span class="ver">版 2026-10-15 DA(ながめる画面に イベント)</span></footer>
 </div>
 
 <script>
@@ -8282,6 +8309,20 @@ function tvwActors_(){
   mates.forEach(function(k){ list.push({ k: k, size: 54 + (bondLv_(k) >= 8 ? 4 : 0), name: DOT_NAMES[k] || "" }); });
   return list;
 }
+function tvwFoot_(key, px){
+  // スプライトの 下の 空白(透明な行)の ぶんだけ 下げて、足を 地面に つける
+  try {
+    let rows = DOT_SPRITES[key] || DOT_SPRITES.baby;
+    let bl = 0;
+    try { const lm = S.life && S.life.mates && S.life.mates[key]; if (lm) bl = lifeLv_(lm.bond); } catch(e){}
+    if (bl >= 4 && DOT_SPRITES[key + "~h"]) rows = DOT_SPRITES[key + "~h"];
+    if (bl >= 8) px = Math.round(px * 1.1);
+    if (isPet_(key)) rows = poseRows_(rows, petPose_(key));
+    let gap = 0;
+    for (let y = rows.length - 1; y >= 0 && /^\.+$/.test(rows[y]); y--) gap++;
+    return gap * px / rows.length;
+  } catch(e){ return 0; }
+}
 function tvwScene_(){
   const h = new Date().getHours();
   const tod = (h >= 5 && h < 10) ? "am" : (h >= 10 && h < 16) ? "day" : (h >= 16 && h < 19) ? "eve" : "night";
@@ -8323,7 +8364,7 @@ function tvwRender_(){
   // 画面が 小さいときは 名前を かくして すっきり
   document.getElementById("tv-watch").classList.toggle("small", sh < 330);
   acts.forEach(function(a){ a.size = Math.round(a.size * k); });
-  stage.innerHTML = "";
+  stage.innerHTML = '<div class="tvw-props" id="tvw-props"></div>';
   acts.forEach(function(a, i){
     a.x = Math.round(12 + (76 / Math.max(1, n - 1)) * i + (Math.random() * 6 - 3));
     a.y = Math.round(12 + ((i * 7) % 17) + Math.random() * 3);
@@ -8331,7 +8372,8 @@ function tvwRender_(){
     el.className = "tvw-a";
     el.style.left = a.x + "%"; el.style.bottom = a.y + "%"; el.style.zIndex = String(40 - a.y);
     const svg = a.hero ? heroWalkSvg_(a.k, a.size, decoOf_(a.k), rpg_().equip) : dotSvg(a.k, a.size, mateLv_(a.k), a.pet ? null : decoOf_(a.k));
-    el.innerHTML = '<div class="tvw-flip"><div class="tvw-body">' + svg + '</div></div><i class="tvw-shadow"></i><span class="tvw-name">' + esc(a.name) + '</span>';
+    const foot = tvwFoot_(a.k, a.size);
+    el.innerHTML = '<div class="tvw-flip" style="margin-bottom:' + (-foot).toFixed(1) + 'px"><div class="tvw-body">' + svg + '</div></div><i class="tvw-shadow"></i><span class="tvw-name">' + esc(a.name) + '</span>';
     stage.appendChild(el);
     a.el = el; a.body = el.querySelector(".tvw-body"); a.flip = el.querySelector(".tvw-flip"); a.busy = 0;
   });
@@ -8343,7 +8385,7 @@ function tvwOpen_(zoom){
   tvwStop_();
   w.style.display = "flex";
   const acts = tvwRender_();
-  __tvw = { acts: acts, timer: null, says: 0, t0: Date.now() };
+  __tvw = { acts: acts, timer: null, says: 0, t0: Date.now(), ev: false, lastEv: Date.now() - 16000 };
   try {
     const b = document.getElementById("tv-btn").getBoundingClientRect();
     w.style.transformOrigin = (b.left + b.width / 2) + "px " + (b.top + b.height / 2) + "px";
@@ -8439,6 +8481,9 @@ function tvwTick_(){
   if (Date.now() - T.t0 > 30 * 60000){ tvwOff_(); return; }   // つけっぱなし 防止(30分)
   tvwClock_();
   const now = Date.now();
+  if (T.ev) return;
+  // ときどき イベント(てきの しゅうらい・ごはん・うんどうかい・たいそう)
+  if (now - T.lastEv > 26000 && Math.random() < 0.22 && T.says === 0){ tvwEvent_(); return; }
   const free = T.acts.filter(function(a){ return a.busy < now; });
   if (!free.length) return;
   const a = free[Math.floor(Math.random() * free.length)];
@@ -8486,6 +8531,202 @@ function tvwTick_(){
     const act = ["jump", "spin", "wiggle", "hop"][Math.floor(Math.random() * 4)];
     T.acts.forEach(function(o, i){ setTimeout(function(){ if (__tvw) tvwAct_(o, act); }, i * 120); o.busy = now + 2200; });
   }
+}
+
+/* ===== ながめる画面の イベント ===== */
+function tvwP_(){ return document.getElementById("tvw-props"); }
+function tvwBanner_(text, cls){
+  const sc = document.getElementById("tvw-stage"); if (!sc) return;
+  sc.querySelectorAll(".tvw-banner").forEach(function(x){ x.remove(); });
+  const b = document.createElement("div"); b.className = "tvw-banner " + (cls || ""); b.textContent = text;
+  sc.appendChild(b); setTimeout(function(){ b.remove(); }, 2300);
+}
+function tvwLater_(fn, ms){ setTimeout(function(){ if (__tvw && __tvw.ev) fn(); }, ms); }
+function tvwEnd_(ms){
+  tvwLater_(function(){
+    const p = tvwP_(); if (p) p.innerHTML = "";
+    __tvw.acts.forEach(function(a){
+      a.busy = 0; const r = a.el.querySelector(".tvw-rank"); if (r) r.remove();
+      if (a.lane0 != null){ a.y = a.lane0; a.lane0 = null; a.el.style.bottom = a.y + "%"; a.el.style.zIndex = String(40 - a.y); }
+    });
+    __tvw.ev = false; __tvw.lastEv = Date.now();
+  }, ms);
+}
+function tvwEvent_(kind){
+  const T = __tvw; if (!T || T.ev) return;
+  const h = new Date().getHours();
+  const list = ["enemy", "meal", "race", "taiso"];
+  if (!kind){
+    // 食事どきは ごはんが 出やすい
+    const w = (h >= 11 && h < 14) || (h >= 17 && h < 20) ? ["meal", "meal", "enemy", "race", "taiso"] : (h < 10 ? ["taiso", "taiso", "enemy", "race", "meal"] : ["enemy", "enemy", "race", "meal", "taiso"]);
+    kind = w[Math.floor(Math.random() * w.length)];
+    if (kind === T.lastKind) kind = list[(list.indexOf(kind) + 1) % list.length];
+  }
+  T.ev = true; T.lastKind = kind;
+  T.acts.forEach(function(a){ a.busy = Date.now() + 60000; const s = a.el.querySelector(".tvw-say"); if (s) s.remove(); });
+  T.says = 0;
+  ({ enemy: tvwEvEnemy_, meal: tvwEvMeal_, race: tvwEvRace_, taiso: tvwEvTaiso_ })[kind]();
+}
+// 1) てきが あらわれて たたかう
+function tvwEvEnemy_(){
+  const T = __tvw, P = tvwP_();
+  const real = rpg_().enemy;
+  const pool = ["e_hokori", "e_chirakari", "e_shinagire", "e_hokan", "e_kigengire", "e_moushinsei"];
+  // 在庫の 本当の もんだいが あれば、その てきが 出やすい
+  try { gameIssues_().forEach(function(x){ if (x.n) pool.push(x.enemy, x.enemy); }); } catch(e){}
+  const key = real || pool[Math.floor(Math.random() * pool.length)];
+  const en = enemyOf_(key) || { name: "てき" };
+  const sh = document.getElementById("tvw-screen").offsetHeight || 300;
+  const sz = Math.round(Math.max(40, Math.min(110, sh * 0.2)) * ((en.size || 44) / 44));
+  const e = document.createElement("div"); e.className = "tvw-enemy";
+  e.style.left = "112%"; e.style.bottom = "16%";
+  e.innerHTML = '<div style="margin-bottom:' + (-tvwFoot_(key, sz)).toFixed(1) + 'px">' + dotSvg(key, sz, 0) + '</div><i class="tvw-shadow"></i>';
+  P.appendChild(e);
+  tvwLater_(function(){ e.style.left = "80%"; }, 50);
+  T.acts.forEach(function(a){ tvwEmo_(a, "❗"); tvwAct_(a, "shock"); });
+  tvwLater_(function(){ tvwBanner_(en.name + "が あらわれた!", "red"); }, 700);
+  // みんな 左に あつまって かまえる
+  tvwLater_(function(){ T.acts.forEach(function(a, i){ tvwWalk_(a, 12 + i * 9); a.busy = Date.now() + 60000; }); }, 1500);
+  const hero = T.acts[0];
+  const hit = function(who, delay, big){
+    tvwLater_(function(){
+      tvwWalk_(who, 64); who.busy = Date.now() + 60000;
+      tvwLater_(function(){
+        tvwAct_(who, big ? "spin" : "charge");
+        const sl = document.createElement("i"); sl.className = "tvw-slash"; sl.style.left = "74%"; sl.style.bottom = "26%"; P.appendChild(sl);
+        e.classList.remove("hit"); void e.offsetWidth; e.classList.add("hit");
+        const d = document.createElement("b"); d.className = "tvw-dmg"; d.style.left = "80%"; d.style.bottom = "42%";
+        d.textContent = big ? (40 + Math.floor(Math.random() * 30)) + "!!" : String(8 + Math.floor(Math.random() * 14)); P.appendChild(d);
+        if (big){ const f = document.createElement("i"); f.className = "tvw-flash"; P.appendChild(f); }
+        setTimeout(function(){ sl.remove(); d.remove(); }, 1000);
+      }, 1300);
+      tvwLater_(function(){ tvwWalk_(who, 18 + Math.random() * 20); who.busy = Date.now() + 60000; }, 2100);
+    }, delay);
+  };
+  tvwSay_(hero, "まかせて!", null, 1800);
+  hit(hero, 3200, false);
+  const helper = T.acts.filter(function(a){ return a !== hero; })[0];
+  if (helper) hit(helper, 5600, false);
+  tvwLater_(function(){ tvwSay_(hero, "とどめだ!", null, 1500); }, 7600);
+  hit(hero, 8000, true);
+  tvwLater_(function(){
+    e.classList.add("bye");
+    tvwBanner_(en.name + "を やっつけた!", "gold");
+    T.acts.forEach(function(a, i){ setTimeout(function(){ if (__tvw) tvwAct_(a, "jump"); }, i * 120); });
+  }, 9700);
+  tvwLater_(function(){
+    if (real) tvwSay_(hero, "……でも 本物の てきは まだ いるみたい。メニューの たたかう から!", null, 4200);
+    else {
+      let ln = "やったね! お店も きれいに しよう";
+      try { const iss = gameIssues_().filter(function(x){ return x.n; })[0]; if (iss) ln = "つぎは 本物の「" + iss.label + "」を かくにん しよう"; } catch(e){}
+      tvwSay_(hero, ln, null, 4000);
+    }
+  }, 11200);
+  tvwEnd_(15000);
+}
+// 2) みんなで ごはん
+function tvwEvMeal_(){
+  const T = __tvw, P = tvwP_();
+  const sheet = document.createElement("i"); sheet.className = "tvw-sheet"; P.appendChild(sheet);
+  const fk = Object.keys(FOODS);
+  const foods = [];
+  for (let i = 0; i < 4; i++){
+    const f = FOODS[fk[Math.floor(Math.random() * fk.length)]];
+    const el = document.createElement("span"); el.className = "tvw-food"; el.textContent = f.ic;
+    el.style.left = (33 + i * 11) + "%"; el.style.bottom = (17 + (i % 2) * 4) + "%"; el.style.animationDelay = (0.3 + i * 0.25) + "s";
+    P.appendChild(el); foods.push({ el: el, f: f });
+  }
+  tvwBanner_("ごはんの じかん!", "green");
+  // シートの まわりに すわる
+  const n = T.acts.length;
+  T.acts.forEach(function(a, i){
+    tvwLater_(function(){
+      const left = i % 2 === 0;
+      tvwWalk_(a, left ? 22 - (i / 2) * 5 : 78 + ((i - 1) / 2) * 5);
+      a.busy = Date.now() + 60000;
+    }, 900 + i * 150);
+  });
+  tvwLater_(function(){ T.acts.forEach(function(a, i){ setTimeout(function(){ if (__tvw){ tvwSay_(a, a.pet ? petCry_(a.k) : "いただきます!", null, 1600); } }, i * 200); }); }, 3600);
+  tvwLater_(function(){
+    T.acts.forEach(function(a, i){ setTimeout(function(){ if (__tvw){ tvwAct_(a, "squash"); tvwEmo_(a, "😋"); } }, i * 300); });
+    foods.forEach(function(o, i){ setTimeout(function(){ o.el.classList.add("eaten"); }, 1200 + i * 500); });
+  }, 6200);
+  tvwLater_(function(){
+    const a = T.acts.filter(function(x){ return !x.pet; })[Math.floor(Math.random() * Math.max(1, n - 1))] || T.acts[0];
+    const o = foods[0];
+    tvwSay_(a, o.f.name + "、おいしいね!", null, 2600); tvwEmo_(a, "♥");
+  }, 8200);
+  tvwLater_(function(){ T.acts.forEach(function(a, i){ setTimeout(function(){ if (__tvw){ tvwSay_(a, a.pet ? "(まんぷく)" : "ごちそうさま!", null, 1500); tvwAct_(a, "jump"); } }, i * 200); }); }, 11400);
+  tvwEnd_(14200);
+}
+// 3) うんどうかい(かけっこ)
+function tvwEvRace_(){
+  const T = __tvw, P = tvwP_();
+  const fl = document.createElement("div"); fl.className = "tvw-flags";
+  ["#E53935", "#FBC02D", "#43A047", "#1E88E5", "#8E24AA", "#FB8C00", "#E53935", "#FBC02D", "#43A047", "#1E88E5"].forEach(function(c){ fl.innerHTML += '<i style="background:' + c + '"></i>'; });
+  P.appendChild(fl);
+  const st = document.createElement("i"); st.className = "tvw-line"; st.style.left = "10%"; P.appendChild(st);
+  const gl = document.createElement("i"); gl.className = "tvw-tape"; gl.style.left = "90%"; P.appendChild(gl);
+  tvwBanner_("うんどうかい! かけっこ", "gold");
+  // コースごとに ならぶ(奥から 手前へ)
+  const nl = T.acts.length;
+  T.acts.forEach(function(a, i){ tvwLater_(function(){
+    a.lane0 = a.y; a.y = Math.round(30 - (22 / Math.max(1, nl - 1)) * i);
+    a.el.style.bottom = a.y + "%"; a.el.style.zIndex = String(40 - a.y);
+    tvwWalk_(a, 8); a.busy = Date.now() + 60000; }, 800 + i * 120); });
+  tvwLater_(function(){ tvwBanner_("よーい……", ""); }, 4300);
+  tvwLater_(function(){
+    tvwBanner_("ドン!", "red");
+    // 足の はやさは ばらばら(あいぼうは 少し はやい)
+    const res = T.acts.map(function(a){ return { a: a, t: (a.pet ? 1.7 : 2.2) + Math.random() * 1.6 }; }).sort(function(x, y){ return x.t - y.t; });
+    res.forEach(function(r, rank){
+      const a = r.a;
+      a.flip.classList.toggle("l", !!a.pet);
+      a.el.style.transitionDuration = r.t + "s"; a.el.style.left = "92%"; a.x = 92;
+      a.body.className = "tvw-body walking";
+      setTimeout(function(){
+        if (!__tvw) return;
+        a.body.classList.remove("walking");
+        const rb = document.createElement("span"); rb.className = "tvw-rank r" + (rank + 1); rb.textContent = (rank + 1) + "い";
+        a.el.appendChild(rb);
+        if (rank === 0){ tvwAct_(a, "jump"); tvwEmo_(a, "🏆"); }
+      }, r.t * 1000);
+    });
+    // ゴールの あとは 順位の じゅんに ならんで ひょうしょうしき
+    tvwLater_(function(){
+      tvwBanner_("ひょうしょうしき", "gold");
+      res.forEach(function(r, rank){
+        const a = r.a; a.y = rank === 0 ? 20 : 14;
+        a.el.style.bottom = a.y + "%"; a.el.style.zIndex = String(40 - a.y);
+        tvwWalk_(a, 50 + (rank % 2 ? -1 : 1) * Math.ceil(rank / 2) * (70 / Math.max(2, res.length)));
+        a.busy = Date.now() + 60000;
+      });
+    }, res[res.length - 1].t * 1000 + 3200);
+    tvwLater_(function(){
+      const w = res[0].a;
+      tvwSay_(w, w.pet ? petCry_(w.k) + "(いちばん!)" : "やったー! いちばん!", null, 2600);
+      const last = res[res.length - 1].a;
+      if (last !== w) setTimeout(function(){ if (__tvw) tvwSay_(last, last.pet ? petCry_(last.k) : "つぎは まけないぞ……", null, 2400); }, 1400);
+    }, res[res.length - 1].t * 1000 + 300);
+  }, 5700);
+  tvwEnd_(17500);
+}
+// 4) みんなで たいそう
+function tvwEvTaiso_(){
+  const T = __tvw;
+  tvwBanner_("みんなで たいそう!", "green");
+  const n = T.acts.length;
+  T.acts.forEach(function(a, i){ tvwLater_(function(){ tvwWalk_(a, 14 + (72 / Math.max(1, n - 1)) * i); a.busy = Date.now() + 60000; }, 800 + i * 100); });
+  const hero = T.acts[0];
+  const steps = [["のびの うんどう", "float"], ["うでを まわして", "spin"], ["からだを よこに", "wiggle"], ["ジャンプ!", "jump"], ["しんこきゅう", "squash"]];
+  steps.forEach(function(sp, k){
+    tvwLater_(function(){
+      tvwSay_(hero, sp[0] + "〜 いち、に!", null, 1900);
+      T.acts.forEach(function(a, i){ setTimeout(function(){ if (__tvw) tvwAct_(a, sp[1]); }, 300 + i * 60); });
+    }, 3600 + k * 2100);
+  });
+  tvwLater_(function(){ tvwSay_(hero, "からだが ぽかぽか。きょうも がんばろう", null, 2600); T.acts.forEach(function(a){ tvwEmo_(a, "✨"); }); }, 3600 + steps.length * 2100);
+  tvwEnd_(3600 + steps.length * 2100 + 3000);
 }
 function setTvDirect(v){ game_().tvDirect = !!v; save(); toast(v ? "テレビを つけたら すぐ メニューを ひらきます" : "テレビを つけたら なかまの ようすを ながめられます"); }
 function renderTv_(){
