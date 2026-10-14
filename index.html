@@ -281,7 +281,21 @@ button.mate-chip { cursor: pointer; font-family: var(--sans); }
 .rpg-msg { font-family: var(--sans); font-size: 12px; line-height: 1.7; letter-spacing: 0.03em; }
 .rpg-msg div { animation: rpgLine 0.25s ease; }
 @keyframes rpgLine { from{opacity:0} to{opacity:1} }
-.rpg-cmd { height: 16px; text-align: right; padding-right: 4px; }
+.rpg-cmd { min-height: 16px; text-align: right; padding-right: 4px; flex-shrink: 0; }
+.rpg-screen.cmd-mode { height: min(72vh, 560px); }
+.bt-mode { display: flex; align-items: center; gap: 6px; margin-top: 10px; font-size: 12.5px; }
+.bt-mode span { color: var(--sub, #5C6B78); margin-right: 4px; }
+.bt-mode button { border: 1px solid var(--line, #D9E1E8); background: #fff; border-radius: 999px; padding: 6px 12px; font-size: 12.5px; cursor: pointer; }
+.bt-mode button.on { background: #1F2D3A; color: #fff; border-color: #1F2D3A; }
+.rpg-cmds { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; margin-top: 6px; text-align: left; }
+.rpg-cmds.rpg-sub { grid-template-columns: repeat(2, 1fr); max-height: 150px; overflow-y: auto; }
+.rpg-c { background: #000; color: #fff; border: 2px solid #fff; border-radius: 5px; padding: 8px 6px 8px 18px; font-family: var(--sans);
+  font-size: 13px; letter-spacing: 0.06em; cursor: pointer; position: relative; text-align: left; line-height: 1.3; min-height: 40px; }
+.rpg-c small { display: block; font-size: 9.5px; color: #B9C2C9; letter-spacing: 0; margin-top: 2px; }
+.rpg-c::before { content: "▶"; position: absolute; left: 5px; top: 9px; font-size: 9px; opacity: 0; }
+.rpg-c:hover::before, .rpg-c:focus::before, .rpg-c:active::before { opacity: 1; }
+.rpg-c:disabled { opacity: 0.4; cursor: default; }
+.rpg-none { grid-column: 1 / -1; font-size: 12px; color: #B9C2C9; margin: 4px 0; font-family: var(--sans); }
 .rpg-wait { display: inline-block; font-size: 14px; animation: rpgBlink 0.9s steps(2) infinite; }
 @keyframes rpgBlink { 0%,50%{opacity:1} 51%,100%{opacity:0} }
 /* 勝敗の表示 */
@@ -1752,7 +1766,7 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
   </section>
 
   <div class="toast" id="toast"></div>
-  <footer class="foot">OTCLinker — とみながグループ 店舗向けツール<br><span class="ver">版 2026-10-14 CQ(画面の整理・マニュアル更新)</span></footer>
+  <footer class="foot">OTCLinker — とみながグループ 店舗向けツール<br><span class="ver">版 2026-10-14 CR(コマンドで たたかう)</span></footer>
 </div>
 
 <script>
@@ -5163,6 +5177,7 @@ function startVs(phId){
     ehp: en.hp || 120, emax: en.hp || 120, eatk: en.atk || 20, edef: en.def || 10,
     log: [], turn: 0, done: false
   };
+  battleInit_(__battle);
   showBattleBox_();
   renderBattle_();
   setTimeout(battleTurn_, 700);
@@ -5559,14 +5574,15 @@ function bag_(){ const r = rpg_(); r.bag = r.bag || {}; return r.bag; }
 function addItem_(k, n){ const b = bag_(); b[k] = (b[k] || 0) + (n || 1); save(); }
 function randomItem_(){ return ITEM_KEYS[Math.floor(Math.random() * ITEM_KEYS.length)]; }
 // 戦いの中で どうぐを 使う(ひとりでに)。使ったら true
-function battleUseItem_(b, who){
+function battleUseItem_(b, who, force){
   const bag = bag_();
   const have = ITEM_KEYS.filter(function(k){ return bag[k] > 0; });
   if (!have.length) return false;
   let k = null;
-  if (b.php < b.pmax * 0.4 && bag.i_nodoame > 0) k = "i_nodoame";
+  if (force){ if (!(bag[force] > 0)) return false; k = force; }
+  else if (b.php < b.pmax * 0.4 && bag.i_nodoame > 0) k = "i_nodoame";
   else if (Math.random() < 0.2) k = have[Math.floor(Math.random() * have.length)];
-  if (!k || (k === "i_nodoame" && b.php > b.pmax * 0.7)) return false;
+  if (!force && (!k || (k === "i_nodoame" && b.php > b.pmax * 0.7))) return false;
   const it = ITEMS[k];
   bag[k]--; if (bag[k] <= 0) delete bag[k];
   b.log.push(who + "は " + it.name + "を つかった!");
@@ -5726,6 +5742,7 @@ function startBattle(practice){
     edef: practice ? Math.round((en.def || 0) * 0.6) : (en.def || 0),
     log: [], turn: 0, done: false
   };
+  battleInit_(__battle);
   if (ENEMY_LOOK[en.key]) __battle.log.push("しらべた: " + ENEMY_LOOK[en.key]);
   showBattleBox_();
   renderBattle_();
@@ -5743,6 +5760,7 @@ function startBoss(key){
     ehp: en.hp, emax: en.hp, eatk: en.atk, edef: en.def || 0,
     log: [], turn: 0, done: false
   };
+  battleInit_(__battle);
   __battle.log.push(en.name + "が あらわれた!");
   showBattleBox_();
   renderBattle_();
@@ -5765,6 +5783,8 @@ function battleTurn_(){
   if (!b || b.done) return;
   b.turn++;
   const who = pet_().heroName || dotStage().name;
+  // コマンドで たたかう(おまかせ でなければ ここで 入力を待つ)
+  if (!b.auto){ b.waiting = true; b.menu = "main"; renderBattle_(); return; }
 
   // なかまが まほうを 使うことがある(2ターンに1回くらい)
   const mates = spellMates_();
@@ -5829,10 +5849,11 @@ function battleEnemy_(sync){
   const b = __battle;
   if (!b || b.done) return;
   const who = pet_().heroName || dotStage().name;
-  if (b.stun){ b.stun = 0; b.log.push(b.en.name + "は むせていて うごけない!"); renderBattle_(); setTimeout(battleTurn_, 1250); return; }
+  if (b.stun){ b.stun = 0; b.guard = 0; b.log.push(b.en.name + "は むせていて うごけない!"); renderBattle_(); setTimeout(battleTurn_, 1250); return; }
   const qs = ENEMY_QUIRK[b.en.key];
   if (qs && Math.random() < (b.en.boss ? 0.1 : 0.2)){ b.log.push(qs[Math.floor(Math.random() * qs.length)]); renderBattle_(); setTimeout(battleTurn_, 1250); return; }
   let edmg = Math.max(1, Math.round((b.eatk * (0.85 + Math.random() * 0.3)) - b.pdef * 0.35));
+  if (b.guard){ edmg = Math.max(1, Math.round(edmg * 0.45)); b.guard = 0; }
   b.php = Math.max(0, b.php - edmg);
   b.log.push(b.en.name + "の こうげき!");
   b.log.push(who + "は " + edmg + " のダメージを うけた!");
@@ -5960,6 +5981,148 @@ function battleLose_(){
     + '<p class="hint">負けても なくすものは ありません。</p>'
     + '<button class="btn" onclick="closeBattle()">とじる</button></div>';
 }
+/* ===== コマンドバトル ===== */
+// おまかせ(自動)か コマンドか。MP は なかまの まほうに使う
+function battleInit_(b){
+  const r = rpg_();
+  b.auto = r.battleAuto === true;
+  const lv = lvInfo_().lv;
+  b.mmax = 4 + Math.floor(lv / 6) + equipFx_("mp") * 2;
+  b.mp = b.mmax;
+  b.menu = "main";
+}
+function spellCost_(sp){ return sp.kind === "dmg" ? 2 : 1; }
+function battleMenuHtml_(){
+  const b = __battle;
+  if (!b || b.done) return "";
+  if (!b.waiting) return '<span class="rpg-wait">▼</span>';
+  const btn = function(label, fn, dis, sub){
+    return '<button class="rpg-c"' + (dis ? ' disabled' : '') + ' onclick="' + fn + '">' + esc(label)
+      + (sub ? '<small>' + esc(sub) + '</small>' : '') + '</button>';
+  };
+  if (b.menu === "spell"){
+    const ks = spellMates_();
+    return '<div class="rpg-cmds rpg-sub">'
+      + (ks.length ? ks.map(function(k){
+          const sp = spellOf_(k); const c = spellCost_(sp);
+          const nm = DOT_NAMES[k] || (petInfo_(k) ? petInfo_(k).name : "なかま");
+          return btn(sp.name, "cmdSpell_('" + k + "')", b.mp < c, nm + " ・ MP" + c);
+        }).join("") : '<p class="rpg-none">まほうを つかえる なかまが いない</p>')
+      + btn("もどる", "cmdMenu_('main')") + '</div>';
+  }
+  if (b.menu === "item"){
+    const bag = bag_();
+    const have = ITEM_KEYS.filter(function(k){ return bag[k] > 0; });
+    return '<div class="rpg-cmds rpg-sub">'
+      + (have.length ? have.map(function(k){ return btn(ITEMS[k].name + " ×" + bag[k], "cmdItem_('" + k + "')", false, ITEMS[k].desc); }).join("")
+                     : '<p class="rpg-none">どうぐぶくろは からっぽだ</p>')
+      + btn("もどる", "cmdMenu_('main')") + '</div>';
+  }
+  return '<div class="rpg-cmds">'
+    + btn("たたかう", "cmdAttack_()")
+    + btn("まほう", "cmdMenu_('spell')", !spellMates_().length)
+    + btn("どうぐ", "cmdMenu_('item')")
+    + btn("ぼうぎょ", "cmdGuard_()")
+    + btn("にげる", "cmdRun_()")
+    + btn("おまかせ", "cmdAuto_()")
+    + '</div>';
+}
+function cmdMenu_(m){ const b = __battle; if (!b || !b.waiting) return; b.menu = m; renderBattle_(); }
+function cmdBegin_(){ const b = __battle; if (!b || !b.waiting || b.done) return null; b.waiting = false; b.menu = "main"; return b; }
+// こちらの行動が終わったら てきの番へ
+function cmdAfter_(b, delay){
+  if (b.ehp <= 0){ b.done = true; b.log.push(b.en.name + "を たおした!"); renderBattle_(); setTimeout(battleWin_, 1400); return; }
+  renderBattle_();
+  setTimeout(function(){ battleEnemy_(); }, delay || 1000);
+}
+function heroAttack_(b){
+  const who = pet_().heroName || dotStage().name;
+  const crit = Math.random() < 0.08 + equipFx_("crit") * 0.10;
+  let dmg = Math.max(1, Math.round((b.patk * (0.85 + Math.random() * 0.3)) - (b.edef != null ? b.edef * 0.35 : b.en.atk * 0.15)));
+  if (crit) dmg = Math.round(dmg * 1.8);
+  b.ehp = Math.max(0, b.ehp - dmg);
+  b.log.push(who + "の こうげき!");
+  b.log.push((crit ? "会心の一撃!　" : "") + b.en.name + "に " + dmg + " のダメージ!");
+  if (crit) flashFx_("crit");
+}
+function cmdAttack_(){ const b = cmdBegin_(); if (!b) return; heroAttack_(b); cmdAfter_(b, 900); }
+function cmdSpell_(k){
+  const b = cmdBegin_(); if (!b) return;
+  const sp = spellOf_(k); if (!sp) return;
+  const c = spellCost_(sp);
+  if (b.mp < c){ b.waiting = true; b.log.push("MPが たりない!"); renderBattle_(); return; }
+  b.mp -= c;
+  const who = pet_().heroName || dotStage().name;
+  const nm2 = DOT_NAMES[k] || (petInfo_(k) ? petInfo_(k).name : "なかま");
+  b.log.push(nm2 + "の " + sp.name + "!");
+  playSpell_(sp, k);
+  if (sp.kind === "dmg"){
+    const d = Math.max(1, Math.round(b.patk * sp.pow * (0.9 + Math.random() * 0.3)));
+    b.ehp = Math.max(0, b.ehp - d);
+    b.log.push(b.en.name + "に " + d + " のダメージ!");
+  } else if (sp.kind === "heal"){
+    const h = Math.round(b.pmax * Math.max(sp.pow, 0.3));
+    b.php = Math.min(b.pmax, b.php + h);
+    b.log.push(who + "は " + h + " かいふくした!");
+  } else if (sp.kind === "buff"){
+    b.patk = Math.round(b.patk * sp.pow);
+    b.log.push(who + "たちの こうげきが 上がった!");
+  } else if (sp.kind === "debuff"){
+    b.eatk = Math.max(1, Math.round(b.eatk * sp.pow));
+    b.log.push(b.en.name + "の こうげきが 下がった!");
+  }
+  cmdAfter_(b, 1300);
+}
+function cmdItem_(k){
+  const b = cmdBegin_(); if (!b) return;
+  const who = pet_().heroName || dotStage().name;
+  if (!battleUseItem_(b, who, k)){ b.waiting = true; renderBattle_(); return; }
+  cmdAfter_(b, 1100);
+}
+function cmdGuard_(){
+  const b = cmdBegin_(); if (!b) return;
+  const who = pet_().heroName || dotStage().name;
+  b.guard = 1;
+  b.log.push(who + "は みを まもっている。");
+  cmdAfter_(b, 700);
+}
+function cmdRun_(){
+  const b = cmdBegin_(); if (!b) return;
+  const who = pet_().heroName || dotStage().name;
+  const rate = b.practice ? 1 : (b.boss ? 0.5 : 0.8);
+  b.log.push(who + "たちは にげだした!");
+  if (Math.random() < rate){
+    b.done = true; b.fled = true;
+    b.log.push("うまく にげきれた!");
+    renderBattle_();
+    setTimeout(battleFled_, 1100);
+    return;
+  }
+  b.log.push("しかし まわりこまれてしまった!");
+  cmdAfter_(b, 900);
+}
+function cmdAuto_(){
+  const b = cmdBegin_(); if (!b) return;
+  b.auto = true;
+  b.log.push("おまかせで たたかう!");
+  renderBattle_();
+  setTimeout(battleTurn2_, 700);
+}
+// 戦いの方法を切りかえる(次の戦いから)
+function setBattleAuto(on){ const r = rpg_(); r.battleAuto = !!on; save(); toast(on ? "戦いは「おまかせ」で 進みます" : "戦いは「コマンド」で 選びます"); }
+// にげたとき(てきは そのまま 残る)
+function battleFled_(){
+  const b = __battle;
+  if (!b) return;
+  const box = battleBox_();
+  box.innerHTML = '<div class="rpg-result">'
+    + '<div class="rpg-lose-t">にげきった!</div>'
+    + '<div class="rpg-res-ico">' + dotSvg(b.en.key, Math.min(64, b.en.size || 56)) + '</div>'
+    + '<p>' + esc(b.en.name) + 'は まだ どこかに いる。</p>'
+    + '<p class="hint">' + (b.boss || b.vs ? "準備を ととのえて また いどもう。" : "なかま画面の たたかい から また いどめます。") + '</p>'
+    + '<button class="btn" onclick="closeBattle()">とじる</button></div>';
+  const cmd = document.getElementById("rpg-cmd"); if (cmd) cmd.innerHTML = "";
+}
 // まほうの 見た目の効果
 function playSpell_(sp, key){
   const st = document.getElementById("rpg-stage");
@@ -6010,13 +6173,15 @@ function renderBattle_(){
         '<div class="rpg-status">'
       +   '<span>' + esc(pet_().heroName || st.name) + '</span>'
       +   '<span>Lv ' + lvInfo_().lv + '</span>'
-      +   '<span>HP ' + Math.max(0, b.php) + '</span>'
+      +   '<span>HP ' + Math.max(0, b.php) + '/' + b.pmax + '</span>'
+      +   (b.mmax ? '<span>MP ' + b.mp + '/' + b.mmax + '</span>' : '')
       + '</div>'
       + '<div class="rpg-hpbar"><i style="width:' + pp + '%"></i></div>'
       + '<div class="rpg-msg">' + b.log.slice(-3).map(function(x){ return '<div>' + esc(x) + '</div>'; }).join("") + '</div>';
   }
   const cmd = document.getElementById("rpg-cmd");
-  if (cmd) cmd.innerHTML = b.done ? "" : '<span class="rpg-wait">▼</span>';
+  if (cmd){ cmd.innerHTML = battleMenuHtml_(); cmd.classList.toggle("on", !!b.waiting && !b.done); }
+  const scr = document.getElementById("rpg-screen"); if (scr) scr.classList.toggle("cmd-mode", !b.auto);
 }
 
 /* ===== そうびの着せかえ ===== */
@@ -6153,6 +6318,10 @@ function battleSection_(){
     +   (en ? '<button class="btn" onclick="startBattle(false)">たたかう</button>' : '')
     +   '<button class="btn ghost" onclick="startBattle(true)">れんしゅう</button>'
     + '</div>'
+    + '<div class="bt-mode"><span>戦いかた</span>'
+    +   '<button class="' + (r.battleAuto ? '' : 'on') + '" onclick="setBattleAuto(false);openPartyModal()">コマンドで選ぶ</button>'
+    +   '<button class="' + (r.battleAuto ? 'on' : '') + '" onclick="setBattleAuto(true);openPartyModal()">おまかせ</button></div>'
+    + '<p class="hint">コマンドでは「たたかう・まほう・どうぐ・ぼうぎょ・にげる」を選べます。まほうは MP を使います(なかまの数だけ種類が増えます)。</p>'
     + '<div class="lv-row"><b>Lv ' + li.lv + '</b><span class="lv-bar"><i style="width:' + li.pct + '%"></i></span>'
     +   '<span>つぎまで ' + Math.max(0, li.next - li.exp) + '</span></div>'
     + '<p class="hint">つよさ: こうげき ' + pw.atk + ' / まもり ' + pw.def + ' / たいりょく ' + pw.hp
