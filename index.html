@@ -384,6 +384,74 @@ button.mate-chip { cursor: pointer; font-family: var(--sans); }
 .join-ask .btn { margin-top: 6px; }
 .legend-in { animation: enemyEnter .8s cubic-bezier(.3,1.6,.5,1); }
 .strong-box { border-color: #E07A1F; }
+/* なかまの くらし */
+.lf-top { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-bottom: 8px; }
+.lf-gold { font-weight: 700; font-size: 14px; margin-right: auto; background: #FFF6D6; border: 1px solid #F0D27A; border-radius: 999px; padding: 4px 12px; }
+.lf-tab { border: 1px solid var(--line); background: #fff; border-radius: 999px; padding: 6px 10px; font-size: 12.5px; cursor: pointer; }
+.lf-tab.on { background: #1F2D3A; color: #fff; border-color: #1F2D3A; }
+.lf-apt { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 8px; padding: 10px; background: #C9A27A; border-radius: 10px;
+  box-shadow: inset 0 0 0 4px #A8835C; }
+.lf-room { position: relative; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 8px 4px 6px; border: 3px solid #7A5A3A; border-radius: 6px;
+  background: linear-gradient(var(--wall) 70%, #E0C9A8 70%); cursor: pointer; font-family: var(--sans); }
+.lf-room:active { transform: scale(.97); }
+.lf-win { animation: lfIdle 2.4s ease-in-out infinite; }
+@keyframes lfIdle { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-3px)} }
+.lf-nm { font-size: 11px; font-weight: 700; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lf-st { font-size: 12px; display: flex; align-items: center; gap: 3px; }
+.lf-mini { display: inline-block; width: 34px; height: 5px; background: #ddd; border-radius: 3px; overflow: hidden; }
+.lf-mini b, .lf-bar b { display: block; height: 100%; background: #F0A33A; }
+.lf-hearts { font-size: 9px; color: #E2466A; letter-spacing: -1px; }
+.lf-req { position: absolute; top: -10px; right: -6px; font-size: 18px; background: #fff; border: 2px solid #E2466A; border-radius: 50% 50% 50% 4px; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center;
+  animation: lfReq 1s ease-in-out infinite; z-index: 1; }
+@keyframes lfReq { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-4px)} }
+.lf-news { list-style: none; padding: 0; margin: 0; font-size: 12.5px; }
+.lf-news li { padding: 6px 2px; border-bottom: 1px dashed var(--line); }
+.lf-news li span { color: #9AA7AF; font-size: 11px; margin-right: 6px; }
+.lf-big { position: relative; height: 180px; margin: 8px 0; border-radius: 12px; overflow: hidden; background: var(--wall); border: 3px solid #7A5A3A; display: flex; align-items: flex-end; justify-content: center; }
+.lf-floor { position: absolute; left: 0; right: 0; bottom: 0; height: 46px; background: repeating-linear-gradient(90deg, #D9B98E 0 30px, #CFAE82 30px 32px); }
+.lf-me { position: relative; margin-bottom: 18px; animation: lfIdle 2s ease-in-out infinite; }
+.lf-bubble { position: absolute; top: 10px; left: 10px; right: 10px; background: #fff; border: 2px solid #E2466A; border-radius: 12px; padding: 6px 10px; font-size: 12.5px; text-align: center; font-family: var(--sans); z-index: 1; }
+.lf-bubble.calm { border-color: #9AA7AF; color: #5C6B78; }
+.lf-name { font-weight: 700; font-size: 16px; display: flex; align-items: center; gap: 8px; }
+.lf-name .lf-hearts { font-size: 13px; }
+.lf-bars { display: grid; grid-template-columns: auto 1fr; gap: 4px 8px; align-items: center; font-size: 12px; margin: 6px 0; }
+.lf-bar { display: block; height: 8px; background: #eee; border-radius: 4px; overflow: hidden; }
+.lf-bar.mood b { background: #FF8FB1; }
+.lf-acts { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; margin: 8px 0; }
+.lf-acts .btn:last-child:nth-child(odd) { grid-column: 1 / -1; }
+.lf-pick { display: flex; flex-direction: column; gap: 6px; margin: 8px 0; }
+.lf-pick button:not(.link) { text-align: left; border: 1px solid var(--line); background: #fff; border-radius: 10px; padding: 9px 12px; font-size: 13.5px; cursor: pointer; display: flex; align-items: center; gap: 6px; }
+.lf-pick small { color: #9AA7AF; margin-left: auto; }
+.lf-q { border: 2px solid #FF8FB1; border-radius: 12px; padding: 10px; margin: 8px 0; text-align: center; }
+.lf-prof dl { display: grid; grid-template-columns: auto 1fr; gap: 4px 10px; font-size: 12.5px; margin: 0; }
+.lf-prof dt { color: #7C8A95; }
+.lf-prof dd { margin: 0; }
+.lf-shoptabs { display: flex; gap: 6px; margin-bottom: 6px; }
+.lf-shoptabs button { flex: 1; border: 1px solid var(--line); background: #fff; border-radius: 10px; padding: 8px 4px; font-size: 12.5px; cursor: pointer; }
+.lf-shoptabs button.on { background: #1F2D3A; color: #fff; border-color: #1F2D3A; }
+.lf-shop { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 8px; }
+.lf-item { border: 1px solid var(--line); border-radius: 12px; padding: 10px; display: flex; flex-direction: column; align-items: center; gap: 3px; background: #fff; }
+.lf-item .ic { font-size: 28px; line-height: 1.2; min-height: 36px; display: flex; align-items: center; }
+.lf-item b { font-size: 13px; } .lf-item small { color: #9AA7AF; font-size: 11px; }
+.lf-item .btn { margin-top: 4px; padding: 6px 14px; min-height: 0; font-size: 13px; }
+/* 大きな リアクション */
+.life-react { position: fixed; inset: 0; z-index: 300; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,.35); animation: lrBg 1.9s ease forwards; pointer-events: none; }
+@keyframes lrBg { 0%{opacity:0} 10%{opacity:1} 85%{opacity:1} 100%{opacity:0} }
+.lr-box { position: relative; background: #fff; border-radius: 20px; padding: 14px 22px 16px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,.35); animation: lrPop 1.9s cubic-bezier(.2,1.4,.4,1) forwards; min-width: 210px; }
+@keyframes lrPop { 0%{transform:scale(.3)} 14%{transform:scale(1.08)} 22%{transform:scale(1)} 100%{transform:scale(1)} }
+.life-react.love .lr-box { border: 4px solid #FF6F96; } .life-react.happy .lr-box { border: 4px solid #FFC94A; }
+.life-react.meh .lr-box { border: 4px solid #B8C2CC; } .life-react.bad .lr-box { border: 4px solid #7FB2FF; } .life-react.up .lr-box { border: 4px solid #FFD54A; background: #FFFBEA; }
+.lr-face { animation: lrFace .6s ease 2; }
+.life-react.love .lr-face, .life-react.up .lr-face { animation: lrJump .5s ease 3; }
+.life-react.bad .lr-face { animation: lrShake .4s ease 3; }
+@keyframes lrFace { 0%,100%{transform:rotate(0)} 30%{transform:rotate(-6deg)} 70%{transform:rotate(6deg)} }
+@keyframes lrJump { 0%,100%{transform:translateY(0)} 45%{transform:translateY(-16px) scale(1.06)} }
+@keyframes lrShake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)} }
+.lr-text { font-weight: 900; font-size: 20px; color: #1F2D3A; margin-top: 4px; }
+.life-react.love .lr-text { color: #E2466A; } .life-react.up .lr-text { color: #C98A00; }
+.lr-sub { font-size: 12.5px; color: #5C6B78; margin-top: 2px; }
+.lr-marks i { position: absolute; left: 50%; top: 40%; font-style: normal; font-size: 22px; animation: lrMark 1.5s ease-out forwards; animation-delay: calc(var(--i) * .1s); opacity: 0; }
+@keyframes lrMark { 0%{opacity:0; transform:translate(-50%,0) scale(.4)} 20%{opacity:1} 100%{opacity:0; transform:translate(calc(-50% + (var(--i) - 3) * 26px), -110px) scale(1.2)} }
 .gm-card.legend { background: linear-gradient(160deg, #3A1A0A, #7A2A12); color: #FFE9C2; border-color: #FFB347; }
 .gm-card.legend .nm { color: #FFE9C2; }
 @keyframes fxLunge { 0%,100%{transform:translateY(0) scale(1)} 40%{transform:translateY(22px) scale(1.18)} }
@@ -452,13 +520,13 @@ button.mate-chip { cursor: pointer; font-family: var(--sans); }
 .pt-body { margin-top: 6px; }
 .stage-more { align-self: center; font-size: 11px; color: #5C6B78; }
 /* ===== なかま画面(ゲーム風) ===== */
-.gm-tabs { display: grid; grid-template-columns: repeat(6, minmax(0,1fr)); gap: 4px; margin-bottom: 10px; }
+.gm-tabs { display: grid; grid-template-columns: repeat(7, minmax(0,1fr)); gap: 4px; margin-bottom: 10px; }
 .gm-tab { position: relative; display: flex; flex-direction: column; align-items: center; gap: 1px; padding: 7px 2px 6px; border: 1px solid var(--line); background: #fff; color: #5C6B78; border-radius: 10px; font-size: 11px; font-family: var(--sans); cursor: pointer; min-width: 0; }
 .gm-tab .ic { font-size: 18px; line-height: 1.1; }
 .gm-tab .lb { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
 .gm-tab .bd { position: absolute; top: -5px; right: -3px; min-width: 18px; height: 18px; padding: 0 4px; border-radius: 999px; background: #E3A21A; color: #fff; font-size: 10px; font-weight: 700; line-height: 18px; text-align: center; }
 .gm-tab.on { border-color: var(--ai); background: var(--ai); color: #fff; font-weight: 700; }
-@media (max-width: 420px) { .gm-tabs { grid-template-columns: repeat(3, minmax(0,1fr)); } }
+@media (max-width: 520px) { .gm-tabs { grid-template-columns: repeat(4, minmax(0,1fr)); } }
 .gm-party { border-radius: 14px; background: linear-gradient(180deg,#22344A 0%,#2E4A63 100%); color: #fff; padding: 10px 10px 8px; margin-bottom: 12px; }
 .gm-party.sleepy { filter: grayscale(0.7); }
 .gm-party-head { display: flex; justify-content: space-between; align-items: baseline; font-size: 12px; letter-spacing: 0.1em; opacity: 0.9; margin-bottom: 6px; }
@@ -1877,7 +1945,7 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
   </section>
 
   <div class="toast" id="toast"></div>
-  <footer class="foot">OTCLinker — とみながグループ 店舗向けツール<br><span class="ver">版 2026-10-14 CT(強敵・伝説のなかま・カットイン)</span></footer>
+  <footer class="foot">OTCLinker — とみながグループ 店舗向けツール<br><span class="ver">版 2026-10-14 CU(なかまの くらし)</span></footer>
 </div>
 
 <script>
@@ -4389,6 +4457,7 @@ function hash32_(str){
   return (h >>> 0);
 }
 function decoOf_(key){
+  try { const lm = S.life && S.life.mates && S.life.mates[key]; if (lm && lm.outfit) return lm.outfit; } catch(e){}
   const t = today();
   const h = hash32_(t + "|" + key);
   const season = seasonDeco_();
@@ -5391,6 +5460,7 @@ function lvInfo_(){
 }
 // けいけんちを あたえる
 function addExp_(n, why){
+  try { goldAdd_(Math.max(1, Math.round(n / 3))); } catch(e){}
   const L = lv_();
   const before = lvOf_(L.exp);
   L.exp += n;
@@ -7359,6 +7429,368 @@ function matesSection_(){
   }
   return h;
 }
+
+/* ============ なかまの くらし(育成・ともだちコレクション風) ============
+   なかまは それぞれ おなか・きぶん・なかよし度 を持ち、ごはん・おしゃべり・プレゼント・きせかえ・あそび で そだつ。
+   なかま どうしの なかよし度もあり、なかよくなったり けんかしたりする。ゴールドは 業務(けいけんち)で たまる。 */
+const FOODS = {
+  f_dango:   { name:"いきなりだんご",   price:15, ic:"🍡" },
+  f_renkon:  { name:"からしれんこん",   price:20, ic:"🥢" },
+  f_taipien: { name:"タイピーエン",     price:25, ic:"🍲" },
+  f_ramen:   { name:"くまもとラーメン", price:30, ic:"🍜" },
+  f_akaushi: { name:"あか牛どん",       price:45, ic:"🍚" },
+  f_dekopon: { name:"デコポン",         price:20, ic:"🍊" },
+  f_banpei:  { name:"ばんぺいゆ",       price:35, ic:"🍈" },
+  f_ichigo:  { name:"いちご",           price:25, ic:"🍓" },
+  f_suika:   { name:"すいか",           price:30, ic:"🍉" },
+  f_kuri:    { name:"山鹿の くり",      price:20, ic:"🌰" },
+  f_ame:     { name:"のどあめ",         price:5,  ic:"🍬" },
+  f_drink:   { name:"スポーツドリンク", price:10, ic:"🥤" }
+};
+const GIFTS = {
+  g_flower: { name:"はなたば",   price:30, ic:"💐" },
+  g_book:   { name:"まんが",     price:25, ic:"📚" },
+  g_ball:   { name:"ボール",     price:20, ic:"⚽" },
+  g_plush:  { name:"ぬいぐるみ", price:40, ic:"🧸" },
+  g_music:  { name:"レコード",   price:35, ic:"💿" },
+  g_mirror: { name:"てかがみ",   price:30, ic:"🪞" },
+  g_kite:   { name:"たこ",       price:25, ic:"🪁" },
+  g_game:   { name:"けいたいゲーム", price:60, ic:"🎮" }
+};
+const WEARS = { ribbon:40, sunglass:50, straw:45, muffler:50, sakura:60, leaf:40, pumpkin:70, santa:80, kagami:60 };
+const PLAYS = ["キャッチボール", "しりとり", "かくれんぼ", "ひなたぼっこ", "おえかき", "うたの れんしゅう", "おはじき", "にらめっこ", "おさんぽ", "トランプ"];
+const LIFE_LV = [0, 6, 16, 32, 55, 85, 125, 175];   // なかよしレベルの 区切り(なかよし度)
+let __lifeView = "home", __lifeSub = "";
+function life_(){
+  S.life = S.life || { gold: 50, foods: { f_dango: 2, f_ame: 3 }, gifts: {}, wears: [], mates: {}, rel: {}, quarrel: {}, news: [], tick: Date.now(), day: "" };
+  return S.life;
+}
+function lifeMate_(k){
+  const L = life_();
+  if (!L.mates[k]) L.mates[k] = { full: 80, mood: 70, bond: 0, req: null, outfit: null, known: {}, talk: "" };
+  return L.mates[k];
+}
+function lifeKeys_(){ return allMates_().map(function(o){ return o.k; }); }
+function lifeName_(k){ return DOT_NAMES[k] || k; }
+// 好み(なかまごとに だいこうぶつ1つ・にがて1つ。ほかは すき か ふつう)
+function tasteOf_(k, id){
+  const pool = id.charAt(0) === "f" ? Object.keys(FOODS) : Object.keys(GIFTS);
+  const h = hash32_(k + "|taste|" + pool.length);
+  const fav = pool[h % pool.length], bad = pool[(h + 5) % pool.length];
+  if (id === fav) return 3;
+  if (id === bad) return 0;
+  return (hash32_(k + "|" + id) % 10) < 4 ? 2 : 1;
+}
+function lifeLv_(bond){ let n = 1; LIFE_LV.forEach(function(v, i){ if (bond >= v) n = i + 1; }); return Math.min(n, LIFE_LV.length); }
+function relKey_(a, b){ return a < b ? a + "|" + b : b + "|" + a; }
+function relOf_(a, b){ return life_().rel[relKey_(a, b)] || 0; }
+function relAdd_(a, b, n){ const L = life_(), key = relKey_(a, b); L.rel[key] = Math.max(-60, Math.min(120, (L.rel[key] || 0) + n)); }
+function lifeNews_(text){ const L = life_(); L.news.unshift({ d: today(), t: text }); L.news = L.news.slice(0, 30); }
+function moodFace_(m){ return m.mood >= 75 ? "😆" : (m.mood >= 50 ? "🙂" : (m.mood >= 25 ? "😐" : "😢")); }
+const REQ_IC = { food:"🍙", talk:"💬", gift:"🎁", play:"🤝", wear:"👕", sleep:"💤" };
+// 時間の けいか(おなかが へる・おねがいが うまれる・なかま どうしの できごと)
+function lifeTick_(){
+  const L = life_(), now = Date.now();
+  const hrs = Math.min(72, Math.max(0, (now - (L.tick || now)) / 3600000));
+  const keys = lifeKeys_();
+  if (hrs >= 0.25){
+    keys.forEach(function(k){
+      const m = lifeMate_(k);
+      m.full = Math.max(0, m.full - hrs * 4);
+      m.mood = Math.max(0, m.mood - hrs * (m.full < 30 ? 3 : 1));
+      if (!m.req && Math.random() < Math.min(0.6, hrs * 0.08)) m.req = makeReq_(k, m);
+    });
+    L.tick = now;
+  }
+  // 1日1回: なかま どうしの できごと
+  if (L.day !== today() && keys.length >= 2){
+    L.day = today();
+    const n = Math.min(3, 1 + Math.floor(keys.length / 6));
+    for (let i = 0; i < n; i++) lifeEvent_(keys);
+  }
+  save();
+}
+function makeReq_(k, m){
+  const keys = lifeKeys_().filter(function(x){ return x !== k; });
+  if (m.full < 45){
+    const liked = Object.keys(FOODS).filter(function(f){ return tasteOf_(k, f) >= 2; });
+    return { type: "food", id: liked[Math.floor(Math.random() * liked.length)] };
+  }
+  const types = ["talk", "gift", "wear"].concat(keys.length ? ["play", "play"] : []);
+  const t = types[Math.floor(Math.random() * types.length)];
+  if (t === "play") return { type: "play", with: keys[Math.floor(Math.random() * keys.length)] };
+  if (t === "gift"){ const liked = Object.keys(GIFTS).filter(function(g){ return tasteOf_(k, g) >= 2; }); return { type: "gift", id: liked[Math.floor(Math.random() * liked.length)] }; }
+  return { type: t };
+}
+function reqText_(k, r){
+  if (!r) return "";
+  if (r.type === "food") return "おなかが すいた……「" + FOODS[r.id].name + "」が たべたいな";
+  if (r.type === "talk") return "ちょっと きいてほしい ことが あるんだ";
+  if (r.type === "gift") return "「" + GIFTS[r.id].name + "」が ほしいなあ";
+  if (r.type === "wear") return "たまには ちがう ふくを きてみたい!";
+  if (r.type === "play") return lifeName_(r.with) + "と あそびたいな";
+  return "";
+}
+function lifeEvent_(keys){
+  const a = keys[Math.floor(Math.random() * keys.length)];
+  let b = keys[Math.floor(Math.random() * keys.length)];
+  if (a === b) return;
+  const L = life_(), r = relOf_(a, b), key = relKey_(a, b);
+  const roll = Math.random();
+  if (r < 10 && roll < 0.22){
+    L.quarrel[key] = true; relAdd_(a, b, -15);
+    const why = ["さいごの おやつを とりあった", "しりとりで「ん」で おわった", "テレビの チャンネルで もめた", "どっちが 先に 起きたかで いいあった"];
+    lifeNews_("💢 " + lifeName_(a) + "と " + lifeName_(b) + "が けんかした(" + why[Math.floor(Math.random() * why.length)] + ")");
+  } else if (roll < 0.75){
+    const p = PLAYS[Math.floor(Math.random() * PLAYS.length)];
+    relAdd_(a, b, 6); lifeMate_(a).mood = Math.min(100, lifeMate_(a).mood + 5); lifeMate_(b).mood = Math.min(100, lifeMate_(b).mood + 5);
+    lifeNews_("🎈 " + lifeName_(a) + "と " + lifeName_(b) + "が " + p + "を して あそんだ");
+    if (relOf_(a, b) >= 60 && !(L.best || {})[key]){ L.best = L.best || {}; L.best[key] = true; lifeNews_("💞 " + lifeName_(a) + "と " + lifeName_(b) + "が しんゆうに なった!"); }
+  } else {
+    const t = [function(){ return "🌙 " + lifeName_(a) + "が " + lifeName_(b) + "の ゆめを みた"; },
+               function(){ return "🎵 " + lifeName_(a) + "が はなうたを うたっていた"; },
+               function(){ return "📸 " + lifeName_(a) + "と " + lifeName_(b) + "が いっしょに しゃしんを とった"; },
+               function(){ return "🍵 " + lifeName_(a) + "が " + lifeName_(b) + "に おちゃを いれてあげた"; }];
+    relAdd_(a, b, 3);
+    lifeNews_(t[Math.floor(Math.random() * t.length)]());
+  }
+}
+// ゴールド(業務で けいけんちが 入ると いっしょに たまる)
+function goldAdd_(n){ const L = life_(); L.gold = Math.max(0, (L.gold || 0) + Math.round(n)); }
+// なかよし度を ふやす(レベルが 上がると ごほうび)
+function bondAdd_(k, n){
+  const m = lifeMate_(k), before = lifeLv_(m.bond);
+  m.bond = Math.max(0, m.bond + n);
+  const after = lifeLv_(m.bond);
+  if (after > before){ goldAdd_(after * 15); lifeNews_("💗 " + lifeName_(k) + "との なかよしレベルが " + after + " に なった!"); return after; }
+  return 0;
+}
+// 大きな リアクション(顔の アップ)
+function lifeReact_(k, kind, text, sub){
+  const host = document.body;
+  const d = document.createElement("div");
+  d.className = "life-react " + kind;
+  const marks = { love: ["💖","💕","💗","✨"], happy: ["♪","✨","♪"], meh: ["…"], bad: ["💦","💦"], angry: ["💢"], up: ["⭐","✨","🎉","💗"] }[kind] || ["✨"];
+  d.innerHTML = '<div class="lr-box"><div class="lr-face">' + dotSvg(k, 130, mateLv_(k), lifeMate_(k).outfit || null) + '</div>'
+    + '<div class="lr-marks">' + marks.concat(marks).map(function(x, i){ return '<i style="--i:' + i + '">' + x + '</i>'; }).join("") + '</div>'
+    + '<div class="lr-text">' + esc(text) + '</div>' + (sub ? '<div class="lr-sub">' + esc(sub) + '</div>' : '') + '</div>';
+  host.appendChild(d);
+  if (navigator.vibrate) navigator.vibrate(kind === "love" || kind === "up" ? [20, 30, 20, 30, 40] : 20);
+  setTimeout(function(){ if (d.parentNode) d.parentNode.removeChild(d); }, 1900);
+}
+function lifeDone_(k, type, match){
+  const m = lifeMate_(k);
+  if (m.req && m.req.type === type && (match == null || match)){ m.req = null; bondAdd_(k, 3); goldAdd_(10); return true; }
+  return false;
+}
+// ---- 行動 ----
+function lifeFeed(k, f){
+  const L = life_(), m = lifeMate_(k);
+  if (!(L.foods[f] > 0)){ toast("もっていません。おみせで かえます"); return; }
+  L.foods[f]--; if (L.foods[f] <= 0) delete L.foods[f];
+  const t = tasteOf_(k, f); m.known[f] = t;
+  const req = lifeDone_(k, "food", m.req && m.req.id === f);
+  const per = personaOf_(k);
+  let lvUp = 0;
+  if (t === 3){ m.mood = Math.min(100, m.mood + 30); m.full = Math.min(100, m.full + 45); lvUp = bondAdd_(k, 4); lifeReact_(k, "love", "だいこうぶつ!!", FOODS[f].name + "を ほおばっている"); }
+  else if (t === 2){ m.mood = Math.min(100, m.mood + 18); m.full = Math.min(100, m.full + 35); lvUp = bondAdd_(k, 2); lifeReact_(k, "happy", "おいしい!", FOODS[f].name); }
+  else if (t === 1){ m.mood = Math.min(100, m.mood + 6); m.full = Math.min(100, m.full + 30); lvUp = bondAdd_(k, 1); lifeReact_(k, "meh", "……ふつう", FOODS[f].name); }
+  else { m.mood = Math.max(0, m.mood - 10); m.full = Math.min(100, m.full + 15); lifeReact_(k, "bad", "これ にがて……", FOODS[f].name + "は くちに あわなかった"); }
+  if (req) setTimeout(function(){ toast("おねがいを かなえた! なかよし度 +3・10G"); }, 1900);
+  if (lvUp) setTimeout(function(){ lifeReact_(k, "up", "なかよしレベル " + lvUp + "!", "ごほうび " + (lvUp * 15) + "G"); }, 2000);
+  __lifeSub = ""; save(); openPartyModal();
+}
+function lifeGift(k, g){
+  const L = life_(), m = lifeMate_(k);
+  if (!(L.gifts[g] > 0)){ toast("もっていません"); return; }
+  L.gifts[g]--; if (L.gifts[g] <= 0) delete L.gifts[g];
+  const t = tasteOf_(k, g); m.known[g] = t;
+  const req = lifeDone_(k, "gift", m.req && m.req.id === g);
+  let lvUp = 0;
+  if (t === 3){ m.mood = Math.min(100, m.mood + 35); lvUp = bondAdd_(k, 6); lifeReact_(k, "love", "ずっと ほしかったの!!", GIFTS[g].name); }
+  else if (t === 2){ m.mood = Math.min(100, m.mood + 22); lvUp = bondAdd_(k, 3); lifeReact_(k, "happy", "ありがとう!", GIFTS[g].name); }
+  else if (t === 1){ m.mood = Math.min(100, m.mood + 8); lvUp = bondAdd_(k, 1); lifeReact_(k, "meh", "あ、ありがとう……", GIFTS[g].name); }
+  else { m.mood = Math.max(0, m.mood - 8); lifeReact_(k, "bad", "うーん、これは ちょっと……", GIFTS[g].name); }
+  if (req) setTimeout(function(){ toast("おねがいを かなえた! なかよし度 +3・10G"); }, 1900);
+  if (lvUp) setTimeout(function(){ lifeReact_(k, "up", "なかよしレベル " + lvUp + "!", "ごほうび " + (lvUp * 15) + "G"); }, 2000);
+  __lifeSub = ""; save(); openPartyModal();
+}
+const TALK_Q = [
+  ["あまい ものと からい もの、どっちが すき?", "あまい もの", "からい もの"],
+  ["休みの日は 家で のんびり? それとも おでかけ?", "のんびり", "おでかけ"],
+  ["阿蘇と 天草、行くなら どっち?", "阿蘇", "天草"],
+  ["朝ごはんは ごはん派? パン派?", "ごはん", "パン"],
+  ["犬と ねこ、どっちが すき?", "犬", "ねこ"],
+  ["夏と 冬、どっちが すき?", "夏", "冬"]
+];
+function lifeTalk(k){
+  const m = lifeMate_(k), per = personaOf_(k);
+  const req = lifeDone_(k, "talk");
+  if (m.talk === today() + "|" + new Date().getHours() && !req){ lifeReact_(k, "meh", "さっきも はなしたよ", "また あとで はなそう"); return; }
+  m.talk = today() + "|" + new Date().getHours();
+  if (Math.random() < 0.45){
+    const q = TALK_Q[hash32_(k + today()) % TALK_Q.length];
+    __lifeSub = "q:" + q.join("|");
+    save(); openPartyModal(); return;
+  }
+  const lines = (per.c || []).slice();
+  const best = lifeKeys_().filter(function(x){ return x !== k; }).sort(function(a, b){ return relOf_(k, b) - relOf_(k, a); })[0];
+  if (best && relOf_(k, best) > 20) lines.push(lifeName_(best) + "と いると たのしいんだ");
+  if (m.full < 40) lines.push("……おなか すいてきた");
+  const line = lines[Math.floor(Math.random() * lines.length)] || "きょうも いい日だね";
+  m.mood = Math.min(100, m.mood + 6);
+  const up = bondAdd_(k, 1);
+  lifeReact_(k, "happy", line, req ? "はなしを きいてあげた! なかよし度 +3" : "");
+  if (up) setTimeout(function(){ lifeReact_(k, "up", "なかよしレベル " + up + "!", "ごほうび " + (up * 15) + "G"); }, 2000);
+  save(); setTimeout(openPartyModal, 50);
+}
+function lifeAnswer(k, i){
+  const m = lifeMate_(k);
+  const same = (hash32_(k + "|ans|" + __lifeSub) % 2) === i;
+  __lifeSub = "";
+  if (same){ m.mood = Math.min(100, m.mood + 15); const up = bondAdd_(k, 3); lifeReact_(k, "love", "やっぱり!? わかってるね!", "きが あうね"); if (up) setTimeout(function(){ lifeReact_(k, "up", "なかよしレベル " + up + "!", ""); }, 2000); }
+  else { m.mood = Math.min(100, m.mood + 4); bondAdd_(k, 1); lifeReact_(k, "meh", "へえ〜、そうなんだ", "いろいろ あるよね"); }
+  save(); openPartyModal();
+}
+function lifeWear(k, d){
+  const L = life_(), m = lifeMate_(k);
+  if (d && L.wears.indexOf(d) < 0){ toast("もっていません"); return; }
+  m.outfit = d || null;
+  const req = lifeDone_(k, "wear", !!d);
+  if (d){ m.mood = Math.min(100, m.mood + 10); bondAdd_(k, 1); lifeReact_(k, "happy", "にあう?", DECOS[d] + "を きた" + (req ? "(おねがい かなえた!)" : "")); }
+  __lifeSub = ""; save(); openPartyModal();
+}
+function lifePlay(k, o){
+  const m = lifeMate_(k), m2 = lifeMate_(o), key = relKey_(k, o), L = life_();
+  const req = lifeDone_(k, "play", m.req && m.req.with === o);
+  if (L.quarrel[key]){
+    delete L.quarrel[key]; relAdd_(k, o, 25);
+    lifeNews_("🤝 " + lifeName_(k) + "と " + lifeName_(o) + "が なかなおりした");
+    lifeReact_(k, "love", "なかなおり できた!", lifeName_(o) + "と また なかよし");
+  } else {
+    const p = PLAYS[Math.floor(Math.random() * PLAYS.length)];
+    relAdd_(k, o, 10); m.mood = Math.min(100, m.mood + 12); m2.mood = Math.min(100, m2.mood + 12);
+    bondAdd_(k, 1);
+    lifeNews_("🎈 " + lifeName_(k) + "と " + lifeName_(o) + "が " + p + "を して あそんだ");
+    lifeReact_(k, "happy", p + "!", lifeName_(o) + "と あそんだ" + (req ? "(おねがい かなえた!)" : ""));
+    if (relOf_(k, o) >= 60 && !(L.best || {})[key]){ L.best = L.best || {}; L.best[key] = true; lifeNews_("💞 " + lifeName_(k) + "と " + lifeName_(o) + "が しんゆうに なった!"); setTimeout(function(){ lifeReact_(k, "up", "しんゆうに なった!", lifeName_(o)); }, 2000); }
+  }
+  __lifeSub = ""; save(); openPartyModal();
+}
+function lifeBuy(kind, id){
+  const L = life_();
+  const price = kind === "food" ? FOODS[id].price : (kind === "gift" ? GIFTS[id].price : WEARS[id]);
+  if ((L.gold || 0) < price){ toast("ゴールドが たりません(業務を すると たまります)"); return; }
+  if (kind === "wear" && L.wears.indexOf(id) >= 0){ toast("もう もっています"); return; }
+  L.gold -= price;
+  if (kind === "food") L.foods[id] = (L.foods[id] || 0) + 1;
+  else if (kind === "gift") L.gifts[id] = (L.gifts[id] || 0) + 1;
+  else L.wears.push(id);
+  save(); toast("かった! のこり " + L.gold + "G"); openPartyModal();
+}
+function setLifeView(v, sub){ __lifeView = v; __lifeSub = sub || ""; openPartyModal(); try { const pb = document.querySelector('#party-modal .pt-body'); if (pb) pb.scrollIntoView({ block: 'start' }); } catch(e){} }
+// ---- 画面 ----
+function lifeSection_(){
+  lifeTick_();
+  const L = life_(), keys = lifeKeys_();
+  const top = '<div class="lf-top"><span class="lf-gold">💰 ' + (L.gold || 0) + ' G</span>'
+    + '<button class="lf-tab' + (__lifeView === "home" ? ' on' : '') + '" onclick="setLifeView(\'home\')">🏠 なかまの家</button>'
+    + '<button class="lf-tab' + (__lifeView === "shop" ? ' on' : '') + '" onclick="setLifeView(\'shop\')">🏪 おみせ</button>'
+    + '<button class="lf-tab' + (__lifeView === "news" ? ' on' : '') + '" onclick="setLifeView(\'news\')">📰 できごと</button></div>';
+  if (!keys.length) return top + '<p class="gm-help">まだ なかまが いません。商品を登録したり 機能を ためすと なかまが やってきます。</p>';
+  if (__lifeView === "shop") return top + lifeShop_();
+  if (__lifeView === "news") return top + lifeNewsHtml_(30);
+  if (__lifeView.indexOf("room:") === 0) return top + lifeRoom_(__lifeView.slice(5));
+  // なかまの家(アパート)
+  const reqs = keys.filter(function(k){ return lifeMate_(k).req; }).length;
+  let h = top + '<p class="gm-help">へやを タップすると なかまに 会えます。' + (reqs ? '<b>' + reqs + '人</b>が おねがいを しています。' : '') + ' ゴールドは 業務を すると たまります。</p>';
+  h += '<div class="lf-apt">' + keys.map(function(k){
+    const m = lifeMate_(k);
+    const qu = Object.keys(L.quarrel).some(function(x){ return L.quarrel[x] && x.split("|").indexOf(k) >= 0; });
+    return '<button class="lf-room" style="--wall:' + roomCol_(k) + '" onclick="setLifeView(\'room:' + k + '\')">'
+      + (m.req ? '<span class="lf-req">' + REQ_IC[m.req.type] + '</span>' : '')
+      + '<span class="lf-win">' + dotSvg(k, 44, mateLv_(k), m.outfit || null) + '</span>'
+      + '<span class="lf-nm">' + esc(lifeName_(k)) + '</span>'
+      + '<span class="lf-st">' + moodFace_(m) + (qu ? '💢' : '') + ' <i class="lf-mini"><b style="width:' + Math.round(m.full) + '%"></b></i></span>'
+      + '<span class="lf-hearts">' + "❤".repeat(lifeLv_(m.bond)) + '</span></button>';
+  }).join("") + '</div>';
+  h += '<div class="divider"><span>きょうの できごと</span></div>' + lifeNewsHtml_(4);
+  return h;
+}
+function roomCol_(k){ const c = ["#FFF4E0", "#E8F4FF", "#F0FFE8", "#FFEAF2", "#F3ECFF", "#FFFBE0", "#E8FFF8"]; return c[hash32_(k) % c.length]; }
+function lifeNewsHtml_(n){
+  const L = life_();
+  if (!L.news.length) return '<p class="gm-help">まだ できごとは ありません。あしたも のぞいてみてください。</p>';
+  return '<ul class="lf-news">' + L.news.slice(0, n).map(function(x){ return '<li><span>' + esc(x.d.slice(5).replace("-", "/")) + '</span>' + esc(x.t) + '</li>'; }).join("") + '</ul>';
+}
+function lifeRoom_(k){
+  const L = life_(), m = lifeMate_(k), per = personaOf_(k);
+  const others = lifeKeys_().filter(function(x){ return x !== k; });
+  const fav = Object.keys(FOODS).filter(function(f){ return m.known[f] === 3; }).map(function(f){ return FOODS[f].name; })
+    .concat(Object.keys(GIFTS).filter(function(g){ return m.known[g] === 3; }).map(function(g){ return GIFTS[g].name; }));
+  const bad = Object.keys(FOODS).concat(Object.keys(GIFTS)).filter(function(x){ return m.known[x] === 0; }).map(function(x){ return (FOODS[x] || GIFTS[x]).name; });
+  const best = others.slice().sort(function(a, b){ return relOf_(k, b) - relOf_(k, a); })[0];
+  const quar = others.filter(function(o){ return L.quarrel[relKey_(k, o)]; });
+  const lv = lifeLv_(m.bond), nextNeed = LIFE_LV[lv] != null ? LIFE_LV[lv] - m.bond : null;
+  let h = '<button class="link" onclick="setLifeView(\'home\')">← なかまの家に もどる</button>';
+  h += '<div class="lf-big" style="--wall:' + roomCol_(k) + '"><div class="lf-floor"></div>'
+    + (m.req ? '<div class="lf-bubble">' + REQ_IC[m.req.type] + ' ' + esc(reqText_(k, m.req)) + '</div>' : '<div class="lf-bubble calm">' + esc((per.c || ["……"])[hash32_(k + today()) % ((per.c || [1]).length)]) + '</div>')
+    + '<div class="lf-me">' + dotSvg(k, 104, mateLv_(k), m.outfit || null) + '</div></div>';
+  h += '<div class="lf-name">' + esc(lifeName_(k)) + ' <span class="lf-hearts">' + "❤".repeat(lv) + "♡".repeat(Math.max(0, LIFE_LV.length - lv)) + '</span></div>'
+    + '<div class="lf-bars"><span>きぶん ' + moodFace_(m) + '</span><i class="lf-bar mood"><b style="width:' + Math.round(m.mood) + '%"></b></i>'
+    + '<span>おなか</span><i class="lf-bar full"><b style="width:' + Math.round(m.full) + '%"></b></i></div>'
+    + '<p class="gm-help">なかよしレベル ' + lv + (nextNeed != null ? '(つぎまで ' + nextNeed + ')' : '(さいこう!)') + '</p>';
+  // 行動
+  if (__lifeSub.indexOf("q:") === 0){
+    const q = __lifeSub.slice(2).split("|");
+    h += '<div class="lf-q"><p>「' + esc(q[0]) + '」</p><div class="lf-acts"><button class="btn" onclick="lifeAnswer(\'' + k + '\',0)">' + esc(q[1]) + '</button><button class="btn" onclick="lifeAnswer(\'' + k + '\',1)">' + esc(q[2]) + '</button></div></div>';
+  } else if (__lifeSub === "food"){
+    const have = Object.keys(L.foods).filter(function(f){ return L.foods[f] > 0; });
+    h += '<div class="lf-pick">' + (have.length ? have.map(function(f){ const t = m.known[f]; return '<button onclick="lifeFeed(\'' + k + '\',\'' + f + '\')">' + FOODS[f].ic + ' ' + esc(FOODS[f].name) + ' ×' + L.foods[f] + (t != null ? ' <small>' + ["にがて","ふつう","すき","だいこうぶつ"][t] + '</small>' : '') + '</button>'; }).join("") : '<p class="gm-help">たべものが ありません。おみせで かえます。</p>')
+      + '<button class="link" onclick="setLifeView(\'room:' + k + '\')">もどる</button></div>';
+  } else if (__lifeSub === "gift"){
+    const have = Object.keys(L.gifts).filter(function(g){ return L.gifts[g] > 0; });
+    h += '<div class="lf-pick">' + (have.length ? have.map(function(g){ const t = m.known[g]; return '<button onclick="lifeGift(\'' + k + '\',\'' + g + '\')">' + GIFTS[g].ic + ' ' + esc(GIFTS[g].name) + ' ×' + L.gifts[g] + (t != null ? ' <small>' + ["にがて","ふつう","すき","だいこうぶつ"][t] + '</small>' : '') + '</button>'; }).join("") : '<p class="gm-help">プレゼントが ありません。おみせで かえます。</p>')
+      + '<button class="link" onclick="setLifeView(\'room:' + k + '\')">もどる</button></div>';
+  } else if (__lifeSub === "wear"){
+    h += '<div class="lf-pick">' + '<button onclick="lifeWear(\'' + k + '\',\'\')">👤 いつもの すがた</button>'
+      + (L.wears.length ? L.wears.map(function(d){ return '<button onclick="lifeWear(\'' + k + '\',\'' + d + '\')">' + esc(DECOS[d]) + (m.outfit === d ? ' <small>きている</small>' : '') + '</button>'; }).join("") : '<p class="gm-help">ふくが ありません。おみせで かえます。</p>')
+      + '<button class="link" onclick="setLifeView(\'room:' + k + '\')">もどる</button></div>';
+  } else if (__lifeSub === "play"){
+    h += '<div class="lf-pick">' + (others.length ? others.map(function(o){ const q = L.quarrel[relKey_(k, o)]; return '<button onclick="lifePlay(\'' + k + '\',\'' + o + '\')">' + dotSvg(o, 22, mateLv_(o), lifeMate_(o).outfit || null) + ' ' + esc(lifeName_(o)) + (q ? ' <small>💢けんか中</small>' : '') + ' <small>' + relLabel_(relOf_(k, o)) + '</small></button>'; }).join("") : '<p class="gm-help">ほかの なかまが いません。</p>')
+      + '<button class="link" onclick="setLifeView(\'room:' + k + '\')">もどる</button></div>';
+  } else {
+    h += '<div class="lf-acts">'
+      + '<button class="btn" onclick="__lifeSub=\'food\';openPartyModal()">🍙 ごはん</button>'
+      + '<button class="btn" onclick="lifeTalk(\'' + k + '\')">💬 はなす</button>'
+      + '<button class="btn" onclick="__lifeSub=\'gift\';openPartyModal()">🎁 プレゼント</button>'
+      + '<button class="btn" onclick="__lifeSub=\'wear\';openPartyModal()">👕 きせかえ</button>'
+      + '<button class="btn" onclick="__lifeSub=\'play\';openPartyModal()">🤝 あそぶ' + (quar.length ? '・なかなおり' : '') + '</button>'
+      + '</div>';
+  }
+  // プロフィール
+  h += '<div class="lf-prof"><div class="divider"><span>プロフィール</span></div><dl>'
+    + '<dt>せいかく</dt><dd>' + esc(per.p || "") + '</dd>'
+    + '<dt>だいこうぶつ</dt><dd>' + (fav.length ? esc(fav.join("・")) : "？？？(いろいろ あげて さがそう)") + '</dd>'
+    + '<dt>にがて</dt><dd>' + (bad.length ? esc(bad.join("・")) : "？？？") + '</dd>'
+    + '<dt>なかよし</dt><dd>' + (best && relOf_(k, best) > 0 ? esc(lifeName_(best)) + "(" + relLabel_(relOf_(k, best)) + ")" : "まだ いない") + '</dd>'
+    + (quar.length ? '<dt>けんか中</dt><dd>💢 ' + esc(quar.map(lifeName_).join("・")) + '(「あそぶ」で なかなおり)</dd>' : '')
+    + '<dt>なかまに なった日</dt><dd>' + ((S.mateMeta || {})[k] ? "いっしょに " + mateDays_(k) + " 日" : "—") + '</dd>'
+    + '</dl></div>';
+  return h;
+}
+function relLabel_(r){ return r >= 60 ? "しんゆう 💞" : (r >= 30 ? "なかよし" : (r >= 10 ? "ともだち" : (r < 0 ? "ぎくしゃく" : "しりあい"))); }
+function lifeShop_(){
+  const L = life_();
+  const tab = __lifeSub || "food";
+  let h = '<div class="lf-shoptabs">'
+    + ['food:🍙 たべもの', 'gift:🎁 プレゼント', 'wear:👕 ふく'].map(function(x){ const p = x.split(":"); return '<button class="' + (tab === p[0] ? 'on' : '') + '" onclick="setLifeView(\'shop\',\'' + p[0] + '\')">' + p[1] + '</button>'; }).join("") + '</div>';
+  h += '<p class="gm-help">ゴールドは 商品の登録・棚卸し・たたかい など、アプリを つかうと たまります。</p><div class="lf-shop">';
+  if (tab === "food") h += Object.keys(FOODS).map(function(f){ return '<div class="lf-item"><span class="ic">' + FOODS[f].ic + '</span><b>' + esc(FOODS[f].name) + '</b><small>もっている ' + (L.foods[f] || 0) + '</small><button class="btn" onclick="lifeBuy(\'food\',\'' + f + '\')">' + FOODS[f].price + 'G</button></div>'; }).join("");
+  if (tab === "gift") h += Object.keys(GIFTS).map(function(g){ return '<div class="lf-item"><span class="ic">' + GIFTS[g].ic + '</span><b>' + esc(GIFTS[g].name) + '</b><small>もっている ' + (L.gifts[g] || 0) + '</small><button class="btn" onclick="lifeBuy(\'gift\',\'' + g + '\')">' + GIFTS[g].price + 'G</button></div>'; }).join("");
+  if (tab === "wear") h += Object.keys(WEARS).map(function(d){ const own = L.wears.indexOf(d) >= 0; return '<div class="lf-item"><span class="ic">' + dotSvg(lifeKeys_()[0] || "tablet", 34, 1, d) + '</span><b>' + esc(DECOS[d]) + '</b><small>' + (own ? "もっている" : "みんなで つかえる") + '</small><button class="btn"' + (own ? ' disabled' : '') + ' onclick="lifeBuy(\'wear\',\'' + d + '\')">' + (own ? "かった" : WEARS[d] + "G") + '</button></div>'; }).join("");
+  return h + '</div>';
+}
 function openPartyModal(){
   try { checkPets_(); } catch(e){}
   petGroup_();
@@ -7366,6 +7798,7 @@ function openPartyModal(){
   const own = petsOwned_();
   const tabs = [
     { id:"mates",  ic:"👥", label:"なかま",     n: allMates_().length },
+    { id:"life",   ic:"🏠", label:"くらし",     n: (function(){ try { return lifeKeys_().filter(function(k){ return lifeMate_(k).req; }).length; } catch(e){ return 0; } })() },
     { id:"buddy",  ic:"🐾", label:"あいぼう",   n: own.length },
     { id:"equip",  ic:"🛡", label:"そうび",     n: EQUIP_SLOTS.filter(function(sl){ return rpg_().equip[sl.id]; }).length },
     { id:"battle", ic:"⚔", label:"たたかい",   n: (rpg_().bosses || []).length + (rpg_().wins || 0) },
@@ -7381,6 +7814,7 @@ function openPartyModal(){
   let body = "";
   if (__partyTab === "mates") body = matesSection_();
   else if (__partyTab === "buddy") body = buddySection_();
+  else if (__partyTab === "life") body = lifeSection_();
   else if (__partyTab === "equip") body = equipSection_();
   else if (__partyTab === "battle") body = battleSection_();
   else if (__partyTab === "status") body = statusSection_();
