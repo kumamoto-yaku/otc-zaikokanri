@@ -849,6 +849,28 @@ body:not([data-tab="list"]) .expiry-alert { display: none !important; }
 .cat-chips { display: flex; gap: 8px; flex-wrap: wrap; }
 .cat-chip { border: 1px solid var(--ai); color: var(--ai); background: #fff; border-radius: 999px; padding: 6px 12px; font-size: 13px; cursor: pointer; font-family: var(--sans); }
 .cat-chip.on { background: var(--ai); color: #fff; }
+body.game-off #dot-pet { display: none !important; }
+.skb.kb-closed { padding: 0 !important; border: 0 !important; background: none !important; box-shadow: none !important; }
+.skb.kb-closed .skb-bar > :not(#skb-tg) { display: none !important; }
+.skb.kb-closed .skb-bar { justify-content: flex-start; margin-bottom: 0; }
+.skb.kb-closed #skb-tg { font-size: 13px; }
+.set-group { margin: 14px 2px -2px; font-size: 12px; font-weight: 700; color: #6B7A86; letter-spacing: .08em; }
+details.set-card > summary.set-h { display: block !important; position: relative; padding-right: 28px; }
+details.set-card > summary.set-h::after { position: absolute; right: 4px; top: 50%; margin-top: -7px; float: none; }
+details.set-card:not([open]) { gap: 0 !important; }
+.set-sub { display: block; font-size: 11.5px; font-weight: 400; color: #7C8A95; margin-top: 3px; }
+.guide-steps { margin: 0; padding-left: 1.4em; line-height: 1.9; font-size: 14px; }
+#tab-list.is-empty > :not(#list-area) { display: none !important; }
+.welcome { text-align: center; padding: 18px 6px 8px; display: flex; flex-direction: column; align-items: center; gap: 14px; }
+.welcome h2 { margin: 0; font-size: 20px; color: var(--ink, #1F2D3A); }
+.wl-lead { margin: 0; color: #4E5D69; font-size: 14px; line-height: 1.7; }
+.wl-steps { list-style: none; margin: 4px 0; padding: 0; display: flex; flex-direction: column; gap: 8px; width: 100%; max-width: 420px; text-align: left; }
+.wl-steps li { display: flex; gap: 12px; align-items: center; border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; background: #fff; }
+.wl-steps b { display: block; font-size: 15px; }
+.wl-steps small { display: block; color: #6B7A86; font-size: 12px; margin-top: 2px; }
+.wl-n { flex: 0 0 30px; height: 30px; border-radius: 50%; background: var(--ink, #1F2D3A); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; }
+.welcome .btn.big { width: 100%; max-width: 420px; }
+.welcome .link { font-size: 13px; }
 .set-card { border: 1px solid var(--line); border-radius: 12px; padding: 14px; background: #fff; display: flex; flex-direction: column; gap: 12px; }
 details.set-card > summary { cursor: pointer; list-style: none; }
 details.set-card > summary::-webkit-details-marker { display: none; }
@@ -1613,26 +1635,19 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
 
   <!-- ============ 会員間共有 ============ -->
   <section class="panel" id="tab-share">
-    <details class="set-card" open>
-      <summary class="set-h">使用マニュアル</summary>
-      <div class="form">
-        <p class="hint">使い方をまとめた冊子です(A4・9ページ・図入り)。印刷して店頭に置いておくこともできます。</p>
-        <div class="row gap wrap">
-          <a class="btn" id="manual-open" href="OTCLinker_使用マニュアル.pdf" target="_blank" rel="noopener">マニュアルを開く(PDF)</a>
-          <a class="btn ghost" id="manual-save" href="OTCLinker_使用マニュアル.pdf" download>PDFを保存</a>
-        </div>
-        <p class="hint">作成日 2026年8月3日 / 対応版 2026-08-03 BM 以降(A4・9ページ)</p>
-      </div>
+    <details class="set-card guide-card" id="guide-card">
+      <summary class="set-h">はじめての方へ<small class="set-sub">3つの手順で使えます</small></summary>
+      <ol class="guide-steps">
+        <li><b>商品登録</b>でバーコードを読み取り、価格と数を入れて「在庫に登録」。</li>
+        <li><b>在庫リスト</b>で商品にチェックを入れ、<b>値札・POP</b>で印刷。</li>
+        <li>売れたら在庫リストの <b>−</b>、入荷したら <b>＋</b>。少なくなったら 🛒 で注文。</li>
+      </ol>
+      <p class="hint">画面の右上の キャラクターは おまけの育成ゲームです。触らなくても 在庫管理には影響しません。不要なときは「見た目と音の設定」で かくせます。</p>
+      <div class="row gap wrap"><button class="btn" onclick="showTab('scan')">商品を登録する</button><button class="btn ghost" onclick="showTab('list')">在庫リストを見る</button></div>
     </details>
-
-    <details class="set-card" ontoggle="if(this.open)renderStockLog()">
-      <summary class="set-h">在庫の動き(入庫・出庫・棚卸しの記録)</summary>
-      <p class="hint">数量の ＋/−、登録、削除、棚卸しで 在庫数が 変わると 自動で記録されます(最新500件)。</p>
-      <div id="stock-log"></div>
-      <div class="btn-grid"><button class="btn ghost" onclick="exportStockLog()">記録をCSV出力</button><button class="btn ghost danger" onclick="clearStockLog()">記録を消す</button></div>
-    </details>
+    <h3 class="set-group">ふだん使うもの</h3>
     <details class="set-card" open>
-      <summary class="set-h">データの控え(バックアップ・機種変更のときの引き継ぎ)</summary>
+      <summary class="set-h">データの控え(バックアップ)<small class="set-sub">機種変更の引き継ぎにも。月1回の保存がおすすめ</small></summary>
       <div id="storage-warn" class="storage-warn" style="display:none"></div>
       <p class="hint" id="storage-info"></p>
       <p class="hint">在庫・商品マスタ・各種設定をファイル1つに保存できます。機種変更やアドレス変更の際は、変更前に「控えを保存」し、変更後の画面で「控えから復元」してください。</p>
@@ -1643,9 +1658,14 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
         <input type="file" id="restore-input" accept=".json,application/json" style="display:none" onchange="restoreData(event)">
       </div>
     </details>
-
+    <details class="set-card" ontoggle="if(this.open)renderStockLog()">
+      <summary class="set-h">在庫の動き<small class="set-sub">入庫・出庫・棚卸しの記録</small></summary>
+      <p class="hint">数量の ＋/−、登録、削除、棚卸しで 在庫数が 変わると 自動で記録されます(最新500件)。</p>
+      <div id="stock-log"></div>
+      <div class="btn-grid"><button class="btn ghost" onclick="exportStockLog()">記録をCSV出力</button><button class="btn ghost danger" onclick="clearStockLog()">記録を消す</button></div>
+    </details>
     <details class="set-card">
-      <summary class="set-h">店舗間の備蓄情報共有</summary>
+      <summary class="set-h">店舗間の備蓄共有<small class="set-sub">他店の在庫をさがす・自店の在庫を見せる</small></summary>
       <div class="share-note">とみながグループ 店舗間の備蓄情報共有です。アップロードすると、共有サーバーに接続している<strong>すべての店舗</strong>が薬局名・品目・在庫数を閲覧できます。</div>
       <label>共有サーバーURL(みんなの備蓄をあずける場所。管理者から配布されたもの)
         <input id="gas-url" placeholder="https://script.google.com/macros/s/……/exec" onchange="savePharmacy()">
@@ -1661,30 +1681,16 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
       <input class="search" id="share-q" placeholder="商品名・JANで全店舗を横断検索" oninput="renderShared()">
       <div id="share-area"></div>
     </details>
-
+    <h3 class="set-group">はじめに一度だけ設定</h3>
     <details class="set-card">
-      <summary class="set-h">見た目と音の設定</summary>
-      <div class="form">
-        <label>アプリのテーマ色
-          <select id="theme-pick" onchange="saveTheme()"></select>
-        </label>
-        <label>スキャンできたときの音
-          <select id="beep-kind" onchange="saveBeepKind()"></select>
-        </label>
-        <p class="hint">音を選ぶとその場で鳴って確かめられます。端末がマナーモードのときは鳴りません。</p>
-      </div>
-    </details>
-
-    <details class="set-card">
-      <summary class="set-h">薬局情報(備蓄共有で使います)</summary>
+      <summary class="set-h">薬局情報<small class="set-sub">薬局名・住所(備蓄共有で使います)</small></summary>
       <div class="grid2">
         <label>薬局名 <input id="ph-name" placeholder="例:とみなが薬局 ○○店" onchange="savePharmacy()"></label>
         <label>住所 <input id="ph-area" placeholder="例:熊本市中央区○○町1-2-3" onchange="savePharmacy()"></label>
       </div>
     </details>
-
     <details class="set-card">
-      <summary class="set-h">注文サイト(e健康ショップ・order-epi)</summary>
+      <summary class="set-h">注文サイト(e健康ショップ・order-epi)<small class="set-sub">🛒ボタンで開くサイトとID・パスワード</small></summary>
       <p class="hint">在庫リストの 🛒 を押すと、発注先が「e健康ショップ」の商品は e健康ショップの管理ページを、一覧にある卸(アステム・アルフレッサ等)や発注先が空欄の商品は order-epi を別のウィンドウで開きます。発注先を「その他」で自由に書いた商品は、メーカー指定の方法で発注するよう お知らせを出します。</p>
       <div class="grid2">
         <label>e健康ショップのURL(空欄なら標準) <input id="ou-ek" inputmode="url" placeholder="https://www.ekenkoshop.jp/pharmacy/login" onchange="saveOrderUrls()"></label>
@@ -1700,9 +1706,8 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
       <p class="hint">別のサイトの入力欄に このアプリから文字を書き込むことは、ブラウザの安全のしくみで禁止されています。そのため、開いたあとに出る「IDをコピー」「パスワードをコピー」で貼り付けてください。毎回の入力を省くには、ブラウザ(Chrome・Safari)の「パスワードを保存」を使うのが確実です。一度保存すれば、次からは自動で入力されます。</p>
       <div class="row gap"><button class="btn ghost" onclick="clearOrderLogin()">保存したIDとパスワードを消す</button></div>
     </details>
-
     <details class="set-card">
-      <summary class="set-h">商品名の自動取得(外部データベース)</summary>
+      <summary class="set-h">商品名の自動取得<small class="set-sub">スキャン時に商品名を自動で入れる</small></summary>
       <p class="hint">楽天ウェブサービス(Rakuten Developers)の <strong>Application ID</strong> と <strong>Access Key</strong> を設定すると、スキャンしたJANコードから商品名を自動取得します。</p>
       <label>Yahoo! Client ID(メーカー名・分類まで取得できます)
         <input id="k-yahoo" placeholder="例:dj00aiZpPT…… の形式" onchange="saveKeys()">
@@ -1719,10 +1724,35 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
       </label>
       <p class="hint">検索順: Yahoo!ショッピング → JANCODE LOOKUP → 楽天市場 → Open Food Facts(キー不要) → 手入力。<strong>Yahoo!はメーカー名と商品分類まで取得できる</strong>ため、設定を強くおすすめします。キーはこの端末にのみ保存されます。</p>
     </details>
+    <h3 class="set-group">そのほか</h3>
+    <details class="set-card">
+      <summary class="set-h">見た目と音の設定<small class="set-sub">テーマ色・スキャン音</small></summary>
+      <div class="form">
+        <label>アプリのテーマ色
+          <select id="theme-pick" onchange="saveTheme()"></select>
+        </label>
+        <label>スキャンできたときの音
+          <select id="beep-kind" onchange="saveBeepKind()"></select>
+        </label>
+        <p class="hint">音を選ぶとその場で鳴って確かめられます。端末がマナーモードのときは鳴りません。</p>
+        <label class="chk-row"><input type="checkbox" id="game-show" onchange="hideGameUntil_(!this.checked)"> キャラクター(おまけの育成ゲーム)を表示する</label>
+      </div>
+    </details>
+    <details class="set-card">
+      <summary class="set-h">使用マニュアル<small class="set-sub">印刷できる説明書(PDF)</small></summary>
+      <div class="form">
+        <p class="hint">使い方をまとめた冊子です(A4・12ページ・画面の図入り)。印刷して店頭に置いておくこともできます。</p>
+        <div class="row gap wrap">
+          <a class="btn" id="manual-open" href="OTCLinker_使用マニュアル.pdf" target="_blank" rel="noopener">マニュアルを開く(PDF)</a>
+          <a class="btn ghost" id="manual-save" href="OTCLinker_使用マニュアル.pdf" download>PDFを保存</a>
+        </div>
+        <p class="hint">作成日 2026年10月14日 / 対応版 2026-10-14 CP 以降(A4・12ページ)</p>
+      </div>
+    </details>
   </section>
 
   <div class="toast" id="toast"></div>
-  <footer class="foot">OTCLinker — とみながグループ 店舗向けツール<br><span class="ver">版 2026-10-14 CO(かざりの削除・棚卸し・在庫の動き)</span></footer>
+  <footer class="foot">OTCLinker — とみながグループ 店舗向けツール<br><span class="ver">版 2026-10-14 CQ(画面の整理・マニュアル更新)</span></footer>
 </div>
 
 <script>
@@ -1901,6 +1931,7 @@ function toastAction_(msg, label, fn){
   t.style.display = "block";
   clearTimeout(t._tm); t._tm = setTimeout(function(){ t.style.display = "none"; }, 6000);
 }
+function gameToast_(msg){ if (typeof gameHidden_ === "function" && gameHidden_()) return; toast(msg); }
 function toast(msg){
   const t = document.getElementById("toast");
   t.textContent = msg; t.style.display = "block";
@@ -2962,13 +2993,21 @@ function renderKeyboard_(){
   const mp = document.getElementById("skb-m-prefix"), mm = document.getElementById("skb-m-middle");
   if (mp) mp.classList.toggle("on", searchMode_() === "prefix");
   if (mm) mm.classList.toggle("on", searchMode_() === "middle");
-  let hidden = false; try { hidden = localStorage.getItem("otc_kb_hidden") === "1"; } catch(e){}
+  let hidden = kbHiddenPref_();
   const body = document.getElementById("skb-body"), tg = document.getElementById("skb-tg");
   if (body) body.classList.toggle("skb-hide", hidden);
-  if (tg) tg.textContent = hidden ? "⌨ キーボードを開く" : "⌨ キーボードを閉じる";
+  const box = document.getElementById("skb"); if (box) box.classList.toggle("kb-closed", hidden);
+  if (tg) tg.textContent = hidden ? "⌨ カナのキーボードで探す" : "⌨ キーボードを閉じる";
+}
+// スマホ(幅700px以下)は 端末の文字入力があるので、はじめは閉じておく。一度開け閉めすれば その選択を覚える
+function kbHiddenPref_(){
+  let v = null; try { v = localStorage.getItem("otc_kb_hidden"); } catch(e){}
+  if (v === "1") return true;
+  if (v === "0") return false;
+  return window.innerWidth <= 700;
 }
 function kbToggle(){
-  let hidden = false; try { hidden = localStorage.getItem("otc_kb_hidden") === "1"; } catch(e){}
+  let hidden = kbHiddenPref_();
   try { localStorage.setItem("otc_kb_hidden", hidden ? "0" : "1"); } catch(e){}
   renderKeyboard_();
 }
@@ -3136,7 +3175,21 @@ function setCatFilter(c){
   document.getElementById("cat-filter").value = c;
   renderList();
 }
+function welcomeHtml_(){
+  return '<div class="welcome">'
+    + '<h2>OTCLinker へ ようこそ</h2>'
+    + '<p class="wl-lead">OTC医薬品の 在庫・値札・POPを まとめて管理できます。<br>まずは 商品を1つ 登録してみましょう。</p>'
+    + '<ol class="wl-steps">'
+    +   '<li><span class="wl-n">1</span><div><b>商品を登録</b><small>バーコードを読み取って、価格と数を入れるだけ</small></div></li>'
+    +   '<li><span class="wl-n">2</span><div><b>値札・POPを印刷</b><small>在庫リストでチェック → 値札・POPタブ</small></div></li>'
+    +   '<li><span class="wl-n">3</span><div><b>在庫を管理</b><small>売れたら −、入荷したら ＋。少なくなったら 🛒 で注文</small></div></li>'
+    + '</ol>'
+    + '<button class="btn big" onclick="showTab(\'scan\')">最初の商品を登録する</button>'
+    + '<button class="link" onclick="showTab(\'share\');var d=document.getElementById(\'restore-input\');if(d)d.click()">以前の控え(バックアップ)から復元する</button>'
+    + '</div>';
+}
 function renderList(){
+  { const tl = document.getElementById("tab-list"); if (tl) tl.classList.toggle("is-empty", !S.items.length); }
   setTimeout(renderDotPet, 0);
   const cf0 = document.getElementById("cat-filter").value;
   const counts = {};
@@ -3179,7 +3232,7 @@ function renderList(){
 
   const area = document.getElementById("list-area");
   if (!S.items.length){
-    area.innerHTML = '<div class="empty"><p>まだ在庫がありません。</p><button class="btn" onclick="showTab(\'scan\')">最初の商品をスキャンする</button></div>';
+    area.innerHTML = welcomeHtml_();
     return;
   }
   const moreBtn = (total > shown.length)
@@ -3214,7 +3267,7 @@ function renderList(){
     '<li class="stock-item">'
     + '<input type="checkbox" ' + (selected.has(it.id)?'checked':'') + ' onchange="toggleSelect(\''+it.id+'\')" aria-label="値札用に選択">'
     + '<div class="stock-main" onclick="editItem(\''+it.id+'\')">'
-    +   '<div class="stock-top"><span class="cat-badge" style="border-color:'+CAT_COLOR[it.category]+';color:'+CAT_COLOR[it.category]+'">'+CAT_SHORT[it.category]+'</span><span class="stock-name">'+(it.name?esc(it.name):"(名称未設定)")+'</span></div>'
+    +   '<div class="stock-top"><span class="cat-badge" style="border-color:'+CAT_COLOR[it.category]+';color:'+CAT_COLOR[it.category]+'">'+esc(CAT_SHORT[it.category]||it.category||"区分なし")+'</span><span class="stock-name">'+(it.name?esc(it.name):"(名称未設定)")+'</span></div>'
     +   '<div class="stock-sub">' + (Number(it.qty) <= 0 ? '<span class="zero-flag">在庫切れ</span>' : (Number(it.qty) <= 2 ? '<span class="low-flag">のこり少</span>' : '')) + (it.smt?'<span class="smt-flag">税制対象</span>':'') + (it.ranyo?'<span class="ranyo-flag">濫用防止</span>':'') + (it.maker?'<span>'+esc(it.maker)+'</span>':'') + '<span>'+yen(it.price)+'</span>' + (it.cost?'<span class="sub-cost">納入 '+yen(it.cost)+'</span>':'') + (it.supplier?'<span class="sub-sup">'+esc(it.supplier)+'</span>':'') + (it.staffPrice?'<span class="sub-staff">職員 '+yen(it.staffPrice)+'</span>':'') + expiryChip(it.expiry) + (it.memo?'<span class="sub-memo">'+esc(it.memo)+'</span>':'') + '</div>'
     + '</div>'
     + (__stocktake
@@ -4098,7 +4151,7 @@ function careFeed_(n){
   c.genki = Math.min(100, c.genki + (n || 6));
   if (c.genki !== before){
     save();
-    if (before === 0) setTimeout(function(){ toast("なかまたちが 目を覚ました!"); renderDotPet(); }, 600);
+    if (before === 0) setTimeout(function(){ gameToast_("なかまたちが 目を覚ました!"); renderDotPet(); }, 600);
   }
 }
 const GENKI_STATES = [
@@ -4925,7 +4978,7 @@ function bonusGetEffect_(got){
   }
   if (navigator.vibrate) navigator.vibrate(got.kind === "rare" ? [40,60,120] : [30,50]);
   const head = got.kind === "rare" ? "★レア★ " : (got.kind === "senmon" ? "せんもんしょく! " : "ごとうち! ");
-  toast(head + "「" + DOT_NAMES[got.key] + "」が なかまに なった!" + (got.note ? "(" + got.note + ")" : ""));
+  gameToast_(head + "「" + DOT_NAMES[got.key] + "」が なかまに なった!" + (got.note ? "(" + got.note + ")" : ""));
 }
 /* ===== あいぼうの ポーズ ===== */
 // 服のかわりに、その日その時の 姿勢で 表情を出す。
@@ -5144,7 +5197,7 @@ function addExp_(n, why){
   if (after > before){
     setTimeout(function(){
       const quips = ["しかし きゅうりょうは かわらない。", "なんだか 肩こりが へった 気がする。", "たなの 高いところに 手が とどきそうだ。", "おくすりの 名前を 3つ 早口で 言えるように なった。", "ねぐせが すこし おとなしく なった。"];
-      toast("レベルが " + after + " に あがった!" + (why ? "(" + why + ")" : "") + " " + quips[after % quips.length]);
+      gameToast_("レベルが " + after + " に あがった!" + (why ? "(" + why + ")" : "") + " " + quips[after % quips.length]);
       checkAll_();
       const el = document.getElementById("dot-pet");
       if (el){ el.classList.remove("rare-pop"); void el.offsetWidth; el.classList.add("rare-pop"); }
@@ -5241,7 +5294,7 @@ function checkPets_(){
   save();
   got.slice(0, 4).forEach(function(x, i){
     setTimeout(function(){
-      toast("🐾 " + x.name + "が なついた! あいぼうに なりました");
+      gameToast_("🐾 " + x.name + "が なついた! あいぼうに なりました");
       const el = document.getElementById("dot-pet");
       if (el){ el.classList.remove("rare-pop"); void el.offsetWidth; el.classList.add("rare-pop"); }
       renderDotPet();
@@ -5389,6 +5442,7 @@ function rpgOnOpen_(){
   const r = rpg_(), t = today();
   if (r.day !== t){ r.day = t; r.count = 0; }
   if (r.enemy) return;                         // すでに出ている
+  if (!gameReady_()) return;                   // 使いはじめは 在庫管理に集中できるよう 出さない
   if (r.count >= 3) return;
   if (genkiState_().key === "nemuri") return;  // 眠っているときは出ない
   if (Math.random() > 0.12) return;
@@ -5399,7 +5453,7 @@ function rpgOnOpen_(){
   r.count++;
   save();
   setTimeout(function(){
-    toast("⚔ " + e.say + " なかま画面から たたかえます");
+    toast("⚔ " + e.say + " 右上のキャラクターを長押しすると たたかえます");
     const el = document.getElementById("dot-pet");
     if (el){ el.classList.remove("rare-pop"); void el.offsetWidth; el.classList.add("rare-pop"); }
   }, 1600);
@@ -5541,7 +5595,17 @@ const ODD_EVENTS = [
   function(){ addItem_("i_gum"); return "あたりつきガムを もらった。 まだ 開けていない。"; },
   function(){ return "ザイコヌーシが 遠くで「数が あったぞい」と 言っている気がする。"; }
 ];
+function gameReady_(){ return (S.items || []).length >= 3 && !gameHidden_(); }
+function gameHidden_(){ try { return localStorage.getItem("otc_game_hidden") === "1"; } catch(e){ return false; } }
+function hideGameUntil_(hide){
+  try { localStorage.setItem("otc_game_hidden", hide ? "1" : "0"); } catch(e){}
+  document.body.classList.toggle("game-off", !!hide);
+  const cb = document.getElementById("game-show"); if (cb) cb.checked = !hide;
+  toast(hide ? "キャラクターを かくしました(その他 → はじめての方へ から もどせます)" : "キャラクターを 表示します");
+  try { renderDotPet(); } catch(e){}
+}
 function oddEvent_(){
+  if (!gameReady_()) return;
   const r = rpg_(), t = today();
   if (r.oddDay === t || Math.random() > 0.35) return;
   r.oddDay = t;
@@ -8434,6 +8498,8 @@ function bootUi_(){
   updateBrand();
   try { initKeyboard_(); } catch(e){}
   try { loadOrderLogin_(); loadOrderUrls_(); } catch(e){}
+  try { document.body.classList.toggle("game-off", gameHidden_()); const cb = document.getElementById("game-show"); if (cb) cb.checked = !gameHidden_(); } catch(e){}
+  try { const gc = document.getElementById("guide-card"); if (gc && !S.items.length) gc.open = true; } catch(e){}
   try { oddEvent_(); } catch(e){}
   renderList();
   showExpiryAlert();
