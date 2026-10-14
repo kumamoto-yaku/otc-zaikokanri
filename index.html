@@ -541,6 +541,24 @@ input:focus, select:focus { outline: 2px solid var(--ai); outline-offset: -1px; 
 .list-tools .selall-row { margin: 0; }
 .list-tools #view-toggle { padding: 6px 14px; }
 .list-order { flex: 0 1 260px; min-width: 170px; }
+.list-actions { display: flex; gap: 8px; flex-wrap: wrap; margin: 0 0 8px; }
+.list-actions .btn { min-height: 38px; padding: 6px 12px; font-size: 13px; }
+.zero-flag, .low-flag { font-size: 10.5px; font-weight: 700; border-radius: 4px; padding: 0 6px; }
+.zero-flag { background: #C0392B; color: #fff; }
+.low-flag { background: #FDEBC8; color: #7A5410; border: 1px solid #E9C77C; }
+.st-wrap { display: flex; flex-direction: row; align-items: center; gap: 6px; font-size: 12px; color: var(--sub, #5C6B78); }
+.st-input { width: 74px !important; min-height: 40px; text-align: center; font-size: 17px !important; font-weight: 700; }
+.st-input.changed { background: #FFF6D6 !important; border-color: #E3A21A !important; }
+.st-bar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 95; display: flex; align-items: center; gap: 8px; justify-content: flex-end; padding: 10px 14px calc(10px + env(safe-area-inset-bottom)); background: #FFF8E6; border-top: 2px solid #E3A21A; box-shadow: 0 -6px 20px rgba(0,0,0,0.12); }
+.st-bar span { margin-right: auto; font-size: 13.5px; }
+body.stocktake .list-actions, body.stocktake .skb { display: none; }
+.log-list { list-style: none; padding: 0; margin: 0; max-height: 320px; overflow-y: auto; border: 1px solid var(--line); border-radius: 10px; }
+.log-list li { display: grid; grid-template-columns: 76px 1fr auto auto; gap: 8px; align-items: center; padding: 6px 10px; border-bottom: 1px dashed var(--line); font-size: 12.5px; }
+.log-list li:last-child { border-bottom: none; }
+.lg-when { color: #8A97A0; font-size: 11.5px; } .lg-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lg-why { color: #5C6B78; font-size: 11.5px; } .lg-up { color: #2E7D46; } .lg-down { color: #C0392B; }
+@media print { .st-bar, .list-actions { display: none !important; } }
+@media screen and (max-width: 700px) { .st-bar { bottom: calc(64px + env(safe-area-inset-bottom)); padding-bottom: 10px; border-radius: 14px 14px 0 0; } }
 .skb-k { min-width: 0; width: 100%; overflow: hidden; white-space: nowrap; }
 @media (max-width: 560px) {
   #tab-list .search { flex: 1 1 100%; min-width: 0; }
@@ -894,6 +912,10 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
 .flash-title { font-size: 16px; font-weight: 700; letter-spacing: 0.03em; }
 .flash-name { font-size: 13px; opacity: 0.92; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .ver { font-size: 11px; color: #9AA7AF; }
+.toast-act { margin-left: 10px; border: 1px solid rgba(255,255,255,0.6); background: transparent; color: #fff; border-radius: 999px; padding: 3px 12px; font-size: 13px; font-weight: 700; cursor: pointer; }
+.list-sum { display: flex; flex-wrap: wrap; gap: 4px 14px; align-items: center; font-size: 12.5px; color: #5C6B78; padding: 2px 2px 8px; }
+.list-sum b { color: var(--ai-deep); font-size: 13.5px; }
+@media print { .list-sum { display: none !important; } }
 .toast { position: fixed; left: 50%; bottom: 28px; transform: translateX(-50%); background: var(--ai-deep); color: #fff; padding: 10px 20px; border-radius: 999px; font-size: 13.5px; box-shadow: 0 4px 14px rgba(0,0,0,0.2); z-index: 50; display: none; }
 #login-gate { position: fixed; inset: 0; background: var(--hakuji); z-index: 100; display: flex; align-items: center; justify-content: center; padding: 20px; }
 .login-card { background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 26px 22px; width: min(100%, 380px); display: flex; flex-direction: column; gap: 12px; box-shadow: 0 6px 24px rgba(20,40,60,0.08); }
@@ -1245,6 +1267,11 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
       <label class="selall-row"><input type="checkbox" id="sel-all" onchange="toggleSelectAll()"> 条件に合うものをすべて選択</label>
       <button class="btn ghost" id="view-toggle" onclick="toggleView()">表形式</button>
     </div>
+    <div class="list-actions">
+      <button class="btn ghost" onclick="orderNeeded()">🛒 注文が必要な商品</button>
+      <button class="btn ghost" onclick="startStocktake()">📋 棚卸し</button>
+    </div>
+    <div class="list-sum" id="list-sum"></div>
     <div class="select-bar" id="select-bar"></div>
     <div id="list-area"></div>
   </section>
@@ -1598,6 +1625,12 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
       </div>
     </details>
 
+    <details class="set-card" ontoggle="if(this.open)renderStockLog()">
+      <summary class="set-h">在庫の動き(入庫・出庫・棚卸しの記録)</summary>
+      <p class="hint">数量の ＋/−、登録、削除、棚卸しで 在庫数が 変わると 自動で記録されます(最新500件)。</p>
+      <div id="stock-log"></div>
+      <div class="btn-grid"><button class="btn ghost" onclick="exportStockLog()">記録をCSV出力</button><button class="btn ghost danger" onclick="clearStockLog()">記録を消す</button></div>
+    </details>
     <details class="set-card" open>
       <summary class="set-h">データの控え(バックアップ・機種変更のときの引き継ぎ)</summary>
       <div id="storage-warn" class="storage-warn" style="display:none"></div>
@@ -1689,7 +1722,7 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
   </section>
 
   <div class="toast" id="toast"></div>
-  <footer class="foot">OTCLinker — とみながグループ 店舗向けツール<br><span class="ver">版 2026-10-14 CM(キャラクターの性格を一新)</span></footer>
+  <footer class="foot">OTCLinker — とみながグループ 店舗向けツール<br><span class="ver">版 2026-10-14 CO(かざりの削除・棚卸し・在庫の動き)</span></footer>
 </div>
 
 <script>
@@ -1843,6 +1876,30 @@ function flash(kind, title, name){
   el._tm = setTimeout(() => { el.style.display = "none"; }, 3500);
   window.scrollTo({ top: 0, behavior: "smooth" });
   if (navigator.vibrate) navigator.vibrate(40);
+}
+// 削除の取り消し(まちがえて消したとき用)
+let __undoDel = null;
+function undoDelete(){
+  if (!__undoDel || !__undoDel.items.length) return;
+  __undoDel.items.slice().sort(function(a, b){ return a.idx - b.idx; }).forEach(function(o){
+    if (S.items.some(function(x){ return x.id === o.it.id; })) return;
+    S.items.splice(Math.min(o.idx, S.items.length), 0, o.it);
+    logStock_(o.it, o.it.qty, "削除の取り消し");
+  });
+  const n = __undoDel.items.length;
+  __undoDel = null;
+  save(); renderList(); checkAll_(); toast(n + "品目を 元に戻しました");
+}
+// ボタンつきの お知らせ(6秒で消える)
+function toastAction_(msg, label, fn){
+  const t = document.getElementById("toast");
+  t.textContent = msg + " ";
+  const b = document.createElement("button");
+  b.className = "toast-act"; b.textContent = label;
+  b.onclick = function(){ t.style.display = "none"; fn(); };
+  t.appendChild(b);
+  t.style.display = "block";
+  clearTimeout(t._tm); t._tm = setTimeout(function(){ t.style.display = "none"; }, 6000);
 }
 function toast(msg){
   const t = document.getElementById("toast");
@@ -2570,6 +2627,8 @@ function saveItem(){
   if (f.jan && !isValidJan(f.jan)){ toast("JANコードの形式が正しくありません(8桁または13桁)"); return; }
   if (f.jan) S.master[f.jan] = { name: f.name, kana: f.kana, maker: f.maker, category: f.category, price: f.price, reduced: f.reduced, supplier: f.supplier, cost: f.cost, staffPrice: f.staffPrice, ranyo: f.ranyo, smt: f.smt };
   if (editingId){
+    const before = S.items.find(it => it.id === editingId);
+    if (before && Number(before.qty) !== Number(f.qty)) logStock_(Object.assign({}, before, f), f.qty - before.qty, "編集");
     S.items = S.items.map(it => it.id===editingId ? Object.assign({}, it, f, { updatedAt: today() }) : it);
     flash("upd", "上書き保存しました", f.name);
   } else {
@@ -2577,10 +2636,15 @@ function saveItem(){
     if (ex){
       ex.name = f.name; ex.kana = f.kana; ex.maker = f.maker; ex.category = f.category; ex.price = f.price; ex.ranyo = f.ranyo; ex.smt = f.smt;
       if (f.expiry) ex.expiry = f.expiry; if (f.memo) ex.memo = f.memo;
+      // 入力があった項目は 新しい内容に 置きかえる(発注先・納入価などが 古いまま残らないように)
+      if (f.kana) ex.kana = f.kana; if (f.supplier) ex.supplier = f.supplier;
+      if (f.cost) ex.cost = f.cost; if (f.staffPrice) ex.staffPrice = f.staffPrice; ex.reduced = f.reduced;
       ex.qty += f.qty; ex.updatedAt = today();
+      logStock_(ex, f.qty, "入庫");
       flash("add", "在庫を追加しました(+" + f.qty + "個 → 合計" + ex.qty + "個)", f.name);
     } else {
       S.items.unshift(Object.assign({ id: rid(), updatedAt: today() }, f));
+      logStock_(S.items[0], f.qty, "新規登録");
       flash("new", "新規登録しました", f.name);
       const got = tryBonusMate_();
       if (got) setTimeout(function(){ bonusGetEffect_(got); }, 900);
@@ -2673,22 +2737,29 @@ function changeQty(id, d){
   setTimeout(checkAll_, 200);
   const it = S.items.find(x => x.id===id);
   if (!it) return;
-  it.qty = Math.max(0, it.qty + d); it.updatedAt = today();
+  const nq = Math.max(0, it.qty + d);
+  if (nq !== it.qty) logStock_(it, nq - it.qty, d > 0 ? "入庫(+)" : "出庫(−)");
+  it.qty = nq; it.updatedAt = today();
   save(); renderList();
 }
 function removeItem(id){
   const it = S.items.find(x => x.id===id);
   if (it && !confirm("「" + (it.name || "この商品") + "」を在庫から削除しますか?")) return;
+  const idx = S.items.findIndex(x => x.id===id);
+  __undoDel = { items: it ? [{ it: it, idx: idx }] : [] };
+  if (it) logStock_(it, -it.qty, "削除");
   S.items = S.items.filter(x => x.id!==id);
   selected.delete(id);
-  save(); renderList(); checkAll_(); toast("削除しました");
+  save(); renderList(); checkAll_(); toastAction_("削除しました", "元に戻す", undoDelete);
 }
 function removeSelected(){
   if (!selected.size) return;
   if (!confirm(selected.size + " 品目をまとめて在庫から削除しますか?")) return;
+  __undoDel = { items: S.items.map(function(it, i){ return { it: it, idx: i }; }).filter(function(o){ return selected.has(o.it.id); }) };
+  __undoDel.items.forEach(function(o){ logStock_(o.it, -o.it.qty, "削除"); });
   S.items = S.items.filter(it => !selected.has(it.id));
   selected.clear();
-  save(); renderList(); checkAll_(); toast("削除しました");
+  save(); renderList(); checkAll_(); toastAction_(__undoDel.items.length + "品目を 削除しました", "元に戻す", undoDelete);
 }
 // 使用期限の書き方は ゆれるので、幅広く 読み取れるようにする
 // (2026-10 / 2026-10-15 / 2026/10 / 2026.10 / 2026年10月 / 前後の空白 など)
@@ -2787,6 +2858,7 @@ function currentFiltered(){
   const cf = document.getElementById("cat-filter").value;
   const arr = S.items.filter(it => {
     if (cf !== "すべて" && it.category !== cf) return false;
+    if (!quickMatch_(it)) return false;
     if (!q) return true;
     return itemMatch_(it, q);
   });
@@ -2982,21 +3054,28 @@ function showMoreList(){
 // 並べ替えと区分の絞り込みを1つの選択欄にまとめる。
 // 表示中の項目は常に「並べ替え」で、区分を絞っているときはその名前を後ろに添える
 const LIST_SORTS_ = [["new","新規登録順"],["aiueo","50音順"],["expiry","有効期限順"]];
-function renderListOrder_(cf, counts){
+function renderListOrder_(cf, counts, shownN){
   const sel = document.getElementById("list-order");
   if (!sel) return;
   const by = (document.getElementById("sort-by")||{}).value || "new";
   const catOn = cf && cf !== "すべて";
-  const n = catOn ? (counts[cf] || 0) : S.items.length;
+  const n = shownN != null ? shownN : (catOn ? (counts[cf] || 0) : S.items.length);
   let h = '<optgroup label="並べ替え">';
   LIST_SORTS_.forEach(function(o){
-    const lab = o[1] + (catOn ? "・" + (CAT_SHORT[cf] || cf) + "のみ" : "") + (o[0] === by ? "(" + n + "件)" : "");
+    const qlab = quickMode_() !== "all" ? "・" + QUICK_FILTERS.filter(function(x){ return x[0] === quickMode_(); })[0][2] : "";
+    const lab = o[1] + (catOn ? "・" + (CAT_SHORT[cf] || cf) + "のみ" : "") + qlab + (o[0] === by ? "(" + n + "件)" : "");
     h += '<option value="sort:' + o[0] + '"' + (o[0] === by ? " selected" : "") + '>' + lab + '</option>';
   });
   h += '</optgroup><optgroup label="区分で絞り込み">';
   h += '<option value="cat:すべて">' + (catOn ? "" : "✓ ") + 'すべての区分 ' + S.items.length + '件</option>';
   CATEGORIES.filter(function(c){ return counts[c]; }).forEach(function(c){
     h += '<option value="cat:' + c + '">' + (cf === c ? "✓ " : "") + c + ' ' + counts[c] + '件</option>';
+  });
+  h += '</optgroup><optgroup label="状態で絞り込み">';
+  const qm = quickMode_();
+  QUICK_FILTERS.forEach(function(o){
+    const n2 = o[0] === "all" ? S.items.length : S.items.filter(function(it){ return quickMatch_(it, o[0]); }).length;
+    h += '<option value="qk:' + o[0] + '">' + (qm === o[0] ? "✓ " : "") + o[1] + ' ' + n2 + '件</option>';
   });
   h += '</optgroup>';
   sel.innerHTML = h;
@@ -3011,7 +3090,46 @@ function onListOrder(v){
     renderList();
   } else if (v.indexOf("cat:") === 0){
     setCatFilter(v.slice(4));
+  } else if (v.indexOf("qk:") === 0){
+    S.listQuick = v.slice(3); save(); renderList();
   }
+}
+// 状態で しぼりこむ(在庫0・少ない・期限)
+const QUICK_FILTERS = [
+  ["all",  "すべての状態",          ""],
+  ["zero", "在庫0の商品",           "在庫0"],
+  ["low",  "在庫が少ない(1〜2個)", "在庫少"],
+  ["exp",  "期限が3か月以内・切れ", "期限近"],
+  ["noexp","期限が未入力",          "期限なし"]
+];
+function quickMode_(){ const m = S.listQuick || "all"; return QUICK_FILTERS.some(function(x){ return x[0] === m; }) ? m : "all"; }
+function quickMatch_(it, mode){
+  mode = mode || quickMode_();
+  const q = Number(it.qty) || 0;
+  if (mode === "zero") return q <= 0;
+  if (mode === "low") return q >= 1 && q <= 2;
+  if (mode === "exp"){ const lv = expiryLevel(it.expiry); return lv === "expired" || lv === "m3"; }
+  if (mode === "noexp") return !String(it.expiry || "").trim() && q > 0;
+  return true;
+}
+// 一覧の下に 合計を出す(棚卸のめやすに)
+function renderListSum_(arr){
+  const el = document.getElementById("list-sum");
+  if (!el) return;
+  if (!S.items.length){ el.innerHTML = ""; return; }
+  let qty = 0, sale = 0, cost = 0, costN = 0;
+  arr.forEach(function(it){
+    const q = Math.max(0, Number(it.qty) || 0);
+    qty += q;
+    if (it.price !== "" && it.price != null) sale += q * (Number(it.price) || 0);
+    if (it.cost !== "" && it.cost != null && Number(it.cost) > 0){ cost += q * Number(it.cost); costN++; }
+  });
+  const filtered = arr.length !== S.items.length;
+  el.innerHTML = '<span><b>' + arr.length + '</b>品目' + (filtered ? '(全' + S.items.length + ')' : '') + '</span>'
+    + '<span>在庫 <b>' + qty.toLocaleString("ja-JP") + '</b>個</span>'
+    + '<span>売価合計 <b>¥' + sale.toLocaleString("ja-JP") + '</b></span>'
+    + (costN ? '<span>納入価合計 <b>¥' + cost.toLocaleString("ja-JP") + '</b></span>' : '')
+    + (quickMode_() !== "all" ? '<button class="link" onclick="S.listQuick=\'all\';save();renderList()">絞り込みを解除</button>' : '');
 }
 function setCatFilter(c){
   if (c && c !== "すべて") doQuest("catfil");
@@ -3023,20 +3141,22 @@ function renderList(){
   const cf0 = document.getElementById("cat-filter").value;
   const counts = {};
   S.items.forEach(it => { counts[it.category] = (counts[it.category] || 0) + 1; });
-  renderListOrder_(cf0, counts);
 
   const q = document.getElementById("q").value.trim().toLowerCase();
   const cf = document.getElementById("cat-filter").value;
   const arr = S.items.filter(it => {
     if (cf !== "すべて" && it.category !== cf) return false;
+    if (!quickMatch_(it)) return false;
     if (!q) return true;
     return itemMatch_(it, q);
   });
   sortItems(arr);
+  renderListOrder_(cf0, counts, arr.length);
+  renderListSum_(arr);
 
   // 品目が多いときは少しずつ表示して、動きが重くならないようにする
   const LIST_STEP = 120;
-  const sig = (q || "") + "|" + cf + "|" + ((document.getElementById("sort-by")||{}).value || "") + "|" + listMode;
+  const sig = (q || "") + "|" + cf + "|" + ((document.getElementById("sort-by")||{}).value || "") + "|" + listMode + "|" + quickMode_();
   if (__listSig !== sig){ __listSig = sig; __listLimit = LIST_STEP; }
   const total = arr.length;
   const shown = arr.slice(0, __listLimit);
@@ -3095,9 +3215,11 @@ function renderList(){
     + '<input type="checkbox" ' + (selected.has(it.id)?'checked':'') + ' onchange="toggleSelect(\''+it.id+'\')" aria-label="値札用に選択">'
     + '<div class="stock-main" onclick="editItem(\''+it.id+'\')">'
     +   '<div class="stock-top"><span class="cat-badge" style="border-color:'+CAT_COLOR[it.category]+';color:'+CAT_COLOR[it.category]+'">'+CAT_SHORT[it.category]+'</span><span class="stock-name">'+(it.name?esc(it.name):"(名称未設定)")+'</span></div>'
-    +   '<div class="stock-sub">' + (it.smt?'<span class="smt-flag">税制対象</span>':'') + (it.ranyo?'<span class="ranyo-flag">濫用防止</span>':'') + (it.maker?'<span>'+esc(it.maker)+'</span>':'') + '<span>'+yen(it.price)+'</span>' + (it.cost?'<span class="sub-cost">納入 '+yen(it.cost)+'</span>':'') + (it.supplier?'<span class="sub-sup">'+esc(it.supplier)+'</span>':'') + (it.staffPrice?'<span class="sub-staff">職員 '+yen(it.staffPrice)+'</span>':'') + expiryChip(it.expiry) + (it.memo?'<span class="sub-memo">'+esc(it.memo)+'</span>':'') + '</div>'
+    +   '<div class="stock-sub">' + (Number(it.qty) <= 0 ? '<span class="zero-flag">在庫切れ</span>' : (Number(it.qty) <= 2 ? '<span class="low-flag">のこり少</span>' : '')) + (it.smt?'<span class="smt-flag">税制対象</span>':'') + (it.ranyo?'<span class="ranyo-flag">濫用防止</span>':'') + (it.maker?'<span>'+esc(it.maker)+'</span>':'') + '<span>'+yen(it.price)+'</span>' + (it.cost?'<span class="sub-cost">納入 '+yen(it.cost)+'</span>':'') + (it.supplier?'<span class="sub-sup">'+esc(it.supplier)+'</span>':'') + (it.staffPrice?'<span class="sub-staff">職員 '+yen(it.staffPrice)+'</span>':'') + expiryChip(it.expiry) + (it.memo?'<span class="sub-memo">'+esc(it.memo)+'</span>':'') + '</div>'
     + '</div>'
-    + '<div class="qty-ctrl"><button onclick="changeQty(\''+it.id+'\',-1)" aria-label="1減らす">−</button><span class="qty">'+it.qty+'</span><button onclick="changeQty(\''+it.id+'\',1)" aria-label="1増やす">＋</button></div>'
+    + (__stocktake
+        ? '<label class="st-wrap" onclick="event.stopPropagation()">数えた数 <input class="st-input' + (__stocktake[it.id] !== undefined ? ' changed' : '') + '" data-id="' + it.id + '" type="number" inputmode="numeric" min="0" value="' + (__stocktake[it.id] !== undefined ? __stocktake[it.id] : it.qty) + '" oninput="stocktakeInput(\'' + it.id + '\', this.value)"></label>'
+        : '<div class="qty-ctrl"><button onclick="changeQty(\''+it.id+'\',-1)" aria-label="1減らす">−</button><span class="qty">'+it.qty+'</span><button onclick="changeQty(\''+it.id+'\',1)" aria-label="1増やす">＋</button></div>')
     + '<button class="ord-btn" onclick="event.stopPropagation();openOrder(\''+it.id+'\')" aria-label="注文サイトを開く" title="' + esc(orderSiteOf_(it).maker ? 'メーカー指定の方法で発注' : orderSiteOf_(it).name + 'を開く') + '">🛒</button>'
     + '<button class="info-btn" onclick="event.stopPropagation();openDrugInfo(\''+it.id+'\',event)" aria-label="患者説明資料" title="患者説明資料を開く">📄</button>'
     + '<button class="del" onclick="removeItem(\''+it.id+'\')" aria-label="削除">×</button></li>'
@@ -3172,7 +3294,9 @@ function exportCsv(){
   if (!S.items.length){ toast("在庫がありません"); return; }
   const head = ["JANコード","商品名","ふりがな","メーカー","区分","濫用防止","税制対象","販売価格(税込)","税率","発注先","納入価(税込)","職員販売価格(税込)","在庫数","使用期限","メモ","更新日"];
   const rows = S.items.map(it => [it.jan,it.name,(it.kana||""),it.maker,it.category,(it.ranyo?"該当":""),(it.smt?"該当":""),it.price,(it.reduced?"8%":"10%"),(it.supplier||""),(it.cost||""),(it.staffPrice||""),it.qty,it.expiry,(it.memo||"").replace(/[\r\n,]/g," "),it.updatedAt]);
-  const csv = "\uFEFF" + [head].concat(rows).map(r => r.join(",")).join("\r\n");
+  // 商品名などに , や " や 改行が入っていても 列が ずれないよう、必要な欄は "" でかこむ
+  const cell = function(v){ v = v == null ? "" : String(v); return /[",\r\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; };
+  const csv = "\uFEFF" + [head].concat(rows).map(r => r.map(cell).join(",")).join("\r\n");
   const blob = new Blob([csv], { type: "text/csv" });
   const a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
@@ -4494,6 +4618,8 @@ function hrPaths_(grid, px){
   return r;
 }
 
+// しんかの かざり(マント・えり・かんむり・はね・きらめき)は キャラが 見えにくくなるので 出さない
+const SHOW_EVO_DECO = false;
 const __heroGridCache = {};
 function eqOne_(slot, k){ const o = {}; o[slot] = k; return o; }
 // 主人公を 2コマ(足ぶみ)で描く。CSSで 交互に 見せる
@@ -4501,6 +4627,8 @@ function heroWalkSvg_(key, px, deco, equip){
   return '<span class="walk2">' + dotSvg(key, px, 0, deco, equip, 0) + dotSvg(key, px, 0, deco, equip, 1) + '</span>';
 }
 function dotSvg(key, px, lv, deco, equip, frame){
+  // しんかの飾り(マント・えり・かんむり・羽・きらめき)は キャラが分かりにくくなるので 描かない(しんかは ★で表示)
+  lv = 0;
   let rows = DOT_SPRITES[key] || DOT_SPRITES.baby;
   // あいぼうは いまの ポーズで描く
   if (typeof isPet_ === "function" && isPet_(key)) rows = poseRows_(rows, petPose_(key));
@@ -4512,7 +4640,7 @@ function dotSvg(key, px, lv, deco, equip, frame){
   const tan = (deco === "tan") ? ' style="filter:sepia(0.4) saturate(1.5) hue-rotate(-12deg)"' : '';
   let r = '<svg width="'+px+'" height="'+px+'" viewBox="0 0 '+px+' '+px+'" shape-rendering="crispEdges"'+tan+'>';
   // 進化の飾りは体の後ろに描く
-  if (lv >= 2){
+  if (SHOW_EVO_DECO && lv >= 2){
     const W = px;
     // キャラごとに決まった色のマント(体に隠れないよう外側まで広げる)
     const cape = DOT_PAL[CAPE_COLS[hash32_(key) % CAPE_COLS.length]];
@@ -4520,7 +4648,7 @@ function dotSvg(key, px, lv, deco, equip, frame){
        + 'L' + (W*0.99) + ' ' + (W*0.93) + 'L' + (W*0.01) + ' ' + (W*0.93) + 'z" fill="' + cape + '"/>';
     r += rc(W*0.01, W*0.895, W*0.98, W*0.04, DOT_PAL.K);
   }
-  if (lv >= 3){
+  if (SHOW_EVO_DECO && lv >= 3){
     const W = px, wg = DOT_PAL.W, ws = DOT_PAL.w || DOT_PAL.S;
     [[0, 1], [1, -1]].forEach(function(sd){
       const dir = sd[1], base = dir > 0 ? W*0.14 : W*0.86;
@@ -4597,7 +4725,7 @@ function dotSvg(key, px, lv, deco, equip, frame){
     }
   }
   // 2だんかい目のしるし:首元のえり(体の前に描く)
-  if (lv >= 2){
+  if (SHOW_EVO_DECO && lv >= 2){
     const W = px;
     const cape = DOT_PAL[CAPE_COLS[hash32_(key) % CAPE_COLS.length]];
     const ey = (DOT_EYE[key] || 0.4) * W;
@@ -4700,7 +4828,7 @@ function dotSvg(key, px, lv, deco, equip, frame){
   }
   // 3だんかい目のかんむりと きらめき(帽子系の衣装のときは重ならないよう省く)
   const hatDeco = (deco === "santa" || deco === "straw" || deco === "pumpkin" || deco === "kagami" || deco === "ribbon");
-  if (lv >= 3){
+  if (SHOW_EVO_DECO && lv >= 3){
     const W = px;
     if (!hatDeco){
       r += rc(W*0.30, W*0.085, W*0.40, W*0.06, DOT_PAL.K)
@@ -4767,7 +4895,8 @@ function renderDotPet(){
   let h = '<span class="pet-unit" data-key="' + st.key + '">' + heroWalkSvg_(st.key, 40, decoOf_(st.key), rpg_().equip) + '</span>';
   if (buddy) h += '<span class="pet-unit buddy" data-key="' + buddy + '">' + dotSvg(buddy, Math.round(((bi && bi.size) || 28) * 1.12), mateLv_(buddy), decoOf_(buddy)) + '</span>';
   shown2.forEach(function(o){
-    h += '<span class="pet-unit ' + o.c + '" data-key="' + o.k + '">' + dotSvg(o.k, 30, mateLv_(o.k), decoOf_(o.k)) + '</span>';
+    const lvm = mateLv_(o.k);   // しんかするほど 少し 大きくなる
+    h += '<span class="pet-unit ' + o.c + '" data-key="' + o.k + '">' + dotSvg(o.k, 30 + (Math.max(1, lvm) - 1) * 3, lvm, decoOf_(o.k)) + '</span>';
   });
   const rest = picks.length ? 0 : (line.length - shown2.length);
   if (rest > 0) h += '<span class="mate-more">+' + rest + '</span>';
@@ -7889,6 +8018,100 @@ function copyOrderLogin_(k, what){
   copyText_(what === "id" ? lg.id : lg.pw, what === "id" ? "ID" : "パスワード");
 }
 function closeOrderSheet(){ const b = document.getElementById("ord-sheet"); if (b) b.hidden = true; }
+
+
+/* ============ 在庫の動き(履歴)・棚卸し・注文が必要な商品 ============ */
+// 在庫数が変わるたびに 記録する(最新500件まで)
+function logStock_(it, diff, why){
+  if (!it) return;
+  S.stockLog = S.stockLog || [];
+  const d = new Date();
+  S.stockLog.unshift({ t: d.toISOString(), id: it.id, name: it.name || "", jan: it.jan || "", diff: Number(diff) || 0, why: why });
+  if (S.stockLog.length > 500) S.stockLog.length = 500;
+}
+function renderStockLog(){
+  const box = document.getElementById("stock-log");
+  if (!box) return;
+  const log = (S.stockLog || []).slice(0, 100);
+  if (!log.length){ box.innerHTML = '<p class="hint">まだ 記録がありません。数量の ＋/− や 登録・削除・棚卸しを すると ここに残ります。</p>'; return; }
+  box.innerHTML = '<ul class="log-list">' + log.map(function(l){
+    const d = new Date(l.t);
+    const when = (d.getMonth() + 1) + "/" + d.getDate() + " " + String(d.getHours()).padStart(2, "0") + ":" + String(d.getMinutes()).padStart(2, "0");
+    const sign = l.diff > 0 ? "+" + l.diff : String(l.diff);
+    return '<li><span class="lg-when">' + when + '</span><span class="lg-name">' + esc(l.name) + '</span><span class="lg-why">' + esc(l.why) + '</span><b class="' + (l.diff > 0 ? "lg-up" : (l.diff < 0 ? "lg-down" : "")) + '">' + sign + '</b></li>';
+  }).join("") + '</ul>';
+}
+function exportStockLog(){
+  const log = S.stockLog || [];
+  if (!log.length){ toast("記録が ありません"); return; }
+  const cell = function(v){ v = v == null ? "" : String(v); return /[",\r\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; };
+  const rows = [["日時","商品名","JANコード","内容","増減"]].concat(log.map(function(l){ return [l.t.replace("T", " ").slice(0, 16), l.name, l.jan, l.why, l.diff]; }));
+  const blob = new Blob(["﻿" + rows.map(function(r){ return r.map(cell).join(","); }).join("\r\n")], { type: "text/csv" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob); a.download = "在庫の動き_" + today() + ".csv"; a.click(); URL.revokeObjectURL(a.href);
+}
+function clearStockLog(){
+  if (!confirm("在庫の動きの記録を すべて消します。よろしいですか?")) return;
+  S.stockLog = []; save(); renderStockLog(); toast("記録を消しました");
+}
+// 棚卸し:実際に数えた数を まとめて入れて、いっぺんに 確定する
+let __stocktake = null;
+function startStocktake(){
+  if (listMode === "table") toggleView();   // 数を入れる欄は カード表示で出す
+  __stocktake = {};
+  document.body.classList.add("stocktake");
+  renderList();
+  renderStocktakeBar_();
+  toast("棚卸しモード: 数えた数を 入れてください(変えたものだけ 反映します)");
+}
+function stocktakeInput(id, v){
+  if (!__stocktake) return;
+  const it = S.items.find(function(x){ return x.id === id; });
+  const n = Math.max(0, parseInt(v, 10));
+  if (!it || isNaN(n) || n === Number(it.qty)) delete __stocktake[id]; else __stocktake[id] = n;
+  const row = document.querySelector('.st-input[data-id="' + id + '"]');
+  if (row) row.classList.toggle("changed", __stocktake[id] !== undefined);
+  renderStocktakeBar_();
+}
+function renderStocktakeBar_(){
+  let bar = document.getElementById("st-bar");
+  if (!__stocktake){ if (bar) bar.remove(); return; }
+  if (!bar){ bar = document.createElement("div"); bar.id = "st-bar"; bar.className = "st-bar"; document.body.appendChild(bar); }
+  const n = Object.keys(__stocktake).length;
+  bar.innerHTML = '<span>棚卸し中 — 変更 <b>' + n + '</b> 品目</span>'
+    + '<button class="btn ghost" onclick="cancelStocktake()">やめる</button>'
+    + '<button class="btn" onclick="commitStocktake()"' + (n ? '' : ' disabled') + '>確定する</button>';
+}
+function cancelStocktake(){
+  if (__stocktake && Object.keys(__stocktake).length && !confirm("入力した数を 反映せずに 棚卸しを やめますか?")) return;
+  __stocktake = null; document.body.classList.remove("stocktake"); renderStocktakeBar_(); renderList();
+}
+function commitStocktake(){
+  const ids = Object.keys(__stocktake || {});
+  if (!ids.length) return;
+  let plus = 0, minus = 0;
+  ids.forEach(function(id){
+    const it = S.items.find(function(x){ return x.id === id; });
+    if (!it) return;
+    const diff = __stocktake[id] - Number(it.qty);
+    if (diff > 0) plus++; else minus++;
+    logStock_(it, diff, "棚卸し");
+    it.qty = __stocktake[id]; it.updatedAt = today();
+  });
+  __stocktake = null; document.body.classList.remove("stocktake");
+  addExp_(10 + ids.length, "棚卸し");
+  save(); renderStocktakeBar_(); renderList(); checkAll_();
+  toast("棚卸しを 確定しました(" + ids.length + "品目: 増 " + plus + " / 減 " + minus + ")。タナオロシ将軍が 感心している!");
+}
+// 在庫0と のこり少(1〜2個)の商品を 選んで、注文サイトを 開く
+function orderNeeded(){
+  const need = S.items.filter(function(it){ return Number(it.qty) <= 2; });
+  if (!need.length){ toast("いま 注文が必要な商品は ありません(在庫0・のこり2個以下)"); return; }
+  selected.clear(); need.forEach(function(it){ selected.add(it.id); });
+  renderList(); renderTags && renderTags();
+  openOrderSelected();
+  toast("在庫0・のこり2個以下の " + need.length + "品目を 選びました");
+}
 
 /* ============ 会員間共有(Google Apps Script サーバー) ============ */
 function updateBrand(){
