@@ -2255,7 +2255,7 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
   </section>
 
   <div class="toast" id="toast"></div>
-  <footer class="foot">OTCLinker — とみながグループ 店舗向けツール<br><span class="ver">版 2026-10-16 DI(成分の欄が つぶれる不具合)</span></footer>
+  <footer class="foot">OTCLinker — とみながグループ 店舗向けツール<br><span class="ver">版 2026-10-16 DJ(登録済み商品も 成分を自動入力)</span></footer>
 </div>
 
 <script>
@@ -3140,6 +3140,7 @@ async function applyJan(code){
   if (existing){
     fillForm(Object.assign({}, existing, { qty: 1 }));
     scanMsg("");
+    if (!existing.ingr) fetchIngr_(code);
     flash("add", "この商品は登録済みです(現在の在庫 " + existing.qty + " 個)。このまま登録すると在庫が加算されます。", existing.name);
     return;
   }
@@ -3279,6 +3280,7 @@ function editItem(id){
   document.getElementById("f-qty-label").childNodes[0].nodeValue = "在庫数 ";
   showTab("scan");
   setTimeout(function(){ try { ingrFit_(); } catch(e){} }, 60);
+  if (!it.ingr && it.jan) fetchIngr_(it.jan);
   scanMsg("「" + it.name + "」を編集中です。内容を修正して「上書き保存」を押してください(やめる場合は「クリア」)。");
   window.scrollTo({ top: 0 });
 }
