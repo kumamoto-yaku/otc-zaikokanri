@@ -562,6 +562,16 @@ body.game-off .tv-btn { display: none !important; }
 .dope-simple li { padding: 8px 0; border-bottom: 1px solid #EEF0F2; font-size: 13.5px; }
 .dope-simple li b { font-size: 14.5px; } .dope-simple li p { margin: 2px 0 0; color: #55606B; font-size: 12.5px; }
 .dope-foot { font-size: 11.5px; color: #66727F; line-height: 1.6; margin-top: 10px; }
+
+.ingr-label { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--sub, #55606B); margin-bottom: -6px; }
+.ingr-label .ingr-src { margin-left: 0; }
+.ingr-src:empty { display: none; }
+.ingr-cam { margin-left: auto; border: 1px solid var(--ai, #2B4C7E); color: var(--ai, #2B4C7E); background: #fff; border-radius: 999px; padding: 6px 12px; font-size: 13px; font-weight: 700; cursor: pointer; white-space: nowrap; }
+.ingr-cam:active { transform: scale(.97); }
+.ingr-ocr-msg { font-size: 12.5px; color: #55606B; margin-top: -6px; }
+.ingr-ocr-msg:empty { display: none; }
+.ingr-ocr-msg .bar { display: block; height: 4px; background: #E6EAEE; border-radius: 4px; margin-top: 4px; overflow: hidden; }
+.ingr-ocr-msg .bar i { display: block; height: 100%; background: var(--ai, #2B4C7E); transition: width .2s; }
 /* ゲーム画面(テレビの 中) */
 #party-modal.game-tv { padding: 0; background: rgba(20,14,8,.85); align-items: stretch; }
 #party-modal.game-tv .order-card { width: min(560px, 100%); max-width: 100%; margin: 0 auto; height: 100%; max-height: 100%; border-radius: 0; overflow-y: auto; -webkit-overflow-scrolling: touch;
@@ -1721,9 +1731,11 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
       </div>
       <p class="hint" id="price-hint" style="margin-top:-4px"></p>
       <label>使用期限(年月) <input type="month" id="f-expiry"></label>
-      <label>成分 <span class="ingr-src" id="ingr-src"></span>
-        <textarea id="f-ingr" rows="2" placeholder="任意。JANを読み取ると自動で入ります" oninput="onIngrInput_()"></textarea>
-      </label>
+      <div class="ingr-label"><span>成分</span><span class="ingr-src" id="ingr-src"></span>
+        <button type="button" class="ingr-cam" onclick="ingrCam_()">📷 箱から読み取る</button>
+        <input type="file" id="ingr-file" accept="image/*" capture="environment" style="display:none" onchange="ingrOcr_(this)"></div>
+      <textarea id="f-ingr" rows="2" placeholder="任意。JANを読み取ると自動で入ります" oninput="onIngrInput_()" aria-label="成分"></textarea>
+      <div class="ingr-ocr-msg" id="ingr-ocr-msg"></div>
       <label class="chk-row ingr-ok" id="ingr-ok-row"><input type="checkbox" id="f-ingr-ok" onchange="onIngrOk_()"> 箱の表示と照合した</label>
       <div class="dope-prev" id="dope-preview"></div>
       <details class="settings">
@@ -2255,7 +2267,7 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
   </section>
 
   <div class="toast" id="toast"></div>
-  <footer class="foot">OTCLinker — とみながグループ 店舗向けツール<br><span class="ver">版 2026-10-16 DJ(登録済み商品も 成分を自動入力)</span></footer>
+  <footer class="foot">OTCLinker — とみながグループ 店舗向けツール<br><span class="ver">版 2026-10-16 DK(箱の成分を カメラで 読み取り)</span></footer>
 </div>
 
 <script>
@@ -9074,7 +9086,7 @@ function ingrSrcText_(o){
   if (o.ingrOk){
     return "照合済み" + (src === "share" ? "(" + (o.ingrBy || "他店") + ")" : "") + (o.ingrAt ? " " + o.ingrAt : "");
   }
-  return src === "web" ? "自動入力・未照合" : "未照合";
+  return src === "web" ? "自動入力・未照合" : (src === "photo" ? "撮影から読み取り・未照合" : "未照合");
 }
 function ingrSrcLabel_(){
   const el = document.getElementById("ingr-src");
@@ -9178,6 +9190,108 @@ function dopeMark_(text){
     h = h.split(esc(x.w)).join('<mark class="' + x.c + '">' + esc(x.w) + '</mark>');
   });
   return h;
+}
+
+/* ===== 箱の 成分を カメラで 読み取る(文字認識:Tesseract.js、端末の中で処理) ===== */
+const OCR_LIB = "https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js";
+let __ocrWorker = null, __ocrLoading = null, __ocrPct = 0;
+function ingrCam_(){ const f = document.getElementById("ingr-file"); if (f){ f.value = ""; f.click(); } }
+function ocrMsg_(t, pct){
+  const el = document.getElementById("ingr-ocr-msg"); if (!el) return;
+  el.innerHTML = t ? esc(t) + (pct != null ? '<span class="bar"><i style="width:' + Math.round(pct) + '%"></i></span>' : '') : "";
+}
+function loadOcr_(){
+  if (window.Tesseract) return Promise.resolve();
+  if (__ocrLoading) return __ocrLoading;
+  __ocrLoading = new Promise(function(ok, ng){
+    const sc = document.createElement("script"); sc.src = OCR_LIB; sc.async = true;
+    sc.onload = function(){ ok(); }; sc.onerror = function(){ __ocrLoading = null; ng(new Error("load")); };
+    document.head.appendChild(sc);
+  });
+  return __ocrLoading;
+}
+async function ocrWorker_(){
+  if (__ocrWorker) return __ocrWorker;
+  await loadOcr_();
+  __ocrWorker = await Tesseract.createWorker("jpn", 1, {
+    logger: function(m){
+      if (m.status === "recognizing text") ocrMsg_("文字を読み取っています…", 30 + m.progress * 70);
+      else if (/load|initializ/.test(m.status || "")) ocrMsg_("読み取りの準備をしています…(はじめてのときは 少し時間がかかります)", Math.min(30, (m.progress || 0) * 30));
+    }
+  });
+  return __ocrWorker;
+}
+// 写真を 読み取りやすい大きさ・白黒に ととのえる
+function ocrPrep_(file){
+  return new Promise(function(ok, ng){
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = function(){
+      const L = Math.max(img.width, img.height), k = Math.min(1, 2000 / L) * (L < 1200 ? 1600 / L : 1);
+      const w = Math.round(img.width * k), h = Math.round(img.height * k);
+      const c = document.createElement("canvas"); c.width = w; c.height = h;
+      const g = c.getContext("2d"); g.drawImage(img, 0, 0, w, h);
+      try {
+        const d = g.getImageData(0, 0, w, h), a = d.data;
+        for (let i = 0; i < a.length; i += 4){ const y = a[i] * 0.299 + a[i+1] * 0.587 + a[i+2] * 0.114; const v = Math.max(0, Math.min(255, (y - 128) * 1.15 + 128)); a[i] = a[i+1] = a[i+2] = v; }
+        g.putImageData(d, 0, 0);
+      } catch(e){}
+      URL.revokeObjectURL(url); ok(c);
+    };
+    img.onerror = function(){ URL.revokeObjectURL(url); ng(new Error("img")); };
+    img.src = url;
+  });
+}
+// 読み取った文字から「成分」の部分を 取り出して 整える
+function ocrToIngr_(raw){
+  const J = "　-ヿ㐀-鿿！-｠・ー";
+  let t = String(raw || "");
+  try { t = t.normalize("NFKC"); } catch(e){}
+  // 日本語の 文字と文字の あいだの 空白を けす
+  for (let i = 0; i < 3; i++) t = t.replace(new RegExp("([" + J + "])[ \\t]+(?=[" + J + "])", "g"), "$1");
+  t = t.replace(new RegExp("([" + J + "])[ \\t]+(?=[(（)）\\-])", "g"), "$1").replace(/([(（\-])[ \t]+/g, "$1").replace(/[ \t]+([)）])/g, "$1");
+  t = t.replace(/(?<!\d)[。,、]\s*(?=\d)/g, " ")
+       .replace(new RegExp("(\\d)[ \\t]+(?=[" + J + "])", "g"), "$1")
+       .replace(new RegExp("([)）])[ \\t]+(?=[" + J + "])", "g"), "$1")
+       .replace(/(\d)[ \t]+\.(?=\d)/g, "$1.").replace(/[ \t]+/g, " ");
+  const lines = t.split(/\n+/).map(function(x){ return x.trim(); }).filter(Boolean);
+  let st = lines.findIndex(function(x){ return /成分/.test(x); });
+  const found = st >= 0;
+  if (st < 0) st = 0;
+  const out = [];
+  for (let i = st; i < lines.length; i++){
+    const ln = lines[i];
+    if (i > st && /^(添加物|用法|効能|効果|使用上|保管|してはいけない|相談すること|内容量|製造販売|お問い?合わせ)/.test(ln)) break;
+    if (/^添加物/.test(ln)) break;
+    out.push(ln);
+  }
+  let body = out.join("、");
+  if (found) body = body.replace(/^.*?成分\s*[・･及び]*\s*(分量)?\s*[:：】\]]?\s*/, "");
+  body = body.replace(/、{2,}/g, "、").replace(/^[、\s]+|[、\s]+$/g, "");
+  return { text: body.slice(0, 600), found: found };
+}
+async function ingrOcr_(input){
+  const file = input && input.files && input.files[0];
+  if (!file) return;
+  const btn = document.querySelector(".ingr-cam"); if (btn) btn.disabled = true;
+  try {
+    ocrMsg_("写真を ととのえています…", 5);
+    const canvas = await ocrPrep_(file);
+    ocrMsg_("読み取りの準備をしています…", 10);
+    const w = await ocrWorker_();
+    const r = await w.recognize(canvas);
+    const res = ocrToIngr_(r && r.data && r.data.text);
+    if (!res.text){ ocrMsg_("文字を読み取れませんでした。成分の部分を 明るく・まっすぐ・大きく 写して もう一度 お試しください。"); return; }
+    const ta = document.getElementById("f-ingr");
+    ta.value = res.text;
+    document.getElementById("f-ingr-ok").checked = false;
+    __ingr = { src: "photo", by: "", at: "", text0: res.text };
+    ingrSrcLabel_(); dopePreview_();
+    ocrMsg_(res.found ? "読み取りました。箱と 見比べて、ちがう所を 直してから「箱の表示と照合した」に チェックしてください。"
+                      : "「成分」の見出しが 見つからなかったため、読み取った文字を すべて入れました。成分の部分だけ 残して 直してください。");
+  } catch(e){
+    ocrMsg_(String(e && e.message) === "load" ? "読み取りの部品を 取り込めませんでした。インターネットに つながっているか 確認してください。" : "読み取りに 失敗しました。もう一度 お試しください。");
+  } finally { if (btn) btn.disabled = false; }
 }
 function setTvDirect(v){ game_().tvDirect = !!v; save(); toast(v ? "テレビを つけたら すぐ メニューを ひらきます" : "テレビを つけたら なかまの ようすを ながめられます"); }
 function renderTv_(){
