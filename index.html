@@ -542,6 +542,10 @@ body.game-off .tv-btn { display: none !important; }
 .ingr-src { align-self: flex-start; width: max-content; margin-left: 6px; font-size: 11px; color: #55606B; background: #F1F3F5; border-radius: 999px; padding: 1px 8px; white-space: nowrap; }
 .ingr-src.ok { color: #1B5E20; background: #E8F5E9; } .ingr-src.web { color: #8A4B00; background: #FFF4E5; }
 .ingr-box textarea { min-height: 52px; font-size: 13.5px; }
+/* 成分の欄: ほかの入力欄と同じ見た目・中身が全部見える高さ */
+#f-ingr { font-family: var(--sans); font-size: 15px; line-height: 1.55; padding: 9px 10px; border: 1px solid var(--line); border-radius: 7px; background: #FBFCFC; color: var(--ink);
+  width: 100%; box-sizing: border-box; min-height: 72px; max-height: 220px; resize: vertical; field-sizing: content; -webkit-appearance: none; appearance: none; }
+#f-ingr:focus { outline: 2px solid var(--ai); outline-offset: -1px; background: #fff; }
 .ingr-ok { font-size: 12.5px; }
 .ingr-pmda { align-self: flex-start; font-size: 12px; }
 .dp-unc { margin-top: 4px; font-size: 12px; color: #8A4B00; }
@@ -2251,7 +2255,7 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
   </section>
 
   <div class="toast" id="toast"></div>
-  <footer class="foot">OTCLinker — とみながグループ 店舗向けツール<br><span class="ver">版 2026-10-15 DH(ドーピング表示を シンプルに)</span></footer>
+  <footer class="foot">OTCLinker — とみながグループ 店舗向けツール<br><span class="ver">版 2026-10-16 DI(成分の欄が つぶれる不具合)</span></footer>
 </div>
 
 <script>
@@ -3274,6 +3278,7 @@ function editItem(id){
   document.getElementById("save-btn").textContent = "上書き保存";
   document.getElementById("f-qty-label").childNodes[0].nodeValue = "在庫数 ";
   showTab("scan");
+  setTimeout(function(){ try { ingrFit_(); } catch(e){} }, 60);
   scanMsg("「" + it.name + "」を編集中です。内容を修正して「上書き保存」を押してください(やめる場合は「クリア」)。");
   window.scrollTo({ top: 0 });
 }
@@ -9010,12 +9015,18 @@ function dopeDetailHtml_(it, compact){
   }
   return h;
 }
+function ingrFit_(){
+  const ta = document.getElementById("f-ingr");
+  if (!ta || !ta.offsetParent) return;          // 画面に出ていないときは はからない(高さ0になるため)
+  ta.style.height = "auto";
+  ta.style.height = Math.max(72, Math.min(220, ta.scrollHeight + 2)) + "px";
+}
 function dopePreview_(){
   const el = document.getElementById("dope-preview");
   if (!el) return;
   const it = { name: document.getElementById("f-name").value, ingr: document.getElementById("f-ingr").value, ingrOk: document.getElementById("f-ingr-ok").checked };
   // 入力欄の 高さを 中身に あわせる
-  try { const ta = document.getElementById("f-ingr"); ta.style.height = "auto"; ta.style.height = Math.min(160, ta.scrollHeight + 2) + "px"; } catch(e){}
+  try { ingrFit_(); } catch(e){}
   if (!String(it.name).trim() && !String(it.ingr).trim()){ el.innerHTML = ""; return; }
   const d = dopeCheck_(it);
   const okRow = document.getElementById("ingr-ok-row");
@@ -11215,6 +11226,7 @@ function showTab(k){
   document.querySelectorAll(".tab").forEach(b => b.classList.toggle("active", b.dataset.tab===k));
   document.querySelectorAll(".panel").forEach(p => p.classList.toggle("active", p.id==="tab-"+k));
   if (k!=="scan") stopScan();
+  if (k==="scan") setTimeout(function(){ try { ingrFit_(); } catch(e){} }, 30);
   if (k==="list") renderList();
   if (k==="print") setPrintKind(printKind);
   if (k==="share") loadShared();
