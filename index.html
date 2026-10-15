@@ -516,6 +516,48 @@ body.game-off .tv-btn { display: none !important; }
 .tvw-body.re-angry { animation: aRampage 1.2s ease; filter: drop-shadow(0 0 4px #E53935); }
 .tvw-poke { position: absolute; left: 50%; top: 40%; width: 34px; height: 34px; margin: -17px 0 0 -17px; border-radius: 50%; border: 3px solid #fff; animation: tvPoke .45s ease-out both; pointer-events: none; z-index: 5; }
 @keyframes tvPoke { from { transform: scale(.3); opacity: 1; } to { transform: scale(1.5); opacity: 0; } }
+
+/* ===== ドーピングの 判定 ===== */
+.dope-flag { display: inline-block; border-radius: 6px; padding: 0 6px; font-size: 11px; font-weight: 700; cursor: pointer; border: 1px solid; white-space: nowrap; }
+.dope-flag.ng { color: #fff; background: #C62828; border-color: #C62828; }
+.dope-flag.warn { color: #B45309; background: #FFF4E5; border-color: #F0A35C; }
+.dope-flag.check { color: #5F6B76; background: #F1F3F5; border-color: #C9D1D9; }
+.dope-prev { margin-top: -4px; font-size: 12.5px; }
+.dope-prev .dp-box { border-radius: 10px; padding: 8px 10px; border: 1px solid; }
+.dp-box.ng { background: #FDECEC; border-color: #E8A0A0; } .dp-box.warn { background: #FFF6E8; border-color: #F0C080; }
+.dp-box.check { background: #F4F6F8; border-color: #D0D7DE; } .dp-box.ok { background: #EEF8F0; border-color: #A8D5B2; }
+.dp-head { font-weight: 800; margin-bottom: 2px; }
+.dp-box ul { margin: 4px 0 0; padding-left: 1.2em; } .dp-box li { margin: 2px 0; }
+.dope-table { width: 100%; border-collapse: collapse; font-size: 13px; margin: 8px 0; }
+.dope-table th, .dope-table td { border-bottom: 1px solid var(--line, #E3E7EB); padding: 6px 4px; text-align: left; vertical-align: top; }
+.dope-table th { font-size: 11.5px; color: #66727F; font-weight: 600; }
+.dope-when { display: inline-block; font-size: 11px; font-weight: 800; border-radius: 4px; padding: 0 5px; white-space: nowrap; }
+.dope-when.always { background: #C62828; color: #fff; } .dope-when.incomp { background: #E65100; color: #fff; } .dope-when.note { background: #8A6D3B; color: #fff; } .dope-when.free { background: #2E7D32; color: #fff; }
+.dope-note { font-size: 12px; color: #55606B; line-height: 1.6; background: #F7F8FA; border-radius: 8px; padding: 8px 10px; }
+@media print { .dope-flag { display: none !important; } }
+
+.ingr-box { border: 1px solid var(--line, #E3E7EB); border-radius: 12px; padding: 10px 12px; display: flex; flex-direction: column; gap: 6px; }
+.ingr-head { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.ingr-head small { color: #66727F; font-size: 11.5px; }
+.ingr-src { align-self: flex-start; width: max-content; margin-left: 6px; font-size: 11px; color: #55606B; background: #F1F3F5; border-radius: 999px; padding: 1px 8px; white-space: nowrap; }
+.ingr-src.ok { color: #1B5E20; background: #E8F5E9; } .ingr-src.web { color: #8A4B00; background: #FFF4E5; }
+.ingr-box textarea { min-height: 52px; font-size: 13.5px; }
+.ingr-ok { font-size: 12.5px; }
+.ingr-pmda { align-self: flex-start; font-size: 12px; }
+.dp-unc { margin-top: 4px; font-size: 12px; color: #8A4B00; }
+.ingr-evi { margin: 8px 0; font-size: 13px; line-height: 1.7; background: #FAFAFB; border: 1px solid #ECEFF2; border-radius: 8px; padding: 8px 10px; }
+.ingr-evi-h { font-size: 11.5px; color: #66727F; margin-bottom: 2px; display: flex; gap: 6px; align-items: center; }
+.ingr-evi mark { background: #FFD6D6; color: #8B0000; font-weight: 800; padding: 0 2px; border-radius: 3px; }
+.ingr-evi mark.w { background: #FFE9C7; color: #7A4300; }
+.dope-flag.unc { border-style: dashed; }
+
+.dope-line { font-size: 13px; font-weight: 700; border-radius: 8px; padding: 6px 10px; margin-top: -4px; }
+.dope-line.ng { color: #B71C1C; background: #FDECEC; } .dope-line.warn { color: #8A4B00; background: #FFF4E5; }
+.dope-line small { font-weight: 400; margin-left: 2px; }
+.dope-simple { list-style: none; padding: 0; margin: 8px 0; }
+.dope-simple li { padding: 8px 0; border-bottom: 1px solid #EEF0F2; font-size: 13.5px; }
+.dope-simple li b { font-size: 14.5px; } .dope-simple li p { margin: 2px 0 0; color: #55606B; font-size: 12.5px; }
+.dope-foot { font-size: 11.5px; color: #66727F; line-height: 1.6; margin-top: 10px; }
 /* ゲーム画面(テレビの 中) */
 #party-modal.game-tv { padding: 0; background: rgba(20,14,8,.85); align-items: stretch; }
 #party-modal.game-tv .order-card { width: min(560px, 100%); max-width: 100%; margin: 0 auto; height: 100%; max-height: 100%; border-radius: 0; overflow-y: auto; -webkit-overflow-scrolling: touch;
@@ -1576,6 +1618,12 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
  </div>
  <div class="tvw-hint">👆 キャラを タッチすると はんのう します</div>
 </div>
+<div id="dope-modal" class="order-modal" style="display:none" onclick="if(event.target===this)closeDope()">
+  <div class="order-card">
+    <div class="order-head"><span class="order-title">🏅 ドーピングの 確認</span><button class="link" onclick="closeDope()">閉じる</button></div>
+    <div id="dope-body"></div>
+  </div>
+</div>
 <div id="party-modal" class="order-modal game-tv" style="display:none">
   <div class="order-card">
     <div class="order-head tv-head">
@@ -1654,7 +1702,7 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
         <input inputmode="numeric" id="f-jan" placeholder="4987……(薬局製剤など無い場合は空欄でOK)" onblur="onJanBlur()">
       </label>
       <label>商品名 *
-        <input id="f-name" placeholder="例:ロキソニンS 12錠">
+        <input id="f-name" placeholder="例:ロキソニンS 12錠" oninput="dopePreview_()">
       </label>
       <label>ふりがな
         <input id="f-kana" placeholder="例:ろきそにんえす ※50音順の並べ替えに使います">
@@ -1669,6 +1717,11 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
       </div>
       <p class="hint" id="price-hint" style="margin-top:-4px"></p>
       <label>使用期限(年月) <input type="month" id="f-expiry"></label>
+      <label>成分 <span class="ingr-src" id="ingr-src"></span>
+        <textarea id="f-ingr" rows="2" placeholder="任意。JANを読み取ると自動で入ります" oninput="onIngrInput_()"></textarea>
+      </label>
+      <label class="chk-row ingr-ok" id="ingr-ok-row"><input type="checkbox" id="f-ingr-ok" onchange="onIngrOk_()"> 箱の表示と照合した</label>
+      <div class="dope-prev" id="dope-preview"></div>
       <details class="settings">
         <summary>詳しい項目(任意) — 税率・発注先・納入価・職員価格・メモ</summary>
         <div class="form" style="padding-top:10px">
@@ -2198,7 +2251,7 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
   </section>
 
   <div class="toast" id="toast"></div>
-  <footer class="foot">OTCLinker — とみながグループ 店舗向けツール<br><span class="ver">版 2026-10-15 DC(キャラを タッチで はんのう)</span></footer>
+  <footer class="foot">OTCLinker — とみながグループ 店舗向けツール<br><span class="ver">版 2026-10-15 DH(ドーピング表示を シンプルに)</span></footer>
 </div>
 
 <script>
@@ -2964,6 +3017,11 @@ function readForm(){
     qty: Math.max(0, parseInt(document.getElementById("f-qty").value,10) || 0),
     expiry: document.getElementById("f-expiry").value,
     memo: document.getElementById("f-memo").value.trim(),
+    ingr: document.getElementById("f-ingr").value.trim(),
+    ingrOk: !!document.getElementById("f-ingr").value.trim() && document.getElementById("f-ingr-ok").checked,
+    ingrSrc: document.getElementById("f-ingr").value.trim() ? (__ingr.src || "manual") : "",
+    ingrBy: document.getElementById("f-ingr").value.trim() ? (__ingr.by || "") : "",
+    ingrAt: document.getElementById("f-ingr").value.trim() ? (__ingr.at || "") : "",
     ranyo: document.getElementById("f-ranyo").checked,
     smt: document.getElementById("f-smt").checked,
     reduced: document.getElementById("f-reduced").checked,
@@ -2983,6 +3041,10 @@ function fillForm(o){
   document.getElementById("f-qty").value = (o.qty===0||o.qty) ? o.qty : 1;
   document.getElementById("f-expiry").value = o.expiry || "";
   document.getElementById("f-memo").value = o.memo || "";
+  document.getElementById("f-ingr").value = o.ingr || "";
+  document.getElementById("f-ingr-ok").checked = !!(o.ingr && o.ingrOk);
+  __ingr = { src: o.ingrSrc || (o.ingr ? "manual" : ""), by: o.ingrBy || "", at: o.ingrAt || "", text0: o.ingr || "" };
+  try { ingrSrcLabel_(); } catch(e){}
   document.getElementById("f-ranyo").checked = !!o.ranyo;
   document.getElementById("f-smt").checked = !!o.smt;
   onCategoryChange();
@@ -3002,6 +3064,7 @@ function fillForm(o){
     otherWrap.style.display = "none";
   }
   updatePriceHint();
+  try { dopePreview_(); } catch(e){}
 }
 function updatePriceHint(){
   const raw = parseInt((document.getElementById("f-price").value||"").replace(/\D/g,""),10);
@@ -3078,16 +3141,20 @@ async function applyJan(code){
   }
   const m = S.master[code];
   if (m){
-    fillForm({ jan: code, name: m.name, kana: m.kana, maker: m.maker, category: m.category, price: m.price, ranyo: m.ranyo, smt: m.smt, supplier: m.supplier, cost: m.cost, staffPrice: m.staffPrice, reduced: m.reduced });
+    fillForm({ jan: code, name: m.name, kana: m.kana, maker: m.maker, category: m.category, price: m.price, ranyo: m.ranyo, smt: m.smt, supplier: m.supplier, cost: m.cost, staffPrice: m.staffPrice, reduced: m.reduced, ingr: m.ingr, ingrOk: m.ingrOk, ingrSrc: m.ingrSrc, ingrBy: m.ingrBy, ingrAt: m.ingrAt });
     scanMsg("商品マスタから情報を補完しました。");
+    if (!m.ingr) fetchIngr_(code);
     return;
   }
   fillForm({ jan: code });
   scanMsg("商品データベースを検索しています…");
+  setTimeout(function(){ if (!document.getElementById("f-ingr").value.trim()) fetchIngr_(code); }, 0);
   const hit = await lookupJanExternal(code);
   if (hit){
     fillForm({ jan: code, name: hit.name, maker: hit.maker, category: hit.category || "その他" });
     scanMsg(hit.source + " から取得しました" + (hit.category ? "(区分も自動判定)" : "") + "。内容を確認して登録してください。");
+    fetchIngr_(code);
+  } else if (false){
   } else if ((S.apiKeys.rakuten && S.apiKeys.rakutenKey) || S.apiKeys.jancode){
     scanMsg("データベースに見つかりませんでした。商品名を入力してください(次回からは自動補完されます)。");
   } else {
@@ -3102,7 +3169,7 @@ function saveItem(){
   if (!f.name){ toast("商品名は必須です"); return; }
   // 薬局製剤などJANコードのない商品も登録できる
   if (f.jan && !isValidJan(f.jan)){ toast("JANコードの形式が正しくありません(8桁または13桁)"); return; }
-  if (f.jan) S.master[f.jan] = { name: f.name, kana: f.kana, maker: f.maker, category: f.category, price: f.price, reduced: f.reduced, supplier: f.supplier, cost: f.cost, staffPrice: f.staffPrice, ranyo: f.ranyo, smt: f.smt };
+  if (f.jan) S.master[f.jan] = { name: f.name, kana: f.kana, maker: f.maker, category: f.category, price: f.price, reduced: f.reduced, supplier: f.supplier, cost: f.cost, staffPrice: f.staffPrice, ranyo: f.ranyo, smt: f.smt, ingr: f.ingr, ingrOk: f.ingrOk, ingrSrc: f.ingrSrc, ingrBy: f.ingrBy, ingrAt: f.ingrAt };
   if (editingId){
     const before = S.items.find(it => it.id === editingId);
     if (before && Number(before.qty) !== Number(f.qty)) logStock_(Object.assign({}, before, f), f.qty - before.qty, "編集");
@@ -3113,6 +3180,7 @@ function saveItem(){
     if (ex){
       ex.name = f.name; ex.kana = f.kana; ex.maker = f.maker; ex.category = f.category; ex.price = f.price; ex.ranyo = f.ranyo; ex.smt = f.smt;
       if (f.expiry) ex.expiry = f.expiry; if (f.memo) ex.memo = f.memo;
+      if (f.ingr){ ex.ingr = f.ingr; ex.ingrOk = f.ingrOk; ex.ingrSrc = f.ingrSrc; ex.ingrBy = f.ingrBy; ex.ingrAt = f.ingrAt; }
       // 入力があった項目は 新しい内容に 置きかえる(発注先・納入価などが 古いまま残らないように)
       if (f.kana) ex.kana = f.kana; if (f.supplier) ex.supplier = f.supplier;
       if (f.cost) ex.cost = f.cost; if (f.staffPrice) ex.staffPrice = f.staffPrice; ex.reduced = f.reduced;
@@ -3585,7 +3653,8 @@ const QUICK_FILTERS = [
   ["zero", "在庫0の商品",           "在庫0"],
   ["low",  "在庫が少ない(1〜2個)", "在庫少"],
   ["exp",  "期限が3か月以内・切れ", "期限近"],
-  ["noexp","期限が未入力",          "期限なし"]
+  ["noexp","期限が未入力",          "期限なし"],
+  ["dope", "ドーピング 禁止・注意", "ドーピング"]
 ];
 function quickMode_(){ const m = S.listQuick || "all"; return QUICK_FILTERS.some(function(x){ return x[0] === m; }) ? m : "all"; }
 function quickMatch_(it, mode){
@@ -3595,6 +3664,7 @@ function quickMatch_(it, mode){
   if (mode === "low") return q >= 1 && q <= 2;
   if (mode === "exp"){ const lv = expiryLevel(it.expiry); return lv === "expired" || lv === "m3"; }
   if (mode === "noexp") return !String(it.expiry || "").trim() && q > 0;
+  if (mode === "dope"){ const d = dopeCheck_(it); return d.level === "ng" || d.level === "warn"; }
   return true;
 }
 // 一覧の下に 合計を出す(棚卸のめやすに)
@@ -3691,7 +3761,7 @@ function renderList(){
       + shown.map(it =>
         '<tr>'
         + '<td><input type="checkbox" '+(selected.has(it.id)?'checked':'')+' onchange="toggleSelect(\''+it.id+'\')" aria-label="値札用に選択"></td>'
-        + '<td class="name-cell" onclick="editItem(\''+it.id+'\')" style="cursor:pointer">'+(it.name?esc(it.name):"(名称未設定)")+(it.smt?' <span class="smt-flag">税制対象</span>':'')+(it.ranyo?' <span class="ranyo-flag">濫用防止</span>':'')+'</td>'
+        + '<td class="name-cell" onclick="editItem(\''+it.id+'\')" style="cursor:pointer">'+(it.name?esc(it.name):"(名称未設定)")+(it.smt?' <span class="smt-flag">税制対象</span>':'')+(it.ranyo?' <span class="ranyo-flag">濫用防止</span>':'')+' '+dopeFlag_(it)+'</td>'
         + '<td style="color:'+(CAT_COLOR[it.category]||"#5C6B78")+';font-weight:600">'+(CAT_SHORT[it.category]||it.category)+'</td>'
         + '<td>'+yen(it.price)+'</td>'
         + '<td>'+(it.cost?yen(it.cost):"")+'</td>'
@@ -3714,7 +3784,7 @@ function renderList(){
     + '<input type="checkbox" ' + (selected.has(it.id)?'checked':'') + ' onchange="toggleSelect(\''+it.id+'\')" aria-label="値札用に選択">'
     + '<div class="stock-main" onclick="editItem(\''+it.id+'\')">'
     +   '<div class="stock-top"><span class="cat-badge" style="border-color:'+CAT_COLOR[it.category]+';color:'+CAT_COLOR[it.category]+'">'+esc(CAT_SHORT[it.category]||it.category||"区分なし")+'</span><span class="stock-name">'+(it.name?esc(it.name):"(名称未設定)")+'</span></div>'
-    +   '<div class="stock-sub">' + (Number(it.qty) <= 0 ? '<span class="zero-flag">在庫切れ</span>' : (Number(it.qty) <= 2 ? '<span class="low-flag">のこり少</span>' : '')) + (it.smt?'<span class="smt-flag">税制対象</span>':'') + (it.ranyo?'<span class="ranyo-flag">濫用防止</span>':'') + (it.maker?'<span>'+esc(it.maker)+'</span>':'') + '<span>'+yen(it.price)+'</span>' + (it.cost?'<span class="sub-cost">納入 '+yen(it.cost)+'</span>':'') + (it.supplier?'<span class="sub-sup">'+esc(it.supplier)+'</span>':'') + (it.staffPrice?'<span class="sub-staff">職員 '+yen(it.staffPrice)+'</span>':'') + expiryChip(it.expiry) + (it.memo?'<span class="sub-memo">'+esc(it.memo)+'</span>':'') + '</div>'
+    +   '<div class="stock-sub">' + (Number(it.qty) <= 0 ? '<span class="zero-flag">在庫切れ</span>' : (Number(it.qty) <= 2 ? '<span class="low-flag">のこり少</span>' : '')) + (it.smt?'<span class="smt-flag">税制対象</span>':'') + (it.ranyo?'<span class="ranyo-flag">濫用防止</span>':'') + dopeFlag_(it) + (it.maker?'<span>'+esc(it.maker)+'</span>':'') + '<span>'+yen(it.price)+'</span>' + (it.cost?'<span class="sub-cost">納入 '+yen(it.cost)+'</span>':'') + (it.supplier?'<span class="sub-sup">'+esc(it.supplier)+'</span>':'') + (it.staffPrice?'<span class="sub-staff">職員 '+yen(it.staffPrice)+'</span>':'') + expiryChip(it.expiry) + (it.memo?'<span class="sub-memo">'+esc(it.memo)+'</span>':'') + '</div>'
     + '</div>'
     + (__stocktake
         ? '<label class="st-wrap" onclick="event.stopPropagation()">数えた数 <input class="st-input' + (__stocktake[it.id] !== undefined ? ' changed' : '') + '" data-id="' + it.id + '" type="number" inputmode="numeric" min="0" value="' + (__stocktake[it.id] !== undefined ? __stocktake[it.id] : it.qty) + '" oninput="stocktakeInput(\'' + it.id + '\', this.value)"></label>'
@@ -8794,6 +8864,308 @@ function tvwPoke_(a){
   }
   a.busy = now + 2600;
 }
+
+/* ===== ドーピング禁止物質の 判定 =====
+   参考: WADA禁止表国際基準(毎年1月改定)、日本アンチ・ドーピング機構(JADA)、
+   北海道薬剤師会「薬剤師のためのアンチ・ドーピング」資料、全日本剣道連盟 アンチ・ドーピングガイドブック2026。
+   ここに載っていない成分が 禁止物質である可能性もあるため、最終確認は Global DRO JAPAN・スポーツファーマシストで。 */
+const DOPE_RULES = [
+  // 競技会時に禁止(S6 興奮薬)
+  { id:"ephedrine", re:/(?:メチル|プソイド|シュード)?エフェドリン/g, pick:function(m){ return /メチル/.test(m) ? "methylephedrine" : (/プソイド|シュード/.test(m) ? "pseudoephedrine" : "ephedrine"); } },
+  { id:"methylephedrine", label:"メチルエフェドリン", cls:"S6 興奮薬", when:"incomp", level:"ng", ex:"かぜ薬・せき止め・鼻炎薬・痔の薬などに入っています(dl-メチルエフェドリン塩酸塩 など)。" },
+  { id:"pseudoephedrine", label:"プソイドエフェドリン", cls:"S6 興奮薬", when:"incomp", level:"ng", ex:"鼻炎用内服薬・かぜ薬に入っています。" },
+  { id:"ephedrine_", label:"エフェドリン", cls:"S6 興奮薬", when:"incomp", level:"ng", ex:"かぜ薬・せき止め・鼻炎薬・痔の薬に入っていることがあります。" },
+  { id:"methoxyphenamine", re:/メトキシフェナミン/, label:"メトキシフェナミン", cls:"S6 興奮薬", when:"incomp", level:"ng", ex:"かぜ薬・せき止めに入っていることがあります。" },
+  { id:"mao", re:/マオウ|麻黄/, label:"マオウ(麻黄)", cls:"S6 興奮薬(エフェドリン類を含む生薬)", when:"incomp", level:"ng", ex:"葛根湯・小青竜湯・麻黄湯・防風通聖散 などの漢方、かぜ薬に入っています。" },
+  { id:"homika", re:/ホミカ|ストリキニーネ/, label:"ホミカ(ストリキニーネ)", cls:"S6 興奮薬", when:"incomp", level:"ng", ex:"胃腸薬・滋養強壮薬に入っていることがあります。" },
+  // 常に禁止(S3 ベータ2作用薬)
+  { id:"trimetoquinol", re:/トリメトキノール|トレトキノール/, label:"トリメトキノール", cls:"S3 ベータ2作用薬", when:"always", level:"ng", ex:"せき止め・去痰薬に入っていることがあります。" },
+  { id:"higenamine", re:/ヒゲナミン/, label:"ヒゲナミン", cls:"S3 ベータ2作用薬", when:"always", level:"ng", ex:"生薬(ナンテン・ブシ・サイシン・ゴシュユ・チョウジ など)に含まれます。" },
+  { id:"nanten", re:/ナンテン|南天/, label:"ナンテン(南天実)", cls:"S3 ベータ2作用薬(ヒゲナミンを含む生薬)", when:"always", level:"ng", ex:"せき止め・のど飴に入っていることがあります。" },
+  { id:"bushi", re:/ブシ|附子|烏頭|トリカブト/, label:"ブシ(附子)", cls:"S3 ベータ2作用薬(ヒゲナミンを含む生薬)", when:"always", level:"ng", ex:"八味地黄丸・牛車腎気丸 などの漢方に入っています。" },
+  { id:"saishin", re:/サイシン|細辛/, label:"サイシン(細辛)", cls:"S3 ベータ2作用薬(ヒゲナミンを含む生薬)", when:"always", level:"ng", ex:"小青竜湯 などの漢方に入っています。" },
+  { id:"goshuyu", re:/ゴシュユ|呉茱萸/, label:"ゴシュユ(呉茱萸)", cls:"S3 ベータ2作用薬(ヒゲナミンを含む生薬)", when:"always", level:"ng", ex:"呉茱萸湯・温経湯 などの漢方に入っています。" },
+  { id:"choji", re:/チョウジ|丁子|丁香/, label:"チョウジ(丁子)", cls:"S3 ベータ2作用薬(ヒゲナミンを含む生薬)", when:"always", level:"ng", ex:"胃腸薬・女神散 などに入っていることがあります。" },
+  // 常に禁止(S1 蛋白同化薬)
+  { id:"testosterone", re:/テストステロン|男性ホルモン/, label:"テストステロン(男性ホルモン)", cls:"S1 蛋白同化薬", when:"always", level:"ng", ex:"滋養強壮薬(内服・塗り薬)・育毛剤に入っていることがあります。メチルテストステロン・プロピオン酸テストステロンも同じです。" },
+  { id:"higenamine2", re:/イボツヅラフジ|ノルコクラウリン/, label:"イボツヅラフジ ほか", cls:"S3 ベータ2作用薬(ヒゲナミンを含む)", when:"always", level:"ng", ex:"ヒゲナミンを含む植物・成分です。サプリメントに入っていることがあります。" },
+  { id:"beta2", re:/クロルプレナリン|プロカテロール|ツロブテロール|テルブタリン|フェノテロール|インダカテロール|オロダテロール|イソクスプリン|リトドリン/, label:"ベータ2作用薬(気管支拡張薬)", cls:"S3 ベータ2作用薬", when:"always", level:"ng", ex:"気管支を広げる成分は 飲み薬・貼り薬(ツロブテロールテープ等)・吸入とも 常に禁止です。" },
+  { id:"beta2inh", re:/サルブタモール|ホルモテロール|サルメテロール|ビランテロール/, label:"サルブタモール・ホルモテロール・サルメテロール・ビランテロール", cls:"S3 ベータ2作用薬(吸入は 規定量まで 使用可)", when:"note", level:"warn", ex:"吸入で 規定量以内なら 使用できます(サルブタモール 24時間で最大1600μg・8時間で600μgまで/ホルモテロール 24時間で最大54μg・12時間で36μgまで/サルメテロール 24時間で最大200μg・8時間で100μgまで/ビランテロール 24時間で最大25μg)。飲み薬・貼り薬などは 常に禁止です。尿中濃度(サルブタモール1000ng/mL・ホルモテロール40ng/mL)を超えると 違反を疑われます。" },
+  { id:"beta2inh_ng", label:"サルブタモール等(吸入以外)", cls:"S3 ベータ2作用薬", when:"always", level:"ng", ex:"吸入以外(錠剤・シロップ・貼り薬など)で使うと 常に禁止です。吸入で 規定量以内のときだけ 例外として使用できます。" },
+  { id:"anabolic2", re:/DHEA|プラステロン|デヒドロエピアンドロステロン|アンドロステン|メテノロン|ナンドロロン|クレンブテロール/, label:"蛋白同化薬(DHEA など)", cls:"S1 蛋白同化薬", when:"always", level:"ng", ex:"サプリメント(DHEA など)や 海外製品に入っていることがあります。" },
+  { id:"diuretic", re:/ヒドロクロロチアジド|トリクロルメチアジド|フロセミド|スピロノラクトン|アセタゾラミド|インダパミド|トラセミド|アゾセミド/, label:"利尿薬", cls:"S5 利尿薬・隠蔽薬", when:"always", level:"ng", ex:"利尿薬は 常に禁止です(体重を落とす・ほかの禁止物質を隠す目的で使われるため)。" },
+  { id:"stim2", re:/(?<![ァ-ヴー])カチン(?![ァ-ヴー])|オキシロフリン|メチルシネフリン|ジメチルアミルアミン|メチルヘキサンアミン|DMAA|メチルフェネチルアミン|フェンカンファミン|モダフィニル/, label:"興奮薬(サプリ等に入るもの)", cls:"S6 興奮薬", when:"incomp", level:"ng", ex:"ダイエット・運動向けのサプリメントや 海外製品に入っていることがあります。" },
+  { id:"tramadol", re:/トラマドール/, label:"トラマドール", cls:"S7 麻薬", when:"incomp", level:"ng", ex:"2024年から競技会時に禁止されています。" },
+  { id:"thc", re:/THC|テトラヒドロカンナビノール|大麻/, label:"THC(大麻成分)", cls:"S8 カンナビノイド", when:"incomp", level:"ng", ex:"競技会時に禁止です。" },
+  { id:"s4", re:/メルドニウム|トリメタジジン|タモキシフェン|クロミフェン|アナストロゾール/, label:"ホルモン・代謝調節薬", cls:"S4 ホルモン調節薬・代謝調節薬", when:"always", level:"ng", ex:"サプリメントや 海外製品に入っていることがあります。" },
+  // 注意(使い方や 量によって 問題になる)
+  { id:"cbd", re:/CBD|カンナビジオール/, label:"CBD(カンナビジオール)", cls:"S8 カンナビノイド(CBDだけは除外)", when:"note", level:"warn", ex:"CBDそのものは禁止されていませんが、製品に THC などが まざっていると 競技会時に違反になります。" },
+  { id:"hange", re:/ハンゲ|半夏/, label:"ハンゲ(半夏)", cls:"S6 興奮薬(エフェドリン類を微量に含む)", when:"incomp", level:"warn", ex:"微量のエフェドリン類を含むため注意が必要とされています。" },
+  { id:"kaikujin", re:/カイクジン|海狗腎|ジャコウ|麝香|ロクジョウ|鹿茸/, label:"カイクジン・ジャコウ・ロクジョウ", cls:"S1 蛋白同化薬に関連する生薬", when:"note", level:"warn", ex:"滋養強壮薬に入っています。蛋白同化作用のある成分を含むおそれがあり、使用を避けるよう案内されています。" },
+  { id:"vaso", re:/ナファゾリン|テトラヒドロゾリン|オキシメタゾリン/, label:"ナファゾリン・テトラヒドロゾリン・オキシメタゾリン", cls:"S6 興奮薬", when:"note", level:"warn", ex:"点鼻薬・点眼薬として局所に使うのは問題ありません。使いすぎて体内に吸収されると違反を疑われることがあります。" },
+  { id:"triam", re:/トリアムシノロン/, label:"トリアムシノロンアセトニド", cls:"S9 糖質コルチコイド", when:"incomp", level:"warn", ex:"口内炎の薬として口の中(ほお・歯ぐき・舌)に使うと、競技会時は禁止です。" },
+  { id:"steroid", re:/ヒドロコルチゾン|プレドニゾロン|デキサメタゾン|ベタメタゾン|フルオシノロン|クロベタゾン|ベクロメタゾン|フルチカゾン|モメタゾン|ブデソニド/, label:"ステロイド(糖質コルチコイド)", cls:"S9 糖質コルチコイド", when:"note", level:"warn", ex:"皮膚に塗る・肛門に塗る・点鼻・吸入は 禁止されません。飲む・坐剤・注射など 全身に入る使い方は 競技会時に禁止です。" },
+  // 禁止ではない(よく聞かれる もの)
+  { id:"codeine", re:/コデイン/, label:"コデイン類", cls:"禁止物質ではない", when:"free", level:"info", ex:"コデインリン酸塩・ジヒドロコデインリン酸塩は禁止物質ではありません。" },
+  { id:"phenylephrine", re:/フェニレフリン|シネフリン/, label:"フェニレフリン・シネフリン", cls:"禁止物質ではない(監視プログラム)", when:"free", level:"info", ex:"現在は禁止物質ではありません(監視の対象)。" },
+  { id:"caffeine", re:/カフェイン/, label:"カフェイン", cls:"禁止物質ではない(監視プログラム)", when:"free", level:"info", ex:"現在は禁止物質ではありません。" }
+];
+// 漢方の 名前から 生薬を みちびく(処方の 構成生薬は 固定のため)
+const DOPE_KAMPO = [
+  ["葛根湯", "麻黄"], ["麻黄湯", "麻黄"], ["小青竜湯", "麻黄 細辛 半夏"], ["防風通聖散", "麻黄"], ["麻杏甘石湯", "麻黄"],
+  ["五虎湯", "麻黄"], ["神秘湯", "麻黄"], ["越婢加朮湯", "麻黄"], ["薏苡仁湯", "麻黄"], ["五積散", "麻黄 半夏"], ["麻杏薏甘湯", "麻黄"],
+  ["麻黄附子細辛湯", "麻黄 附子 細辛"], ["桂枝芍薬知母湯", "麻黄 附子"],
+  ["八味地黄丸", "附子"], ["八味丸", "附子"], ["牛車腎気丸", "附子"], ["真武湯", "附子"], ["桂枝加朮附湯", "附子"],
+  ["呉茱萸湯", "呉茱萸"], ["温経湯", "呉茱萸 半夏"], ["当帰四逆加呉茱萸生姜湯", "呉茱萸 細辛"],
+  ["苓甘姜味辛夏仁湯", "細辛 半夏"], ["立効散", "細辛"], ["女神散", "丁子"],
+  ["半夏厚朴湯", "半夏"], ["六君子湯", "半夏"], ["小柴胡湯", "半夏"], ["柴朴湯", "半夏"], ["麦門冬湯", "半夏"], ["半夏瀉心湯", "半夏"],
+  ["二陳湯", "半夏"], ["柴胡桂枝湯", "半夏"], ["半夏白朮天麻湯", "半夏"], ["小半夏加茯苓湯", "半夏"],
+  ["葛根加朮附湯", "麻黄 附子"], ["大青竜湯", "麻黄"], ["桂麻各半湯", "麻黄"], ["続命湯", "麻黄"],
+  ["附子理中湯", "附子"], ["四逆湯", "附子"], ["当帰四逆湯", "細辛"], ["丁香柿蒂湯", "丁子"],
+  ["柴胡加竜骨牡蛎湯", "半夏"], ["抑肝散加陳皮半夏", "半夏"], ["大柴胡湯", "半夏"], ["竹茹温胆湯", "半夏"], ["参蘇飲", "半夏"], ["釣藤散", "半夏"], ["柴陥湯", "半夏"], ["小陥胸湯", "半夏"]
+];
+// 成分が わからないと 判定できない 薬の種類
+const DOPE_TYPE_HINT = /サプリ|ダイエット|プロテイン|海外|かぜ|カゼ|風邪|感冒|鼻炎|鼻づまり|せき|セキ|咳|去痰|ぜんそく|喘息|のど|強壮|滋養|精力|胃腸|胃薬|育毛|発毛|痔|漢方|生薬|ドリンク|ルル|パブロン|ベンザ|コンタック|エスタック|ストナ|プレコール|コルゲン|改源|カイゲン|ジキニン|アネトン|ブロン|アスクロン|ユンケル|ゼナ|ピンクルス|ハイシー/;
+function dopeNorm_(t){
+  t = String(t || "");
+  try { t = t.normalize("NFKC"); } catch(e){}
+  // ひらがなを カタカナに
+  t = t.replace(/[ぁ-ゖ]/g, function(c){ return String.fromCharCode(c.charCodeAt(0) + 0x60); }).replace(/\s+/g, "");
+  return dopeSmall_(t);
+}
+// 小さい「ァィゥェォャュョッ」と 大きい文字の 打ちまちがいを 吸収する
+function dopeSmall_(t){ return String(t).replace(/[ァィゥェォャュョッヮ]/g, function(c){ return { "ァ":"ア","ィ":"イ","ゥ":"ウ","ェ":"エ","ォ":"オ","ャ":"ヤ","ュ":"ユ","ョ":"ヨ","ッ":"ツ","ヮ":"ワ" }[c]; }); }
+// 判定表の 書き方も 同じ形に そろえる(1回だけ)
+(function(){
+  try {
+    DOPE_RULES.forEach(function(r){ if (r.re) r.re = new RegExp(dopeSmall_(r.re.source), r.re.flags); });
+    DOPE_KAMPO.forEach(function(k){ k[0] = dopeSmall_(k[0]); k[1] = dopeSmall_(k[1]); });
+  } catch(e){}
+})();
+function dopeRule_(id){ return DOPE_RULES.filter(function(r){ return r.id === id; })[0]; }
+function dopeCheck_(it){
+  const name = dopeNorm_(it.name), ingr = dopeNorm_(it.ingr);
+  let text = name + "/" + ingr;
+  const via = {};
+  DOPE_KAMPO.forEach(function(k){ if (name.indexOf(k[0]) >= 0 || ingr.indexOf(k[0]) >= 0){ text += "/" + k[1]; k[1].split(" ").forEach(function(c){ via[c] = k[0]; }); } });
+  const hits = [], seen = {};
+  const add = function(r, src){ if (!r || seen[r.id]) return; seen[r.id] = 1; hits.push({ r: r, src: src || "" }); };
+  DOPE_RULES.forEach(function(r){
+    if (!r.re) return;
+    if (r.id === "beta2inh"){
+      if (!r.re.test(text)) return;
+      // 吸入以外の剤形と わかるときは 禁止として出す
+      const nonInh = /錠|シロップ|テープ|貼付|内服|顆粒|散剤|注射/.test(text) && !/吸入|エアゾール|ディスカス|エリプタ|タービュヘイラー|インヘラー/.test(text);
+      add(nonInh ? dopeRule_("beta2inh_ng") : r);
+      return;
+    }
+    if (r.id === "ephedrine"){
+      (text.match(r.re) || []).forEach(function(m){ add(dopeRule_(r.pick(m) === "ephedrine" ? "ephedrine_" : r.pick(m))); });
+      return;
+    }
+    const m = text.match(r.re);
+    if (m){
+      const word = m[0];
+      const kampo = via[word] || via[(r.label.match(/[(（]([^)）]+)/) || [])[1]] || "";
+      add(r, kampo ? "「" + kampo + "」の構成生薬" : "");
+    }
+  });
+  const ng = hits.filter(function(h){ return h.r.level === "ng"; });
+  const warn = hits.filter(function(h){ return h.r.level === "warn"; });
+  let level = "none";
+  if (ng.length) level = "ng";
+  else if (warn.length) level = "warn";
+  else if (!ingr && (DOPE_TYPE_HINT.test(String(it.name || "")) || DOPE_TYPE_HINT.test(name))) level = "check";
+  else if (ingr) level = "ok";
+  return { level: level, hits: hits, hasIngr: !!ingr };
+}
+function dopeFlag_(it){
+  let d; try { d = dopeCheck_(it); } catch(e){ return ""; }
+  const lab = { ng:"ドーピング禁止", warn:"ドーピング注意" }[d.level];
+  if (!lab) return "";
+  return '<span class="dope-flag ' + d.level + (it.ingr && !it.ingrOk && d.level !== "check" ? ' unc' : '') + '" onclick="event.stopPropagation();openDope(\'' + it.id + '\')" title="タップで くわしく">' + lab + '</span>';
+}
+const DOPE_WHEN = { always:["always","常に禁止"], incomp:["incomp","競技会時に禁止"], note:["note","使い方に注意"], free:["free","禁止ではない"] };
+function dopeDetailHtml_(it, compact){
+  const d = dopeCheck_(it);
+  const head = {
+    ng: "禁止物質を 含んでいます",
+    warn: "使い方・量によって 問題になる成分を 含んでいます",
+    check: "成分が 未入力のため 判定できません",
+    ok: "判定表の 禁止物質は 見つかりませんでした(含まないことの 保証では ありません)",
+    none: "成分が 未入力です"
+  }[d.level];
+  let h = '<div class="dp-box ' + (d.level === "none" || d.level === "ok" ? "check" : d.level) + '"><div class="dp-head">' + (d.level === "ng" ? "⛔ " : d.level === "warn" ? "⚠ " : "") + head + '</div>';
+  if ((d.level === "ng" || d.level === "warn") && it.ingr && !it.ingrOk) h += '<div class="dp-unc">成分は まだ 箱の表示と 照合されていません。照合してから 判断してください。</div>';
+  if (d.level === "check") h += '<div>かぜ薬・鼻炎薬・せき止め・滋養強壮薬・胃腸薬・育毛剤・漢方などは 禁止物質を含むことがあります。' + (compact ? '' : '「成分」を入力すると 自動で判定します。') + '</div>';
+  if (compact && d.hits.length){
+    h += '<ul>' + d.hits.map(function(x){ return '<li><b>' + esc(x.r.label) + '</b> — ' + esc(DOPE_WHEN[x.r.when][1]) + '(' + esc(x.r.cls) + ')' + (x.src ? '<small> ' + esc(x.src) + '</small>' : '') + '</li>'; }).join("") + '</ul>';
+  }
+  h += '</div>';
+  if (!compact && d.hits.length){
+    h += '<table class="dope-table"><tr><th>成分</th><th>いつ</th><th>理由・注意</th></tr>'
+      + d.hits.map(function(x){ const w = DOPE_WHEN[x.r.when];
+          return '<tr><td><b>' + esc(x.r.label) + '</b>' + (x.src ? '<br><small>' + esc(x.src) + '</small>' : '') + '</td><td><span class="dope-when ' + w[0] + '">' + w[1] + '</span></td><td><small>' + esc(x.r.cls) + '</small><br>' + esc(x.r.ex) + '</td></tr>';
+        }).join("") + '</table>';
+  }
+  return h;
+}
+function dopePreview_(){
+  const el = document.getElementById("dope-preview");
+  if (!el) return;
+  const it = { name: document.getElementById("f-name").value, ingr: document.getElementById("f-ingr").value, ingrOk: document.getElementById("f-ingr-ok").checked };
+  // 入力欄の 高さを 中身に あわせる
+  try { const ta = document.getElementById("f-ingr"); ta.style.height = "auto"; ta.style.height = Math.min(160, ta.scrollHeight + 2) + "px"; } catch(e){}
+  if (!String(it.name).trim() && !String(it.ingr).trim()){ el.innerHTML = ""; return; }
+  const d = dopeCheck_(it);
+  const okRow = document.getElementById("ingr-ok-row");
+  if (okRow) okRow.style.display = String(it.ingr).trim() ? "" : "none";
+  el.innerHTML = dopeLine_(d);
+}
+// 一行で: ⛔ ドーピング禁止:メチルエフェドリン(競技会時)
+function dopeLine_(d){
+  const bad = d.hits.filter(function(x){ return x.r.level === "ng" || x.r.level === "warn"; });
+  if (!bad.length) return "";
+  const ng = d.level === "ng";
+  return '<div class="dope-line ' + (ng ? "ng" : "warn") + '">' + (ng ? "⛔ ドーピング禁止:" : "⚠ ドーピング注意:")
+    + bad.map(function(x){ return esc(x.r.label.replace(/\(.*?\)/g, "")) + '<small>(' + DOPE_WHEN[x.r.when][1].replace("に禁止", "") + ')</small>'; }).join("、") + '</div>';
+}
+function openDope(id){
+  const it = S.items.find(function(x){ return x.id === id; });
+  if (!it) return;
+  const d = dopeCheck_(it);
+  const bad = d.hits.filter(function(x){ return x.r.level === "ng" || x.r.level === "warn"; });
+  const head = d.level === "ng" ? '<div class="dope-line ng">⛔ 禁止物質を含みます</div>'
+    : d.level === "warn" ? '<div class="dope-line warn">⚠ 使い方によって注意が必要です</div>'
+    : '<div class="dope-line warn" style="background:#F1F3F5;color:#444">成分を入力すると判定できます</div>';
+  let h = '<p style="margin:4px 0 8px"><b>' + esc(it.name || "") + '</b></p>' + head;
+  if (bad.length){
+    h += '<ul class="dope-simple">' + bad.map(function(x){
+      return '<li><b>' + esc(x.r.label) + '</b>　<span class="dope-when ' + DOPE_WHEN[x.r.when][0] + '">' + DOPE_WHEN[x.r.when][1] + '</span>'
+        + '<p>' + esc(x.r.ex) + (x.src ? '(' + esc(x.src) + ')' : '') + '</p></li>';
+    }).join("") + '</ul>';
+  }
+  if (it.ingr) h += '<div class="ingr-evi"><div class="ingr-evi-h">成分 <span class="ingr-src' + (it.ingrOk ? ' ok' : ' web') + '">' + esc(ingrSrcText_(it)) + '</span></div>' + dopeMark_(it.ingr) + '</div>';
+  h += '<div class="row gap wrap" style="margin:10px 0"><button class="btn ghost" onclick="closeDope();editItem(\'' + id + '\');setTimeout(function(){var e=document.getElementById(\'f-ingr\');if(e){e.focus();e.scrollIntoView({block:\'center\'});}},300)">成分を ' + (it.ingr ? "なおす" : "入力する") + '</button></div>'
+    + '<p class="dope-foot">アプリの判定表と照らし合わせた目安です。最終確認は <a href="https://www.globaldro.com/JP/search" target="_blank" rel="noopener">Global DRO JAPAN</a> や スポーツファーマシストで行ってください。禁止表は毎年1月に改定されます。</p>';
+  document.getElementById("dope-body").innerHTML = h;
+  document.getElementById("dope-modal").style.display = "flex";
+}
+function closeDope(){ document.getElementById("dope-modal").style.display = "none"; }
+
+/* ===== 成分の 自動入力(グループの 確認済み成分 → 通販サイトの説明) ===== */
+let __ingr = { src: "", by: "", at: "", text0: "" };
+function ingrSrcText_(o){
+  if (!o || !o.ingr) return "";
+  const src = o.ingrSrc || "manual";
+  if (o.ingrOk){
+    return "照合済み" + (src === "share" ? "(" + (o.ingrBy || "他店") + ")" : "") + (o.ingrAt ? " " + o.ingrAt : "");
+  }
+  return src === "web" ? "自動入力・未照合" : "未照合";
+}
+function ingrSrcLabel_(){
+  const el = document.getElementById("ingr-src");
+  if (!el) return;
+  const o = { ingr: document.getElementById("f-ingr").value.trim(), ingrOk: document.getElementById("f-ingr-ok").checked, ingrSrc: __ingr.src, ingrBy: __ingr.by, ingrAt: __ingr.at };
+  el.textContent = ingrSrcText_(o);
+  el.className = "ingr-src" + (o.ingrOk ? " ok" : (o.ingr ? " web" : ""));
+  el.style.display = o.ingr ? "" : "none";
+}
+function onIngrInput_(){
+  const v = document.getElementById("f-ingr").value.trim();
+  // 中身を 書きかえたら 確認は やり直し
+  if (v !== __ingr.text0){ document.getElementById("f-ingr-ok").checked = false; if (__ingr.src !== "manual"){ __ingr.src = "manual"; __ingr.by = ""; } __ingr.at = ""; }
+  ingrSrcLabel_(); dopePreview_();
+}
+function onIngrOk_(){
+  const ok = document.getElementById("f-ingr-ok").checked;
+  if (ok && !document.getElementById("f-ingr").value.trim()){ document.getElementById("f-ingr-ok").checked = false; toast("先に 成分を 入力してください"); return; }
+  __ingr.at = ok ? today() : ""; if (ok){ __ingr.text0 = document.getElementById("f-ingr").value.trim(); if (__ingr.src !== "share") __ingr.by = (S.pharmacy && S.pharmacy.name) || ""; }
+  ingrSrcLabel_(); dopePreview_();
+}
+// 通販サイトの 商品説明から「成分」の部分だけを 抜き出す
+function extractIngr_(txt){
+  let t = String(txt || "").replace(/<br\s*\/?>/gi, "\n").replace(/<[^>]+>/g, " ").replace(/&nbsp;/g, " ").replace(/&amp;/g, "&");
+  try { t = t.normalize("NFKC"); } catch(e){}
+  const m = t.match(/(成分[・･]?分量|成分及び分量|成分・含量|有効成分|【成分】|■成分|成分)\s*[:：】\]]?\s*([\s\S]{6,600})/);
+  if (!m) return "";
+  let body = m[2];
+  // 次の見出しで 切る
+  const cut = body.search(/添加物|用法[・･]?用量|効能[・･]?効果|使用上の注意|保管及び取扱い|内容量|区分|広告文責|販売元|製造販売元|お問い?合わせ|【|■|◆|●|★/);
+  if (cut > 0) body = body.slice(0, cut);
+  body = body.replace(/\s+/g, " ").trim().replace(/^[、,。:：\s]+|[、,。\s]+$/g, "");
+  // 成分らしい 書き方か(量の単位・塩・エキス など)を たしかめる
+  if (body.length < 6 || body.length > 500) return "";
+  if (!/(mg|μg|ｍｇ|g|mL|ml|IU|単位|塩|エステル|水和物|エキス|末|乾燥)/.test(body)) return "";
+  return body;
+}
+let __sharedAt = 0;
+async function ensureShared_(){
+  if (!S.gasUrl) return;
+  if (sharedData && sharedData.length && Date.now() - __sharedAt < 10 * 60000) return;
+  try {
+    const r = await fetch(S.gasUrl + "?action=list");
+    const d = await r.json();
+    sharedData = Array.isArray(d) ? d : [];
+    sharedData.forEach(function(ph){ const sp = splitParty_(ph.items); ph.party = sp.party; ph.items = sp.items; });
+    __sharedAt = Date.now();
+  } catch(e){}
+}
+function sharedIngr_(jan){
+  let best = null;
+  (sharedData || []).forEach(function(ph){
+    if (S.pharmacy && String(ph.id) === String(S.pharmacy.id)) return;
+    (ph.items || []).forEach(function(it){
+      if (it.jan === jan && it.ingr && (!best || String(it.ingrAt || "") > String(best.ingrAt || ""))) best = { ingr: it.ingr, ingrAt: it.ingrAt || "", ingrBy: it.ingrBy || (ph.pharmacy && ph.pharmacy.name) || "他店" };
+    });
+  });
+  return best;
+}
+async function fetchIngr_(code){
+  const still = function(){ return document.getElementById("f-jan").value.replace(/\D/g, "") === code && !document.getElementById("f-ingr").value.trim(); };
+  const put = function(text, src, by, at, ok){
+    if (!still()) return;
+    document.getElementById("f-ingr").value = text;
+    document.getElementById("f-ingr-ok").checked = !!ok;
+    __ingr = { src: src, by: by || "", at: at || "", text0: text };
+    ingrSrcLabel_(); dopePreview_();
+  };
+  // 1) グループの 他店が 箱で確認した 成分
+  try {
+    await ensureShared_();
+    const sh = sharedIngr_(code);
+    if (sh){ put(sh.ingr, "share", sh.ingrBy, sh.ingrAt, true); return; }
+  } catch(e){}
+  // 2) 通販サイトの 商品説明(候補。箱との照合が必要)
+  if (!S.gasUrl || !S.apiKeys || !S.apiKeys.yahoo) return;
+  try {
+    const r = await fetch(S.gasUrl + "?action=yahoo&appid=" + encodeURIComponent(S.apiKeys.yahoo) + "&jan=" + encodeURIComponent(code));
+    const d = await r.json();
+    const hits = (d && d.hits) || [];
+    for (let i = 0; i < hits.length; i++){
+      const t = extractIngr_((hits[i].description || "") + "\n" + (hits[i].caption || ""));
+      if (t){ put(t, "web", "", "", false); return; }
+    }
+  } catch(e){}
+}
+// 判定に 使った語に 印をつける
+function dopeMark_(text){
+  let h = esc(text);
+  const words = [];
+  DOPE_RULES.forEach(function(r){
+    if (!r.re || r.level === "info") return;
+    const src = new RegExp(r.re.source, "g");
+    let m; const t = dopeSmall_(String(text));
+    while ((m = src.exec(t))){ words.push({ w: String(text).substr(m.index, m[0].length), c: r.level === "warn" ? "w" : "" }); if (!m[0]) break; }
+  });
+  words.sort(function(a, b){ return b.w.length - a.w.length; });
+  const done = {};
+  words.forEach(function(x){
+    if (!x.w || done[x.w]) return; done[x.w] = 1;
+    h = h.split(esc(x.w)).join('<mark class="' + x.c + '">' + esc(x.w) + '</mark>');
+  });
+  return h;
+}
 function setTvDirect(v){ game_().tvDirect = !!v; save(); toast(v ? "テレビを つけたら すぐ メニューを ひらきます" : "テレビを つけたら なかまの ようすを ながめられます"); }
 function renderTv_(){
   const el = document.getElementById("tv-btn");
@@ -10634,7 +11006,9 @@ async function uploadShare(){
       action: "upload", id: S.pharmacy.id,
       pharmacy: { name: S.pharmacy.name, area: S.pharmacy.area },
       updatedAt: new Date().toISOString(),
-      items: S.items.map(it => ({ jan: it.jan, name: it.name, maker: it.maker, category: it.category, qty: it.qty, expiry: it.expiry || "", smt: !!it.smt }))
+      items: S.items.map(it => Object.assign({ jan: it.jan, name: it.name, maker: it.maker, category: it.category, qty: it.qty, expiry: it.expiry || "", smt: !!it.smt },
+        // 成分は 箱で確認済みのものだけを 共有する(未確認の候補は ほかの店に 広げない)
+        (it.ingr && it.ingrOk && it.jan) ? { ingr: it.ingr, ingrAt: it.ingrAt || "", ingrBy: it.ingrBy || S.pharmacy.name || "" } : {}))
         .concat([{ jan: "__party__", party: myParty_() }])
     };
     const r = await fetch(S.gasUrl, { method: "POST", body: JSON.stringify(payload) });
