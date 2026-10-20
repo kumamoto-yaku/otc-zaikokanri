@@ -579,7 +579,9 @@ body.game-off .tv-btn { display: none !important; }
 @media (min-width: 600px){ #party-modal.game-tv .order-card { height: calc(100% - 24px); margin-top: 12px; border-radius: 18px; border: 8px solid #8B5A2B; } }
 .tv-head { position: sticky; top: 0; z-index: 5; background: #1B2A22; color: #E8F5EA; margin: 0 -12px 10px; padding: 10px 12px; display: flex; align-items: center; gap: 8px; }
 .tv-head .order-title { font-weight: 900; letter-spacing: .06em; color: #FFE27A; font-size: 15px; white-space: nowrap; }
-.tv-stat { font-size: 11.5px; margin-left: auto; white-space: nowrap; }
+.tv-stat { font-size: 11.5px; margin-left: auto; white-space: nowrap; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+@media (max-width: 380px){ .tv-head { gap: 5px; } .tv-off { padding: 5px 8px; } .tv-watch-btn { padding: 4px 8px; } }
+body { overflow-x: clip; }
 .tv-off { border: 1px solid #E8F5EA; background: transparent; color: #E8F5EA; border-radius: 999px; padding: 5px 10px; font-size: 12px; cursor: pointer; white-space: nowrap; }
 .gm-back { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
 .gm-back button { border: 1px solid var(--line); background: #fff; border-radius: 999px; padding: 6px 12px; font-size: 13px; cursor: pointer; }
@@ -949,7 +951,7 @@ svg.bd8 { animation: bdDance 1.6s ease-in-out infinite, bdGold 2s ease-in-out in
 .link.center { margin: 0 auto; display: block; }
 .scan-box { display: flex; flex-direction: column; gap: 12px; align-items: center; max-width: 520px; margin: 8px auto 0; }
 .scan-btns { display: flex; gap: 10px; width: 100%; }
-.scan-btns .btn { flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 15px 10px; font-size: 15px; }
+.scan-btns .btn { flex: 1 1 0; min-width: 0; white-space: normal; line-height: 1.3; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 15px 10px; font-size: 15px; }
 .scan-ico { font-size: 18px; letter-spacing: -2px; opacity: 0.9; }
 .scan-box #jan-reader { width: 100%; }
 .scan-box #jan-reader:empty { display: none; }
@@ -1416,7 +1418,7 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
 .list-sum b { color: var(--ai-deep); font-size: 13.5px; }
 @media print { .list-sum { display: none !important; } }
 .toast { position: fixed; left: 50%; bottom: 28px; transform: translateX(-50%); background: var(--ai-deep); color: #fff; padding: 10px 20px; border-radius: 999px; font-size: 13.5px; box-shadow: 0 4px 14px rgba(0,0,0,0.2); z-index: 50; display: none; }
-#login-gate { position: fixed; inset: 0; background: var(--hakuji); z-index: 100; display: flex; align-items: center; justify-content: center; padding: 20px; }
+#login-gate { position: fixed; inset: 0; background: var(--hakuji); z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 20px; }
 .login-card { background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 26px 22px; width: min(100%, 380px); display: flex; flex-direction: column; gap: 12px; box-shadow: 0 6px 24px rgba(20,40,60,0.08); }
 .login-card h2 { font-family: var(--serif); text-align: center; color: var(--ai-deep); letter-spacing: 0.08em; font-size: 20px; }
 .foot { text-align: center; font-size: 11.5px; color: #8A97A0; padding-top: 26px; letter-spacing: 0.08em; }
@@ -1583,6 +1585,7 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
     <p class="hint" style="text-align:center">とみながグループ 専用ページです。<br>配布された会員IDとパスワードを入力してください。</p>
     <label>会員ID <input id="login-id" autocomplete="username"></label>
     <label>パスワード <input type="password" id="login-pass" autocomplete="current-password" onkeydown="if(event.key==='Enter')checkLogin()"></label>
+    <label class="chk-row" style="font-size:13px"><input type="checkbox" id="login-keep"> この端末では 次から入力を省く</label>
     <button class="btn big" onclick="checkLogin()">入室する</button>
     <p class="hint" id="login-err" style="color:var(--shu);text-align:center"></p>
   </div>
@@ -2251,6 +2254,7 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
         </label>
         <p class="hint">音を選ぶとその場で鳴って確かめられます。端末がマナーモードのときは鳴りません。</p>
         <label class="chk-row"><input type="checkbox" id="game-show" onchange="hideGameUntil_(!this.checked)"> 右上の テレビ(おまけの ゲーム)を 表示する</label>
+        <button class="btn ghost" onclick="logout_()">入室画面に もどる(この端末の 入力省略も 解除)</button>
       </div>
     </details>
     <details class="set-card">
@@ -2267,12 +2271,13 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
   </section>
 
   <div class="toast" id="toast"></div>
-  <footer class="foot">OTCLinker — とみながグループ 店舗向けツール<br><span class="ver">版 2026-10-16 DK(箱の成分を カメラで 読み取り)</span></footer>
+  <footer class="foot">OTCLinker — とみながグループ 店舗向けツール<br><span class="ver">版 2026-10-20 DL(総点検・起動時に入室画面)</span></footer>
 </div>
 
 <script>
 "use strict";
 /* ============ 入室(簡易ロック) ============ */
+try { if (!authed_()) document.body.classList.add("locked"); } catch(e){}
 const LOGIN_ID = "1";
 const LOGIN_PASS_HASH = "6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b";
 async function sha256hex(s){
@@ -2286,8 +2291,11 @@ async function checkLogin(){
   try {
     const h = await sha256hex(pw);
     if (id === LOGIN_ID && h === LOGIN_PASS_HASH){
-      localStorage.setItem("otc-auth-v1", "ok");
+      // 起動するたびに 入室画面を出す(この端末で 省く 設定のときだけ 覚えておく)
+      try { sessionStorage.setItem("otc-auth-v2", "ok"); } catch(e){}
+      try { if (document.getElementById("login-keep").checked) localStorage.setItem("otc-auth-keep-v2", "ok"); else localStorage.removeItem("otc-auth-keep-v2"); localStorage.removeItem("otc-auth-v1"); } catch(e){}
       document.getElementById("login-gate").style.display = "none";
+      document.body.classList.remove("locked");
       showExpiryAlert();
     } else {
       err.textContent = "会員IDまたはパスワードが違います。";
@@ -3877,11 +3885,18 @@ function restoreData(ev){
   };
   rd.readAsText(file);
 }
+function dopeCsv_(it){
+  try {
+    const d = dopeCheck_(it);
+    const bad = d.hits.filter(function(x){ return x.r.level === "ng" || x.r.level === "warn"; }).map(function(x){ return x.r.label + "(" + DOPE_WHEN[x.r.when][1] + ")"; });
+    return d.level === "ng" ? "禁止: " + bad.join(" / ") : (d.level === "warn" ? "注意: " + bad.join(" / ") : "");
+  } catch(e){ return ""; }
+}
 function exportCsv(){
   doQuest("csv");
   if (!S.items.length){ toast("在庫がありません"); return; }
-  const head = ["JANコード","商品名","ふりがな","メーカー","区分","濫用防止","税制対象","販売価格(税込)","税率","発注先","納入価(税込)","職員販売価格(税込)","在庫数","使用期限","メモ","更新日"];
-  const rows = S.items.map(it => [it.jan,it.name,(it.kana||""),it.maker,it.category,(it.ranyo?"該当":""),(it.smt?"該当":""),it.price,(it.reduced?"8%":"10%"),(it.supplier||""),(it.cost||""),(it.staffPrice||""),it.qty,it.expiry,(it.memo||"").replace(/[\r\n,]/g," "),it.updatedAt]);
+  const head = ["JANコード","商品名","ふりがな","メーカー","区分","濫用防止","税制対象","販売価格(税込)","税率","発注先","納入価(税込)","職員販売価格(税込)","在庫数","使用期限","メモ","更新日","成分","成分の照合","ドーピング判定"];
+  const rows = S.items.map(it => [it.jan,it.name,(it.kana||""),it.maker,it.category,(it.ranyo?"該当":""),(it.smt?"該当":""),it.price,(it.reduced?"8%":"10%"),(it.supplier||""),(it.cost||""),(it.staffPrice||""),it.qty,it.expiry,(it.memo||"").replace(/[\r\n,]/g," "),it.updatedAt,(it.ingr||""),(it.ingr ? (it.ingrOk ? "照合済み " + (it.ingrAt||"") : "未照合") : ""),dopeCsv_(it)]);
   // 商品名などに , や " や 改行が入っていても 列が ずれないよう、必要な欄は "" でかこむ
   const cell = function(v){ v = v == null ? "" : String(v); return /[",\r\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; };
   const csv = "\uFEFF" + [head].concat(rows).map(r => r.map(cell).join(",")).join("\r\n");
@@ -6258,7 +6273,8 @@ const ODD_EVENTS = [
   function(){ addItem_("i_gum"); return "あたりつきガムを もらった。 まだ 開けていない。"; },
   function(){ return "ザイコヌーシが 遠くで「数が あったぞい」と 言っている気がする。"; }
 ];
-function gameReady_(){ return (S.items || []).length >= 3 && !gameHidden_(); }
+function gameReady_(){ return (S.items || []).length >= 3 && !gameHidden_() && !loginShown_(); }
+function loginShown_(){ const g = document.getElementById("login-gate"); return !!g && g.style.display !== "none"; }
 function gameHidden_(){ try { return localStorage.getItem("otc_game_hidden") === "1"; } catch(e){ return false; } }
 function hideGameUntil_(hide){
   try { localStorage.setItem("otc_game_hidden", hide ? "1" : "0"); } catch(e){}
@@ -11153,7 +11169,8 @@ async function uploadShare(){
     if (m === "login"){
       shareMsg('アップロードできません。<strong>デプロイ設定の「アクセスできるユーザー」を「全員」</strong>にして再デプロイしてください。');
     } else {
-      shareMsg("アップロードに失敗しました(" + (m || "原因不明") + ")。「接続テスト」で確認してください。");
+      if (/50000|50,000|characters|文字/.test(m)) shareMsg("品目が多く、共有サーバーの1つの欄に入りきりませんでした。共有サーバーを最新版(共有サーバー_v3.gs)に入れかえて、もう一度お試しください。");
+      else shareMsg("アップロードに失敗しました(" + (m || "原因不明") + ")。「接続テスト」で確認してください。");
     }
   }
 }
@@ -11361,7 +11378,21 @@ document.getElementById("k-rakuten").value = S.apiKeys.rakuten || "";
 document.getElementById("k-rakuten-key").value = S.apiKeys.rakutenKey || "";
 document.getElementById("k-jancode").value = S.apiKeys.jancode || "";
 updateBrand();
-if (localStorage.getItem("otc-auth-v1") === "ok") document.getElementById("login-gate").style.display = "none";
+function logout_(){
+  try { sessionStorage.removeItem("otc-auth-v2"); localStorage.removeItem("otc-auth-keep-v2"); localStorage.removeItem("otc-auth-v1"); } catch(e){}
+  try { tvwOff_(); closePartyModal(); } catch(e){}
+  document.getElementById("login-pass").value = "";
+  document.getElementById("login-gate").style.display = "flex";
+  document.body.classList.add("locked");
+  window.scrollTo(0, 0);
+}
+function authed_(){
+  try { if (sessionStorage.getItem("otc-auth-v2") === "ok") return true; } catch(e){}
+  try { if (localStorage.getItem("otc-auth-keep-v2") === "ok") return true; } catch(e){}
+  return false;
+}
+if (authed_()) document.getElementById("login-gate").style.display = "none";
+else document.body.classList.add("locked");
 function fillLookOptions_(){
   const th = document.getElementById("theme-pick");
   if (th) th.innerHTML = Object.keys(THEMES).map(function(k){
