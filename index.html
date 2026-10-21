@@ -577,6 +577,18 @@ body.game-off .tv-btn { display: none !important; }
 .pdf-busy .bar { width: 220px; height: 6px; background: #E6EAEE; border-radius: 6px; overflow: hidden; } .pdf-busy .bar i { display: block; height: 100%; background: var(--ai, #2B4C7E); }
 .sign-sheet.pdf-show-all .print-row { display: contents !important; }
 .sign-sheet.pdf-show-all .print-row > .sign-card { display: flex !important; }
+
+/* ===== 写真の 切り取り ===== */
+#crop-modal { z-index: 110; }
+.crop-card { max-width: 560px; }
+.crop-stage { position: relative; margin: 0 auto; touch-action: none; user-select: none; -webkit-user-select: none; background: #EEF1F4; line-height: 0; width: max-content; max-width: 100%; }
+.crop-stage img { display: block; max-width: 100%; max-height: 58vh; pointer-events: none; }
+.crop-box { position: absolute; border: 2px solid #fff; outline: 1px solid rgba(0,0,0,.6); box-shadow: 0 0 0 9999px rgba(0,0,0,.45); cursor: move; touch-action: none; }
+.crop-box::before, .crop-box::after { content: ""; position: absolute; inset: 33.3% 0; border-top: 1px dashed rgba(255,255,255,.7); border-bottom: 1px dashed rgba(255,255,255,.7); pointer-events: none; }
+.crop-box::after { inset: 0 33.3%; border: 0; border-left: 1px dashed rgba(255,255,255,.7); border-right: 1px dashed rgba(255,255,255,.7); }
+.crop-box i { position: absolute; width: 22px; height: 22px; margin: -11px; border-radius: 50%; background: #fff; border: 2px solid var(--ai, #2B4C7E); touch-action: none; }
+.crop-box i[data-h="nw"] { left: 0; top: 0; cursor: nwse-resize; } .crop-box i[data-h="ne"] { right: 0; top: 0; margin-right: -11px; cursor: nesw-resize; }
+.crop-box i[data-h="sw"] { left: 0; bottom: 0; margin-bottom: -11px; cursor: nesw-resize; } .crop-box i[data-h="se"] { right: 0; bottom: 0; margin: 0 -11px -11px 0; cursor: nwse-resize; }
 /* ゲーム画面(テレビの 中) */
 #party-modal.game-tv { padding: 0; background: rgba(20,14,8,.85); align-items: stretch; }
 #party-modal.game-tv .order-card { width: min(560px, 100%); max-width: 100%; margin: 0 auto; height: 100%; max-height: 100%; border-radius: 0; overflow-y: auto; -webkit-overflow-scrolling: touch;
@@ -1649,6 +1661,20 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
     <div id="dope-body"></div>
   </div>
 </div>
+<div id="crop-modal" class="order-modal" style="display:none">
+  <div class="order-card crop-card">
+    <div class="order-head"><span class="order-title">✂ 写真を切り取る</span><button class="link" onclick="closeCrop_()">やめる</button></div>
+    <p class="hint" style="margin:0 0 8px">枠の中を ドラッグして 動かし、四すみの ● で 大きさを 変えます。</p>
+    <div class="crop-stage" id="crop-stage"><img id="crop-img" alt=""><div class="crop-box" id="crop-box"><i data-h="nw"></i><i data-h="ne"></i><i data-h="sw"></i><i data-h="se"></i></div></div>
+    <div class="row gap wrap" style="margin-top:10px">
+      <button class="btn ghost" onclick="cropPreset_('all')">全体</button>
+      <button class="btn ghost" onclick="cropPreset_('square')">正方形</button>
+      <button class="btn ghost" onclick="cropPreset_('center')">中央を大きく</button>
+      <button class="btn" style="margin-left:auto" onclick="applyCrop_()">切り取る</button>
+    </div>
+    <p class="hint" id="crop-msg"></p>
+  </div>
+</div>
 <div id="party-modal" class="order-modal game-tv" style="display:none">
   <div class="order-card">
     <div class="order-head tv-head">
@@ -1956,6 +1982,7 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
               <label class="btn ghost" style="cursor:pointer">写真を選ぶ<input type="file" accept="image/*" style="display:none" onchange="popImageFile(event)"></label>
               <button class="btn ghost" onclick="fetchPopPhoto()">写真を自動取得</button>
               <p class="hint" id="pop-msg" style="width:100%"></p>
+              <button class="btn ghost" onclick="cropPopImg_()">✂ 写真を切り取る</button>
               <button class="btn ghost" onclick="clearPopImage()">写真を削除</button>
             </div>
             <label>写真の大きさ(%) <input type="number" id="pop-img-size" min="10" max="100" inputmode="numeric" onchange="savePopFont()"></label>
@@ -2279,7 +2306,7 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
   </section>
 
   <div class="toast" id="toast"></div>
-  <footer class="foot">OTCLinker — とみながグループ 店舗向けツール<br><span class="ver">版 2026-10-21 DO(実寸PDFで印刷・最後の白紙を解消)</span></footer>
+  <footer class="foot">OTCLinker — とみながグループ 店舗向けツール<br><span class="ver">版 2026-10-21 DP(写真の切り取り)</span></footer>
 </div>
 
 <script>
@@ -9391,6 +9418,124 @@ async function exactPdf_(kind){
     pdfBusy_("");
   }
 }
+
+/* ===== 写真の 切り取り(商品カード・POP) ===== */
+let __crop = null;
+// 外部の写真は そのままでは 切り取れない(画像の取得元の制限)ため、端末内の画像に してから 使う
+async function cropLoadable_(src){
+  if (/^data:|^blob:/.test(src)) return src;
+  const d = await Promise.race([urlToDataUrl_(src), new Promise(function(r){ setTimeout(function(){ r(null); }, 5000); })]);
+  if (d) return d;
+  // 共有サーバー(v3)経由で 取り込む
+  if (S.gasUrl){
+    try {
+      const r = await fetch(S.gasUrl + "?action=img&url=" + encodeURIComponent(src));
+      const j = await r.json();
+      if (j && j.data && /^data:image\//.test(j.data)) return j.data;
+    } catch(e){}
+  }
+  return null;
+}
+async function openCrop_(src, onDone){
+  if (!src){ toast("先に 写真を 入れてください"); return; }
+  const m = document.getElementById("crop-modal");
+  document.getElementById("crop-msg").textContent = "写真を 読み込んでいます…";
+  m.style.display = "flex";
+  const ok = await cropLoadable_(src);
+  if (!ok){ document.getElementById("crop-msg").textContent = "この写真は 取得元の制限で 切り取れません。お手数ですが「写真を選ぶ」から 端末の画像を 入れ直してください(共有サーバーを最新版にすると 切り取れるようになります)。"; return; }
+  const img = document.getElementById("crop-img");
+  img.onload = function(){
+    document.getElementById("crop-msg").textContent = "";
+    __crop = { src: ok, orig: src, onDone: onDone, x: 0, y: 0, w: 0, h: 0 };
+    cropPreset_("center");
+  };
+  img.src = ok;
+}
+function closeCrop_(){ document.getElementById("crop-modal").style.display = "none"; __crop = null; }
+function cropDraw_(){
+  const c = __crop, b = document.getElementById("crop-box");
+  if (!c || !b) return;
+  b.style.left = c.x + "px"; b.style.top = c.y + "px"; b.style.width = c.w + "px"; b.style.height = c.h + "px";
+}
+function cropPreset_(k){
+  const c = __crop, img = document.getElementById("crop-img");
+  if (!c) return;
+  const W = img.clientWidth, H = img.clientHeight;
+  if (k === "all"){ c.x = 0; c.y = 0; c.w = W; c.h = H; }
+  else if (k === "square"){ const s = Math.min(W, H); c.w = c.h = s; c.x = (W - s) / 2; c.y = (H - s) / 2; }
+  else { c.w = W * 0.8; c.h = H * 0.8; c.x = W * 0.1; c.y = H * 0.1; }
+  cropDraw_();
+}
+(function(){
+  let drag = null;
+  const clamp = function(){
+    const c = __crop, img = document.getElementById("crop-img");
+    const W = img.clientWidth, H = img.clientHeight, MIN = 24;
+    c.w = Math.max(MIN, Math.min(c.w, W)); c.h = Math.max(MIN, Math.min(c.h, H));
+    c.x = Math.max(0, Math.min(c.x, W - c.w)); c.y = Math.max(0, Math.min(c.y, H - c.h));
+  };
+  document.addEventListener("pointerdown", function(ev){
+    const box = document.getElementById("crop-box");
+    if (!__crop || !box || !box.contains(ev.target)) return;
+    ev.preventDefault();
+    const h = ev.target.getAttribute && ev.target.getAttribute("data-h");
+    drag = { h: h || "move", sx: ev.clientX, sy: ev.clientY, c0: Object.assign({}, __crop) };
+    try { ev.target.setPointerCapture(ev.pointerId); } catch(e){}
+  });
+  document.addEventListener("pointermove", function(ev){
+    if (!drag || !__crop) return;
+    ev.preventDefault();
+    const dx = ev.clientX - drag.sx, dy = ev.clientY - drag.sy, c = __crop, o = drag.c0;
+    if (drag.h === "move"){ c.x = o.x + dx; c.y = o.y + dy; c.w = o.w; c.h = o.h; }
+    else {
+      let x1 = o.x, y1 = o.y, x2 = o.x + o.w, y2 = o.y + o.h;
+      if (/w/.test(drag.h)) x1 = Math.min(x2 - 24, o.x + dx); else x2 = Math.max(x1 + 24, x2 + dx);
+      if (/n/.test(drag.h)) y1 = Math.min(y2 - 24, o.y + dy); else y2 = Math.max(y1 + 24, y2 + dy);
+      x1 = Math.max(0, x1); y1 = Math.max(0, y1);
+      c.x = x1; c.y = y1; c.w = x2 - x1; c.h = y2 - y1;
+    }
+    clamp(); cropDraw_();
+  }, { passive: false });
+  document.addEventListener("pointerup", function(){ drag = null; });
+  document.addEventListener("pointercancel", function(){ drag = null; });
+})();
+function applyCrop_(){
+  const c = __crop, img = document.getElementById("crop-img");
+  if (!c) return;
+  const k = img.naturalWidth / img.clientWidth;
+  const sx = Math.round(c.x * k), sy = Math.round(c.y * k), sw = Math.round(c.w * k), sh = Math.round(c.h * k);
+  const max = 900, sc = Math.min(1, max / Math.max(sw, sh));
+  const cv = document.createElement("canvas");
+  cv.width = Math.max(1, Math.round(sw * sc)); cv.height = Math.max(1, Math.round(sh * sc));
+  const g = cv.getContext("2d");
+  g.fillStyle = "#fff"; g.fillRect(0, 0, cv.width, cv.height);
+  g.drawImage(img, sx, sy, sw, sh, 0, 0, cv.width, cv.height);
+  let out;
+  try { out = cv.toDataURL("image/jpeg", 0.9); } catch(e){ document.getElementById("crop-msg").textContent = "切り取れませんでした。"; return; }
+  const done = c.onDone, orig = c.orig;
+  closeCrop_();
+  if (done) done(out, orig);
+  toast("写真を 切り取りました");
+}
+function cropCardImg_(jan){
+  const m = cardMeta_(jan);
+  openCrop_(m.img, function(out){
+    if (!m.imgOrig) m.imgOrig = m.img;     // 最初の写真を 覚えておく(元に戻せるように)
+    m.img = out; save(); renderCards();
+  });
+}
+function undoCardCrop_(jan){
+  const m = cardMeta_(jan);
+  if (m.imgOrig){ m.img = m.imgOrig; m.imgOrig = ""; save(); renderCards(); toast("切り取る前の写真に 戻しました"); }
+}
+function cropPopImg_(){
+  const f = popFont_();
+  if (!f.img){ toast("先に 写真を 入れてください"); return; }
+  openCrop_(f.img, function(out){
+    if (!f.imgOrig) f.imgOrig = f.img;
+    f.img = out; S.popFont = f; save(); renderPop();
+  });
+}
 function setTvDirect(v){ game_().tvDirect = !!v; save(); toast(v ? "テレビを つけたら すぐ メニューを ひらきます" : "テレビを つけたら なかまの ようすを ながめられます"); }
 function renderTv_(){
   const el = document.getElementById("tv-btn");
@@ -9845,7 +9990,9 @@ function renderCardEdit_(){
       +   (m.img ? '<img class="card-edit-thumb" src="' + esc(m.img) + '">' : '<span style="color:#9AA7AF">写真なし</span>')
       +   '<label class="link" style="cursor:pointer">📷 撮影<input type="file" accept="image/*" capture="environment" style="display:none" onchange="cardImageFile(event,\'' + it.jan + '\')"></label>'
       +   '<label class="link" style="cursor:pointer">写真を選ぶ<input type="file" accept="image/*" style="display:none" onchange="cardImageFile(event,\'' + it.jan + '\')"></label>'
-      +   (m.img ? '<button class="link" onclick="setCardMeta(\'' + it.jan + '\',\'img\',\'\')">この商品を削除</button>' : '')
+      +   (m.img ? '<button class="link" onclick="cropCardImg_(\'' + it.jan + '\')">✂ 切り取る</button>' : '')
+      +   (m.img && m.imgOrig ? '<button class="link" onclick="undoCardCrop_(\'' + it.jan + '\')">切り取る前に戻す</button>' : '')
+      +   (m.img ? '<button class="link" onclick="setCardMeta(\'' + it.jan + '\',\'img\',\'\');setCardMeta(\'' + it.jan + '\',\'imgOrig\',\'\');renderCards()">写真を消す</button>' : '')
       + '</div></div>';
   }).join("") + '</div>';
 }
@@ -9937,7 +10084,7 @@ async function cardImageFile(ev, jan){
   try {
     toast("画像を処理中です…");
     const r = await readImageFile_(f, 420);
-    cardMeta_(jan).img = r.dataUrl;
+    cardMeta_(jan).img = r.dataUrl; cardMeta_(jan).imgOrig = "";
     save();
     doQuest("photo");
     renderCards();
@@ -10671,7 +10818,7 @@ async function fetchPopPhoto(){
       new Promise(function(res){ setTimeout(function(){ res(null); }, 4000); })
     ]);
     const f = popFont_();
-    f.img = dataUrl || imgUrl;
+    f.img = dataUrl || imgUrl; f.imgOrig = "";
     S.popFont = f;
     save(); renderPop(); doQuest("popimg");
     say("写真を 取り込みました。");
@@ -10706,13 +10853,13 @@ async function popImageFile(ev){
   try {
     toast("画像を処理中です…");
     const r = await readImageFile_(f, 600);
-    S.popFont = Object.assign(popFont_(), { img: r.dataUrl });
+    S.popFont = Object.assign(popFont_(), { img: r.dataUrl, imgOrig: "" });
     save(); renderPop(); doQuest("popimg");
     toast("写真を取り込みました");
   } catch(e){ toast("画像を読み込めませんでした"); }
 }
 function clearPopImage(){
-  S.popFont = Object.assign(popFont_(), { img: "" });
+  S.popFont = Object.assign(popFont_(), { img: "", imgOrig: "" });
   save(); renderPop();
 }
 function resetPopFont(){ S.popFont = defaultPopFont(); save(); syncPopFontInputs(); renderPop(); }
