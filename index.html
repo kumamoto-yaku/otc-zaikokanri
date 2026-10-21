@@ -1834,10 +1834,10 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
             <label>値札サイズ
               <select id="ts-size" onchange="saveTagStyle()"><option value="s">小</option><option value="m">中</option><option value="l">大</option><option value="custom">自分で指定</option></select>
             </label>
-            <label id="ts-width-wrap" style="display:none">値札の幅(mm) <input type="number" id="ts-width" min="30" max="200" inputmode="numeric" onchange="saveTagStyle()"></label>
+            <label id="ts-width-wrap" style="display:none">値札の幅(mm) <input type="number" id="ts-width" min="15" max="180" inputmode="numeric" onchange="saveTagStyle()"></label>
           </div>
           <div class="grid2" id="ts-height-wrap" style="display:none">
-            <label>値札の高さ(mm) <input type="number" id="ts-height" min="0" max="200" inputmode="numeric" placeholder="0=自動" onchange="saveTagStyle()"></label>
+            <label>値札の高さ(mm) <input type="number" id="ts-height" min="0" max="250" inputmode="numeric" placeholder="0=自動" onchange="saveTagStyle()"></label>
           </div>
           <div class="grid2">
             <label>フォント <select id="ts-font" onchange="saveTagStyle()"></select></label>
@@ -2105,7 +2105,7 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
                   <option value="custom">自分で指定</option>
                 </select>
               </label>
-              <label id="card-size-w-wrap" style="display:none">幅(mm) <input type="number" id="card-width" min="30" max="200" inputmode="numeric" onchange="saveCardStyle()"></label>
+              <label id="card-size-w-wrap" style="display:none">幅(mm) <input type="number" id="card-width" min="20" max="180" inputmode="numeric" onchange="saveCardStyle()"></label>
             </div>
             <div class="grid2" id="card-size-h-wrap" style="display:none">
               <label>高さ(mm) <input type="number" id="card-height" min="0" max="300" inputmode="numeric" placeholder="0=自動" onchange="saveCardStyle()"></label>
@@ -2158,7 +2158,7 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
       <ol class="guide-steps">
         <li><b>商品登録</b>でバーコードを読み取り、価格と数を入れて「在庫に登録」。</li>
         <li><b>在庫リスト</b>で商品にチェックを入れ、<b>値札・POP</b>で印刷。</li>
-        <li>売れたら在庫リストの <b>−</b>、入荷したら <b>＋</b>。少なくなったら 🛒 で注文。</li>
+        <li>売れたら在庫リストの <b>−</b>、入荷したら <b>＋</b>。なくなったら 🛒 で注文。</li>
       </ol>
       <p class="hint">画面の右上の テレビを 押すと、おまけの ゲームが ひらきます。アプリを 使うほど ゲームが すすみ、クイズで OTC医薬品や 法律の 知識も まなべます。不要なときは「見た目と音の設定」で かくせます。</p>
       <div class="row gap wrap"><button class="btn" onclick="showTab('scan')">商品を登録する</button><button class="btn ghost" onclick="showTab('list')">在庫リストを見る</button></div>
@@ -2271,7 +2271,7 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
   </section>
 
   <div class="toast" id="toast"></div>
-  <footer class="foot">OTCLinker — とみながグループ 店舗向けツール<br><span class="ver">版 2026-10-20 DL(総点検・起動時に入室画面)</span></footer>
+  <footer class="foot">OTCLinker — とみながグループ 店舗向けツール<br><span class="ver">版 2026-10-21 DN(値札の自由サイズを実寸で印刷)</span></footer>
 </div>
 
 <script>
@@ -3678,7 +3678,6 @@ function onListOrder(v){
 const QUICK_FILTERS = [
   ["all",  "すべての状態",          ""],
   ["zero", "在庫0の商品",           "在庫0"],
-  ["low",  "在庫が少ない(1〜2個)", "在庫少"],
   ["exp",  "期限が3か月以内・切れ", "期限近"],
   ["noexp","期限が未入力",          "期限なし"],
   ["dope", "ドーピング 禁止・注意", "ドーピング"]
@@ -3725,7 +3724,7 @@ function welcomeHtml_(){
     + '<ol class="wl-steps">'
     +   '<li><span class="wl-n">1</span><div><b>商品を登録</b><small>バーコードを読み取って、価格と数を入れるだけ</small></div></li>'
     +   '<li><span class="wl-n">2</span><div><b>値札・POPを印刷</b><small>在庫リストでチェック → 値札・POPタブ</small></div></li>'
-    +   '<li><span class="wl-n">3</span><div><b>在庫を管理</b><small>売れたら −、入荷したら ＋。少なくなったら 🛒 で注文</small></div></li>'
+    +   '<li><span class="wl-n">3</span><div><b>在庫を管理</b><small>売れたら −、入荷したら ＋。なくなったら 🛒 で注文</small></div></li>'
     + '</ol>'
     + '<button class="btn big" onclick="showTab(\'scan\')">最初の商品を登録する</button>'
     + '<button class="link" onclick="showTab(\'share\');var d=document.getElementById(\'restore-input\');if(d)d.click()">以前の控え(バックアップ)から復元する</button>'
@@ -3811,7 +3810,7 @@ function renderList(){
     + '<input type="checkbox" ' + (selected.has(it.id)?'checked':'') + ' onchange="toggleSelect(\''+it.id+'\')" aria-label="値札用に選択">'
     + '<div class="stock-main" onclick="editItem(\''+it.id+'\')">'
     +   '<div class="stock-top"><span class="cat-badge" style="border-color:'+CAT_COLOR[it.category]+';color:'+CAT_COLOR[it.category]+'">'+esc(CAT_SHORT[it.category]||it.category||"区分なし")+'</span><span class="stock-name">'+(it.name?esc(it.name):"(名称未設定)")+'</span></div>'
-    +   '<div class="stock-sub">' + (Number(it.qty) <= 0 ? '<span class="zero-flag">在庫切れ</span>' : (Number(it.qty) <= 2 ? '<span class="low-flag">のこり少</span>' : '')) + (it.smt?'<span class="smt-flag">税制対象</span>':'') + (it.ranyo?'<span class="ranyo-flag">濫用防止</span>':'') + dopeFlag_(it) + (it.maker?'<span>'+esc(it.maker)+'</span>':'') + '<span>'+yen(it.price)+'</span>' + (it.cost?'<span class="sub-cost">納入 '+yen(it.cost)+'</span>':'') + (it.supplier?'<span class="sub-sup">'+esc(it.supplier)+'</span>':'') + (it.staffPrice?'<span class="sub-staff">職員 '+yen(it.staffPrice)+'</span>':'') + expiryChip(it.expiry) + (it.memo?'<span class="sub-memo">'+esc(it.memo)+'</span>':'') + '</div>'
+    +   '<div class="stock-sub">' + (Number(it.qty) <= 0 ? '<span class="zero-flag">在庫切れ</span>' : '') + (it.smt?'<span class="smt-flag">税制対象</span>':'') + (it.ranyo?'<span class="ranyo-flag">濫用防止</span>':'') + dopeFlag_(it) + (it.maker?'<span>'+esc(it.maker)+'</span>':'') + '<span>'+yen(it.price)+'</span>' + (it.cost?'<span class="sub-cost">納入 '+yen(it.cost)+'</span>':'') + (it.supplier?'<span class="sub-sup">'+esc(it.supplier)+'</span>':'') + (it.staffPrice?'<span class="sub-staff">職員 '+yen(it.staffPrice)+'</span>':'') + expiryChip(it.expiry) + (it.memo?'<span class="sub-memo">'+esc(it.memo)+'</span>':'') + '</div>'
     + '</div>'
     + (__stocktake
         ? '<label class="st-wrap" onclick="event.stopPropagation()">数えた数 <input class="st-input' + (__stocktake[it.id] !== undefined ? ' changed' : '') + '" data-id="' + it.id + '" type="number" inputmode="numeric" min="0" value="' + (__stocktake[it.id] !== undefined ? __stocktake[it.id] : it.qty) + '" oninput="stocktakeInput(\'' + it.id + '\', this.value)"></label>'
@@ -9343,7 +9342,6 @@ function gameIssues_(){
   return [
     { id:"exp",  enemy:"e_kigengire",  n: cnt("exp"),  label:"使用期限が 3か月以内・切れ", unit:"品", q:"exp" },
     { id:"zero", enemy:"e_shinagire",  n: cnt("zero"), label:"在庫0の 商品", unit:"品", q:"zero" },
-    { id:"low",  enemy:"e_hokan",      n: cnt("low"),  label:"のこり 1〜2個の 商品", unit:"品", q:"low" },
     { id:"noexp",enemy:"e_moushinsei", n: cnt("noexp"),label:"使用期限が 未入力", unit:"品", q:"noexp" },
     { id:"stock",enemy:"e_nushi",      n: (items.length >= 5 && (days == null || days >= 30)) ? 1 : 0, label: days == null ? "棚卸しを まだ していない" : "前回の 棚卸しから " + days + "日", unit:"", q:"" }
   ];
@@ -9363,7 +9361,7 @@ function dailyTasks_(){
     { id:"reg",  ic:"📦", label:"商品を 1つ 登録する(入庫も可)", done: has(/新規登録|入庫$/) || has(/^入庫$/), go:"scan" },
     { id:"qty",  ic:"🔢", label:"在庫数を 更新する(＋−・棚卸し)", done: has(/入庫\(\+\)|出庫|棚卸し/), go:"list" },
     { id:"exp",  ic:"📅", label:"使用期限の 近い商品を 確認する", done: !!G.daily.flags.exp, go:"exp" },
-    { id:"low",  ic:"🛒", label:"在庫が 少ない商品を 確認する", done: !!G.daily.flags.low, go:"low" },
+    { id:"low",  ic:"🛒", label:"在庫0の 商品を 確認する", done: !!G.daily.flags.low, go:"zero" },
     { id:"quiz", ic:"📚", label:"まなぶ クイズに 3問 正解する(" + Math.min(3, L.okToday || 0) + "/3)", done: (L.okDay === today() && (L.okToday || 0) >= 3), go:"learn" }
   ];
   tasks.forEach(function(t){ t.claimed = !!G.daily.claimed[t.id]; });
@@ -9670,7 +9668,7 @@ function syncCardStyleInputs(){
 function saveCardStyle(){
   S.cardStyle = {
     size: document.getElementById("card-size").value,
-    width: Math.min(200, Math.max(30, parseInt(document.getElementById("card-width").value, 10) || 52)),
+    width: Math.min(180, Math.max(20, parseFloat(document.getElementById("card-width").value) || 52)),
     height: Math.min(300, Math.max(0, parseInt(document.getElementById("card-height").value, 10) || 0)),
     fields: {
       head: document.getElementById("cf-head").checked,
@@ -9698,7 +9696,10 @@ function cardMeta_(jan){
 }
 // 印刷は「1行ずつのかたまり」に分けると、どのブラウザでも 確実に ページが分かれる。
 // (ばらばらに並べる方式だと、ページの境目で 抜け落ちることがある)
-const PRINT_W_MM = 194;          // A4縦・余白8mmのときに使える横幅
+// 1行に並べる横幅。A4(210mm)から余白を引いた幅は 194mm だが、
+// 端末やブラウザによっては 余白が 12〜15mm になり、はみ出した分 全体が 縮小して 印刷される。
+// どの端末でも 指定どおりの大きさで刷れるよう、180mm に収める。
+const PRINT_W_MM = 180;
 function rowsOf_(list, itemWmm){
   const per = Math.max(1, Math.floor(PRINT_W_MM / Math.max(1, itemWmm)));
   const out = [];
@@ -10293,8 +10294,8 @@ function saveTagStyle(){
   document.getElementById("ts-height-wrap").style.display = size === "custom" ? "grid" : "none";
   S.tagStyle = {
     size: size,
-    width: Math.min(200, Math.max(30, parseInt(document.getElementById("ts-width").value, 10) || 60)),
-    height: Math.min(200, Math.max(0, parseInt(document.getElementById("ts-height").value, 10) || 0)),
+    width: Math.min(180, Math.max(15, parseFloat(document.getElementById("ts-width").value) || 60)),
+    height: Math.min(250, Math.max(0, parseFloat(document.getElementById("ts-height").value) || 0)),
     font: document.getElementById("ts-font").value,
     bold: document.getElementById("ts-bold").value,
     nameSize: Math.min(60, Math.max(8, parseInt(document.getElementById("ts-name-size").value, 10) || 16)),
@@ -10407,6 +10408,7 @@ function renderTags(){
     '<div class="row gap" style="margin-bottom:12px"><button class="btn" onclick="window.print()">値札を印刷(' + totalTags + ' 枚)</button>'
     + (totalTags !== arr.length ? '<span class="hint">' + arr.length + ' 商品 × ' + (tagStyle_().copies === "qty" ? "在庫数" : (totalTags / arr.length) + "枚") + '</span>' : '')
     + '</div>'
+    + '<p class="hint" style="margin:-6px 0 10px">印刷の設定で「倍率(拡大縮小)」を <b>100%(実際のサイズ)</b> にしてください。「用紙に合わせる」だと 大きさが変わります。</p>'
     + '<div class="tag-sheet print-target size-' + t.size + '" style="'+sheetStyle+'">' + wrapRows_([].concat.apply([], arr.map(it => {
       const cp = t.catPos || "top";
       const vert = (cp === "left" || cp === "right");
@@ -11070,14 +11072,14 @@ function commitStocktake(){
   save(); renderStocktakeBar_(); renderList(); checkAll_();
   toast("棚卸しを 確定しました(" + ids.length + "品目: 増 " + plus + " / 減 " + minus + ")。タナオロシ将軍が 感心している!");
 }
-// 在庫0と のこり少(1〜2個)の商品を 選んで、注文サイトを 開く
+// 在庫0の商品を 選んで、注文サイトを 開く
 function orderNeeded(){
-  const need = S.items.filter(function(it){ return Number(it.qty) <= 2; });
-  if (!need.length){ toast("いま 注文が必要な商品は ありません(在庫0・のこり2個以下)"); return; }
+  const need = S.items.filter(function(it){ return Number(it.qty) <= 0; });
+  if (!need.length){ toast("いま 在庫0の商品は ありません"); return; }
   selected.clear(); need.forEach(function(it){ selected.add(it.id); });
   renderList(); renderTags && renderTags();
   openOrderSelected();
-  toast("在庫0・のこり2個以下の " + need.length + "品目を 選びました");
+  toast("在庫0の " + need.length + "品目を 選びました");
 }
 
 /* ============ 会員間共有(Google Apps Script サーバー) ============ */
