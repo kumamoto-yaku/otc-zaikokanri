@@ -572,6 +572,11 @@ body.game-off .tv-btn { display: none !important; }
 .ingr-ocr-msg:empty { display: none; }
 .ingr-ocr-msg .bar { display: block; height: 4px; background: #E6EAEE; border-radius: 4px; margin-top: 4px; overflow: hidden; }
 .ingr-ocr-msg .bar i { display: block; height: 100%; background: var(--ai, #2B4C7E); transition: width .2s; }
+
+.pdf-busy { position: fixed; inset: 0; z-index: 900; background: rgba(255,255,255,.85); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; font-size: 14px; color: #333; }
+.pdf-busy .bar { width: 220px; height: 6px; background: #E6EAEE; border-radius: 6px; overflow: hidden; } .pdf-busy .bar i { display: block; height: 100%; background: var(--ai, #2B4C7E); }
+.sign-sheet.pdf-show-all .print-row { display: contents !important; }
+.sign-sheet.pdf-show-all .print-row > .sign-card { display: flex !important; }
 /* ゲーム画面(テレビの 中) */
 #party-modal.game-tv { padding: 0; background: rgba(20,14,8,.85); align-items: stretch; }
 #party-modal.game-tv .order-card { width: min(560px, 100%); max-width: 100%; margin: 0 auto; height: 100%; max-height: 100%; border-radius: 0; overflow-y: auto; -webkit-overflow-scrolling: touch;
@@ -1443,9 +1448,12 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
 }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 @media print {
-  @page { margin: 8mm; }
+  @page { size: A4 portrait; margin: 8mm; }
   /* A4いっぱいのPOPを刷るときは 余白を詰めないと 収まらない */
   @page :first { margin: 8mm; }
+  /* 画面用の「最低でも画面の高さ」(100vh)が 印刷に残ると、
+     端末によっては 画面の高さぶんの 空白ページが 最後に 足される */
+  html, body { min-height: 0 !important; height: auto !important; }
   html, body { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
   /* 印刷対象以外を完全に消す(場所も詰める) */
   body > .chrome > *:not(.panel),
@@ -2083,7 +2091,7 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
       </details>
 
       <div class="row gap" style="margin:12px 0">
-        <button class="btn" onclick="window.print()">うりば札を印刷</button>
+        <button class="btn" onclick="exactPdf_('signs')">うりば札を印刷</button><button class="link" onclick="window.print()">ブラウザで直接印刷</button>
         <span class="hint" id="sign-count"></span>
       </div>
       <div class="sign-sheet print-target" id="sign-sheet"></div>
@@ -2134,7 +2142,7 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
         </details>
         <div class="row gap wrap">
           <button class="btn ghost" onclick="fetchCardInfo()">写真・特徴を自動取得</button>
-          <button class="btn" onclick="window.print()">カードを印刷</button>
+          <button class="btn" onclick="exactPdf_('cards')">カードを印刷</button><button class="link" onclick="window.print()">ブラウザで直接印刷</button>
         </div>
         <p class="hint" id="card-msg"></p>
         <p class="hint">印刷は用紙を<strong>横向き</strong>にすると見本のように5枚並びになります。<br>
@@ -2271,7 +2279,7 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
   </section>
 
   <div class="toast" id="toast"></div>
-  <footer class="foot">OTCLinker — とみながグループ 店舗向けツール<br><span class="ver">版 2026-10-21 DN(値札の自由サイズを実寸で印刷)</span></footer>
+  <footer class="foot">OTCLinker — とみながグループ 店舗向けツール<br><span class="ver">版 2026-10-21 DO(実寸PDFで印刷・最後の白紙を解消)</span></footer>
 </div>
 
 <script>
@@ -9308,6 +9316,81 @@ async function ingrOcr_(input){
     ocrMsg_(String(e && e.message) === "load" ? "読み取りの部品を 取り込めませんでした。インターネットに つながっているか 確認してください。" : "読み取りに 失敗しました。もう一度 お試しください。");
   } finally { if (btn) btn.disabled = false; }
 }
+
+/* ===== 実寸の PDF を作って 印刷する =====
+   端末やブラウザの 印刷機能は、余白や「用紙に合わせる」で 大きさが 変わることがある。
+   1枚ずつ 画像にして、A4 の PDF に mm 単位で 並べれば どの端末でも 同じ大きさで 刷れる。 */
+const PDF_LIBS = ["https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js", "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"];
+let __pdfLoading = null;
+function loadPdfLibs_(){
+  if (window.html2canvas && window.jspdf) return Promise.resolve();
+  if (__pdfLoading) return __pdfLoading;
+  __pdfLoading = Promise.all(PDF_LIBS.map(function(u){
+    return new Promise(function(ok, ng){ const sc = document.createElement("script"); sc.src = u; sc.onload = ok; sc.onerror = function(){ ng(new Error("load")); }; document.head.appendChild(sc); });
+  })).catch(function(e){ __pdfLoading = null; throw e; });
+  return __pdfLoading;
+}
+function pdfBusy_(t, pct){
+  let el = document.getElementById("pdf-busy");
+  if (!t){ if (el) el.remove(); return; }
+  if (!el){ el = document.createElement("div"); el.id = "pdf-busy"; el.className = "pdf-busy"; document.body.appendChild(el); }
+  el.innerHTML = '<div>' + esc(t) + '</div><div class="bar"><i style="width:' + Math.round(pct || 0) + '%"></i></div>';
+}
+async function exactPdf_(kind){
+  const sel = { tags: "#print-tags .price-tag", cards: "#card-sheet .pcard", signs: "#sign-sheet .sign-card" }[kind];
+  const host = { tags: "print-tags", cards: "card-sheet", signs: "sign-sheet" }[kind];
+  // iPhone/iPad では 押した直後に 窓を開かないと ブロックされる
+  const isIOS = /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+  const win = isIOS ? window.open("", "_blank") : null;
+  const hostEl = document.getElementById(host);
+  try {
+    pdfBusy_("PDFを つくる準備をしています…", 3);
+    await loadPdfLibs_();
+    if (hostEl) hostEl.classList.add("pdf-show-all");
+    await new Promise(function(r){ requestAnimationFrame(function(){ requestAnimationFrame(r); }); });
+    try { if (document.fonts && document.fonts.ready) await document.fonts.ready; } catch(e){}
+    const els = Array.prototype.slice.call(document.querySelectorAll(sel)).filter(function(e){ return e.offsetWidth > 0; });
+    if (!els.length){ pdfBusy_(""); if (win) win.close(); toast("印刷するものが ありません。先に 在庫リストで 商品を 選んでください。"); return; }
+    const doc = new window.jspdf.jsPDF({ unit: "mm", format: "a4", orientation: "portrait", compress: true });
+    const M = 8, PW = 210, PH = 297;
+    let x = M, y = M, rowH = 0, page = 0;
+    const PX2MM = 25.4 / 96;
+    const cache = {};
+    for (let i = 0; i < els.length; i++){
+      const el = els[i];
+      const w = el.offsetWidth * PX2MM, h = el.offsetHeight * PX2MM;
+      pdfBusy_("PDFを つくっています…(" + (i + 1) + "/" + els.length + ")", 5 + 90 * i / els.length);
+      // 同じ中身(枚数をふやした値札)は 1回だけ 画像にする
+      const key = el.outerHTML;
+      let png = cache[key];
+      if (!png){
+        const cv = await html2canvas(el, { scale: 3, backgroundColor: "#ffffff", useCORS: true, logging: false,
+          // 写す札と その親・中身、ページの見た目(head)以外は 複製しない(速くするため)
+          ignoreElements: function(n){ return !(n.contains(el) || el.contains(n) || n.tagName === "HEAD" || (n.closest && n.closest("head"))); } });
+        png = cv.toDataURL("image/png"); cache[key] = png;
+      }
+      if (x + w > PW - M + 0.01){ x = M; y += rowH; rowH = 0; }
+      if (y + h > PH - M + 0.01){ doc.addPage("a4", "portrait"); page++; x = M; y = M; rowH = 0; }
+      doc.addImage(png, "PNG", x, y, w, h, undefined, "FAST");
+      x += w; rowH = Math.max(rowH, h);
+    }
+    pdfBusy_("PDFを ひらいています…", 98);
+    const blob = doc.output("blob");
+    const url = URL.createObjectURL(blob);
+    const name = ({ tags: "値札", cards: "商品カード", signs: "うりば札" }[kind]) + "_" + today() + ".pdf";
+    if (win){ win.location.href = url; }
+    else { const a = document.createElement("a"); a.href = url; a.download = name; document.body.appendChild(a); a.click(); a.remove(); }
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 120000);
+    toast(win ? "実寸の PDF を作りました(" + (page + 1) + "ページ)。開いた画面の 共有ボタン →「プリント」で 印刷してください"
+              : "実寸の PDF「" + name + "」を 保存しました(" + (page + 1) + "ページ)。開いて 印刷してください(倍率は100%)");
+  } catch(e){
+    if (win) try { win.close(); } catch(e2){}
+    toast(String(e && e.message) === "load" ? "PDFを作る部品を 取り込めませんでした。インターネットの接続を 確認するか「ブラウザで直接印刷」を お使いください。" : "PDFを 作れませんでした。「ブラウザで直接印刷」を お使いください。");
+  } finally {
+    if (hostEl) hostEl.classList.remove("pdf-show-all");
+    pdfBusy_("");
+  }
+}
 function setTvDirect(v){ game_().tvDirect = !!v; save(); toast(v ? "テレビを つけたら すぐ メニューを ひらきます" : "テレビを つけたら なかまの ようすを ながめられます"); }
 function renderTv_(){
   const el = document.getElementById("tv-btn");
@@ -10405,10 +10488,10 @@ function renderTags(){
   const totalTags = arr.reduce(function(a, it){ return a + tagCopies_(it); }, 0);
   const sheetStyle = 'display:flex;flex-wrap:wrap;gap:4mm';
   area.innerHTML =
-    '<div class="row gap" style="margin-bottom:12px"><button class="btn" onclick="window.print()">値札を印刷(' + totalTags + ' 枚)</button>'
+    '<div class="row gap" style="margin-bottom:12px"><button class="btn" onclick="exactPdf_(\'tags\')">値札を印刷(' + totalTags + ' 枚)</button><button class="link" onclick="window.print()">ブラウザで直接印刷</button>'
     + (totalTags !== arr.length ? '<span class="hint">' + arr.length + ' 商品 × ' + (tagStyle_().copies === "qty" ? "在庫数" : (totalTags / arr.length) + "枚") + '</span>' : '')
     + '</div>'
-    + '<p class="hint" style="margin:-6px 0 10px">印刷の設定で「倍率(拡大縮小)」を <b>100%(実際のサイズ)</b> にしてください。「用紙に合わせる」だと 大きさが変わります。</p>'
+    + '<p class="hint" style="margin:-6px 0 10px">押すと 実寸の PDF(A4)を 作ります。PDFを 印刷するときは 倍率を <b>100%(実際のサイズ)</b> にしてください。</p>'
     + '<div class="tag-sheet print-target size-' + t.size + '" style="'+sheetStyle+'">' + wrapRows_([].concat.apply([], arr.map(it => {
       const cp = t.catPos || "top";
       const vert = (cp === "left" || cp === "right");
