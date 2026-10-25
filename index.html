@@ -2220,9 +2220,7 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
     <details class="set-card">
       <summary class="set-h">店舗間の備蓄共有<small class="set-sub">他店の在庫をさがす・自店の在庫を見せる</small></summary>
       <div class="share-note">とみながグループ 店舗間の備蓄情報共有です。アップロードすると、共有サーバーに接続している<strong>すべての店舗</strong>が薬局名・品目・在庫数を閲覧できます。</div>
-      <label>共有サーバーURL(みんなの備蓄をあずける場所。管理者から配布されたもの)
-        <input id="gas-url" placeholder="https://script.google.com/macros/s/……/exec" onchange="savePharmacy()">
-      </label>
+      <p class="hint admin-set">共有サーバーは 管理者が設定済みです(この画面には表示されません)。</p>
       <div class="row gap wrap">
         <button class="btn" onclick="uploadShare()">備蓄リストをアップロード</button>
         <button class="btn ghost" onclick="loadShared()">最新の状態に更新</button>
@@ -2261,21 +2259,11 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
     </details>
     <details class="set-card">
       <summary class="set-h">商品名の自動取得<small class="set-sub">スキャン時に商品名を自動で入れる</small></summary>
-      <p class="hint">楽天ウェブサービス(Rakuten Developers)の <strong>Application ID</strong> と <strong>Access Key</strong> を設定すると、スキャンしたJANコードから商品名を自動取得します。</p>
-      <label>Yahoo! Client ID(メーカー名・分類まで取得できます)
-        <input id="k-yahoo" placeholder="例:dj00aiZpPT…… の形式" onchange="saveKeys()">
-      </label>
-      <p class="hint" style="color:#8A4B2A">※Yahoo!はブラウザから直接呼び出せない仕様のため、上の「店舗間の備蓄情報共有」で<strong>共有サーバーURL</strong>を設定している場合のみ利用できます(サーバー経由で取得します)。未設定の場合は自動的に楽天market等で検索します。</p>
-      <label>楽天 Application ID(アプリID)
-        <input id="k-rakuten" placeholder="例:2cb67db9-…… の形式" onchange="saveKeys()">
-      </label>
-      <label>楽天 Access Key(アクセスキー)
-        <input id="k-rakuten-key" placeholder="例:pk_…… の形式" onchange="saveKeys()">
-      </label>
+      <p class="hint admin-set">Yahoo!と楽天の設定は 管理者が設定済みです(この画面には表示されません)。スキャンすると 商品名・メーカー・区分が自動で入ります。</p>
       <label>JANCODE LOOKUP アプリID(任意)
         <input id="k-jancode" placeholder="jancodelookup.com で無料発行" onchange="saveKeys()">
       </label>
-      <p class="hint">検索順: Yahoo!ショッピング → JANCODE LOOKUP → 楽天市場 → Open Food Facts(キー不要) → 手入力。<strong>Yahoo!はメーカー名と商品分類まで取得できる</strong>ため、設定を強くおすすめします。キーはこの端末にのみ保存されます。</p>
+      <p class="hint">検索順: Yahoo!ショッピング → JANCODE LOOKUP → 楽天市場 → Open Food Facts(キー不要) → 手入力。JANCODE LOOKUP のアプリIDは 任意です(入れると 検索先が1つ増えます)。</p>
     </details>
     <h3 class="set-group">そのほか</h3>
     <details class="set-card">
@@ -2306,15 +2294,22 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
   </section>
 
   <div class="toast" id="toast"></div>
-  <footer class="foot">OTCLinker — とみながグループ 店舗向けツール<br><span class="ver">版 2026-10-21 DP(写真の切り取り)</span></footer>
+  <footer class="foot">OTCLinker — とみながグループ 店舗向けツール<br><span class="ver">版 2026-10-25 DT(Yahoo! Client IDを修正)</span></footer>
 </div>
 
 <script>
 "use strict";
 /* ============ 入室(簡易ロック) ============ */
 try { if (!authed_()) document.body.classList.add("locked"); } catch(e){}
-const LOGIN_ID = "1";
-const LOGIN_PASS_HASH = "6b86b273ff34fce19d6b804eff5a3f5747ada4eaa22f1d49c01e52ddb7875b4b";
+// 管理者が設定した接続先(共有サーバー・Yahoo!・楽天)。各店舗の画面には表示せず、変更もできない。
+// 変更するときは このファイルを直接書きかえる(GitHubを更新できる管理者のみ)。
+const ADMIN_CFG_ = (function(){
+  const d = function(x){ try { return atob(x.split("").reverse().join("")); } catch(e){ return ""; } };
+  return { gas: d("==wYlhXZvkGUzAzazI1TFxGNaVkY3MmWZRnV5lTQCl1T29WcrN0dxxGUI9mQhlXMH1WRR1SZzoUTLZmeUZUSWd0VJVEOtU0N5J2Y5Z2SB9ycvM3byNWYt9SbvNmLlx2Zv92ZuQHcpJ3Yz9yL6MHc0RHa"), yahoo: d("==wdkplSURVcwZVZSB3VXBzasV2T41WU2EzaN5mUsRVOnJzYohWbKZjUH5kUONzU3h2VkZUMEpFcalnT3VlaNdXSUBVeW1GZ"), rakuten: d("3QmYxYjYhhDZldDNtETM2gTLzIGO00CN0cTZtkjYkdjNiNmM"), rakutenKey: d("==QTJVDZ4BFO2QEaExGctJDSnlVMihVQsZkSxljQ0UzQ4A3M2lGdmZldrRlUftGc") };
+})();
+function apiKeys_(){ return { yahoo: ADMIN_CFG_.yahoo, rakuten: ADMIN_CFG_.rakuten, rakutenKey: ADMIN_CFG_.rakutenKey, jancode: (S.apiKeys && S.apiKeys.jancode) || "" }; }
+const LOGIN_ID = "tominaga";
+const LOGIN_PASS_HASH = "ad936fcbed631fa67e05c3ea03953905221c9d46af0616b70badf105a966fb11";
 async function sha256hex(s){
   const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(s));
   return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,"0")).join("");
@@ -2327,8 +2322,8 @@ async function checkLogin(){
     const h = await sha256hex(pw);
     if (id === LOGIN_ID && h === LOGIN_PASS_HASH){
       // 起動するたびに 入室画面を出す(この端末で 省く 設定のときだけ 覚えておく)
-      try { sessionStorage.setItem("otc-auth-v2", "ok"); } catch(e){}
-      try { if (document.getElementById("login-keep").checked) localStorage.setItem("otc-auth-keep-v2", "ok"); else localStorage.removeItem("otc-auth-keep-v2"); localStorage.removeItem("otc-auth-v1"); } catch(e){}
+      try { sessionStorage.setItem("otc-auth-v3", "ok"); } catch(e){}
+      try { if (document.getElementById("login-keep").checked) localStorage.setItem("otc-auth-keep-v3", "ok"); else localStorage.removeItem("otc-auth-keep-v3"); localStorage.removeItem("otc-auth-keep-v2"); localStorage.removeItem("otc-auth-v1"); } catch(e){}
       document.getElementById("login-gate").style.display = "none";
       document.body.classList.remove("locked");
       showExpiryAlert();
@@ -2675,13 +2670,13 @@ function stripMaker(name, maker){
   return out || name;
 }
 async function lookupJanExternal(code){
-  const k = S.apiKeys;
+  const k = apiKeys_();
   // Yahoo!ショッピング: JANコードで直接検索でき、ブランド名(メーカー)も取得できる
   if (k.yahoo){
     try {
       // Yahoo!のAPIはブラウザから直接呼べない(CORS非対応)ため、共有サーバー(GAS)経由で取得する
-      if (!S.gasUrl) throw new Error("no-proxy");
-      const u = S.gasUrl + "?action=yahoo&appid=" + encodeURIComponent(k.yahoo) + "&jan=" + encodeURIComponent(code);
+      if (!ADMIN_CFG_.gas) throw new Error("no-proxy");
+      const u = ADMIN_CFG_.gas + "?action=yahoo&appid=" + encodeURIComponent(k.yahoo) + "&jan=" + encodeURIComponent(code);
       const r = await fetch(u);
       if (r.ok){
         const d = await r.json();
@@ -3215,7 +3210,7 @@ async function applyJan(code){
     scanMsg(hit.source + " から取得しました" + (hit.category ? "(区分も自動判定)" : "") + "。内容を確認して登録してください。");
     fetchIngr_(code);
   } else if (false){
-  } else if ((S.apiKeys.rakuten && S.apiKeys.rakutenKey) || S.apiKeys.jancode){
+  } else if ((ADMIN_CFG_.rakuten && ADMIN_CFG_.rakutenKey) || S.apiKeys.jancode){
     scanMsg("データベースに見つかりませんでした。商品名を入力してください(次回からは自動補完されます)。");
   } else {
     scanMsg("商品名を入力してください。「外部データベース設定」で無料APIキーを設定すると自動取得できます。");
@@ -3803,7 +3798,7 @@ function renderList(){
       + '<span style="color:#C9CFD4">｜</span>'
       + '<button class="link" onclick="openOrderSelected()">🛒 注文</button>'
       + '<span style="color:#C9CFD4">｜</span>'
-      + '<button class="link" style="color:var(--shu)" onclick="removeSelected()">この商品を削除</button>'
+      + '<button class="link" style="color:var(--shu)" onclick="removeSelected()">選んだ商品を削除</button>'
       + '<button class="link" onclick="selected.clear();renderList();renderTags()">解除</button>';
   } else bar.style.display = "none";
 
@@ -3884,7 +3879,8 @@ function backupData(){
   S.lastBackup = new Date().toISOString();
   save();
   showBackupAlert();
-  const blob = new Blob([JSON.stringify(S)], { type: "application/json" });
+  const out = Object.assign({}, S, { gasUrl: "", apiKeys: { yahoo: "", rakuten: "", rakutenKey: "", jancode: (S.apiKeys && S.apiKeys.jancode) || "" } });
+  const blob = new Blob([JSON.stringify(out)], { type: "application/json" });
   const a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
   a.download = "OTCLinker控え_" + today() + ".json";
@@ -9176,10 +9172,10 @@ function extractIngr_(txt){
 }
 let __sharedAt = 0;
 async function ensureShared_(){
-  if (!S.gasUrl) return;
+  if (!ADMIN_CFG_.gas) return;
   if (sharedData && sharedData.length && Date.now() - __sharedAt < 10 * 60000) return;
   try {
-    const r = await fetch(S.gasUrl + "?action=list");
+    const r = await fetch(ADMIN_CFG_.gas + "?action=list");
     const d = await r.json();
     sharedData = Array.isArray(d) ? d : [];
     sharedData.forEach(function(ph){ const sp = splitParty_(ph.items); ph.party = sp.party; ph.items = sp.items; });
@@ -9212,9 +9208,9 @@ async function fetchIngr_(code){
     if (sh){ put(sh.ingr, "share", sh.ingrBy, sh.ingrAt, true); return; }
   } catch(e){}
   // 2) 通販サイトの 商品説明(候補。箱との照合が必要)
-  if (!S.gasUrl || !S.apiKeys || !S.apiKeys.yahoo) return;
+  if (!ADMIN_CFG_.gas || !ADMIN_CFG_.yahoo) return;
   try {
-    const r = await fetch(S.gasUrl + "?action=yahoo&appid=" + encodeURIComponent(S.apiKeys.yahoo) + "&jan=" + encodeURIComponent(code));
+    const r = await fetch(ADMIN_CFG_.gas + "?action=yahoo&appid=" + encodeURIComponent(ADMIN_CFG_.yahoo) + "&jan=" + encodeURIComponent(code));
     const d = await r.json();
     const hits = (d && d.hits) || [];
     for (let i = 0; i < hits.length; i++){
@@ -9427,9 +9423,9 @@ async function cropLoadable_(src){
   const d = await Promise.race([urlToDataUrl_(src), new Promise(function(r){ setTimeout(function(){ r(null); }, 5000); })]);
   if (d) return d;
   // 共有サーバー(v3)経由で 取り込む
-  if (S.gasUrl){
+  if (ADMIN_CFG_.gas){
     try {
-      const r = await fetch(S.gasUrl + "?action=img&url=" + encodeURIComponent(src));
+      const r = await fetch(ADMIN_CFG_.gas + "?action=img&url=" + encodeURIComponent(src));
       const j = await r.json();
       if (j && j.data && /^data:image\//.test(j.data)) return j.data;
     } catch(e){}
@@ -10156,7 +10152,7 @@ async function fetchCardInfo(){
   const msg = document.getElementById("card-msg");
   const items = cardItems_();
   if (!items.length){ msg.textContent = "先に在庫リストで商品をチェックしてください。"; return; }
-  if (!S.gasUrl || !S.apiKeys.yahoo){
+  if (!ADMIN_CFG_.gas || !ADMIN_CFG_.yahoo){
     msg.innerHTML = "自動取得には、「その他」タブで<strong>共有サーバーURL</strong>と<strong>Yahoo! Client ID</strong>の両方の設定が必要です。設定後にもう一度お試しください。なお画像は下の「画像を選ぶ」から手動でも登録できます。";
     return;
   }
@@ -10167,7 +10163,7 @@ async function fetchCardInfo(){
     if (m.img && m.feature){ continue; }
     msg.textContent = "取得中… (" + (i+1) + "/" + items.length + ") " + (it.name || "");
     try {
-      const u = S.gasUrl + "?action=yahoo&appid=" + encodeURIComponent(S.apiKeys.yahoo) + "&jan=" + encodeURIComponent(it.jan);
+      const u = ADMIN_CFG_.gas + "?action=yahoo&appid=" + encodeURIComponent(ADMIN_CFG_.yahoo) + "&jan=" + encodeURIComponent(it.jan);
       const r = await fetch(u);
       const d = await r.json();
       const hits = (d && d.hits) || [];
@@ -10800,13 +10796,13 @@ async function fetchPopPhoto(){
   const it = popItem_();
   if (!it){ say("先に 上の一覧から POPにする商品を えらんでください。"); return; }
   if (!it.jan){ say("この商品には JANコードが ないため 自動取得できません。「写真を選ぶ」から 登録してください。"); return; }
-  if (!S.gasUrl || !S.apiKeys.yahoo){
+  if (!ADMIN_CFG_.gas || !ADMIN_CFG_.yahoo){
     say('自動取得には、「その他」タブで<strong>共有サーバーURL</strong>と<strong>Yahoo! Client ID</strong>の両方の設定が必要です。写真は「写真を選ぶ」から手動でも登録できます。', true);
     return;
   }
   say("「" + (it.name || it.jan) + "」の写真をさがしています…");
   try {
-    const u = S.gasUrl + "?action=yahoo&appid=" + encodeURIComponent(S.apiKeys.yahoo) + "&jan=" + encodeURIComponent(it.jan);
+    const u = ADMIN_CFG_.gas + "?action=yahoo&appid=" + encodeURIComponent(ADMIN_CFG_.yahoo) + "&jan=" + encodeURIComponent(it.jan);
     const r = await fetch(u);
     const d = await r.json();
     const h0 = d && d.hits && d.hits[0];
@@ -11325,22 +11321,18 @@ function savePharmacy(){
   if (document.getElementById("ph-name").value.trim()) doQuest("pharm");
   S.pharmacy.name = document.getElementById("ph-name").value.trim();
   S.pharmacy.area = document.getElementById("ph-area").value.trim();
-  S.gasUrl = document.getElementById("gas-url").value.trim().replace(/\s+/g, "");
   save();
   updateBrand();
   syncPharmacyInputs();
 }
 function saveKeys(){
-  S.apiKeys.yahoo = document.getElementById("k-yahoo").value.trim();
-  S.apiKeys.rakuten = document.getElementById("k-rakuten").value.trim();
-  S.apiKeys.rakutenKey = document.getElementById("k-rakuten-key").value.trim();
   S.apiKeys.jancode = document.getElementById("k-jancode").value.trim();
   save();
 }
 function shareMsg(m){ document.getElementById("share-msg").innerHTML = m; }
 
 async function testShareServer(){
-  const url = (S.gasUrl || "").trim();
+  const url = (ADMIN_CFG_.gas || "").trim();
   const box = document.getElementById("share-msg");
   if (!url){ box.innerHTML = '<span style="color:#C0392B">共有サーバーURLが未入力です。</span>'; return; }
   const lines = [];
@@ -11373,7 +11365,7 @@ async function testShareServer(){
   box.innerHTML = lines.join("<br>");
 }
 async function uploadShare(){
-  if (!S.gasUrl){ shareMsg("共有サーバーURLを入力してください(管理者から配布されます)。"); return; }
+  if (!ADMIN_CFG_.gas){ shareMsg("共有サーバーURLを入力してください(管理者から配布されます)。"); return; }
   if (!S.pharmacy.name){ shareMsg("先に薬局名を入力してください。"); return; }
   shareMsg("アップロード中…");
   try {
@@ -11386,7 +11378,7 @@ async function uploadShare(){
         (it.ingr && it.ingrOk && it.jan) ? { ingr: it.ingr, ingrAt: it.ingrAt || "", ingrBy: it.ingrBy || S.pharmacy.name || "" } : {}))
         .concat([{ jan: "__party__", party: myParty_() }])
     };
-    const r = await fetch(S.gasUrl, { method: "POST", body: JSON.stringify(payload) });
+    const r = await fetch(ADMIN_CFG_.gas, { method: "POST", body: JSON.stringify(payload) });
     const txt = await r.text();
     if (!r.ok) throw new Error("HTTP " + r.status);
     if (/^\s*<(!doctype|html)/i.test(txt)) throw new Error("login");
@@ -11422,9 +11414,9 @@ async function removeSharedEntry(id){
     ? "自局(" + nm + ")の共有データを削除します。よろしいですか?"
     : "他店舗「" + nm + "」の共有データを共有サーバーから削除します。\n\n端末の故障や機種変更で更新できなくなった店舗の情報を消すための機能です。\n削除するとその店舗の備蓄は全員に表示されなくなります(その店舗が再度アップロードすれば復活します)。\n\n本当に削除しますか?";
   if (!confirm(msg)) return;
-  if (!S.gasUrl){ shareMsg("共有サーバーURLが未設定です。"); return; }
+  if (!ADMIN_CFG_.gas){ shareMsg("共有サーバーURLが未設定です。"); return; }
   try {
-    const r = await fetch(S.gasUrl, { method: "POST", body: JSON.stringify({ action: "delete", id: id }) });
+    const r = await fetch(ADMIN_CFG_.gas, { method: "POST", body: JSON.stringify({ action: "delete", id: id }) });
     const txt = await r.text();
     if (/^\s*<(!doctype|html)/i.test(txt)) throw new Error("login");
     shareMsg("「" + esc(nm) + "」の共有データを削除しました。");
@@ -11437,18 +11429,18 @@ async function removeSharedEntry(id){
   }
 }
 async function removeShare(){
-  if (!S.gasUrl) return;
+  if (!ADMIN_CFG_.gas) return;
   try {
-    await fetch(S.gasUrl, { method: "POST", body: JSON.stringify({ action: "delete", id: S.pharmacy.id }) });
+    await fetch(ADMIN_CFG_.gas, { method: "POST", body: JSON.stringify({ action: "delete", id: S.pharmacy.id }) });
     shareMsg("共有データを取り下げました。");
     loadShared();
   } catch(e){ shareMsg("取り下げに失敗しました。"); }
 }
 async function loadShared(){
-  if (!S.gasUrl){ shareMsg("共有サーバーURLを入力すると、会員の備蓄が表示されます。"); return; }
+  if (!ADMIN_CFG_.gas){ shareMsg("共有サーバーURLを入力すると、会員の備蓄が表示されます。"); return; }
   shareMsg("読み込み中…");
   try {
-    const r = await fetch(S.gasUrl + "?action=list");
+    const r = await fetch(ADMIN_CFG_.gas + "?action=list");
     const d = await r.json();
     sharedData = Array.isArray(d) ? d : [];
     sharedData.forEach(function(ph){
@@ -11604,14 +11596,10 @@ syncPharmacyInputs();
 syncTagStyleInputs();
 document.getElementById("pop-style").value = S.popStyle || "refined";
 syncPopFontInputs();
-document.getElementById("gas-url").value = S.gasUrl || "";
-document.getElementById("k-yahoo").value = S.apiKeys.yahoo || "";
-document.getElementById("k-rakuten").value = S.apiKeys.rakuten || "";
-document.getElementById("k-rakuten-key").value = S.apiKeys.rakutenKey || "";
 document.getElementById("k-jancode").value = S.apiKeys.jancode || "";
 updateBrand();
 function logout_(){
-  try { sessionStorage.removeItem("otc-auth-v2"); localStorage.removeItem("otc-auth-keep-v2"); localStorage.removeItem("otc-auth-v1"); } catch(e){}
+  try { sessionStorage.removeItem("otc-auth-v3"); localStorage.removeItem("otc-auth-keep-v3"); localStorage.removeItem("otc-auth-keep-v2"); localStorage.removeItem("otc-auth-v1"); } catch(e){}
   try { tvwOff_(); closePartyModal(); } catch(e){}
   document.getElementById("login-pass").value = "";
   document.getElementById("login-gate").style.display = "flex";
@@ -11619,8 +11607,8 @@ function logout_(){
   window.scrollTo(0, 0);
 }
 function authed_(){
-  try { if (sessionStorage.getItem("otc-auth-v2") === "ok") return true; } catch(e){}
-  try { if (localStorage.getItem("otc-auth-keep-v2") === "ok") return true; } catch(e){}
+  try { if (sessionStorage.getItem("otc-auth-v3") === "ok") return true; } catch(e){}
+  try { if (localStorage.getItem("otc-auth-keep-v3") === "ok") return true; } catch(e){}
   return false;
 }
 if (authed_()) document.getElementById("login-gate").style.display = "none";
