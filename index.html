@@ -1425,22 +1425,25 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
 .ps-drug .pop-maker { color: #555; }
 .ps-drug .pop-price { align-self: stretch; justify-content: center; background: #FFE500; margin: 4px -22px 0; padding: 10px 0 6px; }
 .ps-drug .pop-yen { color: #D7261E; font-weight: 900; letter-spacing: -.02em; -webkit-text-stroke: 1px #D7261E; }
-.ps-drug .pop-tax { color: #D7261E; font-weight: 700; }
+.ps-drug .pop-tax { color: #D7261E; font-weight: 700; white-space: nowrap; }
 .ps-drug .pop-seal { display: none; }
 .ps-drug .pop-cat { border-radius: 2px; }
-.pop-drug-badge { position: absolute; left: 10px; top: 70px; width: 92px; height: 92px; background: #FFE500; color: #D7261E; font-weight: 900; font-size: 19px; line-height: 1.1; display: flex; align-items: center; justify-content: center; text-align: center; transform: rotate(-12deg);
+.pop-drug-badge { position: absolute; left: 12px; top: 22%; width: 110px; height: 110px; background: #FFE500; color: #D7261E; font-weight: 900; font-size: 23px; line-height: 1.1; display: flex; align-items: center; justify-content: center; text-align: center; transform: rotate(-12deg);
   clip-path: polygon(50% 0%,61% 18%,80% 8%,78% 30%,100% 32%,85% 50%,100% 68%,78% 70%,80% 92%,61% 82%,50% 100%,39% 82%,20% 92%,22% 70%,0% 68%,15% 50%,0% 32%,22% 30%,20% 8%,39% 18%); z-index: 2; }
-.pop-card.ps-gekiyasu { background: #FFF200; border: 6px solid #111; border-radius: 4px; gap: 8px; }
+.pop-card.ps-gekiyasu { background: #FFF200; border: 6px solid #111; border-radius: 4px; gap: 14px; justify-content: center; }
 .ps-gekiyasu .pop-copy { color: #E60012; border: 0; font-weight: 900; transform: rotate(-4deg); letter-spacing: .02em; text-shadow: 2px 2px 0 #fff; }
 .ps-gekiyasu .pop-name { color: #111; font-weight: 900; }
 .ps-gekiyasu .pop-maker { color: #333; }
 .ps-gekiyasu .pop-price { transform: rotate(-3deg); }
 .ps-gekiyasu .pop-yen { color: #E60012; font-weight: 900; -webkit-text-stroke: 6px #111; paint-order: stroke fill; letter-spacing: -.03em; }
-.ps-gekiyasu .pop-tax { color: #111; font-weight: 700; }
+.ps-gekiyasu .pop-tax { color: #111; font-weight: 700; white-space: nowrap; }
 .ps-gekiyasu .pop-note { color: #111; font-weight: 700; border-top: 3px dashed #111; padding-top: 6px; }
 .ps-gekiyasu .pop-seal { display: none; }
-.pop-geki-badge { position: absolute; right: 8px; top: 8px; width: 104px; height: 104px; background: #E60012; color: #FFF200; font-weight: 900; font-size: 26px; line-height: 1.05; display: flex; align-items: center; justify-content: center; text-align: center; transform: rotate(10deg);
+.pop-geki-badge { position: absolute; right: 8px; top: 8px; width: 130px; height: 130px; background: #E60012; color: #FFF200; font-weight: 900; font-size: 32px; line-height: 1.05; display: flex; align-items: center; justify-content: center; text-align: center; transform: rotate(10deg);
   clip-path: polygon(50% 0%,61% 18%,80% 8%,78% 30%,100% 32%,85% 50%,100% 68%,78% 70%,80% 92%,61% 82%,50% 100%,39% 82%,20% 92%,22% 70%,0% 68%,15% 50%,0% 32%,22% 30%,20% 8%,39% 18%); z-index: 2; }
+.gr-bar { display: block; width: 80%; height: 4px; margin: 3px auto 0; background: #E3E8EC; border-radius: 2px; overflow: hidden; }
+.gr-bar i { display: block; height: 100%; background: linear-gradient(90deg,#7CC6F2,#2B6CB0); }
+svg.gr5 { filter: drop-shadow(0 0 2px rgba(255,214,90,.9)) drop-shadow(0 0 5px rgba(255,214,90,.55)); }
 .pop-new-badge { position: absolute; right: 12px; top: 12px; background: #2E7D46; color: #fff; padding: 6px 14px; border-radius: 999px; font-size: 14px; font-weight: 700; }
 .pop-sale-badge { position: absolute; left: 12px; top: 12px; width: 62px; height: 62px; background: #C0392B; color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 17px; transform: rotate(-8deg); }
 .flash { align-items: center; gap: 12px; border-radius: 12px; padding: 14px 16px; margin: 4px 0 12px; color: #fff; box-shadow: 0 4px 16px rgba(0,0,0,0.18); animation: flashIn 0.35s ease; }
@@ -2311,13 +2314,13 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
           <a class="btn" id="manual-open" href="OTCLinker_使用マニュアル.pdf" target="_blank" rel="noopener">マニュアルを開く(PDF)</a>
           <a class="btn ghost" id="manual-save" href="OTCLinker_使用マニュアル.pdf" download>PDFを保存</a>
         </div>
-        <p class="hint">作成日 2026年10月25日 / 対応版 2026-10-25 DW 以降(A4・19ページ)</p>
+        <p class="hint">作成日 2026年10月25日 / 対応版 2026-10-25 DX 以降(A4・19ページ)</p>
       </div>
     </details>
   </section>
 
   <div class="toast" id="toast"></div>
-  <footer class="foot">OTCLinker — とみながグループ 店舗向けツール<br><span class="ver">版 2026-10-25 DW(POPにドラッグストア風・手書き激安風を追加)</span></footer>
+  <footer class="foot">OTCLinker — とみながグループ 店舗向けツール<br><span class="ver">版 2026-10-25 DX(なかま・あいぼうが 5だんかいに 育つように)</span></footer>
 </div>
 
 <script>
@@ -4922,13 +4925,18 @@ function checkEvolve_(){
     const m = meta[o.k];
     if (!m) return;
     const lv = mateLv_(o.k);
-    if ((m.lv || 1) < lv){ m.lv = lv; grown.push({ k: o.k, lv: lv }); }
+    if ((m.glv || 1) < lv){ m.glv = lv; grown.push({ k: o.k, lv: lv }); }
+  });
+  (S.pets || []).concat(S.hime ? ["m_hime"] : []).forEach(function(k){
+    const m = mateMeta_(k), lv = mateLv_(k);
+    if ((m.glv || 1) < lv){ m.glv = lv; grown.push({ k: k, lv: lv }); }
   });
   if (grown.length){
     save();
     grown.slice(0, 3).forEach(function(g, i){
       setTimeout(function(){
-        toast((g.lv >= 3 ? "★さいしゅうしんか★ " : "しんか! ") + "「" + DOT_NAMES[g.k] + "」が おおきくなった!");
+        const nm = DOT_NAMES[g.k] || ((petInfo_(g.k) || {}).name) || "なかま";
+        gameToast_((g.lv >= 5 ? "★" : "") + "せいちょう! 「" + nm + "」が " + GROW_STAGES[g.lv - 1].n + " に なった!" + (g.lv >= 5 ? "★" : ""));
         const el = document.getElementById("dot-pet");
         if (el){ el.classList.remove("rare-pop"); void el.offsetWidth; el.classList.add("rare-pop"); }
       }, 1200 + i * 2600);
@@ -4947,16 +4955,91 @@ function mateDays_(key){
   if (!m) return 0;
   return Math.max(0, careDays_() - (m.got || 0));
 }
-function mateLv_(key){
-  if (!(S.mateMeta || {})[key]) return 1;
-  const d = mateDays_(key);
-  return d >= MATE_LV3_DAYS ? 3 : (d >= MATE_LV2_DAYS ? 2 : 1);
+// ===== 主人公以外の キャラクターの 成長(5だんかい) =====
+// いっしょに過ごした日数・業務(画面に出ている子ほど 早い)・たたかい・なかよし で 少しずつ育つ。
+// 小さいうちは 体が短く(頭でっかち)、育つにつれて 背がのび、体も 大きくなる。
+const GROW_STAGES = [
+  { n: "ちびっこ", need: 0,  sc: 0.80, cut: 4 },
+  { n: "こども",   need: 6,  sc: 0.88, cut: 2 },
+  { n: "わかもの", need: 18, sc: 0.95, cut: 0 },
+  { n: "おとな",   need: 40, sc: 1.00, cut: 0 },
+  { n: "たつじん", need: 80, sc: 1.06, cut: 0 }
+];
+function growOwned_(key){
+  if (!key || (typeof HERO_KEYS !== "undefined" && HERO_KEYS.indexOf(key) >= 0)) return false;
+  if ((S.mateMeta || {})[key]) return true;
+  if (typeof isPet_ === "function" && isPet_(key) && (S.pets || []).indexOf(key) >= 0) return true;
+  if (key === "m_hime" && S.hime) return true;
+  return false;
 }
-// 次の進化まであと何日か(3段階目なら null)
+// これまでの しんか(3だんかい)を 引きつぐ(はじめの1回だけ)
+function growInit_(){
+  if (S.growInit) return;
+  S.grow = S.grow || {};
+  const meta = S.mateMeta || {};
+  Object.keys(meta).forEach(function(k){
+    const d = Math.max(0, careDays_() - (meta[k].got || 0));
+    if (d >= MATE_LV3_DAYS) S.grow[k] = (S.grow[k] || 0) + 24;
+    else if (d >= MATE_LV2_DAYS) S.grow[k] = (S.grow[k] || 0) + 6;
+  });
+  S.growInit = 1;
+}
+function growPts_(key){
+  if (!growOwned_(key)) return 0;
+  growInit_();
+  if (!(S.mateMeta || {})[key]) mateMeta_(key);
+  let p = mateDays_(key) * 2 + ((S.grow || {})[key] || 0);
+  try { p += (bondLv_(key) - 1) * 4; } catch(e){}
+  return Math.floor(p);
+}
+function mateLv_(key){
+  if (!growOwned_(key)) return 3;                      // まだ 仲間でない子(図鑑など)は ふつうの姿
+  const p = growPts_(key); let lv = 1;
+  GROW_STAGES.forEach(function(g, i){ if (p >= g.need) lv = i + 1; });
+  return lv;
+}
+function growStage_(key){ return GROW_STAGES[mateLv_(key) - 1]; }
+// 次の だんかいまで あといくつか(さいごなら null)
 function mateNext_(key){
-  const lv = mateLv_(key), d = mateDays_(key);
-  if (lv >= 3) return null;
-  return (lv === 1 ? MATE_LV2_DAYS : MATE_LV3_DAYS) - d;
+  const lv = mateLv_(key);
+  if (lv >= GROW_STAGES.length) return null;
+  return Math.max(1, GROW_STAGES[lv].need - growPts_(key));
+}
+// つぎの だんかいまでの 進みぐあい(0〜1)
+function growRate_(key){
+  const lv = mateLv_(key); if (lv >= GROW_STAGES.length) return 1;
+  const a = GROW_STAGES[lv - 1].need, b = GROW_STAGES[lv].need;
+  return Math.max(0, Math.min(1, (growPts_(key) - a) / (b - a)));
+}
+// 成長ポイントを 足す
+function growAdd_(key, n){
+  if (!growOwned_(key) || !n) return;
+  S.grow = S.grow || {};
+  S.grow[key] = Math.round(((S.grow[key] || 0) + n) * 10) / 10;
+}
+// 業務や たたかいの たびに 呼ぶ。画面に出ている子と あいぼうは 早く、ほかの子も 少しずつ 育つ。
+function growOnWork_(battle){
+  try {
+    const picks = petPicks_(), all = allMates_(), buddy = activePet_();
+    const front = picks.length ? picks : all.slice(0, PARTY_SHOW).map(function(o){ return o.k; });
+    all.forEach(function(o){ growAdd_(o.k, front.indexOf(o.k) >= 0 ? (battle ? 3 : 1) : (battle ? 0.5 : 0.3)); });
+    if (buddy) growAdd_(buddy, battle ? 3 : 1);
+    (S.pets || []).forEach(function(k){ if (k !== buddy) growAdd_(k, 0.3); });
+    if (S.hime) growAdd_("m_hime", battle ? 1 : 0.3);
+  } catch(e){}
+}
+// 小さいうちは 体の行を ぬいて 背を ひくくする(足もとの 高さは そのまま)
+function growRows_(rows, cut, eye){
+  if (!cut) return rows;
+  const n = rows.length, w = rows[0].length;
+  const a = Math.min(n - 3, Math.floor(n * ((eye || 0.4) + 0.3))), b = Math.floor(n * 0.86);
+  if (b - a < cut + 2) return rows;
+  const drop = {};
+  for (let i = 0; i < cut; i++) drop[Math.round(a + (i + 0.5) * (b - a) / cut)] = 1;
+  const kept = rows.filter(function(r, y){ return !drop[y]; });
+  const blank = ".".repeat(w);
+  while (kept.length < n) kept.unshift(blank);
+  return kept;
 }
 // スプライトでいちばん多く使われている色(進化の飾りの色に使う)
 const CAPE_COLS = ["R","T","V","D","O","M"];
@@ -4976,7 +5059,7 @@ function mainColorChar_(key){
   __mainCol[key] = best;
   return best;
 }
-function mateLvLabel_(lv){ return lv >= 3 ? "さいしゅうしんか" : (lv >= 2 ? "しんかした" : "であったばかり"); }
+function mateLvLabel_(lv){ return (GROW_STAGES[(lv || 1) - 1] || GROW_STAGES[0]).n; }
 
 /* ===== なかまが加わる ===== */
 function addMate_(key, store, kind, extra){
@@ -5405,13 +5488,16 @@ function dotSvg(key, px, lv, deco, equip, frame){
   if (bl >= 8) px = Math.round(px * 1.1);
   // あいぼうは いまの ポーズで描く
   if (typeof isPet_ === "function" && isPet_(key)) rows = poseRows_(rows, petPose_(key));
+  // 成長の だんかいで 背の高さと 大きさが かわる(主人公は べつの しくみ)
+  let gst = null;
+  if (growOwned_(key)){ gst = growStage_(key); rows = growRows_(rows, gst.cut, DOT_EYE[key]); px = Math.max(8, Math.round(px * gst.sc)); }
   const n = rows.length;
   const cell = px / n;
   const rc = function(x, y, w, h, c){
     return '<rect x="'+(Math.round(x*10)/10)+'" y="'+(Math.round(y*10)/10)+'" width="'+(Math.round(w*10)/10)+'" height="'+(Math.round(h*10)/10)+'" fill="'+c+'"/>';
   };
   const tan = (deco === "tan") ? ' style="filter:sepia(0.4) saturate(1.5) hue-rotate(-12deg)"' : '';
-  let r = '<svg width="'+px+'" height="'+px+'" viewBox="0 0 '+px+' '+px+'" shape-rendering="crispEdges"'+tan+(bl >= 3 ? ' class="bd' + Math.min(bl, 8) + '"' : '')+'>';
+  let r = '<svg width="'+px+'" height="'+px+'" viewBox="0 0 '+px+' '+px+'" shape-rendering="crispEdges"'+tan+((bl >= 3 || (gst && mateLv_(key) >= 5)) ? ' class="' + (bl >= 3 ? 'bd' + Math.min(bl, 8) : '') + (gst && mateLv_(key) >= 5 ? ' gr5' : '') + '"' : '')+'>';
   // 進化の飾りは体の後ろに描く
   if (SHOW_EVO_DECO && lv >= 2){
     const W = px;
@@ -5671,7 +5757,7 @@ function renderDotPet(){
   shown2.forEach(function(o){
     const lvm = mateLv_(o.k);   // しんかするほど 少し 大きくなる
     const blv = bondLv_(o.k);
-    h += '<span class="pet-unit ' + o.c + (blv >= 5 ? ' bondy' : '') + '" data-key="' + o.k + '">' + dotSvg(o.k, 30 + (Math.max(1, lvm) - 1) * 3, lvm, decoOf_(o.k)) + '</span>';
+    h += '<span class="pet-unit ' + o.c + (blv >= 5 ? ' bondy' : '') + '" data-key="' + o.k + '">' + dotSvg(o.k, 34, lvm, decoOf_(o.k)) + '</span>';
   });
   const rest = picks.length ? 0 : (line.length - shown2.length);
   if (rest > 0) h += '<span class="mate-more">+' + rest + '</span>';
@@ -5913,6 +5999,7 @@ function lvInfo_(){
 }
 // けいけんちを あたえる
 function addExp_(n, why){
+  try { growOnWork_(/バトル|ボス|勝|たお|たたかった|いどんだ|キンピカ/.test(why || "")); } catch(e){}
   try { goldAdd_(Math.max(1, Math.round(n / 3))); if (!/バトル|ボス|勝|たお|たたかった|いどんだ|キンピカ/.test(why || "")) advStepGain_(n); } catch(e){}
   const L = lv_();
   const before = lvOf_(L.exp);
@@ -6149,14 +6236,14 @@ function partyPower_(){
   let atk = 6 + heroLv * 3 + L * 2, def = 3 + heroLv * 2 + L, hp = 40 + heroLv * 12 + L * 6;
   allMates_().forEach(function(o){
     const lv = mateLv_(o.k);
-    atk += 1 + lv; def += lv; hp += 6 + lv * 3;
+    atk += 1 + lv; def += Math.ceil(lv * 0.8); hp += 6 + lv * 3;
     if (o.c === "legend"){ atk += 8 + lv * 2; def += 5 + lv; hp += 30 + lv * 6; }   // 伝説の なかまは 強い
     const bl = bondLv_(o.k);                                                          // なかよしレベルで 強くなる
     if (bl >= 2){ atk += Math.round((bl - 1) * 1.5); def += bl - 1; hp += (bl - 1) * 5; }
   });
   // 相棒の分を足す
   const bd = petInfo_(activePet_());
-  if (bd){ atk += bd.atk; def += bd.def; hp += (bd.hp || 12); }
+  if (bd){ const gm = [0.8, 0.9, 1, 1.12, 1.25][mateLv_(activePet_()) - 1] || 1; atk += Math.round(bd.atk * gm); def += Math.round(bd.def * gm); hp += Math.round((bd.hp || 12) * gm); }
   // そうびの分を足す
   const eq = rpg_().equip;
   EQUIP_SLOTS.forEach(function(sl){
@@ -7334,7 +7421,7 @@ function otherSection_(){
     + '<li>メニューの「📺 ながめる」で いつでも ながめる画面に もどれます</li>'
     + '<li>商品を登録するほど 主人公が成長し、なかまが増えます</li>'
     + '<li>アプリを使わないと げんきが へり、9日ほどで 眠ってしまいます</li>'
-    + '<li>なかまは いっしょに過ごすと 3だんかいに しんかします</li>'
+    + '<li>なかまと あいぼうは、ちびっこ → こども → わかもの → おとな → たつじん と 5だんかいに 育ちます。いっしょに過ごした日数・業務(画面に出している子ほど早い)・たたかい・なかよし で 育ち、背がのびて 強くなります</li>'
     + '</ul>'
     + '<label class="gm-opt" style="display:flex;gap:8px;align-items:center;margin:8px 0;font-size:13px"><input type="checkbox" ' + (game_().tvDirect ? 'checked ' : '') + 'onchange="setTvDirect(this.checked)">テレビを つけたら すぐ メニューを ひらく(ながめる画面を とばす)</label>'
     + '<div class="divider"><span>きょうの ようす</span></div>'
@@ -7845,7 +7932,7 @@ let __partyTab = "home";
 let __mateGroup = "kusuri";
 function setPartyTab(t){ __partyTab = t; openPartyModal(); try { const mb = document.querySelector("#party-modal .order-card"); if (mb) mb.scrollTop = 0; } catch(e){} }
 function setMateGroup(g){ __mateGroup = g; openPartyModal(); }
-function mateStars_(lv){ return lv >= 3 ? "★★★" : lv >= 2 ? "★★☆" : "★☆☆"; }
+function mateStars_(lv){ lv = Math.max(1, Math.min(5, lv || 1)); return "★★★★★".slice(0, lv) + "☆☆☆☆☆".slice(0, 5 - lv); }
 // 上の「パーティ」:主人公・あいぼう・画面に出す なかま(3体)を 横一列の枠で見せる
 function partyPanel_(){
   const st = dotStage(), gs = genkiState_(), g = genki_(), li = lvInfo_();
@@ -7912,7 +7999,8 @@ function matesSection_(){
       + dotSvg(k, 46, lv, dk)
       + '<span class="nm">' + esc(DOT_NAMES[k]) + '</span>'
       + '<span class="st">' + mateStars_(lv) + '</span>'
-      + '<span class="sub">' + (nx !== null ? 'しんか あと' + nx + '日' : (PERSONA[k] ? esc(PERSONA[k].p) : "")) + '</span>'
+      + '<span class="sub">' + esc(mateLvLabel_(lv)) + '</span>'
+      + '<span class="gr-bar" title="' + (nx !== null ? 'つぎの だんかいまで あと ' + nx : 'さいごの だんかい') + '"><i style="width:' + Math.round(growRate_(k) * 100) + '%"></i></span>'
       + '</button>';
   }).join("") + '</div>';
   if (cur.id === "gotouchi"){
