@@ -1418,6 +1418,29 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
 .pop-card.ps-new { border: 3px solid #2E7D46; background: #F4FBF6; }
 .ps-new .pop-copy { color: #2E7D46; border-color: #2E7D46; }
 .ps-new .pop-yen { color: #2E7D46; }
+/* ⑪ ドラッグストア風 / ⑫ 手書き激安風 */
+.pop-card.ps-drug { background: #fff; border: 5px solid #D7261E; border-radius: 6px; padding-top: 0; padding-bottom: 18px; overflow: hidden; justify-content: space-between; gap: 8px; }
+.ps-drug .pop-copy { align-self: stretch; margin: 0 -22px; background: #D7261E; color: #fff; border: 0; padding: 14px 10px 12px; font-weight: 900; letter-spacing: .06em; text-align: center; }
+.ps-drug .pop-name { color: #1A1A1A; font-weight: 900; margin-top: 6px; }
+.ps-drug .pop-maker { color: #555; }
+.ps-drug .pop-price { align-self: stretch; justify-content: center; background: #FFE500; margin: 4px -22px 0; padding: 10px 0 6px; }
+.ps-drug .pop-yen { color: #D7261E; font-weight: 900; letter-spacing: -.02em; -webkit-text-stroke: 1px #D7261E; }
+.ps-drug .pop-tax { color: #D7261E; font-weight: 700; }
+.ps-drug .pop-seal { display: none; }
+.ps-drug .pop-cat { border-radius: 2px; }
+.pop-drug-badge { position: absolute; left: 10px; top: 70px; width: 92px; height: 92px; background: #FFE500; color: #D7261E; font-weight: 900; font-size: 19px; line-height: 1.1; display: flex; align-items: center; justify-content: center; text-align: center; transform: rotate(-12deg);
+  clip-path: polygon(50% 0%,61% 18%,80% 8%,78% 30%,100% 32%,85% 50%,100% 68%,78% 70%,80% 92%,61% 82%,50% 100%,39% 82%,20% 92%,22% 70%,0% 68%,15% 50%,0% 32%,22% 30%,20% 8%,39% 18%); z-index: 2; }
+.pop-card.ps-gekiyasu { background: #FFF200; border: 6px solid #111; border-radius: 4px; gap: 8px; }
+.ps-gekiyasu .pop-copy { color: #E60012; border: 0; font-weight: 900; transform: rotate(-4deg); letter-spacing: .02em; text-shadow: 2px 2px 0 #fff; }
+.ps-gekiyasu .pop-name { color: #111; font-weight: 900; }
+.ps-gekiyasu .pop-maker { color: #333; }
+.ps-gekiyasu .pop-price { transform: rotate(-3deg); }
+.ps-gekiyasu .pop-yen { color: #E60012; font-weight: 900; -webkit-text-stroke: 6px #111; paint-order: stroke fill; letter-spacing: -.03em; }
+.ps-gekiyasu .pop-tax { color: #111; font-weight: 700; }
+.ps-gekiyasu .pop-note { color: #111; font-weight: 700; border-top: 3px dashed #111; padding-top: 6px; }
+.ps-gekiyasu .pop-seal { display: none; }
+.pop-geki-badge { position: absolute; right: 8px; top: 8px; width: 104px; height: 104px; background: #E60012; color: #FFF200; font-weight: 900; font-size: 26px; line-height: 1.05; display: flex; align-items: center; justify-content: center; text-align: center; transform: rotate(10deg);
+  clip-path: polygon(50% 0%,61% 18%,80% 8%,78% 30%,100% 32%,85% 50%,100% 68%,78% 70%,80% 92%,61% 82%,50% 100%,39% 82%,20% 92%,22% 70%,0% 68%,15% 50%,0% 32%,22% 30%,20% 8%,39% 18%); z-index: 2; }
 .pop-new-badge { position: absolute; right: 12px; top: 12px; background: #2E7D46; color: #fff; padding: 6px 14px; border-radius: 999px; font-size: 14px; font-weight: 700; }
 .pop-sale-badge { position: absolute; left: 12px; top: 12px; width: 62px; height: 62px; background: #C0392B; color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 17px; transform: rotate(-8deg); }
 .flash { align-items: center; gap: 12px; border-radius: 12px; padding: 14px 16px; margin: 4px 0 12px; color: #fff; box-shadow: 0 4px 16px rgba(0,0,0,0.18); animation: flashIn 0.35s ease; }
@@ -1968,7 +1991,7 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
           <label>対象商品 <select id="pop-item" onchange="renderPop()"></select>
             <span class="chk-row" style="margin-top:6px"><label><input type="checkbox" id="pop-all" onchange="savePopAll()"> チェック中の商品<span id="pop-all-n"></span>すべてに同じデザインで作る</label></span>
           </label>
-          <label>デザイン <select id="pop-style" onchange="savePopStyle()"><option value="refined">デザイン①(洗練)</option><option value="fun">デザイン②(楽しい)</option><option value="oshare">デザイン③(おしゃれ)</option><option value="medatsu">デザイン④(目立つ)</option><option value="sale">デザイン⑤(特売)</option><option value="wa">デザイン⑥(和風)</option><option value="soft">デザイン⑦(やわらか)</option><option value="mini">デザイン⑧(ミニマル)</option><option value="board">デザイン⑨(黒板風)</option><option value="new">デザイン⑩(新発売)</option></select></label>
+          <label>デザイン <select id="pop-style" onchange="savePopStyle()"><option value="refined">デザイン①(洗練)</option><option value="fun">デザイン②(楽しい)</option><option value="oshare">デザイン③(おしゃれ)</option><option value="medatsu">デザイン④(目立つ)</option><option value="sale">デザイン⑤(特売)</option><option value="wa">デザイン⑥(和風)</option><option value="soft">デザイン⑦(やわらか)</option><option value="mini">デザイン⑧(ミニマル)</option><option value="board">デザイン⑨(黒板風)</option><option value="new">デザイン⑩(新発売)</option><option value="drug">デザイン⑪(ドラッグストア風)</option><option value="gekiyasu">デザイン⑫(手書き激安風)</option></select></label>
         </div>
         <div class="grid2">
           <label>キャッチコピー <input id="pop-copy" value="薬剤師おすすめ" oninput="renderPop()"></label>
@@ -2288,13 +2311,13 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
           <a class="btn" id="manual-open" href="OTCLinker_使用マニュアル.pdf" target="_blank" rel="noopener">マニュアルを開く(PDF)</a>
           <a class="btn ghost" id="manual-save" href="OTCLinker_使用マニュアル.pdf" download>PDFを保存</a>
         </div>
-        <p class="hint">作成日 2026年10月25日 / 対応版 2026-10-25 DU 以降(A4・19ページ)</p>
+        <p class="hint">作成日 2026年10月25日 / 対応版 2026-10-25 DW 以降(A4・19ページ)</p>
       </div>
     </details>
   </section>
 
   <div class="toast" id="toast"></div>
-  <footer class="foot">OTCLinker — とみながグループ 店舗向けツール<br><span class="ver">版 2026-10-25 DV(使用マニュアルを最新に)</span></footer>
+  <footer class="foot">OTCLinker — とみながグループ 店舗向けツール<br><span class="ver">版 2026-10-25 DW(POPにドラッグストア風・手書き激安風を追加)</span></footer>
 </div>
 
 <script>
@@ -10958,8 +10981,11 @@ function savePopAll(){
   S.popAll = document.getElementById("pop-all").checked;
   save(); renderPop();
 }
+// デザインごとに 決めた書体(この2つは 雰囲気を出すため 書体を固定する)
+const POP_STYLE_FONT = { drug: "rock", gekiyasu: "reggae" };
 function popCardHtml_(it, ps, pf, copy, note){
-  const ff = fontCssAttr(pf.font);
+  const ff = POP_STYLE_FONT[ps] ? fontCssAttr(POP_STYLE_FONT[ps]) : fontCssAttr(pf.font);
+  if (POP_STYLE_FONT[ps]) pf = Object.assign({}, pf, { priceSize: Math.round(pf.priceSize * 1.35), nameSize: Math.round(pf.nameSize * 1.05), copySize: Math.round(pf.copySize * 1.25) });
   const x = pf.fields || {};
   const dim = (pf.size === "custom")
     ? { w: pf.width, h: pf.height }
@@ -10969,6 +10995,8 @@ function popCardHtml_(it, ps, pf, copy, note){
   let h = '<div class="pop-card ps-' + ps + '" style="' + cardCss + '">';
   if (ps === "sale") h += '<div class="pop-sale-badge">特売</div>';
   if (ps === "new") h += '<div class="pop-new-badge">NEW</div>';
+  if (ps === "drug") h += '<div class="pop-drug-badge">お買い<br>得!</div>';
+  if (ps === "gekiyasu") h += '<div class="pop-geki-badge">激安!</div>';
   if (x.copy !== false) h += '<div class="pop-copy" style="font-family:'+ff+' !important;font-size:'+pf.copySize+'px !important">'+esc(copy)+'</div>';
   if (x.name !== false) h += '<div class="pop-name" style="font-family:'+ff+' !important;font-size:'+pf.nameSize+'px !important">'+esc(it.name)+'</div>';
   if (x.maker !== false && it.maker) h += '<div class="pop-maker">'+esc(it.maker)+'</div>';
