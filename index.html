@@ -2294,7 +2294,7 @@ details.set-card:not([open]) > *:not(summary) { display: none; }
   </section>
 
   <div class="toast" id="toast"></div>
-  <footer class="foot">OTCLinker — とみながグループ 店舗向けツール<br><span class="ver">版 2026-10-25 DT(Yahoo! Client IDを修正)</span></footer>
+  <footer class="foot">OTCLinker — とみながグループ 店舗向けツール<br><span class="ver">版 2026-10-25 DU(共有データの安全対策・CSVの式対策)</span></footer>
 </div>
 
 <script>
@@ -2344,6 +2344,30 @@ let S = { items: [], master: {}, pharmacy: { id: rid(), name: "", area: "" }, ap
 let selected = new Set();
 let editingId = null;
 let sharedData = [];
+// 共有サーバーから受け取った他店のデータは、画面に出す前に 安全な形にそろえる
+// (HTMLや スクリプトとして 動いてしまう文字を取り除き、IDの形・数の型を確かめる)
+function cleanShared_(d){
+  const str = function(v){ return String(v == null ? "" : v).replace(/[<>"'`\\]/g, "").slice(0, 4000); };
+  const deep = function(v, depth){
+    if (depth > 6) return null;
+    if (v == null) return v;
+    if (typeof v === "number") return isFinite(v) ? v : 0;
+    if (typeof v === "boolean") return v;
+    if (typeof v === "string") return /^data:image\/(png|jpe?g|webp|gif);base64,[A-Za-z0-9+\/=]+$/.test(v) ? v : str(v);
+    if (Array.isArray(v)) return v.slice(0, 5000).map(function(x){ return deep(x, depth + 1); });
+    if (typeof v === "object"){ const o = {}; Object.keys(v).slice(0, 200).forEach(function(k){ o[str(k)] = deep(v[k], depth + 1); }); return o; }
+    return null;
+  };
+  if (!Array.isArray(d)) return [];
+  return d.filter(function(ph){ return ph && /^[A-Za-z0-9_-]{1,80}$/.test(String(ph.id || "")); }).map(function(ph){
+    const o = deep(ph, 0);
+    o.id = String(ph.id);
+    o.items = (Array.isArray(o.items) ? o.items : []).filter(function(it){ return it && typeof it === "object"; });
+    o.items.forEach(function(it){ if (it.qty !== undefined) it.qty = Number(it.qty) || 0; if (it.category && CATEGORIES.indexOf(it.category) < 0) it.category = "その他"; });
+    return o;
+  });
+}
+
 let scanner = null, scanning = false;
 
 function rid(){ return Math.random().toString(36).slice(2,10); }
@@ -3928,7 +3952,7 @@ function exportCsv(){
   const head = ["JANコード","商品名","ふりがな","メーカー","区分","濫用防止","税制対象","販売価格(税込)","税率","発注先","納入価(税込)","職員販売価格(税込)","在庫数","使用期限","メモ","更新日","成分","成分の照合","ドーピング判定"];
   const rows = S.items.map(it => [it.jan,it.name,(it.kana||""),it.maker,it.category,(it.ranyo?"該当":""),(it.smt?"該当":""),it.price,(it.reduced?"8%":"10%"),(it.supplier||""),(it.cost||""),(it.staffPrice||""),it.qty,it.expiry,(it.memo||"").replace(/[\r\n,]/g," "),it.updatedAt,(it.ingr||""),(it.ingr ? (it.ingrOk ? "照合済み " + (it.ingrAt||"") : "未照合") : ""),dopeCsv_(it)]);
   // 商品名などに , や " や 改行が入っていても 列が ずれないよう、必要な欄は "" でかこむ
-  const cell = function(v){ v = v == null ? "" : String(v); return /[",\r\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; };
+  const cell = function(v){ const num = typeof v === "number"; v = v == null ? "" : String(v); if (!num && /^[=+\-@\t\r]/.test(v)) v = "'" + v; return /[",\r\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; };
   const csv = "\uFEFF" + [head].concat(rows).map(r => r.map(cell).join(",")).join("\r\n");
   const blob = new Blob([csv], { type: "text/csv" });
   const a = document.createElement("a");
@@ -9177,7 +9201,7 @@ async function ensureShared_(){
   try {
     const r = await fetch(ADMIN_CFG_.gas + "?action=list");
     const d = await r.json();
-    sharedData = Array.isArray(d) ? d : [];
+    sharedData = cleanShared_(d);
     sharedData.forEach(function(ph){ const sp = splitParty_(ph.items); ph.party = sp.party; ph.items = sp.items; });
     __sharedAt = Date.now();
   } catch(e){}
@@ -11239,7 +11263,7 @@ function renderStockLog(){
 function exportStockLog(){
   const log = S.stockLog || [];
   if (!log.length){ toast("記録が ありません"); return; }
-  const cell = function(v){ v = v == null ? "" : String(v); return /[",\r\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; };
+  const cell = function(v){ const num = typeof v === "number"; v = v == null ? "" : String(v); if (!num && /^[=+\-@\t\r]/.test(v)) v = "'" + v; return /[",\r\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; };
   const rows = [["日時","商品名","JANコード","内容","増減"]].concat(log.map(function(l){ return [l.t.replace("T", " ").slice(0, 16), l.name, l.jan, l.why, l.diff]; }));
   const blob = new Blob(["﻿" + rows.map(function(r){ return r.map(cell).join(","); }).join("\r\n")], { type: "text/csv" });
   const a = document.createElement("a");
@@ -11442,7 +11466,7 @@ async function loadShared(){
   try {
     const r = await fetch(ADMIN_CFG_.gas + "?action=list");
     const d = await r.json();
-    sharedData = Array.isArray(d) ? d : [];
+    sharedData = cleanShared_(d);
     sharedData.forEach(function(ph){
       const sp = splitParty_(ph.items);
       ph.party = sp.party; ph.items = sp.items;
