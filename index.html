@@ -2283,14 +2283,6 @@ svg.gr5 { filter: drop-shadow(0 0 2px rgba(255,214,90,.9)) drop-shadow(0 0 5px r
       <p class="hint">別のサイトの入力欄に このアプリから文字を書き込むことは、ブラウザの安全のしくみで禁止されています。そのため、開いたあとに出る「IDをコピー」「パスワードをコピー」で貼り付けてください。毎回の入力を省くには、ブラウザ(Chrome・Safari)の「パスワードを保存」を使うのが確実です。一度保存すれば、次からは自動で入力されます。</p>
       <div class="row gap"><button class="btn ghost" onclick="clearOrderLogin()">保存したIDとパスワードを消す</button></div>
     </details>
-    <details class="set-card">
-      <summary class="set-h">商品名の自動取得<small class="set-sub">スキャン時に商品名を自動で入れる</small></summary>
-      <p class="hint admin-set">Yahoo!と楽天の設定は 管理者が設定済みです(この画面には表示されません)。スキャンすると 商品名・メーカー・区分が自動で入ります。</p>
-      <label>JANCODE LOOKUP アプリID(任意)
-        <input id="k-jancode" placeholder="jancodelookup.com で無料発行" onchange="saveKeys()">
-      </label>
-      <p class="hint">検索順: Yahoo!ショッピング → JANCODE LOOKUP → 楽天市場 → Open Food Facts(キー不要) → 手入力。JANCODE LOOKUP のアプリIDは 任意です(入れると 検索先が1つ増えます)。</p>
-    </details>
     <h3 class="set-group">そのほか</h3>
     <details class="set-card">
       <summary class="set-h">見た目と音の設定<small class="set-sub">テーマ色・スキャン音</small></summary>
@@ -2314,13 +2306,13 @@ svg.gr5 { filter: drop-shadow(0 0 2px rgba(255,214,90,.9)) drop-shadow(0 0 5px r
           <a class="btn" id="manual-open" href="OTCLinker_使用マニュアル.pdf" target="_blank" rel="noopener">マニュアルを開く(PDF)</a>
           <a class="btn ghost" id="manual-save" href="OTCLinker_使用マニュアル.pdf" download>PDFを保存</a>
         </div>
-        <p class="hint">作成日 2026年11月2日 / 対応版 2026-11-02 DZ 以降(A4・19ページ)</p>
+        <p class="hint">作成日 2026年11月2日 / 対応版 2026-11-02 EA 以降(A4・19ページ)</p>
       </div>
     </details>
   </section>
 
   <div class="toast" id="toast"></div>
-  <footer class="foot">OTCLinker — とみながグループ 店舗向けツール<br><span class="ver">版 2026-11-02 DZ(Yahoo!・楽天のAPI情報は 管理者が組み込み)</span></footer>
+  <footer class="foot">OTCLinker — とみながグループ 店舗向けツール<br><span class="ver">版 2026-11-02 EA(商品名の自動取得の設定を表示しない)</span></footer>
 </div>
 
 <script>
@@ -2333,7 +2325,7 @@ const ADMIN_CFG_ = (function(){
   const d = function(x){ try { return atob(x.split("").reverse().join("")); } catch(e){ return ""; } };
   return { gas: d("==wYlhXZvkGUzAzazI1TFxGNaVkY3MmWZRnV5lTQCl1T29WcrN0dxxGUI9mQhlXMH1WRR1SZzoUTLZmeUZUSWd0VJVEOtU0N5J2Y5Z2SB9ycvM3byNWYt9SbvNmLlx2Zv92ZuQHcpJ3Yz9yL6MHc0RHa"), yahoo: d("==wdkplSURVcwZVZSB3VXBzasV2T41WU2EzaN5mUsRVOnJzYohWbKZjUH5kUONzU3h2VkZUMEpFcalnT3VlaNdXSUBVeW1GZ"), rakuten: d("3QmYxYjYhhDZldDNtETM2gTLzIGO00CN0cTZtkjYkdjNiNmM"), rakutenKey: d("==QTJVDZ4BFO2QEaExGctJDSnlVMihVQsZkSxljQ0UzQ4A3M2lGdmZldrRlUftGc") };
 })();
-function apiKeys_(){ return { yahoo: ADMIN_CFG_.yahoo, rakuten: ADMIN_CFG_.rakuten, rakutenKey: ADMIN_CFG_.rakutenKey, jancode: (S.apiKeys && S.apiKeys.jancode) || "" }; }
+function apiKeys_(){ return { yahoo: ADMIN_CFG_.yahoo, rakuten: ADMIN_CFG_.rakuten, rakutenKey: ADMIN_CFG_.rakutenKey }; }
 const LOGIN_ID = "tominaga";
 const LOGIN_PASS_HASH = "ad936fcbed631fa67e05c3ea03953905221c9d46af0616b70badf105a966fb11";
 async function sha256hex(s){
@@ -2366,7 +2358,7 @@ const CAT_SHORT = {"要指導医薬品":"要指導","第1類医薬品":"第1類"
 const CAT_COLOR = {"要指導医薬品":"#6A3FA0","第1類医薬品":"#C0392B","指定第2類医薬品":"#D97B29","第2類医薬品":"#3E7C59","第3類医薬品":"#2E6DA4","体外診断用医薬品":"#7B5EA7","薬局製剤":"#2E7D6B","医薬部外品":"#5C6B78","サプリメント・健康食品":"#647D8C","食品・菓子":"#8A6D3B","飲料":"#4E7F8C","日用品・雑貨":"#75808A","その他":"#8A8F94"};
 
 /* ============ 状態 ============ */
-let S = { items: [], master: {}, pharmacy: { id: rid(), name: "", area: "" }, apiKeys: { yahoo: "", rakuten: "", rakutenKey: "", jancode: "" }, gasUrl: "", popStyle: "refined", popFont: { font: "serif", nameSize: 30, priceSize: 52, copySize: 20 }, tagStyle: { size: "m", font: "serif", bold: "bold", nameSize: 16, priceSize: 30, nameColor: "#1F2933", priceColor: "#B7402B" } };
+let S = { items: [], master: {}, pharmacy: { id: rid(), name: "", area: "" }, apiKeys: {}, gasUrl: "", popStyle: "refined", popFont: { font: "serif", nameSize: 30, priceSize: 52, copySize: 20 }, tagStyle: { size: "m", font: "serif", bold: "bold", nameSize: 16, priceSize: 30, nameColor: "#1F2933", priceColor: "#B7402B" } };
 let selected = new Set();
 let editingId = null;
 let sharedData = [];
@@ -2404,7 +2396,7 @@ function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g, c => ({"&":"&am
 function load(){
   try {
     const raw = localStorage.getItem("otc-ledger-v1");
-    if (raw) { const d = JSON.parse(raw); S = Object.assign(S, d); if (!S.pharmacy.id) S.pharmacy.id = rid(); }
+    if (raw) { const d = JSON.parse(raw); S = Object.assign(S, d); S.apiKeys = {}; if (!S.pharmacy.id) S.pharmacy.id = rid(); }
   } catch(e){}
 }
 // 保存: 端末内データベース(IndexedDB)を主体に保存(端末の空き容量まで使える)。
@@ -2750,17 +2742,6 @@ async function lookupJanExternal(code){
           const cat = parseDrugCategory(names.join(" ")) || categoryFromGenre(genres) || inferCategory(names.join(" "), maker);
           if (best) return { name: best, maker: maker, category: cat, source: "Yahoo!ショッピング" };
         }
-      }
-    } catch(e){}
-  }
-  if (k.jancode){
-    try {
-      const r = await fetch("https://api.jancodelookup.com/?appId="+encodeURIComponent(k.jancode)+"&query="+code+"&type=code&hits=1");
-      if (r.ok){
-        const d = await r.json();
-        const p = d.product && d.product[0];
-        const raw = p && (p.itemName || p.name);
-        if (raw){ const mk = p.makerName || p.brandName || detectMaker(raw); return { name: stripMaker(cleanItemName(raw), mk), maker: mk, category: inferCategory(raw, mk), source: "JANCODE LOOKUP" }; }
       }
     } catch(e){}
   }
@@ -3260,10 +3241,10 @@ async function applyJan(code){
     scanMsg(hit.source + " から取得しました" + (hit.category ? "(区分も自動判定)" : "") + "。内容を確認して登録してください。");
     fetchIngr_(code);
   } else if (false){
-  } else if ((ADMIN_CFG_.rakuten && ADMIN_CFG_.rakutenKey) || S.apiKeys.jancode){
+  } else if (ADMIN_CFG_.yahoo || (ADMIN_CFG_.rakuten && ADMIN_CFG_.rakutenKey)){
     scanMsg("データベースに見つかりませんでした。商品名を入力してください(次回からは自動補完されます)。");
   } else {
-    scanMsg("商品名を入力してください。「外部データベース設定」で無料APIキーを設定すると自動取得できます。");
+    scanMsg("データベースに見つかりませんでした。商品名を入力してください(次回からは自動補完されます)。");
   }
 }
 
@@ -3929,7 +3910,7 @@ function backupData(){
   S.lastBackup = new Date().toISOString();
   save();
   showBackupAlert();
-  const out = Object.assign({}, S, { gasUrl: "", apiKeys: { yahoo: "", rakuten: "", rakutenKey: "", jancode: (S.apiKeys && S.apiKeys.jancode) || "" } });
+  const out = Object.assign({}, S, { gasUrl: "", apiKeys: {} });
   const blob = new Blob([JSON.stringify(out)], { type: "application/json" });
   const a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
@@ -3958,7 +3939,7 @@ function restoreData(ev){
         + "先に「控えを保存」で今のデータを書き出しておくと安心です。\n\n"
         + "復元してよろしいですか?";
       if (!confirm(msg)) { toast("復元をとりやめました"); return; }
-      S = Object.assign({ items: [], master: {}, pharmacy: { id: rid(), name: "", area: "" }, apiKeys: { yahoo: "", rakuten: "", rakutenKey: "", jancode: "" }, gasUrl: "", popStyle: "refined", popFont: defaultPopFont(), tagStyle: defaultTagStyle() }, d);
+      S = Object.assign({ items: [], master: {}, pharmacy: { id: rid(), name: "", area: "" }, apiKeys: {}, gasUrl: "", popStyle: "refined", popFont: defaultPopFont(), tagStyle: defaultTagStyle() }, d);
       save();
       location.reload();
     } catch(e){ toast("控えファイルを読み込めませんでした"); }
@@ -11465,10 +11446,6 @@ function savePharmacy(){
   updateBrand();
   syncPharmacyInputs();
 }
-function saveKeys(){
-  S.apiKeys.jancode = document.getElementById("k-jancode").value.trim();
-  save();
-}
 function shareMsg(m){ document.getElementById("share-msg").innerHTML = m; }
 
 async function testShareServer(){
@@ -11736,7 +11713,6 @@ syncPharmacyInputs();
 syncTagStyleInputs();
 document.getElementById("pop-style").value = S.popStyle || "refined";
 syncPopFontInputs();
-document.getElementById("k-jancode").value = S.apiKeys.jancode || "";
 updateBrand();
 function logout_(){
   try { sessionStorage.removeItem("otc-auth-v3"); localStorage.removeItem("otc-auth-keep-v3"); localStorage.removeItem("otc-auth-keep-v2"); localStorage.removeItem("otc-auth-v1"); } catch(e){}
